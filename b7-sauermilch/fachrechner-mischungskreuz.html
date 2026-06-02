@@ -334,25 +334,6 @@
     }
 
     .probe-box strong { display: block; margin-bottom: 4px; }
-
-    .qty-toggle-btn {
-      font-family: var(--font);
-      font-size: 0.76rem;
-      font-weight: 500;
-      padding: 6px 13px;
-      border-radius: 20px;
-      border: 1.5px solid var(--border);
-      background: var(--surface);
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .qty-toggle-btn:hover { border-color: var(--blue); color: var(--blue-dark); }
-    .qty-toggle-btn.active {
-      background: var(--blue);
-      border-color: var(--blue);
-      color: #fff;
-    }
   </style>
 </head>
 <body>
@@ -436,24 +417,15 @@
         </div>
       </div>
 
-      <!-- Mengen-Toggle -->
-      <div style="margin-top:16px; padding-top:16px; border-top:1px solid var(--border);">
-        <label>Mengeneingabe</label>
-        <div style="display:flex; gap:6px; flex-wrap:wrap; margin:10px 0 14px;">
-          <button class="qty-toggle-btn active" id="btnTotal" onclick="setMode('total')">Gesamtmenge</button>
-          <button class="qty-toggle-btn"        id="btnQtyA"  onclick="setMode('qtyA')">Menge von A bekannt</button>
-          <button class="qty-toggle-btn"        id="btnQtyB"  onclick="setMode('qtyB')">Menge von B bekannt</button>
+      <div class="total-row" style="margin-top:16px;">
+        <div class="input-row">
+          <label>Gesamtmenge <span style="font-weight:400; text-transform:none; letter-spacing:0">(optional)</span></label>
+          <input type="number" id="totalQty" placeholder="100" step="0.1" min="0">
+          <div class="optional-note">Wenn angegeben, werden die Mengen in kg berechnet.</div>
         </div>
-        <div style="display:grid; grid-template-columns:1fr 80px; gap:10px 12px; align-items:end;">
-          <div class="input-row">
-            <label id="qtyInputLabel">Gesamtmenge <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
-            <input type="number" id="qtyInput" placeholder="100" step="0.1" min="0">
-            <div class="optional-note" id="qtyInputNote">Wenn angegeben, werden die Mengen in kg berechnet.</div>
-          </div>
-          <div class="input-row">
-            <label>&nbsp;</label>
-            <div class="unit-label">kg</div>
-          </div>
+        <div class="input-row">
+          <label>&nbsp;</label>
+          <div class="unit-label">kg</div>
         </div>
       </div>
 
@@ -510,47 +482,14 @@
       }
     };
 
-    let currentMode = 'total';
-
-    function setMode(mode) {
-      currentMode = mode;
-      const nA = document.getElementById('nameA').value.trim() || 'Komponente A';
-      const nB = document.getElementById('nameB').value.trim() || 'Komponente B';
-
-      ['btnTotal','btnQtyA','btnQtyB'].forEach(id =>
-        document.getElementById(id).classList.remove('active'));
-      document.getElementById(
-        mode === 'total' ? 'btnTotal' : mode === 'qtyA' ? 'btnQtyA' : 'btnQtyB'
-      ).classList.add('active');
-
-      const lbl  = document.getElementById('qtyInputLabel');
-      const note = document.getElementById('qtyInputNote');
-      const inp  = document.getElementById('qtyInput');
-
-      if (mode === 'total') {
-        lbl.innerHTML   = `Gesamtmenge <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span>`;
-        note.textContent = 'Wenn angegeben, werden die Mengen in kg berechnet.';
-        inp.placeholder  = '100';
-      } else if (mode === 'qtyA') {
-        lbl.innerHTML   = `Bekannte Menge: <strong>${nA}</strong>`;
-        note.textContent = `Menge von «${nB}» und Gesamtmenge werden berechnet.`;
-        inp.placeholder  = '80';
-      } else {
-        lbl.innerHTML   = `Bekannte Menge: <strong>${nB}</strong>`;
-        note.textContent = `Menge von «${nA}» und Gesamtmenge werden berechnet.`;
-        inp.placeholder  = '20';
-      }
-    }
-
     function loadPreset(key) {
       const p = PRESETS[key];
-      document.getElementById('nameA').value  = p.nameA;
-      document.getElementById('valueA').value = p.valueA;
-      document.getElementById('nameB').value  = p.nameB;
-      document.getElementById('valueB').value = p.valueB;
-      document.getElementById('target').value = p.target;
-      setMode('total');
-      document.getElementById('qtyInput').value = p.totalQty;
+      document.getElementById('nameA').value    = p.nameA;
+      document.getElementById('valueA').value   = p.valueA;
+      document.getElementById('nameB').value    = p.nameB;
+      document.getElementById('valueB').value   = p.valueB;
+      document.getElementById('target').value   = p.target;
+      document.getElementById('totalQty').value = p.totalQty;
       calculate();
     }
 
@@ -594,30 +533,16 @@
       }
 
       // Mischungskreuz
-      const partsA     = Math.abs(c - b);
-      const partsB     = Math.abs(a - c);
+      // Parts of A = |c - b|, Parts of B = |a - c|
+      const partsA = Math.abs(c - b);
+      const partsB = Math.abs(a - c);
       const partsTotal = partsA + partsB;
-      const pctA       = (partsA / partsTotal) * 100;
-      const pctB       = (partsB / partsTotal) * 100;
 
-      const qtyInput = parseFloat(document.getElementById('qtyInput').value) || null;
-      let amountA = null, amountB = null, total = null;
+      const pctA = (partsA / partsTotal) * 100;
+      const pctB = (partsB / partsTotal) * 100;
 
-      if (qtyInput !== null) {
-        if (currentMode === 'total') {
-          total   = qtyInput;
-          amountA = (partsA / partsTotal) * total;
-          amountB = (partsB / partsTotal) * total;
-        } else if (currentMode === 'qtyA') {
-          amountA = qtyInput;
-          amountB = amountA * (partsB / partsA);
-          total   = amountA + amountB;
-        } else {
-          amountB = qtyInput;
-          amountA = amountB * (partsA / partsB);
-          total   = amountA + amountB;
-        }
-      }
+      const amountA = total ? (partsA / partsTotal) * total : null;
+      const amountB = total ? (partsB / partsTotal) * total : null;
 
       // Draw cross
       drawCross(nameA, a, nameB, b, c, partsA, partsB);
@@ -747,17 +672,9 @@
                  <code>${r(partsB,3)} ÷ ${r(partsTotal,3)} × 100 = <strong>${r(pctB,2)} %</strong></code>`
         },
         ...(hasTot ? [{
-          text: currentMode === 'total'
-            ? `Mengen für ${r(total,2)} kg Gesamtmenge:<br>
-               <code>${nameA}: ${r(pctA/100,4)} × ${r(total,2)} = <strong>${r(amountA,2)} kg</strong></code><br>
-               <code>${nameB}: ${r(pctB/100,4)} × ${r(total,2)} = <strong>${r(amountB,2)} kg</strong></code>`
-            : currentMode === 'qtyA'
-            ? `Bekannte Menge ${nameA} = ${r(amountA,2)} kg:<br>
-               <code>${nameB} = ${r(amountA,2)} × (${r(partsB,3)} ÷ ${r(partsA,3)}) = <strong>${r(amountB,2)} kg</strong></code><br>
-               <code>Gesamtmenge = ${r(amountA,2)} + ${r(amountB,2)} = <strong>${r(total,2)} kg</strong></code>`
-            : `Bekannte Menge ${nameB} = ${r(amountB,2)} kg:<br>
-               <code>${nameA} = ${r(amountB,2)} × (${r(partsA,3)} ÷ ${r(partsB,3)}) = <strong>${r(amountA,2)} kg</strong></code><br>
-               <code>Gesamtmenge = ${r(amountA,2)} + ${r(amountB,2)} = <strong>${r(total,2)} kg</strong></code>`
+          text: `Mengen für ${r(total,2)} kg Gesamtmenge:<br>
+                 <code>${nameA}: ${r(pctA/100,4)} × ${r(total,2)} = <strong>${r(amountA,2)} kg</strong></code><br>
+                 <code>${nameB}: ${r(pctB/100,4)} × ${r(total,2)} = <strong>${r(amountB,2)} kg</strong></code>`
         }] : [])
       ];
 
@@ -790,9 +707,8 @@
     }
 
     function resetAll() {
-      ['nameA','valueA','nameB','valueB','target','qtyInput'].forEach(id =>
+      ['nameA','valueA','nameB','valueB','target','totalQty'].forEach(id =>
         document.getElementById(id).value = '');
-      setMode('total');
       document.getElementById('errorMsg').classList.remove('visible');
       hideResults();
     }
