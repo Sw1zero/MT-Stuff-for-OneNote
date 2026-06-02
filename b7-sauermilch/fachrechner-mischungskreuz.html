@@ -334,6 +334,23 @@
     }
 
     .probe-box strong { display: block; margin-bottom: 4px; }
+
+    .opt { font-weight:400; text-transform:none; letter-spacing:0; }
+
+    .qty-toggle-btn {
+      font-family: var(--font);
+      font-size: 0.76rem;
+      font-weight: 500;
+      padding: 6px 13px;
+      border-radius: 20px;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .qty-toggle-btn:hover { border-color: var(--blue); color: var(--blue-dark); }
+    .qty-toggle-btn.active { background: var(--blue); border-color: var(--blue); color: #fff; }
   </style>
 </head>
 <body>
@@ -417,15 +434,23 @@
         </div>
       </div>
 
-      <div class="total-row" style="margin-top:16px;">
-        <div class="input-row">
-          <label>Gesamtmenge <span style="font-weight:400; text-transform:none; letter-spacing:0">(optional)</span></label>
-          <input type="number" id="totalQty" placeholder="100" step="0.1" min="0">
-          <div class="optional-note">Wenn angegeben, werden die Mengen in kg berechnet.</div>
+      <div style="margin-top:16px; padding-top:16px; border-top:1px solid var(--border);">
+        <label>Mengeneingabe</label>
+        <div style="display:flex; gap:6px; flex-wrap:wrap; margin:10px 0 14px;">
+          <button type="button" class="qty-toggle-btn active" id="btn-total" onclick="setMode('total')">Gesamtmenge</button>
+          <button type="button" class="qty-toggle-btn"        id="btn-qtyA"  onclick="setMode('qtyA')">Menge von A bekannt</button>
+          <button type="button" class="qty-toggle-btn"        id="btn-qtyB"  onclick="setMode('qtyB')">Menge von B bekannt</button>
         </div>
-        <div class="input-row">
-          <label>&nbsp;</label>
-          <div class="unit-label">kg</div>
+        <div style="display:grid; grid-template-columns:1fr 80px; gap:10px 12px; align-items:end;">
+          <div class="input-row">
+            <label id="qtyLabel">Gesamtmenge <span class="opt">(optional)</span></label>
+            <input type="number" id="qtyInput" placeholder="100" step="0.1" min="0">
+            <div class="optional-note" id="qtyNote">Wenn angegeben, werden die Mengen in kg berechnet.</div>
+          </div>
+          <div class="input-row">
+            <label>&nbsp;</label>
+            <div class="unit-label">kg</div>
+          </div>
         </div>
       </div>
 
@@ -462,95 +487,106 @@
 
   <script>
     const PRESETS = {
-      fett: {
-        nameA: 'Vollmilch', valueA: 3.8,
-        nameB: 'Magermilch', valueB: 0.05,
-        target: 1.5, totalQty: 100,
-        unit: '% Fett'
-      },
-      frucht: {
-        nameA: 'Fruchtgrundstoff', valueA: 100,
-        nameB: 'Nature-Jogurt', valueB: 0,
-        target: 8, totalQty: 100,
-        unit: '% Fruchtanteil'
-      },
-      zucker: {
-        nameA: 'Zucker', valueA: 100,
-        nameB: 'Nature-Jogurt', valueB: 0,
-        target: 6, totalQty: 100,
-        unit: '% Zucker'
-      }
+      fett:   { nameA:'Vollmilch',        valueA:3.8,  nameB:'Magermilch',    valueB:0.05, target:1.5, qty:100 },
+      frucht: { nameA:'Fruchtgrundstoff', valueA:100,  nameB:'Nature-Jogurt', valueB:0,    target:8,   qty:100 },
+      zucker: { nameA:'Zucker',           valueA:100,  nameB:'Nature-Jogurt', valueB:0,    target:6,   qty:100 },
     };
 
+    var mode = 'total';
+
+    function setMode(newMode) {
+      mode = newMode;
+      document.querySelectorAll('.qty-toggle-btn').forEach(function(btn) {
+        btn.classList.remove('active');
+      });
+      document.getElementById('btn-' + newMode).classList.add('active');
+
+      var nA  = document.getElementById('nameA').value.trim() || 'Komponente A';
+      var nB  = document.getElementById('nameB').value.trim() || 'Komponente B';
+      var lbl = document.getElementById('qtyLabel');
+      var nte = document.getElementById('qtyNote');
+      var inp = document.getElementById('qtyInput');
+
+      if (newMode === 'total') {
+        lbl.innerHTML   = 'Gesamtmenge <span class="opt">(optional)</span>';
+        nte.textContent = 'Wenn angegeben, werden die Mengen in kg berechnet.';
+        inp.placeholder = '100';
+      } else if (newMode === 'qtyA') {
+        lbl.innerHTML   = 'Bekannte Menge: <strong>' + nA + '</strong>';
+        nte.textContent = 'Menge von «' + nB + '» und Gesamtmenge werden berechnet.';
+        inp.placeholder = '80';
+      } else {
+        lbl.innerHTML   = 'Bekannte Menge: <strong>' + nB + '</strong>';
+        nte.textContent = 'Menge von «' + nA + '» und Gesamtmenge werden berechnet.';
+        inp.placeholder = '20';
+      }
+    }
+
     function loadPreset(key) {
-      const p = PRESETS[key];
-      document.getElementById('nameA').value    = p.nameA;
-      document.getElementById('valueA').value   = p.valueA;
-      document.getElementById('nameB').value    = p.nameB;
-      document.getElementById('valueB').value   = p.valueB;
-      document.getElementById('target').value   = p.target;
-      document.getElementById('totalQty').value = p.totalQty;
+      var p = PRESETS[key];
+      document.getElementById('nameA').value   = p.nameA;
+      document.getElementById('valueA').value  = p.valueA;
+      document.getElementById('nameB').value   = p.nameB;
+      document.getElementById('valueB').value  = p.valueB;
+      document.getElementById('target').value  = p.target;
+      setMode('total');
+      document.getElementById('qtyInput').value = p.qty;
       calculate();
     }
 
-    function r(n, dec = 2) {
-      return parseFloat(n.toFixed(dec));
-    }
+    function r(n, dec) { return parseFloat(n.toFixed(dec !== undefined ? dec : 2)); }
 
     function calculate() {
-      const nameA = document.getElementById('nameA').value.trim() || 'Komponente A';
-      const nameB = document.getElementById('nameB').value.trim() || 'Komponente B';
-      const a     = parseFloat(document.getElementById('valueA').value);
-      const b     = parseFloat(document.getElementById('valueB').value);
-      const c     = parseFloat(document.getElementById('target').value);
-      const total = parseFloat(document.getElementById('totalQty').value) || null;
+      var nameA  = document.getElementById('nameA').value.trim()  || 'Komponente A';
+      var nameB  = document.getElementById('nameB').value.trim()  || 'Komponente B';
+      var a      = parseFloat(document.getElementById('valueA').value);
+      var b      = parseFloat(document.getElementById('valueB').value);
+      var c      = parseFloat(document.getElementById('target').value);
+      var qtyRaw = parseFloat(document.getElementById('qtyInput').value);
+      var hasQty = !isNaN(qtyRaw) && qtyRaw > 0;
 
-      const err = document.getElementById('errorMsg');
+      var err = document.getElementById('errorMsg');
       err.classList.remove('visible');
 
       if (isNaN(a) || isNaN(b) || isNaN(c)) {
         err.textContent = 'Bitte Werte für beide Komponenten und den Zielwert eingeben.';
-        err.classList.add('visible');
-        hideResults();
-        return;
+        err.classList.add('visible'); hideResults(); return;
       }
-
       if (a === b) {
         err.textContent = 'Die beiden Komponentenwerte dürfen nicht gleich sein.';
-        err.classList.add('visible');
-        hideResults();
-        return;
+        err.classList.add('visible'); hideResults(); return;
       }
-
-      const lo = Math.min(a, b);
-      const hi = Math.max(a, b);
-
+      var lo = Math.min(a, b), hi = Math.max(a, b);
       if (c <= lo || c >= hi) {
-        err.textContent = `Der Zielwert (${c}) muss zwischen den Komponentenwerten (${lo} und ${hi}) liegen.`;
-        err.classList.add('visible');
-        hideResults();
-        return;
+        err.textContent = 'Der Zielwert (' + c + ') muss zwischen ' + lo + ' und ' + hi + ' liegen.';
+        err.classList.add('visible'); hideResults(); return;
       }
 
-      // Mischungskreuz
-      // Parts of A = |c - b|, Parts of B = |a - c|
-      const partsA = Math.abs(c - b);
-      const partsB = Math.abs(a - c);
-      const partsTotal = partsA + partsB;
+      var partsA     = Math.abs(c - b);
+      var partsB     = Math.abs(a - c);
+      var partsTotal = partsA + partsB;
+      var pctA       = (partsA / partsTotal) * 100;
+      var pctB       = (partsB / partsTotal) * 100;
 
-      const pctA = (partsA / partsTotal) * 100;
-      const pctB = (partsB / partsTotal) * 100;
+      var amountA = null, amountB = null, total = null;
+      if (hasQty) {
+        if (mode === 'total') {
+          total   = qtyRaw;
+          amountA = (partsA / partsTotal) * total;
+          amountB = (partsB / partsTotal) * total;
+        } else if (mode === 'qtyA') {
+          amountA = qtyRaw;
+          amountB = amountA * (partsB / partsA);
+          total   = amountA + amountB;
+        } else {
+          amountB = qtyRaw;
+          amountA = amountB * (partsA / partsB);
+          total   = amountA + amountB;
+        }
+      }
 
-      const amountA = total ? (partsA / partsTotal) * total : null;
-      const amountB = total ? (partsB / partsTotal) * total : null;
-
-      // Draw cross
       drawCross(nameA, a, nameB, b, c, partsA, partsB);
-
-      // Results table
-      buildResultTable(nameA, a, partsA, pctA, amountA, nameB, b, partsB, pctB, amountB, partsTotal, total, c, a, b);
-
-      // Steps
+      buildResultTable(nameA, a, partsA, pctA, amountA, nameB, b, partsB, pctB, amountB, partsTotal, total);
       buildSteps(nameA, a, nameB, b, c, partsA, partsB, partsTotal, pctA, pctB, amountA, amountB, total);
 
       document.getElementById('crossCard').classList.add('visible');
@@ -559,156 +595,107 @@
     }
 
     function drawCross(nameA, a, nameB, b, c, partsA, partsB) {
-      const svg = document.getElementById('crossSvg');
-
-      const lA    = nameA.length > 18 ? nameA.substring(0, 16) + '…' : nameA;
-      const lB    = nameB.length > 18 ? nameB.substring(0, 16) + '…' : nameB;
-      const col   = { red: '#C40027', blue: '#0066CC', gray: '#718096', light: '#e2e8f0' };
-
-      svg.innerHTML = `
-        <!-- Cross lines -->
-        <line x1="160" y1="40"  x2="230" y2="100" stroke="${col.light}" stroke-width="2"/>
-        <line x1="160" y1="160" x2="230" y2="100" stroke="${col.light}" stroke-width="2"/>
-        <line x1="300" y1="40"  x2="230" y2="100" stroke="${col.light}" stroke-width="2"/>
-        <line x1="300" y1="160" x2="230" y2="100" stroke="${col.light}" stroke-width="2"/>
-
-        <!-- Diagonal lines (the actual cross) -->
-        <line x1="162" y1="42"  x2="298" y2="158" stroke="${col.blue}" stroke-width="1.5" stroke-dasharray="5,3"/>
-        <line x1="162" y1="158" x2="298" y2="42"  stroke="${col.red}"  stroke-width="1.5" stroke-dasharray="5,3"/>
-
-        <!-- Center circle -->
-        <circle cx="230" cy="100" r="28" fill="white" stroke="${col.light}" stroke-width="1.5"/>
-        <text x="230" y="96"  text-anchor="middle" font-size="11" font-weight="700" fill="${col.gray}">Ziel</text>
-        <text x="230" y="112" text-anchor="middle" font-size="13" font-weight="700" fill="${col.blue}">${r(c, 3)}</text>
-
-        <!-- Component A (top left) -->
-        <rect x="2" y="22" width="152" height="36" rx="8" fill="#f8fafc" stroke="${col.light}" stroke-width="1.2"/>
-        <text x="10" y="37" font-size="10" fill="${col.gray}">${lA}</text>
-        <text x="10" y="51" font-size="13" font-weight="700" fill="${col.blue}">${r(a, 3)}</text>
-
-        <!-- Component B (bottom left) -->
-        <rect x="2" y="142" width="152" height="36" rx="8" fill="#f8fafc" stroke="${col.light}" stroke-width="1.2"/>
-        <text x="10" y="157" font-size="10" fill="${col.gray}">${lB}</text>
-        <text x="10" y="171" font-size="13" font-weight="700" fill="${col.red}">${r(b, 3)}</text>
-
-        <!-- Parts A (top right) -->
-        <rect x="306" y="22" width="150" height="36" rx="8" fill="${'#dbeeff'}" stroke="${col.blue}" stroke-width="1.2"/>
-        <text x="314" y="37" font-size="10" fill="${col.blue}">Teile ${lA}</text>
-        <text x="314" y="51" font-size="13" font-weight="700" fill="${col.blue}">${r(partsA, 3)}</text>
-
-        <!-- Parts B (bottom right) -->
-        <rect x="306" y="142" width="150" height="36" rx="8" fill="${'#fde8ed'}" stroke="${col.red}" stroke-width="1.2"/>
-        <text x="314" y="157" font-size="10" fill="${col.red}">Teile ${lB}</text>
-        <text x="314" y="171" font-size="13" font-weight="700" fill="${col.red}">${r(partsB, 3)}</text>
-
-        <!-- Arrow labels -->
-        <text x="186" y="64"  font-size="9" fill="${col.gray}" transform="rotate(-34 186 64)">c − b</text>
-        <text x="186" y="150" font-size="9" fill="${col.gray}" transform="rotate(34 186 150)">a − c</text>
-      `;
+      var svg = document.getElementById('crossSvg');
+      var lA  = nameA.length > 18 ? nameA.substring(0,16) + '…' : nameA;
+      var lB  = nameB.length > 18 ? nameB.substring(0,16) + '…' : nameB;
+      var col = { red:'#C40027', blue:'#0066CC', gray:'#718096', light:'#e2e8f0' };
+      svg.innerHTML =
+        '<line x1="160" y1="40"  x2="230" y2="100" stroke="'+col.light+'" stroke-width="2"/>' +
+        '<line x1="160" y1="160" x2="230" y2="100" stroke="'+col.light+'" stroke-width="2"/>' +
+        '<line x1="300" y1="40"  x2="230" y2="100" stroke="'+col.light+'" stroke-width="2"/>' +
+        '<line x1="300" y1="160" x2="230" y2="100" stroke="'+col.light+'" stroke-width="2"/>' +
+        '<line x1="162" y1="42"  x2="298" y2="158" stroke="'+col.blue+'" stroke-width="1.5" stroke-dasharray="5,3"/>' +
+        '<line x1="162" y1="158" x2="298" y2="42"  stroke="'+col.red+'"  stroke-width="1.5" stroke-dasharray="5,3"/>' +
+        '<circle cx="230" cy="100" r="28" fill="white" stroke="'+col.light+'" stroke-width="1.5"/>' +
+        '<text x="230" y="96"  text-anchor="middle" font-size="11" font-weight="700" fill="'+col.gray+'">Ziel</text>' +
+        '<text x="230" y="112" text-anchor="middle" font-size="13" font-weight="700" fill="'+col.blue+'">' + r(c,3) + '</text>' +
+        '<rect x="2"   y="22"  width="152" height="36" rx="8" fill="#f8fafc" stroke="'+col.light+'" stroke-width="1.2"/>' +
+        '<text x="10"  y="37"  font-size="10" fill="'+col.gray+'">' + lA + '</text>' +
+        '<text x="10"  y="51"  font-size="13" font-weight="700" fill="'+col.blue+'">' + r(a,3) + '</text>' +
+        '<rect x="2"   y="142" width="152" height="36" rx="8" fill="#f8fafc" stroke="'+col.light+'" stroke-width="1.2"/>' +
+        '<text x="10"  y="157" font-size="10" fill="'+col.gray+'">' + lB + '</text>' +
+        '<text x="10"  y="171" font-size="13" font-weight="700" fill="'+col.red+'">' + r(b,3) + '</text>' +
+        '<rect x="306" y="22"  width="150" height="36" rx="8" fill="#dbeeff" stroke="'+col.blue+'" stroke-width="1.2"/>' +
+        '<text x="314" y="37"  font-size="10" fill="'+col.blue+'">Teile ' + lA + '</text>' +
+        '<text x="314" y="51"  font-size="13" font-weight="700" fill="'+col.blue+'">' + r(partsA,3) + '</text>' +
+        '<rect x="306" y="142" width="150" height="36" rx="8" fill="#fde8ed" stroke="'+col.red+'" stroke-width="1.2"/>' +
+        '<text x="314" y="157" font-size="10" fill="'+col.red+'">Teile ' + lB + '</text>' +
+        '<text x="314" y="171" font-size="13" font-weight="700" fill="'+col.red+'">' + r(partsB,3) + '</text>' +
+        '<text x="186" y="64"  font-size="9" fill="'+col.gray+'" transform="rotate(-34 186 64)">c − b</text>' +
+        '<text x="186" y="150" font-size="9" fill="'+col.gray+'" transform="rotate(34 186 150)">a − c</text>';
     }
 
-    function buildResultTable(nameA, a, partsA, pctA, amountA, nameB, b, partsB, pctB, amountB, partsTotal, total, c) {
-      const hasTot = total !== null;
-      const t = document.getElementById('resultTable');
-      t.innerHTML = `
-        <thead>
-          <tr>
-            <th>Komponente</th>
-            <th>Wert</th>
-            <th>Teile</th>
-            <th>Anteil</th>
-            ${hasTot ? '<th>Menge (kg)</th>' : ''}
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>${nameA}</td>
-            <td>${r(a, 3)}</td>
-            <td>${r(partsA, 3)}</td>
-            <td class="val">${r(pctA, 1)} %</td>
-            ${hasTot ? `<td class="val">${r(amountA, 2)} kg</td>` : ''}
-          </tr>
-          <tr>
-            <td>${nameB}</td>
-            <td>${r(b, 3)}</td>
-            <td>${r(partsB, 3)}</td>
-            <td class="val">${r(pctB, 1)} %</td>
-            ${hasTot ? `<td class="val">${r(amountB, 2)} kg</td>` : ''}
-          </tr>
-          <tr class="total-row-result">
-            <td><strong>Total</strong></td>
-            <td>—</td>
-            <td>${r(partsTotal, 3)}</td>
-            <td>100 %</td>
-            ${hasTot ? `<td>${r(total, 2)} kg</td>` : ''}
-          </tr>
-        </tbody>
-      `;
+    function buildResultTable(nameA, a, partsA, pctA, amountA, nameB, b, partsB, pctB, amountB, partsTotal, total) {
+      var has = total !== null;
+      document.getElementById('resultTable').innerHTML =
+        '<thead><tr>' +
+        '<th>Komponente</th><th>Wert</th><th>Teile</th><th>Anteil</th>' +
+        (has ? '<th>Menge (kg)</th>' : '') +
+        '</tr></thead><tbody>' +
+        '<tr><td>' + nameA + '</td><td>' + r(a,3) + '</td><td>' + r(partsA,3) + '</td>' +
+        '<td class="val">' + r(pctA,1) + ' %</td>' +
+        (has ? '<td class="val">' + r(amountA,2) + ' kg</td>' : '') + '</tr>' +
+        '<tr><td>' + nameB + '</td><td>' + r(b,3) + '</td><td>' + r(partsB,3) + '</td>' +
+        '<td class="val">' + r(pctB,1) + ' %</td>' +
+        (has ? '<td class="val">' + r(amountB,2) + ' kg</td>' : '') + '</tr>' +
+        '<tr class="total-row-result"><td><strong>Total</strong></td><td>—</td>' +
+        '<td>' + r(partsTotal,3) + '</td><td>100 %</td>' +
+        (has ? '<td>' + r(total,2) + ' kg</td>' : '') + '</tr>' +
+        '</tbody>';
     }
 
     function buildSteps(nameA, a, nameB, b, c, partsA, partsB, partsTotal, pctA, pctB, amountA, amountB, total) {
-      const hasTot = total !== null;
-      const steps = [
-        {
-          text: `Teile von <strong>${nameA}</strong> (oben im Kreuz):<br>
-                 <code>${r(c,3)} − ${r(b,3)} = <strong>${r(partsA,3)}</strong></code>
-                 &nbsp;(Zielwert minus Wert Komponente B)`
-        },
-        {
-          text: `Teile von <strong>${nameB}</strong> (unten im Kreuz):<br>
-                 <code>${r(a,3)} − ${r(c,3)} = <strong>${r(partsB,3)}</strong></code>
-                 &nbsp;(Wert Komponente A minus Zielwert)`
-        },
-        {
-          text: `Summe der Teile:<br>
-                 <code>${r(partsA,3)} + ${r(partsB,3)} = <strong>${r(partsTotal,3)}</strong></code>`
-        },
-        {
-          text: `Anteil <strong>${nameA}</strong>:<br>
-                 <code>${r(partsA,3)} ÷ ${r(partsTotal,3)} × 100 = <strong>${r(pctA,2)} %</strong></code>`
-        },
-        {
-          text: `Anteil <strong>${nameB}</strong>:<br>
-                 <code>${r(partsB,3)} ÷ ${r(partsTotal,3)} × 100 = <strong>${r(pctB,2)} %</strong></code>`
-        },
-        ...(hasTot ? [{
-          text: `Mengen für ${r(total,2)} kg Gesamtmenge:<br>
-                 <code>${nameA}: ${r(pctA/100,4)} × ${r(total,2)} = <strong>${r(amountA,2)} kg</strong></code><br>
-                 <code>${nameB}: ${r(pctB/100,4)} × ${r(total,2)} = <strong>${r(amountB,2)} kg</strong></code>`
-        }] : [])
+      var has = total !== null;
+      var mengenSchritt = '';
+      if (has) {
+        if (mode === 'total') {
+          mengenSchritt = 'Mengen für ' + r(total,2) + ' kg Gesamtmenge:<br>' +
+            '<code>' + nameA + ': ' + r(pctA/100,4) + ' × ' + r(total,2) + ' = <strong>' + r(amountA,2) + ' kg</strong></code><br>' +
+            '<code>' + nameB + ': ' + r(pctB/100,4) + ' × ' + r(total,2) + ' = <strong>' + r(amountB,2) + ' kg</strong></code>';
+        } else if (mode === 'qtyA') {
+          mengenSchritt = 'Bekannte Menge ' + nameA + ' = ' + r(amountA,2) + ' kg:<br>' +
+            '<code>' + nameB + ' = ' + r(amountA,2) + ' × (' + r(partsB,3) + ' ÷ ' + r(partsA,3) + ') = <strong>' + r(amountB,2) + ' kg</strong></code><br>' +
+            '<code>Gesamtmenge = ' + r(amountA,2) + ' + ' + r(amountB,2) + ' = <strong>' + r(total,2) + ' kg</strong></code>';
+        } else {
+          mengenSchritt = 'Bekannte Menge ' + nameB + ' = ' + r(amountB,2) + ' kg:<br>' +
+            '<code>' + nameA + ' = ' + r(amountB,2) + ' × (' + r(partsA,3) + ' ÷ ' + r(partsB,3) + ') = <strong>' + r(amountA,2) + ' kg</strong></code><br>' +
+            '<code>Gesamtmenge = ' + r(amountA,2) + ' + ' + r(amountB,2) + ' = <strong>' + r(total,2) + ' kg</strong></code>';
+        }
+      }
+
+      var steps = [
+        'Teile von <strong>' + nameA + '</strong>:<br><code>' + r(c,3) + ' − ' + r(b,3) + ' = <strong>' + r(partsA,3) + '</strong></code>&nbsp;(Zielwert − Wert B)',
+        'Teile von <strong>' + nameB + '</strong>:<br><code>' + r(a,3) + ' − ' + r(c,3) + ' = <strong>' + r(partsB,3) + '</strong></code>&nbsp;(Wert A − Zielwert)',
+        'Summe der Teile:<br><code>' + r(partsA,3) + ' + ' + r(partsB,3) + ' = <strong>' + r(partsTotal,3) + '</strong></code>',
+        'Anteil <strong>' + nameA + '</strong>:<br><code>' + r(partsA,3) + ' ÷ ' + r(partsTotal,3) + ' × 100 = <strong>' + r(pctA,2) + ' %</strong></code>',
+        'Anteil <strong>' + nameB + '</strong>:<br><code>' + r(partsB,3) + ' ÷ ' + r(partsTotal,3) + ' × 100 = <strong>' + r(pctB,2) + ' %</strong></code>',
       ];
+      if (has) steps.push(mengenSchritt);
 
-      const probeA = hasTot ? r(amountA * a / total, 3) : r(pctA/100 * a, 3);
-      const probeB = hasTot ? r(amountB * b / total, 3) : r(pctB/100 * b, 3);
-      const probeSum = r(probeA + probeB, 3);
+      var probeA   = has ? r(amountA * a / total, 3) : r(pctA/100 * a, 3);
+      var probeB   = has ? r(amountB * b / total, 3) : r(pctB/100 * b, 3);
+      var probeSum = r(probeA + probeB, 3);
+      var probeText = has
+        ? r(amountA,2) + ' kg × ' + r(a,3) + ' + ' + r(amountB,2) + ' kg × ' + r(b,3) + ' = ' + probeA + ' + ' + probeB + ' = <strong>' + probeSum + '</strong> ÷ ' + r(total,2) + ' kg = <strong>' + r(probeSum/total,3) + '</strong> (Zielwert: ' + r(c,3) + ' ✓)'
+        : r(pctA/100,4) + ' × ' + r(a,3) + ' + ' + r(pctB/100,4) + ' × ' + r(b,3) + ' = ' + probeA + ' + ' + probeB + ' = <strong>' + probeSum + '</strong> (Zielwert: ' + r(c,3) + ' ✓)';
 
-      const container = document.getElementById('stepListCalc');
-      container.innerHTML = steps.map((s, i) => `
-        <div class="calc-step">
-          <div class="calc-step-num">${i + 1}</div>
-          <div class="calc-step-text">${s.text}</div>
-        </div>
-      `).join('');
-
-      container.innerHTML += `
-        <div class="probe-box">
-          <strong>&#10003; Probe</strong>
-          ${hasTot
-            ? `${r(amountA,2)} kg × ${r(a,3)} + ${r(amountB,2)} kg × ${r(b,3)} = ${probeA} + ${probeB} = <strong>${probeSum}</strong> (geteilt durch ${r(total,2)} kg = ${r(probeSum/total,3)}, Zielwert: ${r(c,3)} ✓)`
-            : `${r(pctA/100,4)} × ${r(a,3)} + ${r(pctB/100,4)} × ${r(b,3)} = ${probeA} + ${probeB} = <strong>${probeSum}</strong> (Zielwert: ${r(c,3)} ✓)`
-          }
-        </div>
-      `;
+      var container = document.getElementById('stepListCalc');
+      container.innerHTML = steps.map(function(t, i) {
+        return '<div class="calc-step"><div class="calc-step-num">' + (i+1) + '</div><div class="calc-step-text">' + t + '</div></div>';
+      }).join('') + '<div class="probe-box"><strong>✓ Probe</strong>' + probeText + '</div>';
     }
 
     function hideResults() {
-      ['crossCard','resultCard','stepsCard'].forEach(id =>
-        document.getElementById(id).classList.remove('visible'));
+      ['crossCard','resultCard','stepsCard'].forEach(function(id) {
+        document.getElementById(id).classList.remove('visible');
+      });
     }
 
     function resetAll() {
-      ['nameA','valueA','nameB','valueB','target','totalQty'].forEach(id =>
-        document.getElementById(id).value = '');
+      ['nameA','valueA','nameB','valueB','target','qtyInput'].forEach(function(id) {
+        document.getElementById(id).value = '';
+      });
+      setMode('total');
       document.getElementById('errorMsg').classList.remove('visible');
       hideResults();
     }
