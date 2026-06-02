@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz b.7 – Qualitätsmängel</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px 56px;
+    }
+
+    .back-link {
+      font-size: 0.78rem;
+      color: var(--text-subtle);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 20px;
+      align-self: flex-start;
+    }
+    .back-link:hover { color: var(--red); }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .page-header h1 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    .page-header p { font-size: 0.82rem; color: var(--text-subtle); }
+
+    /* progress */
+    .progress-text  { margin-bottom: 10px; }
+    .progress-bar-wrap {
+      width: 480px;
+      max-width: 92vw;
+      margin-bottom: 28px;
+    }
+
+    /* quiz card */
+    .quiz-card {
+      width: 480px;
+      max-width: 92vw;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      padding: 32px 32px 28px;
+      margin-bottom: 16px;
+    }
+
+    .question-badge {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--red);
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .question-text {
+      font-size: 1.02rem;
+      font-weight: 600;
+      line-height: 1.5;
+      color: var(--text);
+      margin-bottom: 24px;
+    }
+
+    /* answer buttons */
+    .answers {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .answer-btn {
+      font-family: var(--font);
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-align: left;
+      background: #f8fafc;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s, transform 0.1s;
+      line-height: 1.4;
+      color: var(--text);
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .answer-btn:hover:not(:disabled) {
+      border-color: var(--red);
+      background: var(--red-light);
+    }
+
+    .answer-btn:active:not(:disabled) { transform: scale(0.99); }
+
+    .answer-btn .letter {
+      font-weight: 700;
+      font-size: 0.78rem;
+      background: var(--border);
+      color: var(--text-muted);
+      border-radius: 6px;
+      padding: 2px 7px;
+      flex-shrink: 0;
+      margin-top: 1px;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .answer-btn.correct {
+      border-color: #38a169;
+      background: #f0fff4;
+    }
+    .answer-btn.correct .letter {
+      background: #38a169;
+      color: #fff;
+    }
+
+    .answer-btn.wrong {
+      border-color: var(--red);
+      background: var(--red-light);
+    }
+    .answer-btn.wrong .letter {
+      background: var(--red);
+      color: #fff;
+    }
+
+    .answer-btn.reveal {
+      border-color: #38a169;
+      background: #f0fff4;
+      opacity: 0.8;
+    }
+    .answer-btn.reveal .letter {
+      background: #38a169;
+      color: #fff;
+    }
+
+    .answer-btn:disabled { cursor: default; }
+
+    /* feedback box */
+    .feedback {
+      margin-top: 18px;
+      padding: 14px 16px;
+      border-radius: var(--radius-md);
+      font-size: 0.88rem;
+      line-height: 1.5;
+      display: none;
+    }
+
+    .feedback.correct {
+      background: #f0fff4;
+      border: 1px solid #9ae6b4;
+      color: #276749;
+      display: block;
+    }
+
+    .feedback.wrong {
+      background: var(--red-light);
+      border: 1px solid #fca5a5;
+      color: var(--red-dark);
+      display: block;
+    }
+
+    .feedback-icon {
+      font-size: 1rem;
+      margin-right: 6px;
+    }
+
+    /* next button */
+    .next-wrap {
+      width: 480px;
+      max-width: 92vw;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    /* end screen */
+    .end-screen {
+      width: 480px;
+      max-width: 92vw;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      padding: 40px 36px;
+      text-align: center;
+      display: none;
+    }
+
+    .score-circle {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      border: 5px solid var(--red);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+    }
+
+    .score-number {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--red);
+      line-height: 1;
+    }
+
+    .score-total {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .end-message {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .end-sub {
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      margin-bottom: 28px;
+    }
+
+    .end-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+
+  <div class="page-header">
+    <h1>b.7 – Qualitätsmängel erkennen</h1>
+    <p>Wählen Sie die richtige Antwort aus.</p>
+  </div>
+
+  <div class="progress-text" id="progressText"></div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progressBar"></div>
+  </div>
+
+  <!-- Quiz card -->
+  <div class="quiz-card" id="quizCard">
+    <span class="question-badge" id="questionBadge"></span>
+    <div class="question-text" id="questionText"></div>
+    <div class="answers" id="answersContainer"></div>
+    <div class="feedback" id="feedback"></div>
+  </div>
+
+  <div class="next-wrap" id="nextWrap" style="display:none">
+    <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()">Weiter &#8594;</button>
+  </div>
+
+  <!-- End screen -->
+  <div class="end-screen" id="endScreen">
+    <div class="score-circle">
+      <div class="score-number" id="scoreNumber"></div>
+      <div class="score-total" id="scoreTotal"></div>
+    </div>
+    <div class="end-message" id="endMessage"></div>
+    <div class="end-sub" id="endSub"></div>
+    <div class="end-actions">
+      <button class="btn btn-ghost" onclick="location.href='../index.html'">&#8592; Alle Lerntools</button>
+      <button class="btn btn-primary" onclick="restartQuiz()">Nochmals versuchen</button>
+    </div>
+  </div>
+
+  <script>
+    const QUESTIONS = [
+      {
+        badge: "Qualitätsmängel",
+        question: "Im Betrieb zeigt der stichfeste Jogurt nach dem Öffnen eine wässrige Schicht an der Oberfläche. Wie heisst dieser Qualitätsmangel?",
+        answers: ["Griessigkeit", "Molkenlässig", "Fadenziehend", "Übersäuert"],
+        correct: 1,
+        explanation: "Das Absondern von Molke aus der Gallerte heisst Synärese und führt zum Qualitätsmangel «Molkenlässig»."
+      },
+      {
+        badge: "Ursache & Wirkung",
+        question: "Eine Jogurtgallerte wurde beim Umpumpen sehr stark mechanisch belastet. Was ist die wahrscheinlichste Folge im Endprodukt?",
+        answers: ["Übersäuerung", "Zu tiefe Viskosität (zu dünnflüssig)", "Griessigkeit", "Geblähte Verpackung"],
+        correct: 1,
+        explanation: "Starke mechanische Belastung zerstört die Gallertstruktur irreversibel → zu tiefe Viskosität im Endprodukt."
+      },
+      {
+        badge: "Qualitätsmängel",
+        question: "Kunden beschweren sich, dass ihr Jogurt körnig und sandig wirkt. Welcher Qualitätsmangel liegt vor?",
+        answers: ["Molkenlässig", "Fadenziehend", "Griessigkeit", "Übersäuert"],
+        correct: 2,
+        explanation: "Griessigkeit beschreibt eine körnige, sandige Textur der Gallerte. Ursachen: zu tiefe Bebrütungstemperatur, ungenügende Strukturbearbeitung oder zu hohe fettfreie Trockenmasse."
+      },
+      {
+        badge: "Mikrobiologie",
+        question: "Die Bebrütungstemperatur wird auf 45 °C erhöht (statt 42 °C). Welchen Einfluss hat das auf die Bakterienkultur?",
+        answers: [
+          "Streptococcus thermophilus vermehrt sich schneller",
+          "Lactobacillus delbrueckii vermehrt sich schneller",
+          "Beide Bakterienarten sterben ab",
+          "Das Verhältnis Lb : Sc bleibt unverändert"
+        ],
+        correct: 1,
+        explanation: "Lb. delbrueckii hat ein höheres Temperaturoptimum (40–45 °C). Bei 45 °C überwiegt sein Wachstum, was das Nachsäuerungsrisiko erhöht."
+      },
+      {
+        badge: "Qualitätsmängel",
+        question: "Ein Fruchtjogurt-Becher wölbt sich nach oben und riecht beim Öffnen hefig. Was ist die Ursache?",
+        answers: [
+          "Zu hoher Laktobacillenanteil in der Kultur",
+          "Hefeinfektion über Raumluft oder Grundstoff",
+          "Übersäuerung durch zu lange Bebrütung",
+          "Zu tiefe Lagertemperatur"
+        ],
+        correct: 1,
+        explanation: "Hefen können auch bei tiefem pH (4–4,5) wachsen und CO₂ produzieren → geblähte Verpackung. Sie gelangen über Raumluft, Fruchtgrundstoff oder unsaubere Anlagen ins Produkt."
+      },
+      {
+        badge: "Qualitätsmängel",
+        question: "Beim Entnehmen mit dem Löffel zieht der Jogurt lange Fäden. Welche der folgenden Ursachen ist am wahrscheinlichsten?",
+        answers: [
+          "Zu hohe Bebrütungstemperatur",
+          "Zu schnelles Kühlen der Gallerte",
+          "Zu tiefe Bebrütungstemperatur",
+          "Zu starke Homogenisation"
+        ],
+        correct: 2,
+        explanation: "Fadenziehen entsteht durch Infektion mit fadenziehenden MSB oder durch eine zu tiefe Bebrütungstemperatur."
+      },
+      {
+        badge: "Technologie",
+        question: "Bei welchem pH-Wert soll mit dem Kühlen der Jogurtgallerte begonnen werden?",
+        answers: ["pH 5,0", "pH 4,8", "pH 4,5", "pH 4,0"],
+        correct: 2,
+        explanation: "Bei pH 4,5 (= 36–38 °SH) wird die Kühlung eingeleitet. So wird die MSB-Aktivität stark reduziert und Übersäuern verhindert."
+      },
+      {
+        badge: "Qualitätsmängel",
+        question: "Ein Jogurt wird am Ende der Haltbarkeitsfrist deutlich saurer als bei der Produktion gemessen. Was ist die Hauptursache?",
+        answers: [
+          "Schimmelinfektion während der Lagerung",
+          "Nachsäuern durch weiterhin aktive Milchsäurebakterien",
+          "Synärese der Gallerte",
+          "Denaturierung der Molkenproteine bei der Kühlung"
+        ],
+        correct: 1,
+        explanation: "Milchsäurebakterien sind im Endprodukt lebendig. Auch bei < 5 °C bilden sie langsam Milchsäure → Nachsäuern. Wenig Lb in der Kultur und konsequente Kühlung reduzieren dies."
+      },
+      {
+        badge: "Technologie",
+        question: "Die Jogurtmilch wird auf 90 °C erhitzt und 5 Minuten heissgehalten. Was ist der wichtigste Effekt dieser starken Hitzebehandlung?",
+        answers: [
+          "Abtötung der Jogurtbakterien",
+          "Aufspaltung der Laktose",
+          "Denaturierung der Molkenproteine → bessere Wasserbindung",
+          "Erhöhung des Fettgehalts"
+        ],
+        correct: 2,
+        explanation: "Die Molkenproteine entfalten sich (denaturieren) und können mehr Wasser binden. Stichfester Jogurt scheidet weniger Molke ab, gerührter Jogurt wird dickflüssiger."
+      },
+      {
+        badge: "Technologie",
+        question: "Der Homogenisationsdruck beträgt nur 80 bar statt der empfohlenen 180–220 bar. Was ist beim stichfesten Jogurt zu erwarten?",
+        answers: [
+          "Griessige Gallerte",
+          "Aufrahmung des Fettes während der Bebrütung",
+          "Übersäuerung des Endprodukts",
+          "Fadenziehende Konsistenz"
+        ],
+        correct: 1,
+        explanation: "80 bar verhindert die Aufrahmung nicht. Die Fettschicht löst sich von der Gallerte und wirkt unansehnlich. Für die Molkenbindung sind 180–220 bar nötig."
+      },
+      {
+        badge: "Hygiene",
+        question: "Nach der Produktion zeigt sich Schimmelwachstum auf der Jogurtoberfläche. Welche Massnahme ist am wirksamsten dagegen?",
+        answers: [
+          "Längere Bebrütungszeit wählen",
+          "Höheren Homogenisationsdruck anwenden",
+          "Alle Geräte und Leitungen vor Produktkontakt desinfizieren",
+          "Laktobacillenanteil in der Kultur erhöhen"
+        ],
+        correct: 2,
+        explanation: "Schimmel gelangt über Luft, unsaubere Verpackungen oder Geräte ins Produkt. Konsequente Desinfektion und zügiges Arbeiten bei offenem Produkt sind die wichtigsten Massnahmen."
+      },
+      {
+        badge: "Qualitätsmängel",
+        question: "Ein Betrieb verwendet eine Jogurtkultur mit sehr hohem Laktobacillenanteil. Was ist am Ende der Haltbarkeitsfrist zu erwarten?",
+        answers: [
+          "Griessige Konsistenz",
+          "Molkenlässiger Jogurt",
+          "Stark übersäuerter Jogurt",
+          "Fadenziehende Konsistenz"
+        ],
+        correct: 2,
+        explanation: "Laktobacillen produzieren auch bei Kühltemperatur weiter Milchsäure (Endsäurebildner). Ein hoher Lb-Anteil führt zu starkem Nachsäuern → übersäuertes Endprodukt am MHD."
+      },
+      {
+        badge: "Technologie",
+        question: "Beim Kaltmischverfahren wird die Gallerte vor dem Früchtemischen intensiv gerührt. Was passiert mit der Viskosität?",
+        answers: [
+          "Sie nimmt stark zu und bleibt hoch",
+          "Sie bleibt unverändert",
+          "Sie nimmt stark ab und dickt kaum mehr nach",
+          "Sie schwankt je nach Fruchtsorte"
+        ],
+        correct: 2,
+        explanation: "Beim Kaltmischverfahren hat die Gallerte bereits ihre endgültige Struktur. Starkes Rühren zerstört diese → tiefe Viskosität im Endprodukt ohne weiteres Nachdicken."
+      },
+      {
+        badge: "Ursache & Wirkung",
+        question: "Während der Bebrütung werden die Bebrütungstanks durch einen Gabelstapler erschüttert. Was ist die zu erwartende Folge?",
+        answers: [
+          "Übersäuerung des Jogurts",
+          "Molkenabscheidung im Endprodukt",
+          "Fadenziehende Konsistenz",
+          "Erhöhte Hefeinfektion"
+        ],
+        correct: 1,
+        explanation: "Erschütterungen während der Gallertbildung stören das Kasein-Netzwerk → Synärese (Molkenabscheidung) im Endprodukt."
+      },
+      {
+        badge: "Technologie",
+        question: "Warum darf die Jogurtmilch nicht unter 65 °C homogenisiert werden?",
+        answers: [
+          "Die MSB sterben unterhalb 65 °C ab",
+          "Die milcheigene Lipase ist unter 65 °C aktiv und verursacht Ranzigkeit",
+          "Die Fettkügelchen lassen sich unter 65 °C nicht zerkleinern",
+          "Die Molkenproteine denaturieren unter 65 °C nicht"
+        ],
+        correct: 1,
+        explanation: "Unter 65 °C ist die milcheigene Lipase noch aktiv. Sie spaltet Milchfett und verursacht innert Minuten Ranzigkeit in der Jogurtmilch."
+      },
+    ];
+
+    let currentIndex = 0;
+    let score = 0;
+    let answered = false;
+    let order = [];
+
+    function shuffle(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function startQuiz() {
+      order = shuffle([...Array(QUESTIONS.length).keys()]);
+      currentIndex = 0;
+      score = 0;
+      document.getElementById("endScreen").style.display = "none";
+      document.getElementById("quizCard").style.display = "block";
+      showQuestion();
+    }
+
+    function showQuestion() {
+      answered = false;
+      const q = QUESTIONS[order[currentIndex]];
+      const total = QUESTIONS.length;
+
+      document.getElementById("progressText").textContent = `Frage ${currentIndex + 1} von ${total}`;
+      document.getElementById("progressBar").style.width = `${((currentIndex + 1) / total) * 100}%`;
+
+      document.getElementById("questionBadge").textContent = q.badge;
+      document.getElementById("questionText").textContent = q.question;
+
+      const letters = ["A", "B", "C", "D"];
+      const container = document.getElementById("answersContainer");
+      container.innerHTML = q.answers.map((a, i) => `
+        <button class="answer-btn" onclick="selectAnswer(${i})" id="ans-${i}">
+          <span class="letter">${letters[i]}</span>
+          <span>${a}</span>
+        </button>
+      `).join("");
+
+      const fb = document.getElementById("feedback");
+      fb.className = "feedback";
+      fb.textContent = "";
+
+      document.getElementById("nextWrap").style.display = "none";
+      const nextBtn = document.getElementById("nextBtn");
+      nextBtn.textContent = currentIndex < QUESTIONS.length - 1 ? "Weiter →" : "Ergebnis anzeigen";
+    }
+
+    function selectAnswer(chosen) {
+      if (answered) return;
+      answered = true;
+
+      const q = QUESTIONS[order[currentIndex]];
+      const correct = q.correct;
+      const isCorrect = chosen === correct;
+      if (isCorrect) score++;
+
+      // style buttons
+      for (let i = 0; i < q.answers.length; i++) {
+        const btn = document.getElementById(`ans-${i}`);
+        btn.disabled = true;
+        if (i === correct && i === chosen) btn.classList.add("correct");
+        else if (i === chosen && !isCorrect) btn.classList.add("wrong");
+        else if (i === correct) btn.classList.add("reveal");
+      }
+
+      // feedback
+      const fb = document.getElementById("feedback");
+      if (isCorrect) {
+        fb.className = "feedback correct";
+        fb.innerHTML = `<span class="feedback-icon">&#10003;</span><strong>Richtig!</strong> ${q.explanation}`;
+      } else {
+        fb.className = "feedback wrong";
+        fb.innerHTML = `<span class="feedback-icon">&#10007;</span><strong>Nicht ganz.</strong> ${q.explanation}`;
+      }
+
+      document.getElementById("nextWrap").style.display = "flex";
+    }
+
+    function nextQuestion() {
+      currentIndex++;
+      if (currentIndex >= QUESTIONS.length) {
+        showEndScreen();
+      } else {
+        showQuestion();
+      }
+    }
+
+    function showEndScreen() {
+      document.getElementById("quizCard").style.display = "none";
+      document.getElementById("nextWrap").style.display = "none";
+      document.getElementById("progressText").textContent = "";
+      document.getElementById("progressBar").style.width = "100%";
+
+      const total = QUESTIONS.length;
+      const pct = Math.round((score / total) * 100);
+
+      document.getElementById("scoreNumber").textContent = score;
+      document.getElementById("scoreTotal").textContent = `von ${total}`;
+
+      let msg, sub;
+      if (pct === 100) {
+        msg = "Ausgezeichnet!";
+        sub = "Alle Fragen richtig beantwortet. Sie kennen die Qualitätsmängel bestens.";
+      } else if (pct >= 75) {
+        msg = "Sehr gut!";
+        sub = "Fast alle Fragen richtig. Wiederholen Sie die markierten Themen kurz.";
+      } else if (pct >= 50) {
+        msg = "Gut gemacht.";
+        sub = "Mehr als die Hälfte richtig. Schauen Sie die falschen Antworten nochmals an.";
+      } else {
+        msg = "Weiter üben.";
+        sub = "Wiederholen Sie die Lernkärtchen und versuchen Sie es danach nochmals.";
+      }
+
+      document.getElementById("endMessage").textContent = msg;
+      document.getElementById("endSub").textContent = sub;
+      document.getElementById("endScreen").style.display = "block";
+    }
+
+    function restartQuiz() {
+      startQuiz();
+    }
+
+    // start
+    startQuiz();
+  </script>
+</body>
+</html>
