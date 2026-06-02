@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sortierer b.7 – Jogurtherstellung</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px 56px;
+    }
+
+    .back-link {
+      font-size: 0.78rem;
+      color: var(--text-subtle);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 20px;
+      align-self: flex-start;
+    }
+    .back-link:hover { color: var(--red); }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .page-header h1 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    .page-header p { font-size: 0.82rem; color: var(--text-subtle); }
+
+    .instruction {
+      background: var(--blue-light);
+      border-radius: var(--radius-md);
+      padding: 12px 18px;
+      font-size: 0.84rem;
+      color: #1e4e8c;
+      width: 500px;
+      max-width: 92vw;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    /* ---- step list ---- */
+    .step-list {
+      width: 500px;
+      max-width: 92vw;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .step-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 13px 16px;
+      cursor: grab;
+      user-select: none;
+      transition: border-color 0.15s, box-shadow 0.15s, opacity 0.15s, transform 0.15s;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .step-card:active { cursor: grabbing; }
+
+    .step-card.dragging {
+      opacity: 0.35;
+      box-shadow: none;
+    }
+
+    .step-card.drag-over {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px var(--blue-light);
+    }
+
+    .step-card.correct {
+      border-color: #38a169;
+      background: #f0fff4;
+    }
+
+    .step-card.wrong {
+      border-color: var(--red);
+      background: var(--red-light);
+    }
+
+    .step-card.selected {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px var(--blue-light);
+      transform: scale(1.01);
+    }
+
+    .step-num {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #edf2f7;
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .step-card.correct .step-num { background: #38a169; color: #fff; }
+    .step-card.wrong   .step-num { background: var(--red); color: #fff; }
+    .step-card.selected .step-num { background: var(--blue); color: #fff; }
+
+    .step-handle {
+      color: var(--text-subtle);
+      font-size: 1.1rem;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .step-content { flex: 1; }
+
+    .step-text {
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.3;
+    }
+
+    .step-detail {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .step-feedback {
+      font-size: 0.72rem;
+      font-weight: 600;
+      flex-shrink: 0;
+      display: none;
+    }
+    .step-card.correct .step-feedback { display: block; color: #276749; }
+    .step-card.wrong   .step-feedback { display: block; color: var(--red-dark); }
+
+    /* ---- score bar ---- */
+    .score-bar {
+      width: 500px;
+      max-width: 92vw;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .score-bar.visible { display: flex; }
+
+    .score-text {
+      font-size: 0.86rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    /* ---- controls ---- */
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    /* ---- success banner ---- */
+    .success-banner {
+      width: 500px;
+      max-width: 92vw;
+      background: #f0fff4;
+      border: 1.5px solid #9ae6b4;
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      text-align: center;
+      display: none;
+      margin-bottom: 20px;
+    }
+
+    .success-banner.visible { display: block; }
+
+    .success-banner strong {
+      font-size: 1rem;
+      color: #276749;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .success-banner span {
+      font-size: 0.84rem;
+      color: #2f855a;
+    }
+
+    /* floating drag clone */
+    #dragClone {
+      position: fixed;
+      pointer-events: none;
+      z-index: 999;
+      opacity: 0.85;
+      box-shadow: var(--shadow-lg);
+      border-radius: var(--radius-md);
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="dragClone"></div>
+
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+
+  <div class="page-header">
+    <h1>b.7 – Jogurtherstellung</h1>
+    <p>Bringen Sie die Produktionsschritte in die richtige Reihenfolge.</p>
+  </div>
+
+  <div class="instruction">
+    <strong>Aufgabe:</strong> Ziehen Sie die Schritte in die richtige Reihenfolge (oben = zuerst).<br>
+    Auf dem Handy: Schritt antippen und dann an die neue Position tippen.
+  </div>
+
+  <div class="success-banner" id="successBanner">
+    <strong>Perfekt!</strong>
+    <span>Alle Schritte sind in der richtigen Reihenfolge.</span>
+  </div>
+
+  <div class="score-bar" id="scoreBar">
+    <div class="progress-bar-wrap" style="flex:1; margin:0;">
+      <div class="progress-bar-fill" id="scoreBarFill" style="background: #38a169;"></div>
+    </div>
+    <span class="score-text" id="scoreText"></span>
+  </div>
+
+  <div class="step-list" id="stepList"></div>
+
+  <div class="controls">
+    <button class="btn btn-ghost" onclick="resetOrder()">&#8635; Neu mischen</button>
+    <button class="btn btn-primary" onclick="checkOrder()">Überprüfen</button>
+  </div>
+
+  <script>
+    const STEPS = [
+      { id:  1, text: "Rohmilch vorbehandeln",              detail: "Filtrieren, sieben oder thermisieren" },
+      { id:  2, text: "Fettgehalt standardisieren",         detail: "Auf den Rezepturwert einstellen" },
+      { id:  3, text: "Fettfreie Trockenmasse erhöhen",     detail: "Magermilchpulver oder WPC beimischen" },
+      { id:  4, text: "Homogenisieren",                     detail: "Mind. 65 °C, 180–220 bar" },
+      { id:  5, text: "Hitzebehandlung",                    detail: "85–95 °C, 2–10 Minuten" },
+      { id:  6, text: "Auf Impftemperatur kühlen",          detail: "40–44 °C" },
+      { id:  7, text: "Impfen",                             detail: "2 % Betriebskultur oder Direktstarter zugeben" },
+      { id:  8, text: "Bebrüten",                           detail: "40–44 °C, 4–7 Stunden" },
+      { id:  9, text: "Gallerte kühlen",                    detail: "Bei pH 4,5 (36–38 °SH)" },
+      { id: 10, text: "Strukturbearbeitung",                detail: "Gallerte durch Spaltenfilter pumpen" },
+      { id: 11, text: "Früchte und Zucker mischen",         detail: "Warm- oder Kaltmischverfahren" },
+      { id: 12, text: "Abfüllen",                           detail: "Hygienisch, Lufteinschlüsse vermeiden" },
+      { id: 13, text: "Kühllagerung",                       detail: "< 5 °C, MHD 18–28 Tage" },
+    ];
+
+    let checked = false;
+    let selectedCard = null;
+
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function buildList(order) {
+      const list = document.getElementById('stepList');
+      list.innerHTML = '';
+      order.forEach((step, idx) => {
+        const card = document.createElement('div');
+        card.className = 'step-card';
+        card.dataset.id = step.id;
+        card.draggable = true;
+        card.innerHTML = `
+          <span class="step-num">${idx + 1}</span>
+          <span class="step-handle">&#8942;&#8942;</span>
+          <div class="step-content">
+            <div class="step-text">${step.text}</div>
+            <div class="step-detail">${step.detail}</div>
+          </div>
+          <span class="step-feedback" id="fb-${step.id}"></span>
+        `;
+
+        // Desktop drag
+        card.addEventListener('dragstart', onDragStart);
+        card.addEventListener('dragover',  onDragOver);
+        card.addEventListener('dragleave', onDragLeave);
+        card.addEventListener('drop',      onDrop);
+        card.addEventListener('dragend',   onDragEnd);
+
+        // Touch drag
+        card.addEventListener('touchstart', onTouchStart, { passive: true });
+        card.addEventListener('touchmove',  onTouchMove,  { passive: false });
+        card.addEventListener('touchend',   onTouchEnd,   { passive: true });
+
+        list.appendChild(card);
+      });
+    }
+
+    function updateNumbers() {
+      const cards = document.querySelectorAll('.step-card');
+      cards.forEach((c, i) => { c.querySelector('.step-num').textContent = i + 1; });
+    }
+
+    // ---- Desktop drag ----
+    let dragSrc = null;
+
+    function onDragStart(e) {
+      if (checked) return;
+      dragSrc = this;
+      this.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    }
+
+    function onDragOver(e) {
+      if (!dragSrc || dragSrc === this) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      document.querySelectorAll('.step-card').forEach(c => c.classList.remove('drag-over'));
+      this.classList.add('drag-over');
+    }
+
+    function onDragLeave() {
+      this.classList.remove('drag-over');
+    }
+
+    function onDrop(e) {
+      if (!dragSrc || dragSrc === this) return;
+      e.preventDefault();
+      const list = document.getElementById('stepList');
+      const cards = [...list.querySelectorAll('.step-card')];
+      const srcIdx  = cards.indexOf(dragSrc);
+      const destIdx = cards.indexOf(this);
+      if (srcIdx < destIdx) {
+        list.insertBefore(dragSrc, this.nextSibling);
+      } else {
+        list.insertBefore(dragSrc, this);
+      }
+      this.classList.remove('drag-over');
+      updateNumbers();
+    }
+
+    function onDragEnd() {
+      this.classList.remove('dragging');
+      document.querySelectorAll('.step-card').forEach(c => c.classList.remove('drag-over'));
+      dragSrc = null;
+    }
+
+    // ---- Touch drag ----
+    let touchCard = null;
+    let clone = null;
+    let touchOffsetY = 0;
+
+    function onTouchStart(e) {
+      if (checked) {
+        handleTapSelect(this);
+        return;
+      }
+      touchCard = this;
+      const touch = e.touches[0];
+      const rect  = this.getBoundingClientRect();
+      touchOffsetY = touch.clientY - rect.top;
+
+      clone = this.cloneNode(true);
+      clone.id = 'dragClone';
+      clone.style.cssText = `
+        position:fixed; z-index:999; pointer-events:none; opacity:0.85;
+        width:${rect.width}px; display:block;
+        box-shadow:0 8px 28px rgba(0,0,0,0.18);
+        border-radius:var(--radius-md);
+        top:${touch.clientY - touchOffsetY}px;
+        left:${rect.left}px;
+      `;
+      document.body.appendChild(clone);
+      this.style.opacity = '0.25';
+    }
+
+    function onTouchMove(e) {
+      if (!touchCard || !clone) return;
+      e.preventDefault();
+      const touch = e.touches[0];
+      clone.style.top  = (touch.clientY - touchOffsetY) + 'px';
+
+      clone.style.display = 'none';
+      const el = document.elementFromPoint(touch.clientX, touch.clientY);
+      clone.style.display = 'block';
+      const target = el?.closest('.step-card');
+
+      document.querySelectorAll('.step-card').forEach(c => c.classList.remove('drag-over'));
+      if (target && target !== touchCard) {
+        target.classList.add('drag-over');
+      }
+    }
+
+    function onTouchEnd(e) {
+      if (!touchCard || !clone) return;
+      const touch = e.changedTouches[0];
+
+      clone.style.display = 'none';
+      const el = document.elementFromPoint(touch.clientX, touch.clientY);
+      clone.remove(); clone = null;
+
+      const target = el?.closest('.step-card');
+      if (target && target !== touchCard) {
+        const list = document.getElementById('stepList');
+        const cards = [...list.querySelectorAll('.step-card')];
+        const srcIdx  = cards.indexOf(touchCard);
+        const destIdx = cards.indexOf(target);
+        if (srcIdx < destIdx) {
+          list.insertBefore(touchCard, target.nextSibling);
+        } else {
+          list.insertBefore(touchCard, target);
+        }
+        updateNumbers();
+      }
+
+      document.querySelectorAll('.step-card').forEach(c => {
+        c.classList.remove('drag-over');
+        c.style.opacity = '';
+      });
+      touchCard = null;
+    }
+
+    // ---- Tap-to-swap (fallback for touch on checked state) ----
+    function handleTapSelect(card) {
+      if (!selectedCard) {
+        selectedCard = card;
+        card.classList.add('selected');
+      } else if (selectedCard === card) {
+        card.classList.remove('selected');
+        selectedCard = null;
+      } else {
+        const list = document.getElementById('stepList');
+        const cards = [...list.querySelectorAll('.step-card')];
+        const srcIdx  = cards.indexOf(selectedCard);
+        const destIdx = cards.indexOf(card);
+        if (srcIdx < destIdx) {
+          list.insertBefore(selectedCard, card.nextSibling);
+        } else {
+          list.insertBefore(selectedCard, card);
+        }
+        selectedCard.classList.remove('selected');
+        selectedCard = null;
+        updateNumbers();
+      }
+    }
+
+    // ---- Check ----
+    function checkOrder() {
+      checked = true;
+      const cards = [...document.querySelectorAll('.step-card')];
+      let correct = 0;
+
+      cards.forEach((card, idx) => {
+        const id = parseInt(card.dataset.id);
+        const fb = card.querySelector('.step-feedback');
+        card.classList.remove('correct', 'wrong');
+        if (id === idx + 1) {
+          card.classList.add('correct');
+          fb.textContent = '✓';
+          correct++;
+        } else {
+          card.classList.add('wrong');
+          fb.textContent = `→ Pos. ${id}`;
+        }
+        card.draggable = false;
+      });
+
+      const total = cards.length;
+      const pct   = Math.round((correct / total) * 100);
+
+      document.getElementById('scoreBar').classList.add('visible');
+      document.getElementById('scoreBarFill').style.width = pct + '%';
+      document.getElementById('scoreText').textContent = `${correct} / ${total} richtig`;
+
+      if (correct === total) {
+        document.getElementById('successBanner').classList.add('visible');
+      }
+    }
+
+    // ---- Reset ----
+    function resetOrder() {
+      checked = false;
+      selectedCard = null;
+      document.getElementById('scoreBar').classList.remove('visible');
+      document.getElementById('successBanner').classList.remove('visible');
+      buildList(shuffle(STEPS));
+    }
+
+    // Init
+    buildList(shuffle(STEPS));
+  </script>
+</body>
+</html>
