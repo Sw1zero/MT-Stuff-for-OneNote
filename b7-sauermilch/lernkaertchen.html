@@ -4,64 +4,61 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lernkärtchen b.7 – Sauermilchprodukte</title>
+  <link rel="stylesheet" href="../style.css">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
+    /* ---- Page layout (centred column) ---- */
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: #f0f4f8;
-      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 24px 16px;
-      color: #1a202c;
+      padding: 32px 16px 48px;
     }
 
-    h1 {
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: #4a5568;
-      margin-bottom: 6px;
-      letter-spacing: 0.01em;
-    }
-
-    .subtitle {
-      font-size: 0.82rem;
-      color: #718096;
+    .page-header {
+      text-align: center;
       margin-bottom: 28px;
     }
 
-    .progress {
-      font-size: 0.85rem;
-      color: #718096;
-      margin-bottom: 14px;
-      min-width: 260px;
-      text-align: center;
+    .page-header h1 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 4px;
     }
+
+    .page-header p {
+      font-size: 0.82rem;
+      color: var(--text-subtle);
+    }
+
+    .back-link {
+      font-size: 0.78rem;
+      color: var(--text-subtle);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 20px;
+      align-self: flex-start;
+    }
+
+    .back-link:hover { color: var(--red); }
+
+    /* ---- Filter + progress ---- */
+    .filter-wrap    { max-width: 500px; margin-bottom: 24px; }
+    .progress-text  { margin-bottom: 10px; }
 
     .progress-bar-wrap {
-      width: 340px;
+      width: 360px;
       max-width: 90vw;
-      height: 4px;
-      background: #cbd5e0;
-      border-radius: 2px;
       margin-bottom: 28px;
-      overflow: hidden;
     }
 
-    .progress-bar-fill {
-      height: 100%;
-      background: #4299e1;
-      border-radius: 2px;
-      transition: width 0.3s ease;
-    }
-
-    /* --- card scene --- */
+    /* ---- Flashcard scene ---- */
     .scene {
-      width: 420px;
-      max-width: 90vw;
-      height: 260px;
+      width: 440px;
+      max-width: 92vw;
+      height: 270px;
       perspective: 900px;
       cursor: pointer;
       margin-bottom: 32px;
@@ -75,171 +72,78 @@
       transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .card.flipped {
-      transform: rotateY(180deg);
-    }
+    .card.flipped { transform: rotateY(180deg); }
 
     .card-face {
       position: absolute;
       inset: 0;
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
-      border-radius: 16px;
+      border-radius: var(--radius-lg);
       padding: 32px 36px;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06);
+      box-shadow: var(--shadow-md);
     }
 
-    .card-front {
-      background: #ffffff;
-    }
+    .card-front { background: var(--surface); }
+    .card-back  { background: var(--blue-light); transform: rotateY(180deg); }
 
-    .card-back {
-      background: #ebf8ff;
-      transform: rotateY(180deg);
-    }
-
-    .card-label {
-      font-size: 0.7rem;
+    .card-category-badge {
+      display: inline-block;
+      font-size: 0.68rem;
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 14px;
+      letter-spacing: 0.07em;
       padding: 3px 10px;
       border-radius: 20px;
-      display: inline-block;
+      margin-bottom: 14px;
       align-self: flex-start;
     }
 
-    .card-front .card-label {
-      background: #edf2f7;
-      color: #718096;
-    }
-
-    .card-back .card-label {
-      background: #bee3f8;
-      color: #2b6cb0;
-    }
-
     .card-term {
-      font-size: 1.45rem;
+      font-size: 1.42rem;
       font-weight: 700;
-      color: #1a202c;
+      color: var(--text);
       line-height: 1.3;
     }
 
     .card-hint {
       margin-top: 14px;
-      font-size: 0.75rem;
-      color: #a0aec0;
+      font-size: 0.74rem;
+      color: var(--text-subtle);
     }
 
     .card-explanation {
-      font-size: 1.05rem;
-      color: #2d3748;
-      line-height: 1.55;
+      font-size: 1rem;
+      color: var(--text);
+      line-height: 1.58;
     }
 
-    /* --- controls --- */
+    /* ---- Controls ---- */
     .controls {
       display: flex;
-      gap: 12px;
+      gap: 10px;
       align-items: center;
       flex-wrap: wrap;
       justify-content: center;
-      margin-bottom: 20px;
-    }
-
-    button {
-      font-family: inherit;
-      font-size: 0.88rem;
-      font-weight: 500;
-      border: none;
-      border-radius: 10px;
-      padding: 10px 22px;
-      cursor: pointer;
-      transition: background 0.15s, transform 0.1s;
-    }
-
-    button:active { transform: scale(0.97); }
-
-    .btn-prev, .btn-next {
-      background: #ffffff;
-      color: #4a5568;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.10);
-    }
-
-    .btn-prev:hover, .btn-next:hover { background: #edf2f7; }
-
-    .btn-shuffle {
-      background: #4299e1;
-      color: #fff;
-      box-shadow: 0 2px 8px rgba(66,153,225,0.3);
-    }
-
-    .btn-shuffle:hover { background: #3182ce; }
-
-    .btn-flip {
-      background: #48bb78;
-      color: #fff;
-      box-shadow: 0 2px 8px rgba(72,187,120,0.3);
-    }
-
-    .btn-flip:hover { background: #38a169; }
-
-    /* --- category filter --- */
-    .filter-wrap {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      justify-content: center;
-      max-width: 500px;
-      margin-bottom: 28px;
-    }
-
-    .filter-btn {
-      font-size: 0.75rem;
-      padding: 5px 12px;
-      border-radius: 20px;
-      border: 1.5px solid #cbd5e0;
-      background: #fff;
-      color: #4a5568;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-
-    .filter-btn.active {
-      background: #4299e1;
-      border-color: #4299e1;
-      color: #fff;
-    }
-
-    .keyboard-hint {
-      font-size: 0.72rem;
-      color: #a0aec0;
-      margin-top: 4px;
-    }
-
-    .keyboard-hint kbd {
-      background: #edf2f7;
-      color: #4a5568;
-      border-radius: 4px;
-      padding: 1px 5px;
-      font-size: 0.7rem;
-      font-family: inherit;
+      margin-bottom: 12px;
     }
   </style>
 </head>
 <body>
 
-  <h1>Lernkärtchen – b.7 Sauermilchprodukte</h1>
-  <p class="subtitle">Klicken Sie auf die Karte oder drücken Sie <kbd>Leertaste</kbd> zum Umdrehen</p>
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+
+  <div class="page-header">
+    <h1>b.7 – Sauermilchprodukte herstellen</h1>
+    <p>Klicken oder <kbd>Leertaste</kbd> zum Umdrehen</p>
+  </div>
 
   <div class="filter-wrap" id="filterWrap"></div>
 
-  <div class="progress" id="progressText"></div>
+  <div class="progress-text" id="progressText"></div>
   <div class="progress-bar-wrap">
     <div class="progress-bar-fill" id="progressBar"></div>
   </div>
@@ -247,28 +151,30 @@
   <div class="scene" id="scene" onclick="flipCard()">
     <div class="card" id="card">
       <div class="card-face card-front">
-        <span class="card-label" id="frontLabel"></span>
+        <span class="card-category-badge" id="frontLabel"></span>
         <div class="card-term" id="frontTerm"></div>
         <div class="card-hint">Karte umdrehen für die Erklärung</div>
       </div>
       <div class="card-face card-back">
-        <span class="card-label" id="backLabel"></span>
+        <span class="card-category-badge" id="backLabel"></span>
         <div class="card-explanation" id="backExplanation"></div>
       </div>
     </div>
   </div>
 
   <div class="controls">
-    <button class="btn-prev" onclick="prevCard()">&#8592; Zurück</button>
-    <button class="btn-flip" onclick="flipCard()">Umdrehen</button>
-    <button class="btn-next" onclick="nextCard()">Weiter &#8594;</button>
+    <button class="btn btn-ghost" onclick="prevCard()">&#8592; Zurück</button>
+    <button class="btn btn-success" onclick="flipCard()">Umdrehen</button>
+    <button class="btn btn-ghost" onclick="nextCard()">Weiter &#8594;</button>
   </div>
   <div class="controls">
-    <button class="btn-shuffle" onclick="shuffle()">&#x21C4; Mischen</button>
+    <button class="btn btn-primary" onclick="shuffle()">&#x21C4; Mischen</button>
   </div>
 
-  <p class="keyboard-hint">
-    <kbd>&#8592;</kbd> <kbd>&#8594;</kbd> navigieren &nbsp;|&nbsp; <kbd>Leertaste</kbd> umdrehen &nbsp;|&nbsp; <kbd>S</kbd> mischen
+  <p class="keyboard-hint" style="margin-top:12px;">
+    <kbd>&#8592;</kbd> <kbd>&#8594;</kbd> navigieren &nbsp;|&nbsp;
+    <kbd>Leertaste</kbd> umdrehen &nbsp;|&nbsp;
+    <kbd>S</kbd> mischen
   </p>
 
   <script>
@@ -289,7 +195,7 @@
       { term: "probiotisch", explanation: "Mikroorganismen, die gesundheitsfördernd wirken, weil sie die Magen-Darm-Passage überleben und sich im Dickdarm ansiedeln.", category: "Mikrobiologie" },
       { term: "Kefirkörner / Kefirpilze", explanation: "Träger der Kefirkultur; bestehen aus Eiweiss und Kohlenhydraten, auf denen MSB und Hefen in Symbiose leben.", category: "Mikrobiologie" },
 
-      // Physikalisch-chemische Prozesse
+      // Chemie & Physik
       { term: "Laktose", explanation: "Milchzucker; Substrat (Energiequelle) für die Milchsäuregärung der MSB.", category: "Chemie & Physik" },
       { term: "Milchsäure", explanation: "Nebenprodukt der Milchsäuregärung; senkt den pH-Wert der Milch und führt zur Kaseingerinnung.", category: "Chemie & Physik" },
       { term: "Kasein", explanation: "Haupteiweiss der Milch; trägt in normaler Milch überwiegend negative Ladungen und bleibt einzeln gelöst.", category: "Chemie & Physik" },
@@ -303,7 +209,7 @@
       { term: "Säuregrad (°SH)", explanation: "Schweizer Mass für die titrierbare Säure; Kühlen bei 36–38 °SH, was einem pH-Wert von 4,5 entspricht.", category: "Chemie & Physik" },
       { term: "Nachsäuern", explanation: "Unerwünschte Säurezunahme nach der Bebrütung durch verbleibende Aktivität der MSB, auch bei Kühltemperatur.", category: "Chemie & Physik" },
 
-      // Produktionsschritte
+      // Produktion
       { term: "Standardisieren", explanation: "Einstellen des Fettgehalts der Jogurtmilch auf den vorgesehenen Rezepturwert durch Zugabe von Rahm oder Magermilch.", category: "Produktion" },
       { term: "Erhöhung der fettfreien Trockenmasse (fTM)", explanation: "Zugabe von Magermilchpulver, Milchproteinkonzentrat oder WPC; erhöht Viskosität und vermindert Molkenabscheidung um 1,5–3 %.", category: "Produktion" },
       { term: "Homogenisieren", explanation: "Zerkleinerung der Fettkügelchen unter Druck (180–220 bar); verhindert Aufrahmung, verbessert Wasserbindung und Mundgefühl.", category: "Produktion" },
@@ -316,14 +222,14 @@
       { term: "Nachpasteurisation", explanation: "Erneute Erhitzung des Trinkjogurts vor dem Abfüllen; verlängerte Haltbarkeit, keine lebenden MSB mehr im Produkt.", category: "Produktion" },
       { term: "Sterilluftüberdruck", explanation: "Schutz offener Produktionsanlagen durch steril gefilterte Luft; erzeugt leichten Überdruck und verhindert Hefen-/Schimmelinfektion.", category: "Produktion" },
 
-      // Zutaten & Zusatzstoffe
+      // Zutaten
       { term: "Fruchtgrundstoff", explanation: "Mischung aus ca. 50 % Früchten und 50 % Zucker; pasteurisiert, bei Kühltemperatur gelagert, mehrere Wochen haltbar.", category: "Zutaten" },
       { term: "Molkenproteinkonzentrat (WPC)", explanation: "Flüssige Alternative zur Trockenmasse-Erhöhung (Ultrafiltrat aus Molke); einfache Zudosierung ohne Staubentwicklung.", category: "Zutaten" },
       { term: "Verdickungsmittel", explanation: "Zusatzstoff im Fruchtgrundstoff; verhindert Entmischung der Frucht-Zuckermasse.", category: "Zutaten" },
       { term: "Strukturstabilisator", explanation: "Nötig bei Trinkjogurt; verhindert Molkenabscheidung nach intensiver mechanischer Bearbeitung der Gallerte.", category: "Zutaten" },
       { term: "Allergene", explanation: "Bestandteile, die Allergien auslösen können (z. B. Haselnüsse in Grundstoffen); Abfüllung von allergenhaltigen Sorten stets am Schluss der Charge.", category: "Zutaten" },
 
-      // Rechtliche Grundlagen
+      // Recht & Qualität
       { term: "VLtH", explanation: "Verordnung über Lebensmittel tierischer Herkunft; legt gesetzliche Anforderungen an Sauermilchprodukte fest (Keimzahl, Fettgehalt, Sachbezeichnung).", category: "Recht & Qualität" },
       { term: "Sachbezeichnung «Jogurt»", explanation: "Darf nur verwendet werden, wenn: Kuhmilch + Sc thermophilus + Lb delbrueckii (oder andere Lactobacillen) + mind. 10 Mio. KBE/g im Endprodukt.", category: "Recht & Qualität" },
       { term: "Fettgehaltsstufen (Jogurt)", explanation: "Magerjogurt: max. 5 g/kg | Teilentrahmt: 5–35 g/kg | Vollmilchjogurt: mind. 35 g/kg | Rahmangereicherter: mind. 50 g/kg – bezogen auf den Milchanteil.", category: "Recht & Qualität" },
@@ -338,21 +244,12 @@
     ];
 
     const CATEGORY_COLORS = {
-      "Mikrobiologie":    "#e9d8fd",
-      "Chemie & Physik":  "#bee3f8",
-      "Produktion":       "#c6f6d5",
-      "Zutaten":          "#fefcbf",
-      "Recht & Qualität": "#fed7d7",
-      "Qualitätsmängel":  "#fbd38d",
-    };
-
-    const CATEGORY_TEXT = {
-      "Mikrobiologie":    "#553c9a",
-      "Chemie & Physik":  "#2b6cb0",
-      "Produktion":       "#22543d",
-      "Zutaten":          "#744210",
-      "Recht & Qualität": "#822727",
-      "Qualitätsmängel":  "#7b341e",
+      "Mikrobiologie":    { bg: "#f3e8ff", fg: "#6b21a8" },
+      "Chemie & Physik":  { bg: "#dbeeff", fg: "#1e4e8c" },
+      "Produktion":       { bg: "#dcfce7", fg: "#15803d" },
+      "Zutaten":          { bg: "#fef9c3", fg: "#854d0e" },
+      "Recht & Qualität": { bg: "#fde8ed", fg: "#c40027" },
+      "Qualitätsmängel":  { bg: "#ffedd5", fg: "#9a3412" },
     };
 
     let deck = [...ALL_CARDS];
@@ -361,19 +258,17 @@
     let activeCategory = "Alle";
 
     function getFilteredDeck() {
-      if (activeCategory === "Alle") return [...ALL_CARDS];
-      return ALL_CARDS.filter(c => c.category === activeCategory);
+      return activeCategory === "Alle" ? [...ALL_CARDS] : ALL_CARDS.filter(c => c.category === activeCategory);
     }
 
     function renderFilters() {
       const wrap = document.getElementById("filterWrap");
       const categories = ["Alle", ...Object.keys(CATEGORY_COLORS)];
-      wrap.innerHTML = categories.map(cat => `
-        <button class="filter-btn ${cat === activeCategory ? "active" : ""}"
-                onclick="setCategory('${cat}')">${cat}
-          ${cat !== "Alle" ? `<span style="font-size:0.68rem;opacity:0.7"> (${ALL_CARDS.filter(c=>c.category===cat).length})</span>` : ""}
-        </button>
-      `).join("");
+      wrap.innerHTML = categories.map(cat => {
+        const count = cat === "Alle" ? ALL_CARDS.length : ALL_CARDS.filter(c => c.category === cat).length;
+        return `<button class="filter-btn ${cat === activeCategory ? "active" : ""}"
+                  onclick="setCategory('${cat}')">${cat} <span style="opacity:0.65;font-size:0.68rem">${count}</span></button>`;
+      }).join("");
     }
 
     function setCategory(cat) {
@@ -398,21 +293,18 @@
         isFlipped = false;
         document.getElementById("card").classList.remove("flipped");
       }
-
       const c = deck[currentIndex];
+      const col = CATEGORY_COLORS[c.category] || { bg: "#f1f5f9", fg: "#4a5568" };
+
       document.getElementById("frontTerm").textContent = c.term;
       document.getElementById("backExplanation").textContent = c.explanation;
 
-      const bg = CATEGORY_COLORS[c.category] || "#edf2f7";
-      const fg = CATEGORY_TEXT[c.category] || "#4a5568";
-
-      document.getElementById("frontLabel").textContent = c.category;
-      document.getElementById("frontLabel").style.background = bg;
-      document.getElementById("frontLabel").style.color = fg;
-
-      document.getElementById("backLabel").textContent = c.category;
-      document.getElementById("backLabel").style.background = bg;
-      document.getElementById("backLabel").style.color = fg;
+      ["frontLabel", "backLabel"].forEach(id => {
+        const el = document.getElementById(id);
+        el.textContent = c.category;
+        el.style.background = col.bg;
+        el.style.color = col.fg;
+      });
 
       const total = deck.length;
       document.getElementById("progressText").textContent = `Karte ${currentIndex + 1} von ${total}`;
@@ -424,15 +316,8 @@
       document.getElementById("card").classList.toggle("flipped");
     }
 
-    function nextCard() {
-      currentIndex = (currentIndex + 1) % deck.length;
-      showCard(true);
-    }
-
-    function prevCard() {
-      currentIndex = (currentIndex - 1 + deck.length) % deck.length;
-      showCard(true);
-    }
+    function nextCard() { currentIndex = (currentIndex + 1) % deck.length; showCard(true); }
+    function prevCard() { currentIndex = (currentIndex - 1 + deck.length) % deck.length; showCard(true); }
 
     document.addEventListener("keydown", e => {
       if (e.key === " " || e.key === "Enter") { e.preventDefault(); flipCard(); }
@@ -441,7 +326,6 @@
       if (e.key === "s" || e.key === "S") shuffle();
     });
 
-    // init
     renderFilters();
     showCard();
   </script>
