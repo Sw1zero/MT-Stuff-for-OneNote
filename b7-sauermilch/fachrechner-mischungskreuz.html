@@ -650,8 +650,8 @@
       if (has) {
         if (mode === 'total') {
           mengenSchritt = 'Mengen für ' + r(total,2) + ' kg Gesamtmenge:<br>' +
-            '<code>' + nameA + ': ' + r(pctA/100,4) + ' × ' + r(total,2) + ' = <strong>' + r(amountA,2) + ' kg</strong></code><br>' +
-            '<code>' + nameB + ': ' + r(pctB/100,4) + ' × ' + r(total,2) + ' = <strong>' + r(amountB,2) + ' kg</strong></code>';
+            '<code>' + nameA + ': (' + r(partsA,3) + ' ÷ ' + r(partsTotal,3) + ') × ' + r(total,2) + ' = <strong>' + r(amountA,2) + ' kg</strong></code><br>' +
+            '<code>' + nameB + ': (' + r(partsB,3) + ' ÷ ' + r(partsTotal,3) + ') × ' + r(total,2) + ' = <strong>' + r(amountB,2) + ' kg</strong></code>';
         } else if (mode === 'qtyA') {
           mengenSchritt = 'Bekannte Menge ' + nameA + ' = ' + r(amountA,2) + ' kg:<br>' +
             '<code>' + nameB + ' = ' + r(amountA,2) + ' × (' + r(partsB,3) + ' ÷ ' + r(partsA,3) + ') = <strong>' + r(amountB,2) + ' kg</strong></code><br>' +
@@ -667,17 +667,16 @@
         'Teile von <strong>' + nameA + '</strong>:<br><code>' + r(c,3) + ' − ' + r(b,3) + ' = <strong>' + r(partsA,3) + '</strong></code>&nbsp;(Zielwert − Wert B)',
         'Teile von <strong>' + nameB + '</strong>:<br><code>' + r(a,3) + ' − ' + r(c,3) + ' = <strong>' + r(partsB,3) + '</strong></code>&nbsp;(Wert A − Zielwert)',
         'Summe der Teile:<br><code>' + r(partsA,3) + ' + ' + r(partsB,3) + ' = <strong>' + r(partsTotal,3) + '</strong></code>',
-        'Anteil <strong>' + nameA + '</strong>:<br><code>' + r(partsA,3) + ' ÷ ' + r(partsTotal,3) + ' × 100 = <strong>' + r(pctA,2) + ' %</strong></code>',
-        'Anteil <strong>' + nameB + '</strong>:<br><code>' + r(partsB,3) + ' ÷ ' + r(partsTotal,3) + ' × 100 = <strong>' + r(pctB,2) + ' %</strong></code>',
       ];
       if (has) steps.push(mengenSchritt);
 
-      var probeA   = has ? r(amountA * a / total, 3) : r(pctA/100 * a, 3);
-      var probeB   = has ? r(amountB * b / total, 3) : r(pctB/100 * b, 3);
-      var probeSum = r(probeA + probeB, 3);
+      var probeA   = has ? r(amountA * a, 3) : r(partsA / partsTotal * a, 3);
+      var probeB   = has ? r(amountB * b, 3) : r(partsB / partsTotal * b, 3);
+      var probeDen = has ? total : 1;
+      var probeSum = r((probeA + probeB) / probeDen, 3);
       var probeText = has
-        ? r(amountA,2) + ' kg × ' + r(a,3) + ' + ' + r(amountB,2) + ' kg × ' + r(b,3) + ' = ' + probeA + ' + ' + probeB + ' = <strong>' + probeSum + '</strong> ÷ ' + r(total,2) + ' kg = <strong>' + r(probeSum/total,3) + '</strong> (Zielwert: ' + r(c,3) + ' ✓)'
-        : r(pctA/100,4) + ' × ' + r(a,3) + ' + ' + r(pctB/100,4) + ' × ' + r(b,3) + ' = ' + probeA + ' + ' + probeB + ' = <strong>' + probeSum + '</strong> (Zielwert: ' + r(c,3) + ' ✓)';
+        ? r(amountA,2) + ' kg × ' + r(a,3) + ' + ' + r(amountB,2) + ' kg × ' + r(b,3) + ' = ' + r(probeA+probeB,3) + ' ÷ ' + r(total,2) + ' kg = <strong>' + probeSum + '</strong> (Zielwert: ' + r(c,3) + ' ✓)'
+        : '(' + r(partsA,3) + ' ÷ ' + r(partsTotal,3) + ') × ' + r(a,3) + ' + (' + r(partsB,3) + ' ÷ ' + r(partsTotal,3) + ') × ' + r(b,3) + ' = <strong>' + probeSum + '</strong> (Zielwert: ' + r(c,3) + ' ✓)';
 
       var container = document.getElementById('stepListCalc');
       container.innerHTML = steps.map(function(t, i) {
