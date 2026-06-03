@@ -52,7 +52,7 @@ body {
 
 /* ---- Header ----------------------------------------------- */
 .bzwu-header {
-  background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-light) 100%);
+  background: var(--blue-dark);
   padding: 20px 32px 18px;
   display: flex;
   align-items: center;
@@ -232,7 +232,7 @@ body {
 .btn-ghost:hover { background: #f1f5f9; }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-light) 100%);
+  background: var(--blue-dark);
   color: #fff;
   box-shadow: 0 2px 8px rgba(19,64,97,0.28);
 }
@@ -308,7 +308,7 @@ body {
 }
 
 .filter-btn.active {
-  background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-light) 100%);
+  background: var(--blue-dark);
   border-color: var(--blue-dark);
   color: #fff;
 }
