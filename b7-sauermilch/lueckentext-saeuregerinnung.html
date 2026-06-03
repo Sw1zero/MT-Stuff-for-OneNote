@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lückentext b.7 – Säuregerinnung</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px 56px;
+    }
+
+    .back-link {
+      font-size: 0.78rem;
+      color: var(--text-subtle);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 20px;
+      align-self: flex-start;
+    }
+    .back-link:hover { color: var(--red); }
+
+    .page-header { text-align: center; margin-bottom: 24px; }
+    .page-header h1 { font-size: 1.15rem; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; }
+    .page-header p  { font-size: 0.82rem; color: var(--text-subtle); }
+
+    /* ---- Difficulty selector ---- */
+    .diff-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .diff-btn {
+      font-family: var(--font);
+      font-size: 0.88rem;
+      font-weight: 600;
+      padding: 12px 22px;
+      border-radius: var(--radius-md);
+      border: 2px solid var(--border);
+      background: var(--surface);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      min-width: 170px;
+    }
+
+    .diff-btn .diff-label { font-size: 0.72rem; font-weight: 400; opacity: 0.75; }
+
+    .diff-btn:hover { border-color: var(--blue); color: var(--text); }
+
+    .diff-btn.active-easy {
+      border-color: #38a169;
+      background: #f0fff4;
+      color: #276749;
+    }
+
+    .diff-btn.active-hard {
+      border-color: var(--red);
+      background: var(--red-light);
+      color: var(--red-dark);
+    }
+
+    /* ---- Text card ---- */
+    .text-card {
+      width: 560px;
+      max-width: 92vw;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      padding: 32px 32px 28px;
+      font-size: 0.96rem;
+      line-height: 2.1;
+      color: var(--text);
+      margin-bottom: 20px;
+    }
+
+    /* ---- Blank slots (easy mode) ---- */
+    .blank-slot {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 110px;
+      height: 30px;
+      border-bottom: 2px solid var(--border);
+      border-radius: 0;
+      padding: 0 8px;
+      margin: 0 3px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--blue-dark);
+      background: transparent;
+      vertical-align: middle;
+      transition: border-color 0.15s, background 0.15s;
+      position: relative;
+    }
+
+    .blank-slot.empty {
+      color: var(--text-subtle);
+      font-weight: 400;
+      font-style: italic;
+    }
+
+    .blank-slot.selected {
+      border-bottom-color: var(--blue);
+      border-bottom-width: 2.5px;
+      background: var(--blue-light);
+      border-radius: 4px 4px 0 0;
+    }
+
+    .blank-slot.correct {
+      border-bottom-color: #38a169;
+      color: #276749;
+      background: #f0fff4;
+      border-radius: 4px 4px 0 0;
+    }
+
+    .blank-slot.wrong {
+      border-bottom-color: var(--red);
+      color: var(--red-dark);
+      background: var(--red-light);
+      border-radius: 4px 4px 0 0;
+    }
+
+    .blank-slot .correct-label {
+      display: none;
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.66rem;
+      font-weight: 600;
+      color: var(--red-dark);
+      background: var(--red-light);
+      padding: 1px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .blank-slot.wrong .correct-label { display: block; }
+
+    /* ---- Blank inputs (hard mode) ---- */
+    .blank-input {
+      font-family: var(--font);
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--blue-dark);
+      border: none;
+      border-bottom: 2px solid var(--border);
+      background: transparent;
+      padding: 2px 6px;
+      margin: 0 3px;
+      vertical-align: middle;
+      outline: none;
+      transition: border-color 0.15s;
+      min-width: 80px;
+    }
+
+    .blank-input:focus { border-bottom-color: var(--blue); }
+
+    .blank-input.correct {
+      border-bottom-color: #38a169;
+      color: #276749;
+      background: #f0fff4;
+    }
+
+    .blank-input.wrong {
+      border-bottom-color: var(--red);
+      color: var(--red-dark);
+      background: var(--red-light);
+    }
+
+    /* ---- Word bank ---- */
+    .word-bank {
+      width: 560px;
+      max-width: 92vw;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: 18px 20px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .word-bank.visible { display: block; }
+
+    .word-bank-title {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-subtle);
+      margin-bottom: 12px;
+    }
+
+    .word-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .word-chip {
+      font-family: var(--font);
+      font-size: 0.84rem;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1.5px solid var(--border);
+      background: #f8fafc;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .word-chip:hover  { border-color: var(--blue); background: var(--blue-light); color: var(--blue-dark); }
+    .word-chip.used   { opacity: 0.3; pointer-events: none; }
+
+    /* ---- Result ---- */
+    .result-box {
+      width: 560px;
+      max-width: 92vw;
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      text-align: center;
+      font-size: 0.92rem;
+      display: none;
+      margin-bottom: 16px;
+    }
+
+    .result-box.visible { display: block; }
+    .result-box.perfect { background: #f0fff4; border: 1px solid #9ae6b4; color: #276749; }
+    .result-box.good    { background: #dbeeff; border: 1px solid #93c5fd; color: #1e4e8c; }
+    .result-box.retry   { background: var(--red-light); border: 1px solid #fca5a5; color: var(--red-dark); }
+
+    .result-score { font-size: 1.4rem; font-weight: 700; display: block; margin-bottom: 4px; }
+
+    .controls { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+  </style>
+</head>
+<body>
+
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+
+  <div class="page-header">
+    <h1>b.7 – Säuregerinnung</h1>
+    <p>Füllen Sie alle Lücken im Text aus.</p>
+  </div>
+
+  <!-- Difficulty -->
+  <div class="diff-row">
+    <button type="button" class="diff-btn" id="btn-easy" onclick="setDifficulty('easy')">
+      Einfach
+      <span class="diff-label">Wörter anklicken &amp; zuordnen</span>
+    </button>
+    <button type="button" class="diff-btn" id="btn-hard" onclick="setDifficulty('hard')">
+      Schwer
+      <span class="diff-label">Wörter selbst eintippen</span>
+    </button>
+  </div>
+
+  <!-- Text -->
+  <div class="text-card" id="textCard"></div>
+
+  <!-- Word bank (easy) -->
+  <div class="word-bank" id="wordBank">
+    <div class="word-bank-title">Wortbank – klicken Sie ein Wort an</div>
+    <div class="word-chips" id="wordChips"></div>
+  </div>
+
+  <!-- Result -->
+  <div class="result-box" id="resultBox">
+    <span class="result-score" id="resultScore"></span>
+    <span id="resultMsg"></span>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <button type="button" class="btn btn-primary" onclick="checkAll()">Überprüfen</button>
+    <button type="button" class="btn btn-ghost"   onclick="resetGame()">Nochmals</button>
+  </div>
+
+  <script>
+    // ---- Text data ----
+    // Each segment: {t: 'text'} or {b: index} (blank)
+    var SEGMENTS = [
+      {t: 'Sauermilchprodukte entstehen durch die '},
+      {b: 0},
+      {t: '. Die Milchsäurebakterien vergären die '},
+      {b: 1},
+      {t: ' (Milchzucker) und gewinnen dadurch '},
+      {b: 2},
+      {t: '. Als Nebenprodukt entsteht '},
+      {b: 3},
+      {t: ', die den '},
+      {b: 4},
+      {t: '-Wert der Milch senkt.'},
+
+      {t: '\n\nIn unverarbeiteter Milch tragen die Kaseinkügelchen überwiegend '},
+      {b: 5},
+      {t: ' elektrische Ladungen. Weil sich gleichartige Ladungen abstossen, bleiben sie einzeln gelöst.'},
+
+      {t: '\n\nDie gebildete Milchsäure spaltet '},
+      {b: 6},
+      {t: ' Ladungen ab. Diese neutralisieren die negativen Ladungen auf den Kaseinkügelchen. Die Kügelchen stossen sich nicht mehr ab – sie lagern sich zu einem dreidimensionalen Netzwerk zusammen: die '},
+      {b: 7},
+      {t: ' entsteht.'},
+
+      {t: '\n\nZieht sich die Gallerte zusammen, wird '},
+      {b: 8},
+      {t: ' abgepresst. Dieser Vorgang heisst '},
+      {b: 9},
+      {t: '. Um das Nachsäuern zu verhindern, beginnt man mit dem Kühlen, wenn ein pH-Wert von '},
+      {b: 10},
+      {t: ' erreicht ist.'},
+    ];
+
+    var ANSWERS = [
+      'Milchsäuregärung',
+      'Laktose',
+      'Energie',
+      'Milchsäure',
+      'pH',
+      'negative',
+      'positive',
+      'Gallerte',
+      'Molke',
+      'Synärese',
+      '4,5'
+    ];
+
+    var difficulty    = null;
+    var selectedSlot  = null;   // easy mode: currently selected blank index
+    var filledWords   = [];     // easy mode: word placed in each blank (or null)
+
+    // ---- Difficulty ----
+    function setDifficulty(mode) {
+      difficulty   = mode;
+      selectedSlot = null;
+      filledWords  = ANSWERS.map(function() { return null; });
+
+      document.getElementById('btn-easy').className = 'diff-btn' + (mode === 'easy' ? ' active-easy' : '');
+      document.getElementById('btn-hard').className = 'diff-btn' + (mode === 'hard' ? ' active-hard' : '');
+
+      renderText();
+      if (mode === 'easy') buildWordBank();
+      document.getElementById('wordBank').className = 'word-bank' + (mode === 'easy' ? ' visible' : '');
+      hideResult();
+    }
+
+    // ---- Render text ----
+    function renderText() {
+      var card = document.getElementById('textCard');
+      var html = '';
+
+      SEGMENTS.forEach(function(seg) {
+        if (seg.t !== undefined) {
+          // Convert \n\n to paragraph breaks
+          html += seg.t.replace(/\n\n/g, '</p><p>');
+        } else {
+          var i = seg.b;
+          if (difficulty === 'easy') {
+            html += renderSlot(i);
+          } else {
+            html += renderInput(i);
+          }
+        }
+      });
+
+      card.innerHTML = '<p>' + html + '</p>';
+      card.innerHTML = card.innerHTML.replace(/<p><\/p>/g, '');
+
+      // Attach events
+      if (difficulty === 'easy') {
+        card.querySelectorAll('.blank-slot').forEach(function(el) {
+          el.addEventListener('click', function() { clickSlot(parseInt(el.dataset.id)); });
+        });
+      }
+    }
+
+    function renderSlot(i) {
+      var word    = filledWords[i];
+      var isEmpty = word === null;
+      var len     = Math.max(ANSWERS[i].length * 9, 80);
+      return '<span class="blank-slot empty" data-id="' + i + '" style="min-width:' + len + 'px">' +
+        (isEmpty ? '&nbsp;&nbsp;&nbsp;' : escHtml(word)) +
+        '<span class="correct-label"></span></span>';
+    }
+
+    function renderInput(i) {
+      var len = Math.max(ANSWERS[i].length * 10, 70);
+      return '<input class="blank-input" type="text" data-id="' + i +
+        '" style="width:' + len + 'px" autocomplete="off" spellcheck="false"' +
+        ' onkeydown="if(event.key===\'Enter\'){event.preventDefault();focusNext(' + i + ')}">';
+    }
+
+    function focusNext(i) {
+      var next = document.querySelector('.blank-input[data-id="' + (i+1) + '"]');
+      if (next) next.focus();
+    }
+
+    // ---- Easy mode: word bank ----
+    function buildWordBank() {
+      var shuffled = ANSWERS.slice().sort(function() { return Math.random() - 0.5; });
+      var html = '';
+      shuffled.forEach(function(word) {
+        html += '<button type="button" class="word-chip" data-word="' + escHtml(word) + '"' +
+          ' onclick="clickWord(\'' + escHtml(word) + '\')">' + escHtml(word) + '</button>';
+      });
+      document.getElementById('wordChips').innerHTML = html;
+      updateChips();
+    }
+
+    function updateChips() {
+      var used = filledWords.filter(function(w) { return w !== null; });
+      document.querySelectorAll('.word-chip').forEach(function(chip) {
+        var w = chip.dataset.word;
+        chip.className = 'word-chip' + (used.indexOf(w) !== -1 ? ' used' : '');
+      });
+    }
+
+    // ---- Easy mode: interactions ----
+    function clickSlot(i) {
+      var word = filledWords[i];
+
+      // If slot already filled → clear it and deselect
+      if (word !== null) {
+        filledWords[i] = null;
+        selectedSlot   = null;
+        refreshSlot(i);
+        updateChips();
+        return;
+      }
+
+      // Select this slot
+      selectedSlot = i;
+      refreshAllSlots();
+    }
+
+    function clickWord(word) {
+      if (difficulty !== 'easy') return;
+
+      // Find target slot
+      var target = selectedSlot;
+      if (target === null) {
+        // Fill first empty slot
+        for (var j = 0; j < ANSWERS.length; j++) {
+          if (filledWords[j] === null) { target = j; break; }
+        }
+      }
+      if (target === null) return;
+
+      filledWords[target] = word;
+      selectedSlot        = null;
+      refreshAllSlots();
+      updateChips();
+    }
+
+    function refreshAllSlots() {
+      for (var i = 0; i < ANSWERS.length; i++) { refreshSlot(i); }
+    }
+
+    function refreshSlot(i) {
+      var el = document.querySelector('.blank-slot[data-id="' + i + '"]');
+      if (!el) return;
+      var word    = filledWords[i];
+      var isEmpty = word === null;
+      var len     = Math.max(ANSWERS[i].length * 9, 80);
+
+      el.style.minWidth = len + 'px';
+      el.innerHTML      = (isEmpty ? '&nbsp;&nbsp;&nbsp;' : escHtml(word)) + '<span class="correct-label"></span>';
+      el.className      = 'blank-slot' +
+        (isEmpty        ? ' empty'    : '') +
+        (selectedSlot === i ? ' selected' : '');
+    }
+
+    // ---- Check answers ----
+    function checkAll() {
+      if (!difficulty) return;
+      var correct = 0;
+
+      for (var i = 0; i < ANSWERS.length; i++) {
+        var userAns, el;
+
+        if (difficulty === 'easy') {
+          userAns = filledWords[i] || '';
+          el      = document.querySelector('.blank-slot[data-id="' + i + '"]');
+        } else {
+          el      = document.querySelector('.blank-input[data-id="' + i + '"]');
+          userAns = el ? el.value.trim() : '';
+        }
+
+        var isOk = normalize(userAns) === normalize(ANSWERS[i]);
+        if (isOk) correct++;
+
+        if (el) {
+          el.classList.remove('correct', 'wrong', 'empty', 'selected');
+          el.classList.add(isOk ? 'correct' : 'wrong');
+
+          if (difficulty === 'easy' && !isOk) {
+            var lbl = el.querySelector('.correct-label');
+            if (lbl) lbl.textContent = ANSWERS[i];
+            if (!filledWords[i]) el.textContent = '';
+          }
+
+          if (difficulty === 'hard' && !isOk) {
+            el.value = el.value; // keep wrong answer visible
+          }
+        }
+      }
+
+      showResult(correct, ANSWERS.length);
+    }
+
+    function normalize(s) {
+      return s.trim().toLowerCase()
+        .replace(/ae/g, 'ä').replace(/oe/g, 'ö').replace(/ue/g, 'ü')
+        .replace(/[.,]/g, function(c) { return c; });
+    }
+
+    // ---- Result ----
+    function showResult(correct, total) {
+      var box  = document.getElementById('resultBox');
+      var pct  = correct / total;
+      var cls  = pct === 1 ? 'perfect' : pct >= 0.7 ? 'good' : 'retry';
+
+      document.getElementById('resultScore').textContent = correct + ' / ' + total + ' richtig';
+      document.getElementById('resultMsg').textContent   =
+        pct === 1   ? 'Ausgezeichnet – alle Lücken korrekt!' :
+        pct >= 0.7  ? 'Gut! Schauen Sie die rot markierten Lücken nochmals an.' :
+                      'Wiederholen Sie den Stoff und versuchen Sie es nochmals.';
+
+      box.className = 'result-box visible ' + cls;
+    }
+
+    function hideResult() {
+      document.getElementById('resultBox').className = 'result-box';
+    }
+
+    // ---- Reset ----
+    function resetGame() {
+      if (!difficulty) return;
+      setDifficulty(difficulty);
+    }
+
+    // ---- Helpers ----
+    function escHtml(s) {
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+  </script>
+</body>
+</html>
