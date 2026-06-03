@@ -193,31 +193,150 @@
 </div>
 
 <script>
-  /* ---- Zonen (cx/cy in % der Originalgrösse 656×551, r in Pixel) ---- */
   var IMG_W = 656, IMG_H = 551;
 
-  /* cx/cy in % der Originalgrösse (656×551), r in Pixel im Originalkoordinatensystem */
+  /* Zonentypen:
+     circle   → {cx, cy in %, r in px}
+     polygon  → Klick muss INNERHALB der Fläche sein
+     polyline → Klick muss max. tolerance px neben der Linie sein        */
   var ZONES = [
-    { name: 'Zellwand',           cx: 50,  cy:  8, r:  35, hint: 'Klick auf den äussersten dunklen Ring' },
-    { name: 'Cytoplasmamembran',  cx: 13,  cy: 47, r:  30, hint: 'Klick auf den inneren Ring (linke Seite)' },
-    { name: 'Cytoplasma',         cx: 52,  cy: 46, r: 160, hint: 'Klick irgendwo ins Zellinnere' },
-    { name: 'Bakterienchromosom', cx: 35,  cy: 49, r:  60 },
-    { name: 'Zelleinschlüsse',    cx: 66,  cy: 60, r:  38 },
-    { name: 'Geissel',            cx: 11,  cy: 84, r:  50 },
-    { name: 'Schleimkapsel',      cx: 87,  cy: 25, r:  55 },
-    { name: 'Ribosomen',          cx: 53,  cy: 64, r:  40 },
+    {
+      name: 'Zellwand', type: 'polyline', tolerance: 25,
+      hint: 'Klick auf den äussersten dunklen Ring',
+      points: [{cx:23,cy:26},{cx:69,cy:26},{cx:78,cy:31},{cx:86,cy:46},
+               {cx:84,cy:62},{cx:73,cy:74},{cx:16,cy:74},{cx:6,cy:67},
+               {cx:1,cy:52},{cx:8,cy:32},{cx:23,cy:26}]
+    },
+    {
+      name: 'Cytoplasmamembran', type: 'polyline', tolerance: 22,
+      hint: 'Klick auf den inneren Ring',
+      points: [{cx:16,cy:31},{cx:73,cy:32},{cx:82,cy:45},{cx:73,cy:69},
+               {cx:19,cy:70},{cx:9,cy:64},{cx:5,cy:51},{cx:9,cy:38},{cx:16,cy:31}]
+    },
+    {
+      name: 'Cytoplasma', type: 'polygon',
+      hint: 'Klick irgendwo ins Zellinnere',
+      points: [{cx:17,cy:32},{cx:69,cy:32},{cx:82,cy:48},
+               {cx:71,cy:69},{cx:18,cy:70},{cx:6,cy:52}]
+    },
+    {
+      name: 'Bakterienchromosom', type: 'polygon',
+      points: [{cx:31,cy:44},{cx:57,cy:45},{cx:56,cy:56},{cx:31,cy:59}]
+    },
+    { name: 'Zelleinschlüsse', type: 'circle', cx: 69, cy: 60, r: 35 },
+    {
+      name: 'Geissel', type: 'polyline', tolerance: 30,
+      points: [{cx:23,cy:65},{cx:9,cy:76},{cx:7,cy:85},{cx:13,cy:90},
+               {cx:24,cy:84},{cx:39,cy:90},{cx:60,cy:84},{cx:76,cy:85},{cx:90,cy:74}]
+    },
+    {
+      name: 'Schleimkapsel', type: 'polyline', tolerance: 35,
+      hint: 'Klick auf den gestrichelten Aussenbereich',
+      points: [{cx:46,cy:23},{cx:73,cy:24},{cx:81,cy:31},
+               {cx:88,cy:47},{cx:86,cy:61},{cx:78,cy:74},{cx:46,cy:77}]
+    },
+    { name: 'Ribosomen', type: 'circle', cx: 53, cy: 64, r: 40 },
   ];
 
-  var questions  = [];
-  var current    = 0;
-  var score      = 0;
-  var locked     = false;
+  var questions = [];
+  var current   = 0;
+  var score     = 0;
+  var locked    = false;
 
+  /* ---- Hilfsfunktionen Geometrie ---- */
+  function ptPx(p) { return { x: p.cx / 100 * IMG_W, y: p.cy / 100 * IMG_H }; }
+
+  function pointInPolygon(px, py, pts) {
+    var inside = false;
+    for (var i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+      var xi = pts[i].x, yi = pts[i].y, xj = pts[j].x, yj = pts[j].y;
+      if ((yi > py) !== (yj > py) && px < (xj - xi) * (py - yi) / (yj - yi) + xi)
+        inside = !inside;
+    }
+    return inside;
+  }
+
+  function distToSegment(px, py, x1, y1, x2, y2) {
+    var dx = x2 - x1, dy = y2 - y1, lenSq = dx * dx + dy * dy;
+    if (lenSq === 0) return Math.sqrt((px-x1)*(px-x1)+(py-y1)*(py-y1));
+    var t = Math.max(0, Math.min(1, ((px-x1)*dx + (py-y1)*dy) / lenSq));
+    return Math.sqrt(Math.pow(px-x1-t*dx,2) + Math.pow(py-y1-t*dy,2));
+  }
+
+  function nearPolyline(px, py, pts, tol) {
+    for (var i = 0; i < pts.length - 1; i++) {
+      if (distToSegment(px, py, pts[i].x, pts[i].y, pts[i+1].x, pts[i+1].y) <= tol)
+        return true;
+    }
+    return false;
+  }
+
+  function isHit(clickX, clickY, zone) {
+    if (zone.type === 'circle') {
+      var zx = zone.cx / 100 * IMG_W, zy = zone.cy / 100 * IMG_H;
+      return Math.sqrt(Math.pow(clickX-zx,2)+Math.pow(clickY-zy,2)) <= zone.r;
+    }
+    var pts = zone.points.map(ptPx);
+    if (zone.type === 'polygon')  return pointInPolygon(clickX, clickY, pts);
+    if (zone.type === 'polyline') return nearPolyline(clickX, clickY, pts, zone.tolerance);
+    return false;
+  }
+
+  /* ---- Zonen als SVG zeichnen ---- */
+  function drawZoneSvg(svg, zone, color, label) {
+    if (zone.type === 'circle') {
+      var zx = zone.cx / 100 * IMG_W, zy = zone.cy / 100 * IMG_H;
+      var c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      c.setAttribute('cx', zx); c.setAttribute('cy', zy); c.setAttribute('r', zone.r);
+      c.setAttribute('fill', color); c.setAttribute('fill-opacity', '0.2');
+      c.setAttribute('stroke', color); c.setAttribute('stroke-width', '2.5');
+      c.setAttribute('stroke-dasharray', '6 4');
+      svg.appendChild(c);
+      if (label) addLabel(svg, zx, zy, zone.name, color);
+    } else {
+      var pts = zone.points.map(ptPx);
+      var d = 'M ' + pts[0].x + ' ' + pts[0].y;
+      for (var i = 1; i < pts.length; i++) d += ' L ' + pts[i].x + ' ' + pts[i].y;
+      if (zone.type === 'polygon') d += ' Z';
+      var path = document.createElementNS('http://www.w3.org/2000/svg','path');
+      path.setAttribute('d', d);
+      path.setAttribute('fill', zone.type === 'polygon' ? color : 'none');
+      path.setAttribute('fill-opacity', '0.18');
+      path.setAttribute('stroke', color);
+      path.setAttribute('stroke-width', zone.type === 'polyline' ? '4' : '2.5');
+      path.setAttribute('stroke-dasharray', '7 4');
+      path.setAttribute('stroke-linecap', 'round');
+      svg.appendChild(path);
+      if (label) {
+        var mx = pts.reduce(function(s,p){return s+p.x;},0)/pts.length;
+        var my = pts.reduce(function(s,p){return s+p.y;},0)/pts.length;
+        addLabel(svg, mx, my, zone.name, color);
+      }
+    }
+  }
+
+  function addLabel(svg, x, y, text, color) {
+    var bg = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    var w = text.length * 6.8 + 10;
+    bg.setAttribute('x', x - w/2); bg.setAttribute('y', y - 11);
+    bg.setAttribute('width', w); bg.setAttribute('height', '17');
+    bg.setAttribute('rx', '4'); bg.setAttribute('fill', 'white'); bg.setAttribute('fill-opacity', '0.88');
+    svg.appendChild(bg);
+    var t = document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('x', x); t.setAttribute('y', y + 3);
+    t.setAttribute('text-anchor', 'middle'); t.setAttribute('font-size', '11');
+    t.setAttribute('font-weight', '700'); t.setAttribute('fill', color);
+    t.setAttribute('font-family', 'system-ui,sans-serif');
+    t.textContent = text;
+    svg.appendChild(t);
+  }
+
+  /* ---- Spiel ---- */
   function shuffle(arr) {
     var a = arr.slice();
     for (var i = a.length - 1; i > 0; i--) {
       var j = Math.floor(Math.random() * (i + 1));
-      var t = a[i]; a[i] = a[j]; a[j] = t;
+      var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
     }
     return a;
   }
@@ -228,103 +347,58 @@
     document.getElementById('imgWrap').style.display = 'block';
     document.getElementById('questionCard').style.display = 'flex';
     document.getElementById('feedbackBar').className = 'feedback-bar';
-
     questions = shuffle(ZONES.map(function(_, i) { return i; }));
-    current   = 0;
-    score     = 0;
-    locked    = false;
-
-    clearSvg();
-    showQuestion();
+    current = 0; score = 0; locked = false;
+    clearSvg(); showQuestion();
   }
 
   function showQuestion() {
     if (current >= questions.length) { showEndScreen(); return; }
     var zone = ZONES[questions[current]];
-    var hint = zone.hint ? '<div style="font-size:0.75rem;font-weight:400;color:var(--text-subtle);margin-top:3px">' + zone.hint + '</div>' : '';
-    document.getElementById('questionText').innerHTML =
-      'Klick auf: <span>' + zone.name + '</span>' + hint;
-    document.getElementById('progressBadge').textContent =
-      (current + 1) + ' / ' + questions.length;
+    var hint = zone.hint
+      ? '<div style="font-size:0.75rem;font-weight:400;color:var(--text-subtle);margin-top:3px">' + zone.hint + '</div>'
+      : '';
+    document.getElementById('questionText').innerHTML = 'Klick auf: <span>' + zone.name + '</span>' + hint;
+    document.getElementById('progressBadge').textContent = (current + 1) + ' / ' + questions.length;
     document.getElementById('feedbackBar').className = 'feedback-bar';
-    clearSvg();
-    locked = false;
+    clearSvg(); locked = false;
   }
 
-  function clearSvg() {
-    document.getElementById('bzSvg').innerHTML = '';
-  }
+  function clearSvg() { document.getElementById('bzSvg').innerHTML = ''; }
 
-  /* ---- Click-Handler ---- */
   document.getElementById('imgWrap').addEventListener('click', function(e) {
     if (locked) return;
     if (e.target.id === 'startOverlay' || e.target.closest('#startOverlay')) return;
 
     var rect   = document.getElementById('bzImg').getBoundingClientRect();
-    var scaleX = IMG_W / rect.width;
-    var scaleY = IMG_H / rect.height;
-    var clickX = (e.clientX - rect.left)  * scaleX;
-    var clickY = (e.clientY - rect.top)   * scaleY;
-
-    var zone    = ZONES[questions[current]];
-    var zx      = zone.cx / 100 * IMG_W;
-    var zy      = zone.cy / 100 * IMG_H;
-    var dist    = Math.sqrt(Math.pow(clickX - zx, 2) + Math.pow(clickY - zy, 2));
-    var correct = dist <= zone.r;
+    var clickX = (e.clientX - rect.left) / rect.width  * IMG_W;
+    var clickY = (e.clientY - rect.top)  / rect.height * IMG_H;
+    var zone   = ZONES[questions[current]];
+    var correct = isHit(clickX, clickY, zone);
 
     locked = true;
-    showClickFeedback(clickX, clickY, correct, zx, zy);
+    var svg   = document.getElementById('bzSvg');
+    var color = correct ? '#16a34a' : '#dc2626';
+
+    /* Klickpunkt */
+    var dot = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    dot.setAttribute('cx', clickX); dot.setAttribute('cy', clickY); dot.setAttribute('r', '14');
+    dot.setAttribute('fill', color); dot.setAttribute('fill-opacity', '0.35');
+    dot.setAttribute('stroke', color); dot.setAttribute('stroke-width', '2.5');
+    svg.appendChild(dot);
+
+    /* Bei falsch: korrekte Zone einzeichnen */
+    if (!correct) drawZoneSvg(svg, zone, '#16a34a', false);
 
     if (correct) {
       score++;
       setFeedback(true, zone.name + ' – Richtig!');
       setTimeout(function() { current++; showQuestion(); }, 1400);
     } else {
-      setFeedback(false, 'Nicht ganz – die richtige Stelle wird grün markiert.');
+      setFeedback(false, 'Nicht ganz – die korrekte Zone wird grün markiert.');
       setTimeout(function() { current++; showQuestion(); }, 2800);
     }
   });
-
-  function showClickFeedback(cx, cy, correct, zx, zy) {
-    var svg   = document.getElementById('bzSvg');
-    var color = correct ? '#16a34a' : '#dc2626';
-
-    /* Klick-Ring */
-    var ring = document.createElementNS('http://www.w3.org/2000/svg','circle');
-    ring.setAttribute('cx', cx);
-    ring.setAttribute('cy', cy);
-    ring.setAttribute('r',  '16');
-    ring.setAttribute('fill', color);
-    ring.setAttribute('fill-opacity', '0.35');
-    ring.setAttribute('stroke', color);
-    ring.setAttribute('stroke-width', '2.5');
-    svg.appendChild(ring);
-
-    /* Bei falsch: korrekte Zone grün anzeigen */
-    if (!correct) {
-      var correctCircle = document.createElementNS('http://www.w3.org/2000/svg','circle');
-      correctCircle.setAttribute('cx', zx);
-      correctCircle.setAttribute('cy', zy);
-      correctCircle.setAttribute('r',  '20');
-      correctCircle.setAttribute('fill', '#16a34a');
-      correctCircle.setAttribute('fill-opacity', '0.25');
-      correctCircle.setAttribute('stroke', '#16a34a');
-      correctCircle.setAttribute('stroke-width', '3');
-      correctCircle.setAttribute('stroke-dasharray', '6 4');
-      svg.appendChild(correctCircle);
-
-      /* Pulsierender Aussenring */
-      var pulse = document.createElementNS('http://www.w3.org/2000/svg','circle');
-      pulse.setAttribute('cx', zx);
-      pulse.setAttribute('cy', zy);
-      pulse.setAttribute('r',  '18');
-      pulse.setAttribute('fill', 'none');
-      pulse.setAttribute('stroke', '#16a34a');
-      pulse.setAttribute('stroke-width', '3');
-      pulse.setAttribute('class', 'pulse-anim');
-      svg.appendChild(pulse);
-    }
-  }
 
   function setFeedback(correct, text) {
     var bar = document.getElementById('feedbackBar');
@@ -346,87 +420,35 @@
     document.getElementById('questionCard').style.display = 'flex';
     document.getElementById('questionText').innerHTML = 'Alle Strukturen';
     document.getElementById('progressBadge').textContent = '';
-    locked = true;
-    clearSvg();
-
-    var svg    = document.getElementById('bzSvg');
+    locked = true; clearSvg();
     var colors = ['#0066CC','#C40027','#059669','#7c3aed','#d97706','#0891b2','#be185d','#4d7c0f'];
-
-    ZONES.forEach(function(zone, i) {
-      var zx = zone.cx / 100 * IMG_W;
-      var zy = zone.cy / 100 * IMG_H;
-
-      var c = document.createElementNS('http://www.w3.org/2000/svg','circle');
-      c.setAttribute('cx', zx); c.setAttribute('cy', zy); c.setAttribute('r', '14');
-      c.setAttribute('fill', colors[i]); c.setAttribute('fill-opacity', '0.25');
-      c.setAttribute('stroke', colors[i]); c.setAttribute('stroke-width', '2');
-      svg.appendChild(c);
-
-      var bg = document.createElementNS('http://www.w3.org/2000/svg','rect');
-      var labelX = zx + 18, labelY = zy + 5;
-      if (labelX > 460) labelX = zx - 18 - zone.name.length * 6.5;
-      bg.setAttribute('x', labelX - 4); bg.setAttribute('y', labelY - 13);
-      bg.setAttribute('width', zone.name.length * 6.8 + 8); bg.setAttribute('height', '18');
-      bg.setAttribute('rx', '4'); bg.setAttribute('fill', 'white'); bg.setAttribute('fill-opacity', '0.85');
-      svg.appendChild(bg);
-
-      var t = document.createElementNS('http://www.w3.org/2000/svg','text');
-      t.setAttribute('x', labelX); t.setAttribute('y', labelY);
-      t.setAttribute('font-size', '12'); t.setAttribute('font-weight', '600');
-      t.setAttribute('fill', colors[i]); t.setAttribute('font-family', 'system-ui,sans-serif');
-      t.textContent = zone.name;
-      svg.appendChild(t);
-    });
-
+    var svg = document.getElementById('bzSvg');
+    ZONES.forEach(function(zone, i) { drawZoneSvg(svg, zone, colors[i], true); });
     document.getElementById('feedbackBar').className = 'feedback-bar visible correct-fb';
-    document.getElementById('feedbackBar').textContent = 'Übersicht aller Strukturen — klick «Nochmals» um neu zu starten.';
+    document.getElementById('feedbackBar').textContent = 'Übersicht aller Strukturen – klick «Nochmals» um neu zu starten.';
   }
 
-  /* ================================================================
-     DEBUG-MODUS  (?debug in der URL)
-     Zeigt alle Zonen + Klick-Koordinaten zur Kalibrierung
-     ================================================================ */
+  /* ---- Debug-Modus (?debug) ---- */
   if (window.location.search.indexOf('debug') !== -1) {
     document.getElementById('startOverlay').classList.add('hidden');
     document.getElementById('questionCard').style.display = 'flex';
     document.getElementById('questionText').innerHTML = '<span style="color:#d97706">Debug-Modus</span>';
     document.getElementById('progressBadge').textContent = 'Klick zum Messen';
     locked = true;
-
-    /* Alle Zonen einzeichnen */
     var dbgSvg    = document.getElementById('bzSvg');
     var dbgColors = ['#0066CC','#C40027','#059669','#7c3aed','#d97706','#0891b2','#be185d','#4d7c0f'];
-    ZONES.forEach(function(zone, i) {
-      var zx = zone.cx / 100 * IMG_W;
-      var zy = zone.cy / 100 * IMG_H;
-      var c = document.createElementNS('http://www.w3.org/2000/svg','circle');
-      c.setAttribute('cx', zx); c.setAttribute('cy', zy); c.setAttribute('r', zone.r);
-      c.setAttribute('fill', dbgColors[i]); c.setAttribute('fill-opacity', '0.18');
-      c.setAttribute('stroke', dbgColors[i]); c.setAttribute('stroke-width', '2');
-      dbgSvg.appendChild(c);
-      var t = document.createElementNS('http://www.w3.org/2000/svg','text');
-      t.setAttribute('x', zx); t.setAttribute('y', zy + 4);
-      t.setAttribute('text-anchor', 'middle');
-      t.setAttribute('font-size', '11'); t.setAttribute('font-weight', '700');
-      t.setAttribute('fill', dbgColors[i]); t.setAttribute('font-family', 'system-ui,sans-serif');
-      t.textContent = zone.name;
-      dbgSvg.appendChild(t);
-    });
-
-    /* Klick → Koordinaten anzeigen */
+    ZONES.forEach(function(zone, i) { drawZoneSvg(dbgSvg, zone, dbgColors[i], true); });
     document.getElementById('imgWrap').addEventListener('click', function(e) {
       var rect   = document.getElementById('bzImg').getBoundingClientRect();
       var clickX = Math.round((e.clientX - rect.left) / rect.width  * IMG_W);
       var clickY = Math.round((e.clientY - rect.top)  / rect.height * IMG_H);
-      var pctX   = Math.round(clickX / IMG_W * 100);
-      var pctY   = Math.round(clickY / IMG_H * 100);
       document.getElementById('progressBadge').textContent =
-        'px: ' + clickX + ' / ' + clickY + '  |  %: ' + pctX + ' / ' + pctY;
-      /* Markierungspunkt */
-      var dot = document.createElementNS('http://www.w3.org/2000/svg','circle');
-      dot.setAttribute('cx', clickX); dot.setAttribute('cy', clickY); dot.setAttribute('r', '5');
-      dot.setAttribute('fill', '#f59e0b'); dot.setAttribute('stroke', '#92400e'); dot.setAttribute('stroke-width', '1.5');
-      dbgSvg.appendChild(dot);
+        'px: ' + clickX + ' / ' + clickY + '  |  %: ' +
+        Math.round(clickX/IMG_W*100) + ' / ' + Math.round(clickY/IMG_H*100);
+      var d = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      d.setAttribute('cx', clickX); d.setAttribute('cy', clickY); d.setAttribute('r', '5');
+      d.setAttribute('fill', '#f59e0b'); d.setAttribute('stroke', '#92400e'); d.setAttribute('stroke-width', '1.5');
+      dbgSvg.appendChild(d);
     });
   }
 </script>
