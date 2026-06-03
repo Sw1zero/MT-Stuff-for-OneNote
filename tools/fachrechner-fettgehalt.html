@@ -105,7 +105,7 @@
       letter-spacing: 0.06em;
     }
 
-    input[type="text"], input[type="number"] {
+    input[type="text"] {
       font-family: var(--font);
       font-size: 0.92rem;
       padding: 9px 12px;
@@ -151,16 +151,6 @@
       letter-spacing: 0.06em;
     }
 
-    .total-row {
-      display: grid;
-      grid-template-columns: 1fr 80px;
-      gap: 10px 12px;
-      align-items: end;
-      padding-top: 4px;
-      border-top: 1px solid var(--border);
-      margin-top: 4px;
-    }
-
     .optional-note {
       font-size: 0.72rem;
       color: var(--text-subtle);
@@ -175,7 +165,6 @@
       padding: 8px 12px;
       display: none;
     }
-
     .error-msg.visible { display: block; }
 
     /* ---- Mischungskreuz SVG ---- */
@@ -186,7 +175,6 @@
       padding: 24px;
       display: none;
     }
-
     .cross-card.visible { display: block; }
 
     .cross-title {
@@ -211,7 +199,6 @@
       padding: 24px;
       display: none;
     }
-
     .result-card.visible { display: block; }
 
     .result-title {
@@ -228,7 +215,6 @@
       border-collapse: collapse;
       font-size: 0.88rem;
     }
-
     .result-table th {
       text-align: left;
       font-size: 0.72rem;
@@ -239,21 +225,17 @@
       padding: 0 8px 10px 0;
       border-bottom: 1px solid var(--border);
     }
-
     .result-table td {
       padding: 10px 8px 10px 0;
       border-bottom: 1px solid #f1f5f9;
       color: var(--text);
     }
-
     .result-table tr:last-child td { border-bottom: none; }
-
     .result-table .val {
       font-weight: 700;
       color: var(--red-dark);
       font-size: 1rem;
     }
-
     .result-table .total-row-result td {
       font-weight: 600;
       background: #f8fafc;
@@ -268,7 +250,6 @@
       padding: 24px;
       display: none;
     }
-
     .steps-card.visible { display: block; }
 
     .steps-title {
@@ -332,7 +313,6 @@
       color: #276749;
       line-height: 1.55;
     }
-
     .probe-box strong { display: block; margin-bottom: 4px; }
 
     .opt { font-weight:400; text-transform:none; letter-spacing:0; }
@@ -351,6 +331,142 @@
     }
     .qty-toggle-btn:hover { border-color: var(--blue); color: var(--blue-dark); }
     .qty-toggle-btn.active { background: var(--blue); border-color: var(--blue); color: #fff; }
+
+    /* ---- Divider between sections ---- */
+    .section-divider {
+      width: 520px;
+      max-width: 92vw;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 8px 0;
+    }
+    .section-divider-line { flex: 1; height: 1px; background: var(--border); }
+    .section-divider-text {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-subtle);
+    }
+
+    /* ---- Übungsaufgaben ---- */
+    .quiz-wrap {
+      width: 520px;
+      max-width: 92vw;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .quiz-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .quiz-section-title {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-subtle);
+    }
+
+    .quiz-new-btn {
+      font-family: var(--font);
+      font-size: 0.78rem;
+      font-weight: 500;
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .quiz-new-btn:hover { border-color: var(--red); color: var(--red-dark); background: var(--red-light); }
+
+    .quiz-card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: 24px;
+    }
+
+    .quiz-question {
+      font-size: 0.92rem;
+      color: var(--text);
+      line-height: 1.65;
+      margin-bottom: 20px;
+    }
+
+    .quiz-question strong { color: var(--blue-dark); }
+
+    .quiz-inputs {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .quiz-input-row {
+      display: grid;
+      grid-template-columns: 1fr 110px 40px;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .quiz-input-label {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .quiz-input-field {
+      font-family: var(--font);
+      font-size: 0.92rem;
+      padding: 8px 11px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      background: #f8fafc;
+      transition: border-color 0.15s;
+      width: 100%;
+      text-align: right;
+    }
+    .quiz-input-field:focus {
+      outline: none;
+      border-color: var(--blue);
+      background: var(--surface);
+    }
+    .quiz-input-field.correct { border-color: #16a34a; background: #f0fff4; }
+    .quiz-input-field.wrong   { border-color: var(--red); background: var(--red-light); }
+
+    .quiz-unit {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .quiz-feedback {
+      margin-top: 16px;
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      line-height: 1.55;
+      display: none;
+    }
+    .quiz-feedback.visible { display: block; }
+    .quiz-feedback.correct-fb { background: #f0fff4; border: 1px solid #9ae6b4; color: #166534; }
+    .quiz-feedback.wrong-fb   { background: var(--red-light); border: 1px solid #fca5a5; color: #991b1b; }
+
+    .quiz-empty {
+      text-align: center;
+      padding: 32px 16px;
+      color: var(--text-subtle);
+      font-size: 0.88rem;
+    }
   </style>
 </head>
 <body>
@@ -384,7 +500,7 @@
 
         <div class="input-row">
           <label>Fettgehalt A</label>
-          <input type="number" id="valueA" placeholder="3.8" step="0.01" min="0">
+          <input type="text" inputmode="decimal" id="valueA" placeholder="3.8">
         </div>
         <div class="input-row">
           <label>&nbsp;</label>
@@ -401,7 +517,7 @@
       <div class="input-grid" style="margin-top:12px;">
         <div class="input-row">
           <label>Ziel-Fettgehalt</label>
-          <input type="number" id="target" placeholder="1.5" step="0.01" min="0">
+          <input type="text" inputmode="decimal" id="target" placeholder="1.5">
         </div>
         <div class="input-row">
           <label>&nbsp;</label>
@@ -424,7 +540,7 @@
 
         <div class="input-row">
           <label>Fettgehalt B</label>
-          <input type="number" id="valueB" placeholder="0.05" step="0.01" min="0">
+          <input type="text" inputmode="decimal" id="valueB" placeholder="0.1">
         </div>
         <div class="input-row">
           <label>&nbsp;</label>
@@ -442,7 +558,7 @@
         <div style="display:grid; grid-template-columns:1fr 80px; gap:10px 12px; align-items:end;">
           <div class="input-row">
             <label id="qtyLabel">Gesamtmenge <span class="opt">(optional)</span></label>
-            <input type="number" id="qtyInput" placeholder="100" step="0.1" min="0">
+            <input type="text" inputmode="decimal" id="qtyInput" placeholder="100">
             <div class="optional-note" id="qtyNote">Wenn angegeben, werden die Mengen in kg berechnet.</div>
           </div>
           <div class="input-row">
@@ -483,19 +599,49 @@
 
   </div>
 
-  <script>
-    var mode = 'total';
+  <!-- Divider -->
+  <div class="section-divider" style="margin-top:40px;">
+    <div class="section-divider-line"></div>
+    <div class="section-divider-text">Übungsaufgaben</div>
+    <div class="section-divider-line"></div>
+  </div>
 
+  <div class="quiz-wrap">
+    <div class="quiz-card">
+      <div class="quiz-header">
+        <span class="quiz-section-title">Aufgabe</span>
+        <button class="quiz-new-btn" onclick="newQuestion()">Neue Aufgabe</button>
+      </div>
+      <div id="quizBody">
+        <div class="quiz-empty">Klick auf «Neue Aufgabe» um zu starten.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ---- Hilfsfunktionen ---- */
+    function parseNum(str) {
+      return parseFloat(String(str).replace(',', '.'));
+    }
+
+    function r(n, dec) {
+      return parseFloat(n.toFixed(dec !== undefined ? dec : 2));
+    }
+
+    /* ---- Preset ---- */
     function loadPreset() {
-      document.getElementById('nameA').value   = 'Vollmilch';
-      document.getElementById('valueA').value  = 3.8;
-      document.getElementById('nameB').value   = 'Magermilch';
-      document.getElementById('valueB').value  = 0.05;
-      document.getElementById('target').value  = 1.5;
+      document.getElementById('nameA').value  = 'Vollmilch';
+      document.getElementById('valueA').value = '3.8';
+      document.getElementById('nameB').value  = 'Magermilch';
+      document.getElementById('valueB').value = '0.1';
+      document.getElementById('target').value = '1.5';
       setMode('total');
-      document.getElementById('qtyInput').value = 100;
+      document.getElementById('qtyInput').value = '100';
       calculate();
     }
+
+    /* ---- Mengenmodus ---- */
+    var mode = 'total';
 
     function setMode(newMode) {
       mode = newMode;
@@ -525,15 +671,14 @@
       }
     }
 
-    function r(n, dec) { return parseFloat(n.toFixed(dec !== undefined ? dec : 2)); }
-
+    /* ---- Berechnung ---- */
     function calculate() {
       var nameA  = document.getElementById('nameA').value.trim()  || 'Komponente A';
       var nameB  = document.getElementById('nameB').value.trim()  || 'Komponente B';
-      var a      = parseFloat(document.getElementById('valueA').value);
-      var b      = parseFloat(document.getElementById('valueB').value);
-      var c      = parseFloat(document.getElementById('target').value);
-      var qtyRaw = parseFloat(document.getElementById('qtyInput').value);
+      var a      = parseNum(document.getElementById('valueA').value);
+      var b      = parseNum(document.getElementById('valueB').value);
+      var c      = parseNum(document.getElementById('target').value);
+      var qtyRaw = parseNum(document.getElementById('qtyInput').value);
       var hasQty = !isNaN(qtyRaw) && qtyRaw > 0;
 
       var err = document.getElementById('errorMsg');
@@ -688,6 +833,99 @@
       setMode('total');
       document.getElementById('errorMsg').classList.remove('visible');
       hideResults();
+    }
+
+    /* ================================================================
+       ÜBUNGSAUFGABEN
+       ================================================================ */
+
+    var QUESTION_POOL = [
+      { A:{n:'Vollmilch',f:3.8},   B:{n:'Magermilch',f:0.1},  targets:[1.5, 2.0, 2.5, 3.0, 3.5] },
+      { A:{n:'Rahm',f:35},         B:{n:'Vollmilch',f:3.8},   targets:[7, 10, 15, 20, 25] },
+      { A:{n:'Doppelrahm',f:45},   B:{n:'Halbrahm',f:15},     targets:[20, 25, 30, 35, 40] },
+      { A:{n:'Rahm',f:35},         B:{n:'Magermilch',f:0.1},  targets:[5, 7, 10, 15, 20] },
+      { A:{n:'Halbrahm',f:15},     B:{n:'Magermilch',f:0.1},  targets:[1.5, 3.5, 5, 7, 10] },
+      { A:{n:'Doppelrahm',f:45},   B:{n:'Vollmilch',f:3.8},   targets:[10, 15, 20, 25, 30] },
+    ];
+
+    var TOTALS = [100, 150, 200, 250, 300, 400, 500];
+
+    var currentAnswer = null;
+
+    function newQuestion() {
+      var pool   = QUESTION_POOL[Math.floor(Math.random() * QUESTION_POOL.length)];
+      var target = pool.targets[Math.floor(Math.random() * pool.targets.length)];
+      var total  = TOTALS[Math.floor(Math.random() * TOTALS.length)];
+
+      var partsA     = Math.abs(target - pool.B.f);
+      var partsB     = Math.abs(pool.A.f - target);
+      var partsTotal = partsA + partsB;
+      var amtA       = (partsA / partsTotal) * total;
+      var amtB       = (partsB / partsTotal) * total;
+
+      currentAnswer = { amtA: amtA, amtB: amtB, nA: pool.A.n, nB: pool.B.n };
+
+      var html =
+        '<div class="quiz-question">' +
+        'Du sollst <strong>' + total + ' kg Milch mit ' + target + ' % Fettgehalt</strong> herstellen.<br>' +
+        'Dir stehen zur Verfügung:<br>' +
+        '&nbsp;&nbsp;– <strong>' + pool.A.n + '</strong> mit <strong>' + pool.A.f + ' % Fett</strong><br>' +
+        '&nbsp;&nbsp;– <strong>' + pool.B.n + '</strong> mit <strong>' + pool.B.f + ' % Fett</strong><br><br>' +
+        'Berechne auf Papier die benötigten Mengen und trag die Lösung ein.' +
+        '</div>' +
+        '<div class="quiz-inputs">' +
+        '<div class="quiz-input-row">' +
+        '<span class="quiz-input-label">' + pool.A.n + '</span>' +
+        '<input type="text" inputmode="decimal" class="quiz-input-field" id="ansA" placeholder="0.00">' +
+        '<span class="quiz-unit">kg</span>' +
+        '</div>' +
+        '<div class="quiz-input-row">' +
+        '<span class="quiz-input-label">' + pool.B.n + '</span>' +
+        '<input type="text" inputmode="decimal" class="quiz-input-field" id="ansB" placeholder="0.00">' +
+        '<span class="quiz-unit">kg</span>' +
+        '</div>' +
+        '</div>' +
+        '<button class="btn btn-primary" onclick="checkAnswer()" style="width:100%">Lösung prüfen</button>' +
+        '<div class="quiz-feedback" id="quizFeedback"></div>';
+
+      document.getElementById('quizBody').innerHTML = html;
+    }
+
+    function checkAnswer() {
+      if (!currentAnswer) return;
+
+      var inputA = parseNum(document.getElementById('ansA').value);
+      var inputB = parseNum(document.getElementById('ansB').value);
+      var fb     = document.getElementById('quizFeedback');
+      var fldA   = document.getElementById('ansA');
+      var fldB   = document.getElementById('ansB');
+
+      if (isNaN(inputA) || isNaN(inputB)) {
+        fb.className = 'quiz-feedback visible wrong-fb';
+        fb.textContent = 'Bitte beide Felder ausfüllen.';
+        return;
+      }
+
+      var tol    = Math.max(0.5, currentAnswer.amtA * 0.01);
+      var okA    = Math.abs(inputA - currentAnswer.amtA) <= tol;
+      var okB    = Math.abs(inputB - currentAnswer.amtB) <= tol;
+
+      fldA.className = 'quiz-input-field ' + (okA ? 'correct' : 'wrong');
+      fldB.className = 'quiz-input-field ' + (okB ? 'correct' : 'wrong');
+
+      if (okA && okB) {
+        fb.className = 'quiz-feedback visible correct-fb';
+        fb.innerHTML = '<strong>Richtig!</strong> ' +
+          currentAnswer.nA + ': ' + r(currentAnswer.amtA, 2) + ' kg &nbsp;|&nbsp; ' +
+          currentAnswer.nB + ': ' + r(currentAnswer.amtB, 2) + ' kg';
+      } else {
+        fb.className = 'quiz-feedback visible wrong-fb';
+        fb.innerHTML = '<strong>Nicht ganz.</strong> Korrekte Mengen:<br>' +
+          currentAnswer.nA + ': <strong>' + r(currentAnswer.amtA, 2) + ' kg</strong><br>' +
+          currentAnswer.nB + ': <strong>' + r(currentAnswer.amtB, 2) + ' kg</strong>';
+      }
+
+      fb.classList.add('visible');
     }
   </script>
 </body>
