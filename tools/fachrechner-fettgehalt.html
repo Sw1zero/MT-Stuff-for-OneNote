@@ -879,9 +879,11 @@
     var currentAnswer = null;
 
     function newQuestion() {
-      var pool   = QUESTION_POOL[Math.floor(Math.random() * QUESTION_POOL.length)];
-      var target = pool.targets[Math.floor(Math.random() * pool.targets.length)];
-      var total  = TOTALS[Math.floor(Math.random() * TOTALS.length)];
+      var pool      = QUESTION_POOL[Math.floor(Math.random() * QUESTION_POOL.length)];
+      var target    = pool.targets[Math.floor(Math.random() * pool.targets.length)];
+      var total     = TOTALS[Math.floor(Math.random() * TOTALS.length)];
+      var qModes    = ['total', 'qtyA', 'qtyB'];
+      var qMode     = qModes[Math.floor(Math.random() * 3)];
 
       var partsA     = Math.abs(target - pool.B.f);
       var partsB     = Math.abs(pool.A.f - target);
@@ -889,29 +891,52 @@
       var amtA       = (partsA / partsTotal) * total;
       var amtB       = (partsB / partsTotal) * total;
 
-      currentAnswer = { amtA: amtA, amtB: amtB, nA: pool.A.n, nB: pool.B.n };
+      currentAnswer = { amtA: amtA, amtB: amtB, total: total, qMode: qMode, nA: pool.A.n, nB: pool.B.n };
 
       var produktLabel = pool.product
-        ? '<strong>' + total + ' kg ' + pool.product + '</strong> (Ziel-Fettgehalt: <strong>' + target + ' %</strong>)'
-        : '<strong>' + total + ' kg Milch mit ' + target + ' % Fettgehalt</strong>';
+        ? '<strong>' + pool.product + '</strong> (Ziel-Fettgehalt: <strong>' + target + ' %</strong>)'
+        : 'Milch mit <strong>' + target + ' % Fettgehalt</strong>';
+
+      var frageText, input1Id, input1Label, input2Id, input2Label;
+
+      if (qMode === 'total') {
+        frageText =
+          'Sie haben den Auftrag erhalten <strong>' + total + ' kg ' + produktLabel + '</strong> herzustellen.<br>' +
+          'Ihnen stehen zur Verfügung:<br>' +
+          '&nbsp;&nbsp;– <strong>' + pool.A.n + '</strong> mit <strong>' + pool.A.f + ' % Fett</strong><br>' +
+          '&nbsp;&nbsp;– <strong>' + pool.B.n + '</strong> mit <strong>' + pool.B.f + ' % Fett</strong><br><br>' +
+          'Wie viel kg benötigen Sie von jeder Komponente?';
+        input1Id = 'ans1'; input1Label = pool.A.n;
+        input2Id = 'ans2'; input2Label = pool.B.n;
+      } else if (qMode === 'qtyA') {
+        frageText =
+          'Sie haben <strong>' + r(amtA, 1) + ' kg ' + pool.A.n + '</strong> (' + pool.A.f + ' % Fett) zur Verfügung.<br>' +
+          'Sie möchten daraus <strong>' + produktLabel + '</strong> herstellen.<br>' +
+          'Dazu wird <strong>' + pool.B.n + '</strong> (' + pool.B.f + ' % Fett) zugegeben.<br><br>' +
+          'Wie viel kg <strong>' + pool.B.n + '</strong> benötigen Sie? Wie gross ist die <strong>Gesamtmenge</strong>?';
+        input1Id = 'ans1'; input1Label = pool.B.n;
+        input2Id = 'ans2'; input2Label = 'Gesamtmenge';
+      } else {
+        frageText =
+          'Sie haben <strong>' + r(amtB, 1) + ' kg ' + pool.B.n + '</strong> (' + pool.B.f + ' % Fett) zur Verfügung.<br>' +
+          'Sie möchten daraus <strong>' + produktLabel + '</strong> herstellen.<br>' +
+          'Dazu wird <strong>' + pool.A.n + '</strong> (' + pool.A.f + ' % Fett) zugegeben.<br><br>' +
+          'Wie viel kg <strong>' + pool.A.n + '</strong> benötigen Sie? Wie gross ist die <strong>Gesamtmenge</strong>?';
+        input1Id = 'ans1'; input1Label = pool.A.n;
+        input2Id = 'ans2'; input2Label = 'Gesamtmenge';
+      }
 
       var html =
-        '<div class="quiz-question">' +
-        'Sie haben den Auftrag erhalten ' + produktLabel + ' herzustellen.<br>' +
-        'Ihnen stehen zur Verfügung:<br>' +
-        '&nbsp;&nbsp;– <strong>' + pool.A.n + '</strong> mit <strong>' + pool.A.f + ' % Fett</strong><br>' +
-        '&nbsp;&nbsp;– <strong>' + pool.B.n + '</strong> mit <strong>' + pool.B.f + ' % Fett</strong><br><br>' +
-        'Berechnen Sie auf Papier die benötigten Mengen und tragen Sie die Lösung ein.' +
-        '</div>' +
+        '<div class="quiz-question">' + frageText + '</div>' +
         '<div class="quiz-inputs">' +
         '<div class="quiz-input-row">' +
-        '<span class="quiz-input-label">' + pool.A.n + '</span>' +
-        '<input type="text" inputmode="decimal" class="quiz-input-field" id="ansA" placeholder="0.00">' +
+        '<span class="quiz-input-label">' + input1Label + '</span>' +
+        '<input type="text" inputmode="decimal" class="quiz-input-field" id="' + input1Id + '" placeholder="0.00">' +
         '<span class="quiz-unit">kg</span>' +
         '</div>' +
         '<div class="quiz-input-row">' +
-        '<span class="quiz-input-label">' + pool.B.n + '</span>' +
-        '<input type="text" inputmode="decimal" class="quiz-input-field" id="ansB" placeholder="0.00">' +
+        '<span class="quiz-input-label">' + input2Label + '</span>' +
+        '<input type="text" inputmode="decimal" class="quiz-input-field" id="' + input2Id + '" placeholder="0.00">' +
         '<span class="quiz-unit">kg</span>' +
         '</div>' +
         '</div>' +
@@ -924,35 +949,52 @@
     function checkAnswer() {
       if (!currentAnswer) return;
 
-      var inputA = parseNum(document.getElementById('ansA').value);
-      var inputB = parseNum(document.getElementById('ansB').value);
-      var fb     = document.getElementById('quizFeedback');
-      var fldA   = document.getElementById('ansA');
-      var fldB   = document.getElementById('ansB');
+      var in1 = parseNum(document.getElementById('ans1').value);
+      var in2 = parseNum(document.getElementById('ans2').value);
+      var fb  = document.getElementById('quizFeedback');
+      var f1  = document.getElementById('ans1');
+      var f2  = document.getElementById('ans2');
 
-      if (isNaN(inputA) || isNaN(inputB)) {
+      if (isNaN(in1) || isNaN(in2)) {
         fb.className = 'quiz-feedback visible wrong-fb';
         fb.textContent = 'Bitte beide Felder ausfüllen.';
         return;
       }
 
-      var tol    = Math.max(0.5, currentAnswer.amtA * 0.01);
-      var okA    = Math.abs(inputA - currentAnswer.amtA) <= tol;
-      var okB    = Math.abs(inputB - currentAnswer.amtB) <= tol;
+      var ca    = currentAnswer;
+      var tol   = Math.max(1, ca.total * 0.005);
+      var ok1, ok2, correct1, correct2, label1, label2;
 
-      fldA.className = 'quiz-input-field ' + (okA ? 'correct' : 'wrong');
-      fldB.className = 'quiz-input-field ' + (okB ? 'correct' : 'wrong');
+      if (ca.qMode === 'total') {
+        ok1 = Math.abs(in1 - ca.amtA) <= tol;
+        ok2 = Math.abs(in2 - ca.amtB) <= tol;
+        correct1 = r(ca.amtA, 2); label1 = ca.nA;
+        correct2 = r(ca.amtB, 2); label2 = ca.nB;
+      } else if (ca.qMode === 'qtyA') {
+        ok1 = Math.abs(in1 - ca.amtB) <= tol;
+        ok2 = Math.abs(in2 - ca.total) <= tol;
+        correct1 = r(ca.amtB, 2); label1 = ca.nB;
+        correct2 = r(ca.total, 2); label2 = 'Gesamtmenge';
+      } else {
+        ok1 = Math.abs(in1 - ca.amtA) <= tol;
+        ok2 = Math.abs(in2 - ca.total) <= tol;
+        correct1 = r(ca.amtA, 2); label1 = ca.nA;
+        correct2 = r(ca.total, 2); label2 = 'Gesamtmenge';
+      }
 
-      if (okA && okB) {
+      f1.className = 'quiz-input-field ' + (ok1 ? 'correct' : 'wrong');
+      f2.className = 'quiz-input-field ' + (ok2 ? 'correct' : 'wrong');
+
+      if (ok1 && ok2) {
         fb.className = 'quiz-feedback visible correct-fb';
         fb.innerHTML = '<strong>Richtig!</strong> ' +
-          currentAnswer.nA + ': ' + r(currentAnswer.amtA, 2) + ' kg &nbsp;|&nbsp; ' +
-          currentAnswer.nB + ': ' + r(currentAnswer.amtB, 2) + ' kg';
+          label1 + ': ' + correct1 + ' kg &nbsp;|&nbsp; ' +
+          label2 + ': ' + correct2 + ' kg';
       } else {
         fb.className = 'quiz-feedback visible wrong-fb';
-        fb.innerHTML = '<strong>Nicht ganz.</strong> Korrekte Mengen:<br>' +
-          currentAnswer.nA + ': <strong>' + r(currentAnswer.amtA, 2) + ' kg</strong><br>' +
-          currentAnswer.nB + ': <strong>' + r(currentAnswer.amtB, 2) + ' kg</strong>';
+        fb.innerHTML = '<strong>Nicht ganz.</strong> Korrekte Werte:<br>' +
+          label1 + ': <strong>' + correct1 + ' kg</strong><br>' +
+          label2 + ': <strong>' + correct2 + ' kg</strong>';
       }
 
       fb.classList.add('visible');
