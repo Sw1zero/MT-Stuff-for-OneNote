@@ -113,13 +113,17 @@
       <!-- Netzwerklinien (Gallerte, Step 5) -->
       <g id="netLines" opacity="0"></g>
 
-      <!-- Molke-Tröpfchen (Step 5) -->
+      <!-- Molke-Tröpfchen mit Molkenproteine (Step 5) -->
       <g id="wheyDrops" opacity="0">
         <circle cx="158" cy="127" r="9" fill="#bae6fd" opacity="0.8"/>
         <circle cx="255" cy="122" r="7" fill="#bae6fd" opacity="0.8"/>
         <circle cx="352" cy="128" r="8" fill="#bae6fd" opacity="0.8"/>
         <circle cx="205" cy="212" r="8" fill="#bae6fd" opacity="0.8"/>
         <circle cx="305" cy="210" r="7" fill="#bae6fd" opacity="0.8"/>
+        <!-- Legende -->
+        <rect x="4" y="285" width="176" height="18" rx="4" fill="white" fill-opacity="0.85"/>
+        <circle cx="14" cy="294" r="6" fill="#bae6fd"/>
+        <text x="24" y="298" font-family="system-ui,sans-serif" font-size="10" fill="#0369a1">= Molke mit Molkenproteinen (nicht gefällt)</text>
       </g>
 
       <!-- Milchsäurebakterien (ab Step 2) -->
@@ -212,8 +216,8 @@
   var STEPS = [
     {
       ph: 6.7,
-      title: 'Schritt 1 – Normaler pH-Wert (pH 6.7)',
-      text:  'Kaseinmizellen tragen bei normalem pH (~6.7) negative elektrische Ladungen (−). Gleichnamige Ladungen stossen sich gegenseitig ab – die Mizellen bleiben einzeln in der Lösung verteilt. Die Milch bleibt flüssig.',
+      title: 'Schritt 1 – Ausgangslage (pH 6.7)',
+      text:  'Kasein ist das Haupteiweiss der Milch. Bei normalem pH (~6.7) trägt Kasein überwiegend negative elektrische Ladungen (−). Gleichnamige Ladungen stossen sich ab → die Mizellen bleiben einzeln in der Lösung verteilt → Milch bleibt flüssig.',
       chargeOpacity: 1.0,
       showBact:  false,
       showNet:   false,
@@ -221,8 +225,8 @@
     },
     {
       ph: 6.0,
-      title: 'Schritt 2 – Milchsäurebakterien sind aktiv',
-      text:  'Milchsäurebakterien (MSB) vergären Laktose zu Milchsäure. Der pH-Wert beginnt zu sinken. Die elektrischen Ladungen auf den Kaseinmizellen werden schwächer – die gegenseitige Abstossung lässt nach.',
+      title: 'Schritt 2 – Milchsäuregärung senkt den pH',
+      text:  'Milchsäurebakterien (MSB) gewinnen Energie aus Laktose. Als Nebenprodukt entsteht Milchsäure → pH-Wert sinkt. Die negativen Ladungen auf den Kaseinmizellen werden durch die Milchsäure zunehmend neutralisiert – die Abstossung lässt nach.',
       chargeOpacity: 0.55,
       showBact:  true,
       showNet:   false,
@@ -231,7 +235,7 @@
     {
       ph: 4.6,
       title: 'Schritt 3 – Isoelektrischer Punkt (pH 4.6)',
-      text:  'Bei pH 4.6 (isoelektrischer Punkt des Kaseins) sind alle negativen Ladungen neutralisiert. Die Abstossung zwischen den Mizellen fällt vollständig weg – sie können sich nun frei annähern.',
+      text:  'Bei pH 4.6, dem isoelektrischen Punkt des Kaseins, sind alle negativen Ladungen vollständig neutralisiert. Die Nettolodung der Kaseinmizellen ist null → die gegenseitige Abstossung fällt weg → die Mizellen können sich annähern.',
       chargeOpacity: 0.0,
       showBact:  true,
       showNet:   false,
@@ -239,8 +243,8 @@
     },
     {
       ph: 4.6,
-      title: 'Schritt 4 – Aggregation der Kaseinmizellen',
-      text:  'Ohne gegenseitige Abstossung ziehen sich die Kaseinmizellen an. Sie lagern sich zusammen (Aggregation) und bilden zunächst kleine Cluster. Dieser Vorgang ist der Beginn der Gelbildung.',
+      title: 'Schritt 4 – Aggregation',
+      text:  'Ohne Abstossung ziehen sich die Kaseinmizellen an und lagern sich zusammen (Aggregation). Es bilden sich zunächst kleine Cluster. Wichtig: Molkenproteine werden durch Säure NICHT ausgefällt – sie bleiben gelöst.',
       chargeOpacity: 0.0,
       showBact:  true,
       showNet:   false,
@@ -248,8 +252,8 @@
     },
     {
       ph: 4.5,
-      title: 'Schritt 5 – Gallerte entsteht',
-      text:  'Die Kaseinmizellen bilden ein dreidimensionales Proteinnetzwerk – die Gallerte. Wasser, Molkenproteine (blaue Tröpfchen) und weitere Milchbestandteile werden im Netzwerk eingeschlossen. Jogurt ist entstanden.',
+      title: 'Schritt 5 – Gallerte entsteht (pH 4.5 = 36–38 °SH)',
+      text:  'Die Kaseinmizellen bilden ein dreidimensionales Proteinnetzwerk – die Gallerte. Nur Kasein wird ausgefällt. Molkenproteine (blaue Tröpfchen) werden durch Säure NICHT gefällt; sie verbleiben gelöst in der Molkenphase. Bei pH 4.5 (= 36–38 °SH) wird das Kühlen eingeleitet.',
       chargeOpacity: 0.0,
       showBact:  true,
       showNet:   true,
