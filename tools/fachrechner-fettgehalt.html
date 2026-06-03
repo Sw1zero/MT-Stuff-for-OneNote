@@ -848,7 +848,11 @@
       { A:{n:'Doppelrahm',f:45},   B:{n:'Vollmilch',f:3.8},   targets:[10, 15, 20, 25, 30] },
     ];
 
-    var TOTALS = [100, 150, 200, 250, 300, 400, 500];
+    var TOTALS = (function() {
+      var t = [];
+      for (var i = 1000; i <= 5000; i += 50) t.push(i);
+      return t;
+    }());
 
     var currentAnswer = null;
 
