@@ -839,13 +839,42 @@
        ÜBUNGSAUFGABEN
        ================================================================ */
 
+    /* Fettgehalte gemäss Schweizer Lebensmittelrecht (g/kg → %):
+       Magermilch ≤ 0.5 %, Vollmilch ≥ 3.5 %, standardisierte Vollmilch 3.5–5 %,
+       teilentrahmte Milch 0.5–3.5 %, halbentrahmte Milch 1.5–1.8 %,
+       rahmangereicherte Milch 5–15 %, Halbrahm/Kaffeerahm ≥ 15 %,
+       Rahm/Vollrahm ≥ 35 %, Doppelrahm ≥ 45 % */
     var QUESTION_POOL = [
-      { A:{n:'Vollmilch',f:3.8},   B:{n:'Magermilch',f:0.1},  targets:[1.5, 2.0, 2.5, 3.0, 3.5] },
-      { A:{n:'Rahm',f:35},         B:{n:'Vollmilch',f:3.8},   targets:[7, 10, 15, 20, 25] },
-      { A:{n:'Doppelrahm',f:45},   B:{n:'Halbrahm',f:15},     targets:[20, 25, 30, 35, 40] },
-      { A:{n:'Rahm',f:35},         B:{n:'Magermilch',f:0.1},  targets:[5, 7, 10, 15, 20] },
-      { A:{n:'Halbrahm',f:15},     B:{n:'Magermilch',f:0.1},  targets:[1.5, 3.5, 5, 7, 10] },
-      { A:{n:'Doppelrahm',f:45},   B:{n:'Vollmilch',f:3.8},   targets:[10, 15, 20, 25, 30] },
+      {
+        A:{n:'Vollrahm',f:35}, B:{n:'Magermilch',f:0.1},
+        targets:[1.5, 1.6, 1.8, 2.0, 2.5, 3.0, 3.5, 3.8, 4.0, 4.5],
+        product:'standardisierte Vollmilch / teilentrahmte Milch'
+      },
+      {
+        A:{n:'Vollrahm',f:35}, B:{n:'Vollmilch',f:3.5},
+        targets:[15, 18, 20, 23, 25, 28, 30],
+        product:'Halbrahm / Kaffeerahm'
+      },
+      {
+        A:{n:'Doppelrahm',f:45}, B:{n:'Vollmilch',f:3.5},
+        targets:[15, 18, 20, 25, 30, 35],
+        product:'Halbrahm / Rahm'
+      },
+      {
+        A:{n:'Doppelrahm',f:45}, B:{n:'Vollrahm',f:35},
+        targets:[36, 37, 38, 39, 40, 41, 42, 43, 44],
+        product:'Vollrahm (adjustiert)'
+      },
+      {
+        A:{n:'Halbrahm',f:15}, B:{n:'Vollmilch',f:3.5},
+        targets:[5, 6, 7, 8, 10, 12],
+        product:'rahmangereicherte Milch'
+      },
+      {
+        A:{n:'Vollmilch',f:3.5}, B:{n:'Magermilch',f:0.1},
+        targets:[0.5, 1.0, 1.5, 1.6, 1.8, 2.0, 2.5, 3.0],
+        product:'halbentrahmte / teilentrahmte Milch'
+      },
     ];
 
     var TOTALS = (function() {
@@ -869,9 +898,13 @@
 
       currentAnswer = { amtA: amtA, amtB: amtB, nA: pool.A.n, nB: pool.B.n };
 
+      var produktLabel = pool.product
+        ? '<strong>' + total + ' kg ' + pool.product + '</strong> (Ziel-Fettgehalt: <strong>' + target + ' %</strong>)'
+        : '<strong>' + total + ' kg Milch mit ' + target + ' % Fettgehalt</strong>';
+
       var html =
         '<div class="quiz-question">' +
-        'Sie haben den Auftrag erhalten <strong>' + total + ' kg Milch mit ' + target + ' % Fettgehalt</strong> herzustellen.<br>' +
+        'Sie haben den Auftrag erhalten ' + produktLabel + ' herzustellen.<br>' +
         'Ihnen stehen zur Verfügung:<br>' +
         '&nbsp;&nbsp;– <strong>' + pool.A.n + '</strong> mit <strong>' + pool.A.f + ' % Fett</strong><br>' +
         '&nbsp;&nbsp;– <strong>' + pool.B.n + '</strong> mit <strong>' + pool.B.f + ' % Fett</strong><br><br>' +
