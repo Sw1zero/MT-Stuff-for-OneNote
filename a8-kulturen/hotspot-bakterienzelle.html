@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hotspot – Bakterienzelle</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 28px 16px 56px;
+    }
+
+    .back-link {
+      font-size: 0.78rem;
+      color: var(--text-subtle);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 20px;
+      align-self: flex-start;
+    }
+    .back-link:hover { color: var(--red); }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .page-header h1 { font-size: 1.1rem; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; }
+    .page-header p  { font-size: 0.82rem; color: var(--text-subtle); }
+
+    .game-wrap {
+      width: 660px;
+      max-width: 96vw;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* ---- Question card ---- */
+    .question-card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      min-height: 68px;
+    }
+    .question-text {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .question-text span { color: var(--blue-dark); }
+    .progress-badge {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-subtle);
+      background: #f1f5f9;
+      border-radius: 20px;
+      padding: 4px 12px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* ---- Feedback bar ---- */
+    .feedback-bar {
+      height: 40px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .feedback-bar.visible { opacity: 1; }
+    .feedback-bar.correct-fb { background: #dcfce7; color: #166534; }
+    .feedback-bar.wrong-fb   { background: var(--red-light); color: #991b1b; }
+
+    /* ---- Image wrapper ---- */
+    .img-wrap {
+      position: relative;
+      display: block;
+      cursor: crosshair;
+      user-select: none;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      background: #f8fafc;
+    }
+    .img-wrap img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    .img-wrap svg {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+    }
+    .img-wrap.locked { cursor: default; }
+
+    /* ---- End screen ---- */
+    .end-screen {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: 40px 32px;
+      text-align: center;
+      display: none;
+    }
+    .end-screen.visible { display: block; }
+    .end-score {
+      font-size: 2.8rem;
+      font-weight: 800;
+      color: var(--blue-dark);
+      margin-bottom: 4px;
+    }
+    .end-label {
+      font-size: 0.88rem;
+      color: var(--text-subtle);
+      margin-bottom: 28px;
+    }
+
+    /* ---- Start overlay ---- */
+    .start-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.82);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-lg);
+      backdrop-filter: blur(2px);
+    }
+    .start-overlay.hidden { display: none; }
+
+    @keyframes pulse-ring {
+      0%   { r: 18; opacity: 0.9; }
+      60%  { r: 32; opacity: 0.4; }
+      100% { r: 40; opacity: 0; }
+    }
+    .pulse-anim { animation: pulse-ring 0.8s ease-out forwards; }
+  </style>
+</head>
+<body>
+
+<a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+
+<div class="page-header">
+  <h1>Bakterienzelle</h1>
+  <p>Klick auf die richtige Struktur im Bild.</p>
+</div>
+
+<div class="game-wrap">
+
+  <div class="question-card" id="questionCard">
+    <div class="question-text" id="questionText">–</div>
+    <div class="progress-badge" id="progressBadge">0 / 8</div>
+  </div>
+
+  <div class="feedback-bar" id="feedbackBar"></div>
+
+  <div class="img-wrap" id="imgWrap">
+    <img id="bzImg" src="images/a.8_Bakterienzelle_leer.png" alt="Bakterienzelle" draggable="false">
+    <svg id="bzSvg" viewBox="0 0 656 551" preserveAspectRatio="xMidYMid meet"></svg>
+
+    <!-- Start overlay -->
+    <div class="start-overlay" id="startOverlay">
+      <button class="btn btn-primary" onclick="startGame()" style="font-size:1rem;padding:12px 32px;">
+        Starten
+      </button>
+    </div>
+  </div>
+
+  <!-- End screen (replaces image) -->
+  <div class="end-screen" id="endScreen">
+    <div class="end-score" id="endScore">–</div>
+    <div class="end-label">von 8 Strukturen beim ersten Versuch gefunden</div>
+    <button class="btn btn-primary" onclick="startGame()" style="margin-right:10px">Nochmals</button>
+    <button class="btn btn-ghost"   onclick="showAllZones()">Alle Strukturen anzeigen</button>
+  </div>
+
+</div>
+
+<script>
+  /* ---- Zonen (cx/cy in % der Originalgrösse 656×551, r in Pixel) ---- */
+  var IMG_W = 656, IMG_H = 551;
+
+  var ZONES = [
+    { name: 'Zellwand',           cx: 50,  cy:  8, r: 35 },  // oberer Aussenring
+    { name: 'Cytoplasmamembran',  cx: 13,  cy: 47, r: 30 },  // linker Innenring
+    { name: 'Cytoplasma',         cx: 65,  cy: 35, r: 60 },  // freies Inneres oben rechts
+    { name: 'Bakterienchromosom', cx: 35,  cy: 49, r: 60 },  // gewellte DNA-Linien
+    { name: 'Zelleinschlüsse',    cx: 66,  cy: 60, r: 38 },  // einzelner Kreis rechts
+    { name: 'Geissel',            cx: 11,  cy: 84, r: 50 },  // langer gewellter Faden
+    { name: 'Schleimkapsel',      cx: 87,  cy: 25, r: 55 },  // gestrichelter Aussenbereich rechts
+    { name: 'Ribosomen',          cx: 53,  cy: 64, r: 40 },  // kleine Kreisgruppe
+  ];
+
+  var questions  = [];
+  var current    = 0;
+  var score      = 0;
+  var locked     = false;
+
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function startGame() {
+    document.getElementById('startOverlay').classList.add('hidden');
+    document.getElementById('endScreen').classList.remove('visible');
+    document.getElementById('imgWrap').style.display = 'block';
+    document.getElementById('questionCard').style.display = 'flex';
+    document.getElementById('feedbackBar').className = 'feedback-bar';
+
+    questions = shuffle(ZONES.map(function(_, i) { return i; }));
+    current   = 0;
+    score     = 0;
+    locked    = false;
+
+    clearSvg();
+    showQuestion();
+  }
+
+  function showQuestion() {
+    if (current >= questions.length) { showEndScreen(); return; }
+    var zone = ZONES[questions[current]];
+    document.getElementById('questionText').innerHTML =
+      'Klick auf: <span>' + zone.name + '</span>';
+    document.getElementById('progressBadge').textContent =
+      (current + 1) + ' / ' + questions.length;
+    document.getElementById('feedbackBar').className = 'feedback-bar';
+    clearSvg();
+    locked = false;
+  }
+
+  function clearSvg() {
+    document.getElementById('bzSvg').innerHTML = '';
+  }
+
+  /* ---- Click-Handler ---- */
+  document.getElementById('imgWrap').addEventListener('click', function(e) {
+    if (locked) return;
+    if (e.target.id === 'startOverlay' || e.target.closest('#startOverlay')) return;
+
+    var rect   = document.getElementById('bzImg').getBoundingClientRect();
+    var scaleX = IMG_W / rect.width;
+    var scaleY = IMG_H / rect.height;
+    var clickX = (e.clientX - rect.left)  * scaleX;
+    var clickY = (e.clientY - rect.top)   * scaleY;
+
+    var zone    = ZONES[questions[current]];
+    var zx      = zone.cx / 100 * IMG_W;
+    var zy      = zone.cy / 100 * IMG_H;
+    var dist    = Math.sqrt(Math.pow(clickX - zx, 2) + Math.pow(clickY - zy, 2));
+    var correct = dist <= zone.r;
+
+    locked = true;
+    showClickFeedback(clickX, clickY, correct, zx, zy);
+
+    if (correct) {
+      score++;
+      setFeedback(true, zone.name + ' – Richtig!');
+      setTimeout(function() { current++; showQuestion(); }, 1400);
+    } else {
+      setFeedback(false, 'Nicht ganz – die richtige Stelle wird grün markiert.');
+      setTimeout(function() { current++; showQuestion(); }, 2800);
+    }
+  });
+
+  function showClickFeedback(cx, cy, correct, zx, zy) {
+    var svg   = document.getElementById('bzSvg');
+    var color = correct ? '#16a34a' : '#dc2626';
+
+    /* Klick-Ring */
+    var ring = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    ring.setAttribute('cx', cx);
+    ring.setAttribute('cy', cy);
+    ring.setAttribute('r',  '16');
+    ring.setAttribute('fill', color);
+    ring.setAttribute('fill-opacity', '0.35');
+    ring.setAttribute('stroke', color);
+    ring.setAttribute('stroke-width', '2.5');
+    svg.appendChild(ring);
+
+    /* Bei falsch: korrekte Zone grün anzeigen */
+    if (!correct) {
+      var correctCircle = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      correctCircle.setAttribute('cx', zx);
+      correctCircle.setAttribute('cy', zy);
+      correctCircle.setAttribute('r',  '20');
+      correctCircle.setAttribute('fill', '#16a34a');
+      correctCircle.setAttribute('fill-opacity', '0.25');
+      correctCircle.setAttribute('stroke', '#16a34a');
+      correctCircle.setAttribute('stroke-width', '3');
+      correctCircle.setAttribute('stroke-dasharray', '6 4');
+      svg.appendChild(correctCircle);
+
+      /* Pulsierender Aussenring */
+      var pulse = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      pulse.setAttribute('cx', zx);
+      pulse.setAttribute('cy', zy);
+      pulse.setAttribute('r',  '18');
+      pulse.setAttribute('fill', 'none');
+      pulse.setAttribute('stroke', '#16a34a');
+      pulse.setAttribute('stroke-width', '3');
+      pulse.setAttribute('class', 'pulse-anim');
+      svg.appendChild(pulse);
+    }
+  }
+
+  function setFeedback(correct, text) {
+    var bar = document.getElementById('feedbackBar');
+    bar.textContent = (correct ? '✓  ' : '✗  ') + text;
+    bar.className = 'feedback-bar visible ' + (correct ? 'correct-fb' : 'wrong-fb');
+  }
+
+  function showEndScreen() {
+    document.getElementById('imgWrap').style.display = 'none';
+    document.getElementById('questionCard').style.display = 'none';
+    document.getElementById('feedbackBar').className = 'feedback-bar';
+    document.getElementById('endScore').textContent = score + ' / ' + questions.length;
+    document.getElementById('endScreen').classList.add('visible');
+  }
+
+  function showAllZones() {
+    document.getElementById('endScreen').classList.remove('visible');
+    document.getElementById('imgWrap').style.display = 'block';
+    document.getElementById('questionCard').style.display = 'flex';
+    document.getElementById('questionText').innerHTML = 'Alle Strukturen';
+    document.getElementById('progressBadge').textContent = '';
+    locked = true;
+    clearSvg();
+
+    var svg    = document.getElementById('bzSvg');
+    var colors = ['#0066CC','#C40027','#059669','#7c3aed','#d97706','#0891b2','#be185d','#4d7c0f'];
+
+    ZONES.forEach(function(zone, i) {
+      var zx = zone.cx / 100 * IMG_W;
+      var zy = zone.cy / 100 * IMG_H;
+
+      var c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      c.setAttribute('cx', zx); c.setAttribute('cy', zy); c.setAttribute('r', '14');
+      c.setAttribute('fill', colors[i]); c.setAttribute('fill-opacity', '0.25');
+      c.setAttribute('stroke', colors[i]); c.setAttribute('stroke-width', '2');
+      svg.appendChild(c);
+
+      var bg = document.createElementNS('http://www.w3.org/2000/svg','rect');
+      var labelX = zx + 18, labelY = zy + 5;
+      if (labelX > 460) labelX = zx - 18 - zone.name.length * 6.5;
+      bg.setAttribute('x', labelX - 4); bg.setAttribute('y', labelY - 13);
+      bg.setAttribute('width', zone.name.length * 6.8 + 8); bg.setAttribute('height', '18');
+      bg.setAttribute('rx', '4'); bg.setAttribute('fill', 'white'); bg.setAttribute('fill-opacity', '0.85');
+      svg.appendChild(bg);
+
+      var t = document.createElementNS('http://www.w3.org/2000/svg','text');
+      t.setAttribute('x', labelX); t.setAttribute('y', labelY);
+      t.setAttribute('font-size', '12'); t.setAttribute('font-weight', '600');
+      t.setAttribute('fill', colors[i]); t.setAttribute('font-family', 'system-ui,sans-serif');
+      t.textContent = zone.name;
+      svg.appendChild(t);
+    });
+
+    document.getElementById('feedbackBar').className = 'feedback-bar visible correct-fb';
+    document.getElementById('feedbackBar').textContent = 'Übersicht aller Strukturen — klick «Nochmals» um neu zu starten.';
+  }
+</script>
+</body>
+</html>
