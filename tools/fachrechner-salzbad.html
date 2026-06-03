@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fachrechner Salzbad</title>
+  <title>Salzbad berechnen</title>
   <link rel="stylesheet" href="../style.css">
   <style>
     .back-link {
@@ -336,7 +336,7 @@
     <button class="density-toggle" onclick="toggleDensity()">▶ Dichtetabelle anzeigen</button>
     <div class="density-table-wrap" id="densityTable">
       <table class="density-table">
-        <thead><tr><th>NaCl (%)</th><th>Dichte (kg/L)</th><th>NaCl (%)</th><th>Dichte (kg/L)</th></tr></thead>
+        <thead><tr><th>NaCl (%)</th><th>Dichte (kg/l)</th><th>NaCl (%)</th><th>Dichte (kg/l)</th></tr></thead>
         <tbody>
           <tr><td>16 %</td><td>1.119</td><td>21 %</td><td>1.159</td></tr>
           <tr><td>17 %</td><td>1.127</td><td>22 %</td><td>1.167</td></tr>
@@ -352,7 +352,7 @@
         <label>Volumen des Salzbades</label>
         <div class="input-row">
           <input type="number" id="t3_vol" placeholder="z.B. 1540" min="0">
-          <span style="padding:0.45rem 0.5rem;font-size:0.88rem;color:var(--text-muted)">dm³/L</span>
+          <span style="padding:0.45rem 0.5rem;font-size:0.88rem;color:var(--text-muted)">dm³/l</span>
         </div>
       </div>
       <div class="form-group">
@@ -382,7 +382,7 @@
     <button class="density-toggle" onclick="toggleDensity4()">▶ Dichtetabelle anzeigen</button>
     <div class="density-table-wrap" id="densityTable4">
       <table class="density-table">
-        <thead><tr><th>NaCl (%)</th><th>Dichte (kg/L)</th><th>NaCl (%)</th><th>Dichte (kg/L)</th></tr></thead>
+        <thead><tr><th>NaCl (%)</th><th>Dichte (kg/l)</th><th>NaCl (%)</th><th>Dichte (kg/l)</th></tr></thead>
         <tbody>
           <tr><td>16 %</td><td>1.119</td><td>21 %</td><td>1.159</td></tr>
           <tr><td>17 %</td><td>1.127</td><td>22 %</td><td>1.167</td></tr>
@@ -398,7 +398,7 @@
         <label>Volumen des Salzbades</label>
         <div class="input-row">
           <input type="number" id="t4_vol" placeholder="z.B. 6800" min="0">
-          <span style="padding:0.45rem 0.5rem;font-size:0.88rem;color:var(--text-muted)">dm³/L</span>
+          <span style="padding:0.45rem 0.5rem;font-size:0.88rem;color:var(--text-muted)">dm³/l</span>
         </div>
       </div>
       <div class="form-group">
@@ -571,10 +571,10 @@ function calcT3() {
   var rw = document.getElementById('rw3');
   rw.innerHTML =
     '<div class="rechenweg-title">Rechenweg</div>' +
-    '<div class="rw-step">Volumen: <strong>' + fmt(vol,0) + ' dm³/L</strong></div>' +
-    '<div class="rw-step">Konzentration: <strong>' + konz + ' %</strong> → Dichte laut Tabelle: <strong>' + dichte.toFixed(3) + ' kg/L</strong></div>' +
+    '<div class="rw-step">Volumen: <strong>' + fmt(vol,0) + ' dm³/l</strong></div>' +
+    '<div class="rw-step">Konzentration: <strong>' + konz + ' %</strong> → Dichte laut Tabelle: <strong>' + dichte.toFixed(3) + ' kg/l</strong></div>' +
     '<div class="rw-step" style="margin-top:0.4rem">Formel: Gewicht = Volumen × Dichte</div>' +
-    '<div class="rw-step">= ' + fmt(vol,0) + ' L × ' + dichte.toFixed(3) + ' kg/L</div>' +
+    '<div class="rw-step">= ' + fmt(vol,0) + ' l × ' + dichte.toFixed(3) + ' kg/l</div>' +
     '<div class="rw-result">Gewicht des Salzbades = ' + fmt(gewicht, 1) + ' kg</div>';
   rw.classList.add('show');
 }
@@ -604,8 +604,8 @@ function calcT4() {
 
   // Schritt 1: Umrechnung
   html += '<div class="rw-step"><strong>Schritt 1 – Volumen in Gewicht umrechnen</strong></div>';
-  html += '<div class="rw-step">Dichte bei ' + ist + ' %: <strong>' + dichte.toFixed(3) + ' kg/L</strong></div>';
-  html += '<div class="rw-step">' + fmt(vol,0) + ' L × ' + dichte.toFixed(3) + ' kg/L = <strong>' + fmt(gewSalzbad,1) + ' kg</strong></div>';
+  html += '<div class="rw-step">Dichte bei ' + ist + ' %: <strong>' + dichte.toFixed(3) + ' kg/l</strong></div>';
+  html += '<div class="rw-step">' + fmt(vol,0) + ' l × ' + dichte.toFixed(3) + ' kg/l = <strong>' + fmt(gewSalzbad,1) + ' kg</strong></div>';
 
   // Schritt 2: Mischungskreuz
   html += '<div class="rw-step" style="margin-top:0.75rem"><strong>Schritt 2 – Mischungskreuz aufstellen</strong></div>';
@@ -624,7 +624,7 @@ function calcT4() {
     teileA  = ziel - 0;
     teileB  = ist - ziel;
     labelB  = 'Wasser';
-    einheitB = 'L';
+    einheitB = 'l';
   }
 
   html +=
@@ -650,8 +650,8 @@ function calcT4() {
 
   if (t4Mode === 'ab') {
     html += '<div class="rw-step">= ' + fmt(mengeB,1) + ' kg Wasser</div>';
-    html += '<div class="rw-step">Wasser hat Dichte 1 kg/L → <strong>' + fmt(mengeB,1) + ' L Wasser</strong></div>';
-    html += '<div class="rw-result">Benötigtes Wasser = ' + fmt(mengeB,1) + ' kg = ' + fmt(mengeB,1) + ' L</div>';
+    html += '<div class="rw-step">Wasser hat Dichte 1 kg/l → <strong>' + fmt(mengeB,1) + ' l Wasser</strong></div>';
+    html += '<div class="rw-result">Benötigtes Wasser = ' + fmt(mengeB,1) + ' kg = ' + fmt(mengeB,1) + ' l</div>';
   } else {
     html += '<div class="rw-result">Benötigtes Salz = ' + fmt(mengeB,1) + ' kg</div>';
   }
