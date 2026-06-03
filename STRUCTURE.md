@@ -51,7 +51,7 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 | `a5`          | a.5   | a.5 – Homogenisation durchführen           | `a5-homogenisation/`            | 🔲     |
 | `a6`          | a.6   | a.6 – Zutaten beimischen                   | `a6-zutaten/`                   | 🔲     |
 | `a7`          | a.7   | a.7 – Technische Einrichtungen bedienen    | `a7-technische-einrichtungen/`  | 🔲     |
-| `a8`          | a.8   | a.8 – Kulturen herstellen                  | `a8-kulturen/`                  | 🔲     |
+| `a8`          | a.8   | a.8 – Kulturen herstellen                  | `a8-kulturen/`                  | ✅     |
 | `b1`          | b.1   | b.1 – Hartkäse herstellen                  | `b1-hartkaese/`                 | 🔲     |
 | `b2`          | b.2   | b.2 – Halbhartkäse herstellen              | `b2-halbhartkase/`              | 🔲     |
 | `b3`          | b.3   | b.3 – Weichkäse herstellen                 | `b3-weichkaese/`                | 🔲     |
@@ -89,13 +89,13 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 | `wahr-falsch`      | Wahr/Falsch       | `wahr-falsch-sauermilch.html`           | Tinder-Swipe: rechts = wahr, links = falsch             |
 | `tabellen-luecken` | Tabellen-Lücken   | `tabellen-luecken-kulturen.html`        | Vergleichstabelle mit Wortbank ausfüllen                |
 | `prozessvergleich` | Prozessvergleich  | `prozessvergleich-jogurt.html`          | Zwei Produktionswege nebeneinander, aufklappbare Details |
+| `hotspot`          | Hotspot           | `hotspot-bakterienzelle.html`           | Bild mit anklickbaren Zonen (Polygon/Kreis/Polylinie)   |
 
 ### Geplant / Ideen
 
 | `data-type`        | Badge-Text        | Beschreibung                                                        |
 |--------------------|-------------------|---------------------------------------------------------------------|
 | `kreuzwortraetsel` | Kreuzworträtsel   | Klassisches Kreuzworträtsel aus Fachbegriffen                       |
-| `hotspot`          | Hotspot           | Bild mit anklickbaren Punkten beschriften                           |
 | `prozess-entscheid`| Prozess-Entscheid | Verzweigter Entscheidungsbaum: Was passiert wenn...?                |
 | `lueckendiagramm`  | Lückendiagramm    | Unvollständiges Flussdiagramm/Kurve ergänzen                        |
 | `fehlersuche`      | Fehlersuche       | Text mit eingebauten Fehlern – Lernende markieren und korrigieren   |
@@ -143,6 +143,122 @@ Beispiele:
 ```
 
 Bilder liegen immer in `[modulordner]/images/[thema]/`
+
+---
+
+## Corporate Design – Komponentenvorlagen
+
+Jedes neue Tool **muss** diesen Vorlagen folgen. Abweichungen nur bei technischer Notwendigkeit.
+
+---
+
+### Lernkärtchen (Canonical Pattern)
+
+Referenz: `b7-sauermilch/lernkaertchen.html` und `b7-sauermilch/qualitaetsmaengel-jogurt.html`
+
+**Karten-Grösse:**
+- Begriff ↔ Erklärung (kurze Inhalte): `width: 440px; height: 270px`
+- Frage ↔ Antwort (K2-Fragen, längere Inhalte): `width: 440px; height: 310px`
+
+**HTML-Gerüst:**
+```html
+<div class="scene" id="scene" onclick="flipCard()">
+  <div class="card" id="card">
+    <div class="card-face card-front">
+      <span class="card-category-badge" id="frontLabel"></span>
+      <div class="card-term" id="frontTerm"></div>          <!-- oder card-question -->
+      <div class="card-hint">Karte umdrehen für die Erklärung</div>
+    </div>
+    <div class="card-face card-back">
+      <span class="card-category-badge" id="backLabel"></span>
+      <div class="card-explanation" id="backExplanation"></div>  <!-- oder card-answer -->
+    </div>
+  </div>
+</div>
+```
+
+**CSS-Klassen (in style.css definiert):**
+- `.scene` – perspektivischer Container
+- `.card` – flip-fähige Karte (`transform-style: preserve-3d`)
+- `.card.flipped` – rotierter Zustand (`transform: rotateY(180deg)`)
+- `.card-face` – gemeinsame Stile für Vorder-/Rückseite
+- `.card-front` – weisser Hintergrund (`var(--surface)`)
+- `.card-back` – blauer Hintergrund (`var(--blue-light)`)
+- `.card-category-badge` – Kategorie-Pill oben links
+- `.card-term` – grosser Begriff (1.42rem, fett)
+- `.card-question` – K2-Frage (0.97rem, fett) – für Frage-Karten
+- `.card-explanation` / `.card-answer` – Erklärungstext Rückseite
+
+**Steuerung (immer gleich):**
+```html
+<div class="controls">
+  <button class="btn btn-ghost"   onclick="prevCard()">← Zurück</button>
+  <button class="btn btn-success" onclick="flipCard()">Umdrehen</button>
+  <button class="btn btn-ghost"   onclick="nextCard()">Weiter →</button>
+</div>
+<div class="controls">
+  <button class="btn btn-primary" onclick="shuffleCards()">⇄ Mischen</button>
+</div>
+<p class="keyboard-hint">
+  ← → navigieren | Leertaste umdrehen | S mischen
+</p>
+```
+
+**Keyboard-Shortcuts (immer identisch):**
+```javascript
+document.addEventListener('keydown', e => {
+  if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); flipCard(); }
+  if (e.key === 'ArrowRight') nextCard();
+  if (e.key === 'ArrowLeft')  prevCard();
+  if (e.key === 's' || e.key === 'S') shuffleCards();
+});
+```
+
+**Fortschrittsanzeige (immer gleich):**
+```html
+<div class="progress-text" id="progressText"></div>
+<div class="progress-bar-wrap">
+  <div class="progress-bar-fill" id="progressBar"></div>
+</div>
+```
+```javascript
+document.getElementById('progressText').textContent = `Karte ${currentIndex + 1} von ${total}`;
+document.getElementById('progressBar').style.width  = `${((currentIndex + 1) / total) * 100}%`;
+```
+
+**Kategorie-Badge-Farben (Standard):**
+```javascript
+const CATEGORY_COLORS = {
+  "Mikrobiologie":       { bg: "#f3e8ff", fg: "#6b21a8" },
+  "Chemie & Physik":     { bg: "#dbeeff", fg: "#1e4e8c" },
+  "Produktion":          { bg: "#dcfce7", fg: "#15803d" },
+  "Zutaten":             { bg: "#fef9c3", fg: "#854d0e" },
+  "Recht & Qualität":    { bg: "#fde8ed", fg: "#c40027" },
+  "Qualitätsmängel":     { bg: "#ffedd5", fg: "#9a3412" },
+  // Subkategorien Qualitätsmängel:
+  "Mikrobiologisch":     { bg: "#ffedd5", fg: "#9a3412" },
+  "Konsistenz & Struktur": { bg: "#dbeeff", fg: "#1e4e8c" },
+  "Geschmack":           { bg: "#dcfce7", fg: "#15803d" },
+};
+```
+
+---
+
+### Hotspot (Canonical Pattern)
+
+Referenz: `a8-kulturen/hotspot-bakterienzelle.html`
+
+**Zonentypen:**
+- `circle` – Kreiszone: `{ type:'circle', cx:50, cy:46, r:35 }` (cx/cy in %, r in px)
+- `polygon` – Flächenzone (point-in-polygon): `{ type:'polygon', points:[{cx,cy},...] }`
+- `polyline` – Linienzzone (Nähe zur Linie): `{ type:'polyline', tolerance:25, points:[...] }`
+
+**Debug-Modus:** URL-Parameter `?debug` zeigt alle Zonen + Klickkoordinaten zur Kalibrierung.
+
+**Wann welcher Typ:**
+- Einzelne Strukturen (Organellen, Punkte): `circle`
+- Flächige Bereiche (Cytoplasma, Chromosom): `polygon`
+- Ringe, Linien, Kurven (Membran, Geissel): `polyline`
 
 ---
 
