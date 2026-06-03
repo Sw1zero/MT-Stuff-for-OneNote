@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prozessvergleich – Gerührter vs. Stichfester Joghurt</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .back-link {
+      display: inline-block;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      margin-bottom: 1.5rem;
+      transition: color 0.15s;
+    }
+    .back-link:hover { color: var(--blue-dark); }
+
+    /* Legend */
+    .legend {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 1.75rem;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* Process wrapper */
+    .process-wrap { max-width: 760px; margin: 0 auto; }
+
+    /* Common section */
+    .common-section { display: flex; flex-direction: column; align-items: center; }
+
+    /* Step box */
+    .step-box {
+      width: 100%;
+      max-width: 420px;
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      border-left: 4px solid;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 0;
+      cursor: pointer;
+      transition: box-shadow 0.15s, transform 0.12s;
+      overflow: hidden;
+    }
+    .step-box:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.7rem 1rem;
+    }
+    .step-num {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      font-size: 0.7rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: #fff;
+    }
+    .step-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text);
+      flex: 1;
+    }
+    .step-toggle {
+      font-size: 0.7rem;
+      color: var(--text-subtle);
+      transition: transform 0.2s;
+    }
+    .step-box.open .step-toggle { transform: rotate(180deg); }
+
+    .step-detail {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.25s ease, padding 0.2s;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      padding: 0 1rem 0 3.1rem;
+    }
+    .step-box.open .step-detail {
+      max-height: 120px;
+      padding: 0 1rem 0.75rem 3.1rem;
+    }
+
+    /* Color variants */
+    .step-common  { border-left-color: var(--blue-dark); }
+    .step-common  .step-num { background: var(--blue-dark); }
+    .step-gerührt { border-left-color: #059669; }
+    .step-gerührt .step-num { background: #059669; }
+    .step-stichfest { border-left-color: #d97706; }
+    .step-stichfest .step-num { background: #d97706; }
+
+    /* Connector arrows */
+    .connector {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 28px;
+      color: var(--text-subtle);
+      font-size: 1.1rem;
+    }
+
+    /* Fork divider */
+    .fork {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      max-width: 420px;
+      margin: 4px 0;
+      position: relative;
+    }
+    .fork-line {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+      height: 2px;
+      background: var(--border);
+    }
+    .fork-label-wrap {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+    }
+    .fork-label {
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 20px;
+      color: #fff;
+    }
+    .fork-label-g { background: #059669; }
+    .fork-label-s { background: #d97706; }
+
+    /* Split columns */
+    .split-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      width: 100%;
+      margin: 4px 0;
+    }
+    .split-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+    .split-col .step-box { max-width: 100%; }
+
+    /* Merge */
+    .merge {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      max-width: 420px;
+      margin: 4px 0;
+      position: relative;
+    }
+    .merge-line {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+      height: 2px;
+      background: var(--border);
+    }
+    .merge-dot {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 10px;
+      height: 10px;
+      background: var(--border);
+      border-radius: 50%;
+    }
+
+    /* Mobile: stack split columns */
+    @media (max-width: 560px) {
+      .split-section { grid-template-columns: 1fr; gap: 0; }
+      .split-col:first-child { margin-bottom: 1rem; }
+      .fork-line, .merge-line, .merge-dot { display: none; }
+    }
+
+    /* Hint */
+    .hint {
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--text-subtle);
+      margin-bottom: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologie EFZ · b.7</span>
+    <h1>Prozessvergleich</h1>
+    <p>Gerührter Joghurt vs. Stichfester Joghurt</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+  <a class="back-link" href="../index.html">← Alle Lerntools</a>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--blue-dark)"></div> Gemeinsame Schritte</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#059669"></div> Nur gerührter Joghurt</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#d97706"></div> Nur stichfester Joghurt</div>
+  </div>
+
+  <p class="hint">Klicke auf einen Schritt für Details.</p>
+
+  <div class="process-wrap">
+    <div class="common-section" id="commonTop"></div>
+
+    <!-- Fork -->
+    <div class="common-section">
+      <div class="connector">↓</div>
+      <div class="fork" style="max-width:420px">
+        <div class="fork-line"></div>
+        <div class="fork-label-wrap">
+          <span class="fork-label fork-label-g">Gerührt</span>
+          <span class="fork-label fork-label-s">Stichfest</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Split -->
+    <div class="split-section">
+      <div class="split-col" id="colGerührt"></div>
+      <div class="split-col" id="colStichfest"></div>
+    </div>
+
+    <!-- Merge -->
+    <div class="common-section">
+      <div class="merge" style="max-width:420px">
+        <div class="merge-line"></div>
+        <div class="merge-dot"></div>
+      </div>
+      <div class="connector">↓</div>
+    </div>
+
+    <div class="common-section" id="commonBottom"></div>
+  </div>
+
+</main>
+
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologie EFZ · Philipp Neukomm
+</footer>
+
+<script>
+var COMMON_TOP = [
+  { label: 'Rohmilch vorbereiten',        detail: 'Sieben oder Filtrieren, ggf. Thermisieren zum Erhalt der mikrobiologischen Qualität.' },
+  { label: 'Fettgehalt standardisieren',  detail: 'Einstellung gemäss Rezeptur: Magerjogurt max. 5 g/kg, Vollmilchjogurt mind. 35 g/kg.' },
+  { label: 'Trockenmasse erhöhen',         detail: '1,5–3 % Magermilchpulver oder Molkenproteinkonzentrat – verbessert Viskosität und reduziert Synärese.' },
+  { label: 'Homogenisieren',              detail: 'Mind. 65 °C, Druck 180–220 bar. Verhindert Aufrahmung, verbessert Feinheit im Mund, bindet mehr Wasser.' },
+  { label: 'Hitzebehandlung',             detail: '85–95 °C, 10–2 Minuten. Molkenproteine denaturieren → mehr Wasserbindung → weniger Molkenabscheidung.' },
+  { label: 'Kühlen auf Impftemperatur',   detail: 'Auf 40–44 °C abkühlen – optimale Temperatur für die Jogurtkultur.' },
+  { label: 'Impfen',                      detail: '2 % Betriebskultur oder Direktstarterkultur. Hygienisch und zielgerichtet einrühren.' },
+];
+
+var GERÜHRT = [
+  { label: 'Bebrüten im Tank',              detail: '40–44 °C, 4–7 Stunden bis pH 4,5 (36–38 °SH). Während der Gerinnung keine Erschütterungen.' },
+  { label: 'Gallerte strukturbearbeiten',   detail: 'Spaltenfilter oder Druckhalteventil beim Umpumpen. Glättet die Struktur, behebt leichte Griessigkeit.' },
+  { label: 'Kühlen & Mischverfahren',       detail: 'Warmmisch­verfahren (20–30 °C): Frucht gleich beimischen. Kaltmisch­verfahren (<5 °C): Frucht erst am nächsten Tag.' },
+  { label: 'Fruchtgrundstoff mischen',      detail: '6–10 % Grundstoff, 5–10 % Zucker. Chargenweise oder kontinuierlich zumischen, Lufteinschlüsse vermeiden.' },
+  { label: 'Abfüllen',                      detail: 'Frisch abgefüllter Joghurt ist dünnflüssig – dickt beim Kühlen in der Verpackung nach.' },
+];
+
+var STICHFEST = [
+  { label: 'Fruchtpüree/Aroma beimischen',       detail: 'Online-Mischer in der Produktionslinie. Färbe- und Süssstoffe erst nach der Hitzebehandlung.' },
+  { label: 'Anwärmen auf Bebrütungstemperatur',  detail: 'Anwärmverfahren: Milch kalt zwischenlagern, kurz vor Abfüllen auf 40–44 °C anwärmen.' },
+  { label: 'Abfüllen in Endverpackung',          detail: 'Abfülltemperatur max. 50 °C. Gleichmässige Temperatur in allen Gebinden entscheidend. Kultur erst jetzt zugeben.' },
+  { label: 'Bebrüten in der Verpackung',         detail: 'Brutzelle 40–44 °C bis pH 4,5. Keine Bewegung! Erschütterungen führen zu Molkenabscheidung.' },
+];
+
+var COMMON_BOTTOM = [
+  { label: 'Kühlen auf < 5 °C',   detail: 'Möglichst schnell kühlen – reduziert Nachsäuern. Lagerung <5 °C. MHD 18–28 Tage.' },
+];
+
+var counters = { common: 1, gerührt: 1, stichfest: 1 };
+
+function buildStep(data, type, num) {
+  var box = document.createElement('div');
+  box.className = 'step-box step-' + type;
+
+  var header = document.createElement('div');
+  header.className = 'step-header';
+
+  var numEl = document.createElement('div');
+  numEl.className = 'step-num';
+  numEl.textContent = num;
+
+  var label = document.createElement('div');
+  label.className = 'step-label';
+  label.textContent = data.label;
+
+  var toggle = document.createElement('div');
+  toggle.className = 'step-toggle';
+  toggle.textContent = '▼';
+
+  header.appendChild(numEl);
+  header.appendChild(label);
+  header.appendChild(toggle);
+
+  var detail = document.createElement('div');
+  detail.className = 'step-detail';
+  detail.textContent = data.detail;
+
+  box.appendChild(header);
+  box.appendChild(detail);
+
+  box.addEventListener('click', function() {
+    box.classList.toggle('open');
+  });
+
+  return box;
+}
+
+function buildConnector() {
+  var c = document.createElement('div');
+  c.className = 'connector';
+  c.textContent = '↓';
+  return c;
+}
+
+function buildSection(containerId, steps, type) {
+  var container = document.getElementById(containerId);
+  steps.forEach(function(step, i) {
+    if (i > 0) container.appendChild(buildConnector());
+    var num = type === 'common' ? counters.common++ : (type === 'gerührt' ? counters.gerührt++ : counters.stichfest++);
+    container.appendChild(buildStep(step, type, num));
+  });
+}
+
+// Reset counters to step numbers within each section (start fresh per column)
+counters = { common: 1, gerührt: 1, stichfest: 1 };
+
+buildSection('commonTop',    COMMON_TOP,    'common');
+buildSection('colGerührt',   GERÜHRT,       'gerührt');
+buildSection('colStichfest', STICHFEST,     'stichfest');
+buildSection('commonBottom', COMMON_BOTTOM, 'common');
+</script>
+
+</body>
+</html>
