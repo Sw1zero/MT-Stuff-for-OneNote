@@ -3,15 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Qualitätsmängel Jogurt – Lernkärtchen</title>
+  <title>Lernkärtchen b.7 – Qualitätsmängel Jogurt</title>
   <link rel="stylesheet" href="../style.css">
   <style>
     body {
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 28px 16px 56px;
+      padding: 32px 16px 48px;
     }
+
+    .page-header { text-align: center; margin-bottom: 28px; }
+    .page-header h1 { font-size: 1.15rem; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; }
+    .page-header p  { font-size: 0.82rem; color: var(--text-subtle); }
 
     .back-link {
       font-size: 0.78rem;
@@ -25,308 +29,290 @@
     }
     .back-link:hover { color: var(--red); }
 
-    .page-header {
-      text-align: center;
-      margin-bottom: 24px;
-    }
-    .page-header h1 { font-size: 1.1rem; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; }
-    .page-header p  { font-size: 0.82rem; color: var(--text-subtle); }
+    .filter-wrap   { max-width: 500px; margin-bottom: 24px; }
+    .progress-text { margin-bottom: 10px; }
 
-    .card-wrap {
-      width: 620px;
-      max-width: 96vw;
+    .progress-bar-wrap {
+      width: 360px;
+      max-width: 90vw;
+      margin-bottom: 28px;
+    }
+
+    /* ---- Flashcard ---- */
+    .scene {
+      width: 440px;
+      max-width: 92vw;
+      height: 310px;
+      perspective: 900px;
+      cursor: pointer;
+      margin-bottom: 32px;
+    }
+
+    .card {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .card.flipped { transform: rotateY(180deg); }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: var(--radius-lg);
+      padding: 28px 32px;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      gap: 20px;
+      justify-content: center;
+      box-shadow: var(--shadow-md);
     }
 
-    /* ---- Flip-Karte ---- */
-    .flip-scene {
-      width: 100%;
-      perspective: 1200px;
-      cursor: pointer;
-    }
+    .card-front { background: var(--surface); }
+    .card-back  { background: var(--blue-light); transform: rotateY(180deg); }
 
-    .flip-inner {
-      width: 100%;
-      transform-style: preserve-3d;
-      transition: transform 0.45s ease;
-      position: relative;
-    }
-
-    .flip-scene.flipped .flip-inner { transform: rotateY(180deg); }
-
-    .flip-face {
-      width: 100%;
-      backface-visibility: hidden;
-      background: var(--surface);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-sm);
-      padding: 32px 30px 24px;
-    }
-
-    .flip-back {
-      transform: rotateY(180deg);
-      position: absolute;
-      top: 0; left: 0;
-    }
-
-    /* Vorderseite */
-    .face-label {
+    .card-category-badge {
+      display: inline-block;
       font-size: 0.68rem;
-      font-weight: 700;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.09em;
-      color: var(--text-subtle);
-      margin-bottom: 18px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      letter-spacing: 0.07em;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-bottom: 14px;
+      align-self: flex-start;
     }
 
-    .face-label .kat-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-
-    .question-text {
-      font-size: 1.05rem;
+    /* Frage (etwas kleiner als card-term, da ganzer Satz) */
+    .card-question {
+      font-size: 0.97rem;
       font-weight: 600;
       color: var(--text);
-      line-height: 1.55;
-      margin-bottom: 20px;
+      line-height: 1.5;
     }
 
-    .flip-hint {
+    .card-hint {
+      margin-top: 14px;
       font-size: 0.74rem;
       color: var(--text-subtle);
-      text-align: right;
     }
 
-    /* Rückseite */
-    .answer-label {
-      font-size: 0.68rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.09em;
-      color: var(--text-subtle);
-      margin-bottom: 14px;
-    }
-
-    .answer-text {
-      font-size: 0.92rem;
+    /* Antwort */
+    .card-answer {
+      font-size: 0.9rem;
       color: var(--text);
-      line-height: 1.65;
+      line-height: 1.6;
+      overflow-y: auto;
+      max-height: 210px;
     }
 
-    .answer-text strong { color: var(--blue-dark); }
+    .card-answer strong { color: var(--blue-dark); }
 
-    .answer-text ul {
-      margin: 8px 0 0 0;
-      padding-left: 18px;
+    .card-answer ul {
+      margin: 6px 0 0 0;
+      padding-left: 16px;
       display: flex;
       flex-direction: column;
-      gap: 5px;
+      gap: 4px;
     }
 
-    .answer-text li { font-size: 0.9rem; }
-
-    .kat-badge-sm {
-      display: inline-block;
-      font-size: 0.7rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      padding: 2px 9px;
-      border-radius: 20px;
-      margin-top: 18px;
-    }
-
-    .kat-mikro  { background:#fee2e2; color:#991b1b; }
-    .kat-konsis { background:#dbeafe; color:#1e40af; }
-    .kat-geschm { background:#d1fae5; color:#065f46; }
-
-    /* ---- Navigation ---- */
-    .card-nav {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-
-    .nav-counter {
-      font-size: 0.9rem;
-      font-weight: 700;
-      color: var(--text-subtle);
-      min-width: 52px;
-      text-align: center;
-    }
-
-    .card-actions {
+    /* ---- Controls ---- */
+    .controls {
       display: flex;
       gap: 10px;
+      align-items: center;
       flex-wrap: wrap;
       justify-content: center;
+      margin-bottom: 12px;
     }
-
-    /* Höhe synchronisieren: Front und Back gleich hoch */
-    .flip-inner { min-height: var(--card-h, 240px); }
-    .flip-face  { min-height: var(--card-h, 240px); }
   </style>
 </head>
 <body>
 
-<a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
 
-<div class="page-header">
-  <h1>Qualitätsmängel Jogurt</h1>
-  <p>K2-Fragen – Klick zum Umdrehen</p>
-</div>
+  <div class="page-header">
+    <h1>b.7 – Qualitätsmängel Jogurt</h1>
+    <p>Klicken oder <kbd>Leertaste</kbd> zum Umdrehen</p>
+  </div>
 
-<div class="card-wrap">
+  <div class="filter-wrap" id="filterWrap"></div>
 
-  <div class="flip-scene" id="flipScene" onclick="flipCard()">
-    <div class="flip-inner" id="flipInner">
+  <div class="progress-text" id="progressText"></div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progressBar"></div>
+  </div>
 
-      <div class="flip-face flip-front" id="cardFront">
-        <div class="face-label">
-          <span class="kat-dot" id="katDot"></span>
-          <span id="katLabel">–</span>
-        </div>
-        <div class="question-text" id="questionText">–</div>
-        <div class="flip-hint">Klick für die Antwort →</div>
+  <div class="scene" id="scene" onclick="flipCard()">
+    <div class="card" id="card">
+      <div class="card-face card-front">
+        <span class="card-category-badge" id="frontLabel"></span>
+        <div class="card-question" id="frontQuestion"></div>
+        <div class="card-hint">Karte umdrehen für die Antwort</div>
       </div>
-
-      <div class="flip-face flip-back" id="cardBack">
-        <div class="answer-label">Antwort</div>
-        <div class="answer-text" id="answerText"></div>
-        <span class="kat-badge-sm" id="katBadge">–</span>
+      <div class="card-face card-back">
+        <span class="card-category-badge" id="backLabel"></span>
+        <div class="card-answer" id="backAnswer"></div>
       </div>
-
     </div>
   </div>
 
-  <div class="card-nav">
-    <button class="btn btn-ghost" onclick="prevCard()" aria-label="Zurück">&#8592;</button>
-    <span class="nav-counter" id="navCounter">1 / 10</span>
-    <button class="btn btn-ghost" onclick="nextCard()" aria-label="Weiter">&#8594;</button>
+  <div class="controls">
+    <button class="btn btn-ghost"   onclick="prevCard()">&#8592; Zurück</button>
+    <button class="btn btn-success" onclick="flipCard()">Umdrehen</button>
+    <button class="btn btn-ghost"   onclick="nextCard()">Weiter &#8594;</button>
+  </div>
+  <div class="controls">
+    <button class="btn btn-primary" onclick="shuffleCards()">&#x21C4; Mischen</button>
   </div>
 
-  <div class="card-actions">
-    <button class="btn btn-primary" onclick="shuffleCards()">Mischen</button>
-    <button class="btn btn-ghost"   onclick="resetCards()">Reihenfolge zurücksetzen</button>
-  </div>
+  <p class="keyboard-hint" style="margin-top:12px;">
+    <kbd>&#8592;</kbd> <kbd>&#8594;</kbd> navigieren &nbsp;|&nbsp;
+    <kbd>Leertaste</kbd> umdrehen &nbsp;|&nbsp;
+    <kbd>S</kbd> mischen
+  </p>
 
-</div>
+  <script>
+    const ALL_CARDS = [
+      {
+        category: 'Mikrobiologisch',
+        question:  'Erklären Sie, wie es zu einer geblähten Jogurtverpackung kommen kann. Nennen Sie drei mögliche Eintragsquellen für Hefen.',
+        answer:    '<strong>Ursache:</strong> Hefen produzieren bei der Gärung CO₂ → Druck in der Verpackung steigt.<br><br><strong>Eintragsquellen:</strong><ul><li>Raumluft</li><li>Kontaminierter Grundstoff oder Zucker</li><li>Unsaubere Anlagen oder Kontakt mit den Händen</li></ul>',
+      },
+      {
+        category: 'Mikrobiologisch',
+        question:  'Beschreiben Sie, auf welchem Weg Schimmelpilze auf die Jogurtoberfläche gelangen können. Bringen Sie ein Beispiel.',
+        answer:    'Schimmelpilze gelangen über <strong>Raumluft</strong> (z. B. offene Fenster im Abfüllraum), über <strong>unsaubere Verpackungen</strong> oder über <strong>Spritzwasser</strong> auf die Oberfläche.',
+      },
+      {
+        category: 'Konsistenz & Struktur',
+        question:  'Erklären Sie, welche Produktionsfehler zu einem griesigen Jogurt führen können. Nennen Sie vier Ursachen.',
+        answer:    '<ul><li>Nature-Jogurt zu wenig strukturbearbeitet</li><li>Abfallende Bebrütungstemperatur</li><li>Zu hohe Bebrütungstemperatur (Lb.-Anteil zu hoch)</li><li>Zu hohe fettfreie Milchtrockenmasse</li></ul>',
+      },
+      {
+        category: 'Konsistenz & Struktur',
+        question:  'Erklären Sie, warum eine ungenügende thermische Belastung der Milch zu einer zu tiefen Viskosität des Jogurts führt.',
+        answer:    'Bei ungenügender Erhitzung werden die <strong>Molkenproteine nicht ausreichend denaturiert</strong>. Sie können dann nicht an der Gelbildung mitwirken → die Proteinstruktur bleibt schwach → Jogurt wird zu dünnflüssig.',
+      },
+      {
+        category: 'Konsistenz & Struktur',
+        question:  'Beschreiben Sie fünf verschiedene Ursachen, die zu einem zu dünnflüssigen Jogurt führen können.',
+        answer:    '<ul><li>Ungenügende thermische Belastung der Milch</li><li>Keine oder ungenügende Homogenisation</li><li>Zu starke mechanische Belastung der Gallerte (starkes Rühren, ungeeignete Pumpen)</li><li>Zu tiefe fettfreie Trockenmasse / Verwässerung</li><li>Ungenügende Säuerung</li></ul>',
+      },
+      {
+        category: 'Konsistenz & Struktur',
+        question:  'Erklären Sie, warum Erschütterungen während der Gerinnung oder des Kühlens zur Molkenabscheidung führen können. Bringen Sie ein Beispiel.',
+        answer:    'Die Gallerte ist während der Gerinnung und beim Kühlen mechanisch empfindlich. <strong>Erschütterungen</strong> (z. B. Transport auf unebener Strasse) zerstören das Proteingerüst → Molke tritt aus der Gelstruktur aus.',
+      },
+      {
+        category: 'Konsistenz & Struktur',
+        question:  'Beschreiben Sie, wie Lufteinzug beim Mischen die Qualität des Jogurts beeinflussen kann. Erklären Sie den Zusammenhang mit der Molkenabscheidung.',
+        answer:    'Luftblasen, die durch undichte Leitungen oder falsches Mischen eingetragen werden, <strong>stören die Gallertstruktur</strong>. Das Proteingerüst wird beschädigt → Molke scheidet sich ab → Molkenlässigkeit.',
+      },
+      {
+        category: 'Konsistenz & Struktur',
+        question:  'Beschreiben Sie zwei mögliche Ursachen für einen fadenziehenden Jogurt. Bringen Sie je ein Beispiel.',
+        answer:    '<ul><li><strong>Zu tiefe Bebrütungstemperatur</strong> (z. B. Thermostat defekt) → Bakterien bilden vermehrt Schleimsubstanzen</li><li><strong>Infektion mit fadenziehenden Milchsäurebakterien</strong> (z. B. durch unzureichende Anlagenreinigung)</li></ul>',
+      },
+      {
+        category: 'Geschmack',
+        question:  'Erklären Sie, warum ein zu langsames oder ungenügendes Kühlen nach der Bebrütung zu einem übersäuerten Jogurt führt.',
+        answer:    'Bei hoher Temperatur arbeiten die Milchsäurebakterien weiter → <strong>Nachsäuerung</strong>: Milchsäureproduktion setzt sich fort → Säuregehalt steigt an. Erst unter 10 °C wird die Säuerung gestoppt.',
+      },
+      {
+        category: 'Geschmack',
+        question:  'Erklären Sie den Einfluss eines hohen Laktobacillenanteils in der Jogurtkultur auf die Säuerung. Bringen Sie ein Beispiel.',
+        answer:    'Laktobazillen säuern <strong>stärker</strong> als Streptokokken. Ein zu hoher Lb.-Anteil führt zu übermässiger Milchsäurebildung → Jogurt wird übersäuert (z. B. wenn die Kultur aus dem Gleichgewicht gerät und Lb. dominieren).',
+      },
+    ];
 
-<script>
-  var KAT = {
-    mikro:   { label: 'Mikrobiologisch',      css: 'kat-mikro',  dot: '#dc2626' },
-    konsis:  { label: 'Konsistenz & Struktur', css: 'kat-konsis', dot: '#2563eb' },
-    geschm:  { label: 'Geschmack',             css: 'kat-geschm', dot: '#059669' },
-  };
+    const CATEGORY_COLORS = {
+      'Mikrobiologisch':     { bg: '#ffedd5', fg: '#9a3412' },
+      'Konsistenz & Struktur': { bg: '#dbeeff', fg: '#1e4e8c' },
+      'Geschmack':           { bg: '#dcfce7', fg: '#15803d' },
+    };
 
-  var CARDS = [
-    {
-      kat: 'mikro',
-      frage: 'Erklären Sie, wie es zu einer geblähten Jogurtverpackung kommen kann. Nennen Sie drei mögliche Eintragsquellen für Hefen.',
-      antwort: '<strong>Ursache:</strong> Hefen produzieren bei der Gärung CO₂ → Druck in der Verpackung steigt.<br><br><strong>Mögliche Eintragsquellen:</strong><ul><li>Raumluft</li><li>Kontaminierter Grundstoff oder Zucker</li><li>Unsaubere Anlagen oder Kontakt mit den Händen</li></ul>',
-    },
-    {
-      kat: 'mikro',
-      frage: 'Beschreiben Sie, auf welchem Weg Schimmelpilze auf die Jogurtoberfläche gelangen können. Bringen Sie ein Beispiel.',
-      antwort: 'Schimmelpilze gelangen über <strong>Raumluft</strong> (z. B. offene Fenster im Abfüllraum), über <strong>unsaubere Verpackungen</strong> oder über <strong>Spritzwasser</strong> auf die Oberfläche.',
-    },
-    {
-      kat: 'konsis',
-      frage: 'Erklären Sie, welche Produktionsfehler zu einem griesigen Jogurt führen können. Nennen Sie vier Ursachen.',
-      antwort: '<ul><li>Nature-Jogurt zu wenig strukturbearbeitet</li><li>Abfallende Bebrütungstemperatur</li><li>Zu hohe Bebrütungstemperatur (Lb.-Anteil zu hoch)</li><li>Zu hohe fettfreie Milchtrockenmasse</li></ul>',
-    },
-    {
-      kat: 'konsis',
-      frage: 'Erklären Sie, warum eine ungenügende thermische Belastung der Milch zu einer zu tiefen Viskosität des Jogurts führt.',
-      antwort: 'Bei ungenügender Erhitzung werden die <strong>Molkenproteine nicht ausreichend denaturiert</strong>. Sie können dann nicht an der Gelbildung mitwirken → die Proteinstruktur bleibt schwach → der Jogurt wird zu dünnflüssig.',
-    },
-    {
-      kat: 'konsis',
-      frage: 'Beschreiben Sie fünf verschiedene Ursachen, die zu einem zu dünnflüssigen Jogurt führen können.',
-      antwort: '<ul><li>Ungenügende thermische Belastung der Milch</li><li>Keine oder ungenügende Homogenisation</li><li>Zu starke mechanische Belastung der Gallerte (starkes Rühren, ungeeignete Pumpen)</li><li>Zu tiefe fettfreie Trockenmasse / Verwässerung</li><li>Ungenügende Säuerung</li></ul>',
-    },
-    {
-      kat: 'konsis',
-      frage: 'Erklären Sie, warum Erschütterungen während der Gerinnung oder des Kühlens zur Molkenabscheidung führen können. Bringen Sie ein Beispiel.',
-      antwort: 'Die Gallerte (Proteingerüst) ist während der Gerinnung und beim Kühlen mechanisch empfindlich. <strong>Erschütterungen</strong> (z. B. Transport auf unebener Strasse) zerstören das Netzwerk → Molke tritt aus der Gelstruktur aus.',
-    },
-    {
-      kat: 'konsis',
-      frage: 'Beschreiben Sie zwei mögliche Ursachen für einen fadenziehenden Jogurt. Bringen Sie je ein Beispiel.',
-      antwort: '<ul><li><strong>Zu tiefe Bebrütungstemperatur</strong> (z. B. Thermostat defekt) → Bakterien bilden vermehrt Schleimsubstanzen</li><li><strong>Infektion mit fadenziehenden Milchsäurebakterien</strong> (z. B. durch unzureichende Anlagenreinigung)</li></ul>',
-    },
-    {
-      kat: 'geschm',
-      frage: 'Erklären Sie, warum ein zu langsames oder ungenügendes Kühlen nach der Bebrütung zu einem übersäuerten Jogurt führt.',
-      antwort: 'Bei hoher Temperatur arbeiten die Milchsäurebakterien weiter → <strong>Nachsäuerung</strong>: die Milchsäureproduktion setzt sich fort → Säuregehalt steigt an. Erst bei unter 10 °C wird die Säuerung gestoppt.',
-    },
-    {
-      kat: 'geschm',
-      frage: 'Erklären Sie den Einfluss eines hohen Laktobacillenanteils in der Jogurtkultur auf die Säuerung. Bringen Sie ein Beispiel.',
-      antwort: 'Laktobazillen säuern <strong>stärker</strong> als Streptokokken. Ein zu hoher Lb.-Anteil führt zur übermässigen Milchsäurebildung → Jogurt wird übersäuert (z. B. wenn die Kultur nicht mehr im Gleichgewicht ist und Lb. dominieren).',
-    },
-    {
-      kat: 'konsis',
-      frage: 'Beschreiben Sie, wie Lufteinzug beim Mischen die Qualität des Jogurts beeinflussen kann. Erklären Sie den Zusammenhang mit der Molkenabscheidung.',
-      antwort: 'Luftblasen, die durch undichte Leitungen oder falsches Mischen eingetragen werden, <strong>stören die Gallertstruktur</strong>. Das Proteingerüst wird beschädigt → Molke kann sich abscheiden → Molkenlässigkeit.',
-    },
-  ];
+    let deck = [...ALL_CARDS];
+    let currentIndex = 0;
+    let isFlipped = false;
+    let activeCategory = 'Alle';
 
-  var order   = CARDS.map(function(_, i) { return i; });
-  var current = 0;
-
-  function renderCard() {
-    var c   = CARDS[order[current]];
-    var kat = KAT[c.kat];
-
-    document.getElementById('katDot').style.background = kat.dot;
-    document.getElementById('katLabel').textContent     = kat.label;
-    document.getElementById('questionText').textContent = c.frage;
-    document.getElementById('answerText').innerHTML     = c.antwort;
-
-    var badge = document.getElementById('katBadge');
-    badge.textContent = kat.label;
-    badge.className   = 'kat-badge-sm ' + kat.css;
-
-    document.getElementById('navCounter').textContent =
-      (current + 1) + ' / ' + order.length;
-    document.getElementById('flipScene').classList.remove('flipped');
-
-    /* Karten-Mindesthöhe angleichen */
-    requestAnimationFrame(function() {
-      var frontH = document.getElementById('cardFront').scrollHeight;
-      var backH  = document.getElementById('cardBack').scrollHeight;
-      var h      = Math.max(frontH, backH, 220);
-      document.getElementById('flipInner').style.minHeight = h + 'px';
-      document.getElementById('cardFront').style.minHeight = h + 'px';
-      document.getElementById('cardBack').style.minHeight  = h + 'px';
-    });
-  }
-
-  function flipCard()    { document.getElementById('flipScene').classList.toggle('flipped'); }
-  function nextCard()    { current = (current + 1) % order.length; renderCard(); }
-  function prevCard()    { current = (current - 1 + order.length) % order.length; renderCard(); }
-  function shuffleCards(){ order = shuffle(order); current = 0; renderCard(); }
-  function resetCards()  { order = CARDS.map(function(_, i){ return i; }); current = 0; renderCard(); }
-
-  function shuffle(arr) {
-    var a = arr.slice();
-    for (var i = a.length - 1; i > 0; i--) {
-      var j = Math.floor(Math.random() * (i + 1));
-      var t = a[i]; a[i] = a[j]; a[j] = t;
+    function getFilteredDeck() {
+      return activeCategory === 'Alle' ? [...ALL_CARDS]
+        : ALL_CARDS.filter(c => c.category === activeCategory);
     }
-    return a;
-  }
 
-  renderCard();
-</script>
+    function renderFilters() {
+      const wrap = document.getElementById('filterWrap');
+      const categories = ['Alle', ...Object.keys(CATEGORY_COLORS)];
+      wrap.innerHTML = categories.map(cat => {
+        const count = cat === 'Alle' ? ALL_CARDS.length
+          : ALL_CARDS.filter(c => c.category === cat).length;
+        return `<button class="filter-btn ${cat === activeCategory ? 'active' : ''}"
+                  onclick="setCategory('${cat}')">${cat} <span style="opacity:0.65;font-size:0.68rem">${count}</span></button>`;
+      }).join('');
+    }
+
+    function setCategory(cat) {
+      activeCategory = cat;
+      deck = getFilteredDeck();
+      currentIndex = 0;
+      renderFilters();
+      showCard();
+    }
+
+    function shuffleCards() {
+      for (let i = deck.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [deck[i], deck[j]] = [deck[j], deck[i]];
+      }
+      currentIndex = 0;
+      showCard(true);
+    }
+
+    function showCard(forceUnflip = false) {
+      if (isFlipped || forceUnflip) {
+        isFlipped = false;
+        document.getElementById('card').classList.remove('flipped');
+      }
+      const c   = deck[currentIndex];
+      const col = CATEGORY_COLORS[c.category] || { bg: '#f1f5f9', fg: '#4a5568' };
+
+      document.getElementById('frontQuestion').textContent = c.question;
+      document.getElementById('backAnswer').innerHTML = c.answer;
+
+      ['frontLabel', 'backLabel'].forEach(id => {
+        const el = document.getElementById(id);
+        el.textContent   = c.category;
+        el.style.background = col.bg;
+        el.style.color      = col.fg;
+      });
+
+      const total = deck.length;
+      document.getElementById('progressText').textContent = `Karte ${currentIndex + 1} von ${total}`;
+      document.getElementById('progressBar').style.width  = `${((currentIndex + 1) / total) * 100}%`;
+    }
+
+    function flipCard() {
+      isFlipped = !isFlipped;
+      document.getElementById('card').classList.toggle('flipped');
+    }
+
+    function nextCard() { currentIndex = (currentIndex + 1) % deck.length; showCard(true); }
+    function prevCard() { currentIndex = (currentIndex - 1 + deck.length) % deck.length; showCard(true); }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); flipCard(); }
+      if (e.key === 'ArrowRight') nextCard();
+      if (e.key === 'ArrowLeft')  prevCard();
+      if (e.key === 's' || e.key === 'S') shuffleCards();
+    });
+
+    renderFilters();
+    showCard();
+  </script>
 </body>
 </html>
