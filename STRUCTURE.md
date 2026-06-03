@@ -22,6 +22,8 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 
 ## Tool-Typen
 
+### Gebaut
+
 | `data-type`    | Badge-Text    | Beschreibung                                  |
 |----------------|---------------|-----------------------------------------------|
 | `lernkaertchen`| Lernkärtchen  | Flip-Karten Begriff ↔ Erklärung               |
@@ -32,6 +34,19 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 | `lueckentext`  | Lückentext    | Lücken füllen (Wortbank oder Tippen)          |
 | `fachrechner`  | Fachrechner   | Berechnungen mit Rechenweg                    |
 | `trainer`      | Trainer       | Randomisierte Übungsaufgaben                  |
+
+### Geplant / Ideen
+
+| `data-type`        | Badge-Text        | Beschreibung                                                        |
+|--------------------|-------------------|---------------------------------------------------------------------|
+| `wahr-falsch`      | Wahr/Falsch       | Tinder-Swipe: Karte rechts = wahr, links = falsch                   |
+| `tabellen-luecken` | Tabellen-Lücken   | Vergleichstabelle mit leeren Zellen ausfüllen (z.B. Produktvergleich) |
+| `kreuzwortraetsel` | Kreuzworträtsel   | Klassisches Kreuzworträtsel aus Fachbegriffen                       |
+| `hotspot`          | Hotspot           | Bild mit anklickbaren Punkten beschriften                           |
+| `prozess-entscheid`| Prozess-Entscheid | Verzweigter Entscheidungsbaum: Was passiert wenn...?                |
+| `lueckendiagramm`  | Lückendiagramm    | Unvollständiges Flussdiagramm/Kurve ergänzen                        |
+| `fehlersuche`      | Fehlersuche       | Text mit eingebauten Fehlern – Lernende markieren und korrigieren   |
+| `prozessvergleich` | Prozessvergleich  | Zwei Produktionswege interaktiv nebeneinander vergleichen           |
 
 ---
 
