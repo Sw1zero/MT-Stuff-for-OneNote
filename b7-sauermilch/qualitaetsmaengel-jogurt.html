@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Qualitätsmängel Jogurt</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    /* ---- Kategorie-Farben ---- */
+    .kat-mikro  { background:#fee2e2; color:#991b1b; }
+    .kat-konsis { background:#dbeafe; color:#1e40af; }
+    .kat-geschm { background:#d1fae5; color:#065f46; }
+
+    /* ---- Tab 1: Lernkärtchen ---- */
+    .card-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      padding-top: 8px;
+    }
+
+    .flip-wrap {
+      width: 100%;
+      max-width: 580px;
+      perspective: 1200px;
+      cursor: pointer;
+      min-height: 220px;
+    }
+
+    .flip-inner {
+      position: relative;
+      width: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.45s ease;
+      min-height: 220px;
+    }
+
+    .flip-wrap.flipped .flip-inner { transform: rotateY(180deg); }
+
+    .flip-front, .flip-back {
+      position: absolute; top: 0; left: 0; width: 100%;
+      backface-visibility: hidden;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: 32px 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .flip-back {
+      transform: rotateY(180deg);
+      position: relative;
+    }
+
+    .flip-front .kat-badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-bottom: 14px;
+      width: fit-content;
+    }
+
+    .flip-front .mangel-name {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.35;
+      margin-bottom: 16px;
+    }
+
+    .flip-hint {
+      font-size: 0.75rem;
+      color: var(--text-subtle);
+      margin-top: auto;
+    }
+
+    .flip-back .ursachen-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-subtle);
+      margin-bottom: 12px;
+    }
+
+    .ursachen-list {
+      list-style: none;
+      padding: 0; margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .ursachen-list li {
+      font-size: 0.88rem;
+      color: var(--text);
+      padding-left: 14px;
+      position: relative;
+      line-height: 1.45;
+    }
+
+    .ursachen-list li::before {
+      content: '→';
+      position: absolute; left: 0;
+      color: var(--text-subtle);
+      font-size: 0.78rem;
+    }
+
+    .card-nav {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .card-counter {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-subtle);
+      min-width: 48px;
+      text-align: center;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    /* ---- Tab 2: Kategorie-Quiz ---- */
+    .quiz-mangel-card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: 28px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .quiz-mangel-name {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .kat-btns {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+
+    .kat-btn {
+      font-family: var(--font);
+      font-size: 0.88rem;
+      font-weight: 600;
+      padding: 10px 20px;
+      border-radius: var(--radius-sm);
+      border: 2px solid var(--border);
+      background: var(--surface);
+      cursor: pointer;
+      transition: all 0.15s;
+      color: var(--text-muted);
+    }
+
+    .kat-btn:hover { border-color: var(--blue); color: var(--blue-dark); }
+    .kat-btn.correct-choice { border-color: #16a34a; background: #f0fff4; color: #166534; }
+    .kat-btn.wrong-choice   { border-color: var(--red); background: var(--red-light); color: #991b1b; }
+    .kat-btn:disabled { cursor: default; opacity: 0.85; }
+
+    .quiz-feedback-box {
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .quiz-feedback-box.visible { display: block; }
+    .quiz-feedback-box.correct-fb { background: #f0fff4; border: 1px solid #9ae6b4; color: #166534; }
+    .quiz-feedback-box.wrong-fb   { background: var(--red-light); border: 1px solid #fca5a5; color: #991b1b; }
+
+    .quiz-progress {
+      font-size: 0.8rem;
+      color: var(--text-subtle);
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    /* ---- Tab 3: Ursachen zuordnen ---- */
+    .t3-mangel-header {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: 20px 24px;
+      margin-bottom: 16px;
+    }
+
+    .t3-mangel-name {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .t3-instruction {
+      font-size: 0.8rem;
+      color: var(--text-subtle);
+    }
+
+    .t3-options {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .t3-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 16px;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: border-color 0.15s;
+      font-size: 0.88rem;
+      color: var(--text);
+      line-height: 1.45;
+    }
+
+    .t3-option:hover { border-color: var(--blue); }
+    .t3-option input[type="checkbox"] { margin-top: 2px; flex-shrink: 0; width: 16px; height: 16px; cursor: pointer; }
+    .t3-option.correct-opt { border-color: #16a34a; background: #f0fff4; }
+    .t3-option.wrong-opt   { border-color: var(--red); background: var(--red-light); }
+    .t3-option.missed-opt  { border-color: #f59e0b; background: #fefce8; }
+    .t3-option.disabled    { cursor: default; pointer-events: none; }
+
+    /* ---- Score screen ---- */
+    .score-screen {
+      text-align: center;
+      padding: 40px 20px;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .score-big {
+      font-size: 3rem;
+      font-weight: 800;
+      color: var(--blue-dark);
+      margin-bottom: 4px;
+    }
+
+    .score-sub {
+      font-size: 0.88rem;
+      color: var(--text-subtle);
+      margin-bottom: 24px;
+    }
+  </style>
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · b.7 Sauermilchprodukte</span>
+    <h1>Qualitätsmängel Jogurt</h1>
+    <p>Lernen · Einordnen · Vertiefen</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+  <a class="back-link" href="../index.html">← Alle Lerntools</a>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="showTab(1)"><span class="tab-num">1</span>Lernen</button>
+    <button class="tab-btn"        onclick="showTab(2)"><span class="tab-num">2</span>Einordnen</button>
+    <button class="tab-btn"        onclick="showTab(3)"><span class="tab-num">3</span>Vertiefen</button>
+  </div>
+
+  <!-- ============================================================
+       TAB 1: Lernkärtchen
+       ============================================================ -->
+  <div class="tab-panel active" id="tab1">
+    <div class="card-area">
+
+      <div class="flip-wrap" id="flipCard" onclick="flipCard()">
+        <div class="flip-inner" id="flipInner">
+          <div class="flip-front" id="cardFront">
+            <span class="kat-badge" id="cardKat">–</span>
+            <div class="mangel-name" id="cardName">–</div>
+            <div class="flip-hint">Klick zum Umdrehen</div>
+          </div>
+          <div class="flip-back" id="cardBack">
+            <div class="ursachen-title">Ursachen</div>
+            <ul class="ursachen-list" id="cardUrsachen"></ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-nav">
+        <button class="btn btn-ghost" onclick="prevCard()">&#8592;</button>
+        <span class="card-counter" id="cardCounter">1 / 7</span>
+        <button class="btn btn-ghost" onclick="nextCard()">&#8594;</button>
+      </div>
+
+      <div class="card-actions">
+        <button class="btn btn-primary" onclick="shuffleCards()">Mischen</button>
+        <button class="btn btn-ghost"   onclick="resetCards()">Reihenfolge zurücksetzen</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================================
+       TAB 2: Kategorie-Quiz
+       ============================================================ -->
+  <div class="tab-panel" id="tab2">
+    <div id="t2Game">
+      <div class="quiz-progress" id="t2Progress">1 / 7</div>
+      <div class="quiz-mangel-card">
+        <div class="quiz-mangel-name" id="t2MangelName">–</div>
+      </div>
+      <div class="kat-btns">
+        <button class="kat-btn" onclick="checkKat('mikrobiologisch')">Mikrobiologisch</button>
+        <button class="kat-btn" onclick="checkKat('konsistenz')">Konsistenz &amp; Struktur</button>
+        <button class="kat-btn" onclick="checkKat('geschmack')">Geschmack</button>
+      </div>
+      <div class="quiz-feedback-box" id="t2Feedback"></div>
+      <div style="text-align:center">
+        <button class="btn btn-primary" id="t2NextBtn" onclick="t2Next()" style="display:none">Weiter →</button>
+      </div>
+    </div>
+    <div class="score-screen" id="t2Score" style="display:none">
+      <div class="score-big" id="t2ScoreBig">–</div>
+      <div class="score-sub">von 7 Kategorien richtig zugeordnet</div>
+      <button class="btn btn-primary" onclick="initTab2()">Nochmals</button>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       TAB 3: Ursachen zuordnen
+       ============================================================ -->
+  <div class="tab-panel" id="tab3">
+    <div id="t3Game">
+      <div class="t3-mangel-header">
+        <div class="t3-mangel-name" id="t3MangelName">–</div>
+        <div class="t3-instruction">Wähle alle zutreffenden Ursachen aus. <span id="t3Progress" style="color:var(--text-subtle);font-weight:600"></span></div>
+      </div>
+      <div class="t3-options" id="t3Options"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="t3CheckBtn" onclick="checkT3()">Prüfen</button>
+        <button class="btn btn-ghost"   id="t3NextBtn"  onclick="t3Next()" style="display:none">Weiter →</button>
+      </div>
+      <div class="quiz-feedback-box" id="t3Feedback" style="margin-top:12px"></div>
+    </div>
+    <div class="score-screen" id="t3Score" style="display:none">
+      <div class="score-big" id="t3ScoreBig">–</div>
+      <div class="score-sub">von 7 Mängeln alle Ursachen korrekt zugeordnet</div>
+      <button class="btn btn-primary" onclick="initTab3()">Nochmals</button>
+    </div>
+  </div>
+
+</main>
+
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologie EFZ · Philipp Neukomm
+</footer>
+
+<script>
+/* ================================================================
+   DATENBASIS
+   ================================================================ */
+var MAENGEL = [
+  {
+    name: 'Geblähte Verpackung',
+    kat: 'mikrobiologisch',
+    ursachen: [
+      'Hefeninfektion durch Raumluft',
+      'Kontaminierter Grundstoff oder Zucker',
+      'Unsaubere Anlagen',
+      'Kontakt mit den Händen',
+    ]
+  },
+  {
+    name: 'Schimmelwachstum auf der Oberfläche',
+    kat: 'mikrobiologisch',
+    ursachen: [
+      'Infektion über Raumluft',
+      'Unsaubere Verpackungen',
+      'Spritzwasser',
+    ]
+  },
+  {
+    name: 'Griessigkeit',
+    kat: 'konsistenz',
+    ursachen: [
+      'Nature-Jogurt zu wenig strukturbearbeitet',
+      'Abfallende Bebrütungstemperatur',
+      'Zu hohe Bebrütungstemperatur (Lb.-Anteil zu hoch)',
+      'Zu hohe fettfreie Milchtrockenmasse',
+    ]
+  },
+  {
+    name: 'Zu tiefe Viskosität (zu dünnflüssig)',
+    kat: 'konsistenz',
+    ursachen: [
+      'Ungenügende thermische Belastung der Milch (Molkenproteine zu wenig denaturiert)',
+      'Keine oder ungenügende Homogenisation',
+      'Zu starke mechanische Belastung der Gallerte (starkes Rühren, ungeeignete Pumpen)',
+      'Zu tiefe fettfreie Trockenmasse / Verwässerung',
+      'Ungenügende Säuerung',
+    ]
+  },
+  {
+    name: 'Molkenlässig',
+    kat: 'konsistenz',
+    ursachen: [
+      'Erschütterungen im warmen Zustand (Gerinnung, Kühlen, Transport)',
+      'Lufteinzug durch undichte Leitungen oder Lufteinschlag beim Mischen',
+    ]
+  },
+  {
+    name: 'Fadenziehender Jogurt',
+    kat: 'konsistenz',
+    ursachen: [
+      'Zu tiefe Bebrütungstemperatur',
+      'Infektion mit fadenziehenden Milchsäurebakterien',
+    ]
+  },
+  {
+    name: 'Übersäuert',
+    kat: 'geschmack',
+    ursachen: [
+      'Zu lange Bebrütungszeit',
+      'Starkes Nachsäuren durch ungenügendes oder zu langsames Kühlen',
+      'Unterbrochene Kühlkette',
+      'Hoher Laktobacillenanteil in der Kultur',
+      'Überalterter Jogurt',
+    ]
+  },
+];
+
+var KAT_LABELS = {
+  mikrobiologisch: 'Mikrobiologisch',
+  konsistenz:      'Konsistenz & Struktur',
+  geschmack:       'Geschmack',
+};
+
+var KAT_CSS = {
+  mikrobiologisch: 'kat-mikro',
+  konsistenz:      'kat-konsis',
+  geschmack:       'kat-geschm',
+};
+
+function shuffle(arr) {
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+
+/* ================================================================
+   TAB-NAVIGATION
+   ================================================================ */
+function showTab(n) {
+  for (var i = 1; i <= 3; i++) {
+    document.getElementById('tab' + i).classList.toggle('active', i === n);
+    document.querySelectorAll('.tab-btn')[i-1].classList.toggle('active', i === n);
+  }
+  if (n === 2 && !t2Initialized) initTab2();
+  if (n === 3 && !t3Initialized) initTab3();
+}
+
+/* ================================================================
+   TAB 1 – LERNKÄRTCHEN
+   ================================================================ */
+var t1Order = MAENGEL.map(function(_, i) { return i; });
+var t1Current = 0;
+
+function renderCard() {
+  var m = MAENGEL[t1Order[t1Current]];
+  var kat = document.getElementById('cardKat');
+  kat.textContent = KAT_LABELS[m.kat];
+  kat.className = 'kat-badge ' + KAT_CSS[m.kat];
+  document.getElementById('cardName').textContent = m.name;
+  document.getElementById('cardUrsachen').innerHTML =
+    m.ursachen.map(function(u) { return '<li>' + u + '</li>'; }).join('');
+  document.getElementById('cardCounter').textContent = (t1Current + 1) + ' / ' + t1Order.length;
+  document.getElementById('flipCard').classList.remove('flipped');
+
+  /* Karte hoch genug machen für die Rückseite */
+  var backHeight = document.getElementById('cardBack').scrollHeight;
+  document.getElementById('flipInner').style.minHeight = Math.max(220, backHeight) + 'px';
+}
+
+function flipCard()  { document.getElementById('flipCard').classList.toggle('flipped'); }
+function nextCard()  { t1Current = (t1Current + 1) % t1Order.length; renderCard(); }
+function prevCard()  { t1Current = (t1Current - 1 + t1Order.length) % t1Order.length; renderCard(); }
+function shuffleCards() { t1Order = shuffle(t1Order); t1Current = 0; renderCard(); }
+function resetCards()   { t1Order = MAENGEL.map(function(_, i) { return i; }); t1Current = 0; renderCard(); }
+
+renderCard();
+
+/* ================================================================
+   TAB 2 – KATEGORIE-QUIZ
+   ================================================================ */
+var t2Order = [];
+var t2Current = 0;
+var t2Score = 0;
+var t2Initialized = false;
+
+function initTab2() {
+  t2Order = shuffle(MAENGEL.map(function(_, i) { return i; }));
+  t2Current = 0;
+  t2Score = 0;
+  t2Initialized = true;
+  document.getElementById('t2Score').style.display = 'none';
+  document.getElementById('t2Game').style.display = 'block';
+  renderT2();
+}
+
+function renderT2() {
+  var m = MAENGEL[t2Order[t2Current]];
+  document.getElementById('t2MangelName').textContent = m.name;
+  document.getElementById('t2Progress').textContent = (t2Current + 1) + ' / ' + t2Order.length;
+  document.getElementById('t2Feedback').className = 'quiz-feedback-box';
+  document.getElementById('t2NextBtn').style.display = 'none';
+  document.querySelectorAll('.kat-btn').forEach(function(b) {
+    b.className = 'kat-btn'; b.disabled = false;
+  });
+}
+
+function checkKat(chosen) {
+  var m = MAENGEL[t2Order[t2Current]];
+  var correct = chosen === m.kat;
+  if (correct) t2Score++;
+
+  document.querySelectorAll('.kat-btn').forEach(function(b) {
+    b.disabled = true;
+    var bKat = b.textContent.trim();
+    var bKatKey = bKat === 'Mikrobiologisch' ? 'mikrobiologisch'
+                : bKat === 'Konsistenz & Struktur' ? 'konsistenz' : 'geschmack';
+    if (bKatKey === m.kat) b.classList.add('correct-choice');
+    if (bKatKey === chosen && !correct) b.classList.add('wrong-choice');
+  });
+
+  var fb = document.getElementById('t2Feedback');
+  if (correct) {
+    fb.className = 'quiz-feedback-box visible correct-fb';
+    fb.textContent = '✓  Richtig! Dies ist ein ' + KAT_LABELS[m.kat] + '-Mangel.';
+  } else {
+    fb.className = 'quiz-feedback-box visible wrong-fb';
+    fb.textContent = '✗  Nicht ganz. «' + m.name + '» gehört zu: ' + KAT_LABELS[m.kat] + '.';
+  }
+  document.getElementById('t2NextBtn').style.display = 'inline-flex';
+}
+
+function t2Next() {
+  t2Current++;
+  if (t2Current >= t2Order.length) {
+    document.getElementById('t2Game').style.display = 'none';
+    document.getElementById('t2ScoreBig').textContent = t2Score + ' / ' + t2Order.length;
+    document.getElementById('t2Score').style.display = 'block';
+  } else {
+    renderT2();
+  }
+}
+
+/* ================================================================
+   TAB 3 – URSACHEN ZUORDNEN
+   ================================================================ */
+var t3Order = [];
+var t3Current = 0;
+var t3Score = 0;
+var t3Initialized = false;
+var t3CurrentOptions = []; // {text, isCorrect}
+
+function initTab3() {
+  t3Order = shuffle(MAENGEL.map(function(_, i) { return i; }));
+  t3Current = 0;
+  t3Score = 0;
+  t3Initialized = true;
+  document.getElementById('t3Score').style.display = 'none';
+  document.getElementById('t3Game').style.display = 'block';
+  renderT3();
+}
+
+function getDistractors(mangel, count) {
+  var pool = [];
+  MAENGEL.forEach(function(m) {
+    if (m.name !== mangel.name) m.ursachen.forEach(function(u) { pool.push(u); });
+  });
+  return shuffle(pool).slice(0, count);
+}
+
+function renderT3() {
+  var m = MAENGEL[t3Order[t3Current]];
+  document.getElementById('t3MangelName').textContent = m.name;
+  document.getElementById('t3Progress').textContent = (t3Current + 1) + ' / ' + t3Order.length;
+
+  var nDistractors = m.ursachen.length <= 2 ? 3 : 2;
+  var distractors  = getDistractors(m, nDistractors);
+
+  t3CurrentOptions = shuffle(
+    m.ursachen.map(function(u) { return {text: u, isCorrect: true}; }).concat(
+    distractors.map(function(u) { return {text: u, isCorrect: false}; }))
+  );
+
+  document.getElementById('t3Options').innerHTML = t3CurrentOptions.map(function(opt, i) {
+    return '<label class="t3-option" id="t3opt' + i + '">' +
+      '<input type="checkbox" id="t3cb' + i + '"> ' +
+      '<span>' + opt.text + '</span>' +
+      '</label>';
+  }).join('');
+
+  document.getElementById('t3Feedback').className = 'quiz-feedback-box';
+  document.getElementById('t3CheckBtn').style.display = 'inline-flex';
+  document.getElementById('t3NextBtn').style.display = 'none';
+}
+
+function checkT3() {
+  var allCorrect = true;
+  var nCorrectChecked = 0;
+  var nCorrectTotal   = 0;
+
+  t3CurrentOptions.forEach(function(opt, i) {
+    var cb  = document.getElementById('t3cb' + i);
+    var lbl = document.getElementById('t3opt' + i);
+    lbl.classList.add('disabled');
+    if (opt.isCorrect) nCorrectTotal++;
+    if (cb.checked && opt.isCorrect)  { lbl.classList.add('correct-opt'); nCorrectChecked++; }
+    if (cb.checked && !opt.isCorrect) { lbl.classList.add('wrong-opt');   allCorrect = false; }
+    if (!cb.checked && opt.isCorrect) { lbl.classList.add('missed-opt');  allCorrect = false; }
+  });
+
+  if (allCorrect) t3Score++;
+
+  var fb = document.getElementById('t3Feedback');
+  if (allCorrect) {
+    fb.className = 'quiz-feedback-box visible correct-fb';
+    fb.textContent = '✓  Alle Ursachen korrekt!';
+  } else {
+    fb.className = 'quiz-feedback-box visible wrong-fb';
+    fb.innerHTML = '✗  ' + nCorrectChecked + ' von ' + nCorrectTotal +
+      ' Ursachen gefunden. Gelb markiert = vergessen, rot = falsch gewählt.';
+  }
+
+  document.getElementById('t3CheckBtn').style.display = 'none';
+  document.getElementById('t3NextBtn').style.display = 'inline-flex';
+}
+
+function t3Next() {
+  t3Current++;
+  if (t3Current >= t3Order.length) {
+    document.getElementById('t3Game').style.display = 'none';
+    document.getElementById('t3ScoreBig').textContent = t3Score + ' / ' + t3Order.length;
+    document.getElementById('t3Score').style.display = 'block';
+  } else {
+    renderT3();
+  }
+}
+</script>
+</body>
+</html>
