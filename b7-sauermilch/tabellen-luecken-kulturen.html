@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tabellen-Lücken – Jogurtkulturen</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .back-link {
+      display: inline-block;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      margin-bottom: 1.5rem;
+      transition: color 0.15s;
+    }
+    .back-link:hover { color: var(--red); }
+
+    .instruction {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      margin-bottom: 1.25rem;
+      text-align: center;
+    }
+
+    /* Word bank */
+    .word-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      background: var(--blue-light);
+      border-radius: var(--radius-md);
+      padding: 0.9rem 1rem;
+      margin-bottom: 1.5rem;
+      min-height: 52px;
+    }
+    .word-chip {
+      font-family: var(--font);
+      font-size: 0.82rem;
+      font-weight: 500;
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 20px;
+      padding: 0.3rem 0.85rem;
+      cursor: pointer;
+      color: var(--text);
+      transition: all 0.15s;
+      line-height: 1.4;
+    }
+    .word-chip:hover   { border-color: var(--blue); }
+    .word-chip.selected { background: var(--blue); border-color: var(--blue); color: #fff; }
+    .word-chip.used     { opacity: 0.22; pointer-events: none; }
+
+    /* Table */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.5rem;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .compare-table th,
+    .compare-table td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.88rem;
+      vertical-align: middle;
+    }
+
+    .compare-table tr:last-child td,
+    .compare-table tr:last-child th { border-bottom: none; }
+
+    /* Header row */
+    .compare-table thead th {
+      background: var(--red);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.82rem;
+    }
+    .compare-table thead th:first-child {
+      background: #c40027;
+    }
+
+    /* Organism name cells */
+    .col-sc { border-right: 1px solid var(--border); }
+
+    /* Property label cells */
+    .compare-table td.prop-label {
+      font-weight: 600;
+      color: var(--text);
+      background: #f8f9fb;
+      width: 35%;
+    }
+
+    /* Blank cells */
+    .blank-cell {
+      min-width: 130px;
+      min-height: 36px;
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.3rem 0.65rem;
+      font-size: 0.84rem;
+      color: var(--text-subtle);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      transition: all 0.15s;
+    }
+    .blank-cell.ready  { border-color: var(--blue); border-style: solid; background: #f0f7ff; }
+    .blank-cell.filled { border-style: solid; border-color: var(--blue); color: var(--text); font-weight: 500; }
+    .blank-cell.correct { border-color: #16a34a !important; background: #f0fdf4 !important; color: #15803d !important; }
+    .blank-cell.wrong   { border-color: var(--red) !important; background: var(--red-light) !important; color: var(--red) !important; }
+
+    /* Symbiose info box */
+    .info-box {
+      background: #f0f7ff;
+      border-left: 3px solid var(--blue);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 0.75rem 1rem;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+    .info-box strong { color: var(--text); }
+
+    .btn-row {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .result-banner {
+      margin-top: 1.25rem;
+      padding: 0.9rem 1rem;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.92rem;
+      text-align: center;
+      display: none;
+    }
+    .result-banner.show    { display: block; }
+    .result-banner.perfect { background: #f0fdf4; color: #15803d; border: 1.5px solid #bbf7d0; }
+    .result-banner.partial { background: #fff7ed; color: #c2410c; border: 1.5px solid #fed7aa; }
+
+    @media (max-width: 500px) {
+      .compare-table th,
+      .compare-table td { padding: 0.55rem 0.65rem; font-size: 0.78rem; }
+      .blank-cell { min-width: 100px; font-size: 0.78rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="bzwu-header">
+  <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologie EFZ · b.7</span>
+  <h1>Tabellen-Lücken</h1>
+  <p>Eigenschaften der Jogurtkulturen im Vergleich</p>
+</header>
+
+<main class="page-main">
+  <a class="back-link" href="../index.html">← Alle Lerntools</a>
+
+  <p class="instruction">Wähle einen Begriff aus der Wortbank und klicke auf die passende Lücke.</p>
+
+  <div class="word-bank" id="wordBank"></div>
+
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th>Eigenschaft</th>
+        <th class="col-sc"><i>Sc. thermophilus</i></th>
+        <th><i>Lb. delbrueckii</i> ssp. <i>bulgaricus</i></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="prop-label">Temperatur-Optimum</td>
+        <td class="col-sc"><span class="blank-cell" data-answer="37–42 °C">—</span></td>
+        <td><span class="blank-cell" data-answer="40–45 °C">—</span></td>
+      </tr>
+      <tr>
+        <td class="prop-label">pH-Optimum</td>
+        <td class="col-sc"><span class="blank-cell" data-answer="6–6,8">—</span></td>
+        <td><span class="blank-cell" data-answer="5,2–5,5">—</span></td>
+      </tr>
+      <tr>
+        <td class="prop-label">Säurebildung</td>
+        <td class="col-sc"><span class="blank-cell" data-answer="Anfangssäure">—</span></td>
+        <td><span class="blank-cell" data-answer="Endsäure">—</span></td>
+      </tr>
+      <tr>
+        <td class="prop-label">Besondere Eigenschaft</td>
+        <td class="col-sc"><span class="blank-cell" data-answer="viskositätserhöhend">—</span></td>
+        <td><span class="blank-cell" data-answer="Aromabildung">—</span></td>
+      </tr>
+      <tr>
+        <td class="prop-label">Symbiose-Leistung</td>
+        <td class="col-sc"><span class="blank-cell" data-answer="senkt pH-Wert">—</span></td>
+        <td><span class="blank-cell" data-answer="liefert Aminosäuren">—</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="info-box">
+    <strong>Symbiose:</strong> Die beiden Bakterienarten leben in Symbiose – sie säuern gemeinsam deutlich schneller als jede Art alleine.
+    Lb. bulgaricus wirkt <em>proteolytisch</em> und spaltet Aminosäuren aus dem Milcheiweiss ab, die Sc. thermophilus für sein Wachstum benötigt.
+    Sc. thermophilus senkt den pH-Wert und ermöglicht dadurch den Lactobacillen ein schnelleres Wachstum.
+  </div>
+
+  <div class="btn-row">
+    <button type="button" class="btn btn-primary" onclick="checkAll()">Überprüfen</button>
+    <button type="button" class="btn btn-ghost"   onclick="resetAll()">Zurücksetzen</button>
+  </div>
+
+  <div class="result-banner" id="resultBanner"></div>
+
+</main>
+
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologie EFZ · Philipp Neukomm
+</footer>
+
+<script>
+var ANSWERS = [
+  '37–42 °C',
+  '40–45 °C',
+  '6–6,8',
+  '5,2–5,5',
+  'Anfangssäure',
+  'Endsäure',
+  'viskositätserhöhend',
+  'Aromabildung',
+  'senkt pH-Wert',
+  'liefert Aminosäuren'
+];
+
+var selected = null;
+
+function shuffle(arr) {
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+
+function init() {
+  // Build word bank
+  var bank = document.getElementById('wordBank');
+  bank.innerHTML = '';
+  shuffle(ANSWERS).forEach(function(word) {
+    var chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'word-chip';
+    chip.textContent = word;
+    chip.dataset.word = word;
+    chip.onclick = function() { selectChip(this); };
+    bank.appendChild(chip);
+  });
+
+  // Reset all blank cells
+  document.querySelectorAll('.blank-cell').forEach(function(cell) {
+    cell.textContent = '—';
+    cell.className = 'blank-cell';
+    delete cell.dataset.filled;
+    cell.onclick = function() { fillCell(this); };
+  });
+
+  selected = null;
+  document.getElementById('resultBanner').className = 'result-banner';
+}
+
+function selectChip(chip) {
+  if (chip.classList.contains('selected')) {
+    chip.classList.remove('selected');
+    selected = null;
+    clearReady();
+    return;
+  }
+  document.querySelectorAll('.word-chip.selected').forEach(function(c) { c.classList.remove('selected'); });
+  chip.classList.add('selected');
+  selected = chip.dataset.word;
+
+  document.querySelectorAll('.blank-cell').forEach(function(c) {
+    c.classList.remove('ready');
+    if (!c.dataset.filled) c.classList.add('ready');
+  });
+}
+
+function fillCell(cell) {
+  if (cell.dataset.filled) {
+    // Clear cell, return word
+    returnWord(cell.dataset.filled);
+    delete cell.dataset.filled;
+    cell.textContent = '—';
+    cell.className = 'blank-cell';
+    if (selected) cell.classList.add('ready');
+    return;
+  }
+  if (!selected) return;
+
+  cell.dataset.filled = selected;
+  cell.textContent = selected;
+  cell.className = 'blank-cell filled';
+
+  markUsed(selected);
+  selected = null;
+  clearReady();
+}
+
+function returnWord(word) {
+  document.querySelectorAll('.word-chip').forEach(function(c) {
+    if (c.dataset.word === word) c.classList.remove('used', 'selected');
+  });
+}
+
+function markUsed(word) {
+  document.querySelectorAll('.word-chip').forEach(function(c) {
+    if (c.dataset.word === word) { c.classList.remove('selected'); c.classList.add('used'); }
+  });
+}
+
+function clearReady() {
+  document.querySelectorAll('.blank-cell').forEach(function(c) { c.classList.remove('ready'); });
+}
+
+function checkAll() {
+  var correct = 0, filled = 0;
+  document.querySelectorAll('.blank-cell').forEach(function(cell) {
+    var val = cell.dataset.filled;
+    if (!val) return;
+    filled++;
+    cell.classList.remove('filled', 'ready');
+    if (val === cell.dataset.answer) { cell.classList.add('correct'); correct++; }
+    else                              { cell.classList.add('wrong'); }
+  });
+
+  var banner = document.getElementById('resultBanner');
+  if (correct === 10) {
+    banner.textContent = 'Perfekt! Alle 10 Felder richtig ausgefüllt.';
+    banner.className = 'result-banner show perfect';
+  } else {
+    banner.textContent = correct + ' von ' + filled + ' Feldern korrekt. Rot markierte Felder nochmals überprüfen.';
+    banner.className = 'result-banner show partial';
+  }
+}
+
+function resetAll() { init(); }
+
+init();
+</script>
+
+</body>
+</html>
