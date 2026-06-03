@@ -40,16 +40,35 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 
 ## Module
 
-| `data-module` | Badge-Text | Sektions-Titel                      | Ordner                  |
-|---------------|------------|-------------------------------------|-------------------------|
-| `a1`          | a.1        | a.1 – Milch annehmen                | `a1-milch-annehmen/`    |
-| `a2`          | a.2        | a.2 – Rohstoffe trennen             | `a2-rohstoffe-trennen/` |
-| `a3`          | a.3        | a.3 – Rohstoffe aufkonzentrieren    | `a3-aufkonzentrieren/`  |
-| `a4`          | a.4        | a.4 – Wärmebehandlung durchführen   | `a4-waermebehandlung/`  |
-| `b1`          | b.1        | b.1 – Hartkäse herstellen           | `b1-hartkaese/`         |
-| `b7`          | b.7        | b.7 – Sauermilchprodukte herstellen | `b7-sauermilch/`        |
-| `d1`          | d.1        | d.1 – Hygiene                       | `d1-hygiene/`           |
-| `allgemein`   | Allgemein  | Allgemeine Tools                    | `tools/`                |
+✅ = Tools vorhanden · 🔲 = noch keine Tools
+
+| `data-module` | Badge | Sektions-Titel                             | Ordner                          | Status |
+|---------------|-------|--------------------------------------------|---------------------------------|--------|
+| `a1`          | a.1   | a.1 – Rohstoffe annehmen                   | `a1-rohstoffe-annehmen/`        | 🔲     |
+| `a2`          | a.2   | a.2 – Rohstoffe trennen                    | `a2-rohstoffe-trennen/`         | ✅     |
+| `a3`          | a.3   | a.3 – Rohstoffe aufkonzentrieren           | `a3-aufkonzentrieren/`          | 🔲     |
+| `a4`          | a.4   | a.4 – Wärmebehandlung durchführen          | `a4-waermebehandlung/`          | 🔲     |
+| `a5`          | a.5   | a.5 – Homogenisation durchführen           | `a5-homogenisation/`            | 🔲     |
+| `a6`          | a.6   | a.6 – Zutaten beimischen                   | `a6-zutaten/`                   | 🔲     |
+| `a7`          | a.7   | a.7 – Technische Einrichtungen bedienen    | `a7-technische-einrichtungen/`  | 🔲     |
+| `a8`          | a.8   | a.8 – Kulturen herstellen                  | `a8-kulturen/`                  | 🔲     |
+| `b1`          | b.1   | b.1 – Hartkäse herstellen                  | `b1-hartkaese/`                 | 🔲     |
+| `b2`          | b.2   | b.2 – Halbhartkäse herstellen              | `b2-halbhartkase/`              | 🔲     |
+| `b3`          | b.3   | b.3 – Weichkäse herstellen                 | `b3-weichkaese/`                | 🔲     |
+| `b4`          | b.4   | b.4 – Mozzarella herstellen                | `b4-mozzarella/`                | 🔲     |
+| `b5`          | b.5   | b.5 – Quark herstellen                     | `b5-quark/`                     | 🔲     |
+| `b6`          | b.6   | b.6 – Konsummilch herstellen               | `b6-konsummilch/`               | 🔲     |
+| `b7`          | b.7   | b.7 – Sauermilchprodukte herstellen        | `b7-sauermilch/`                | ✅     |
+| `b8`          | b.8   | b.8 – Speiseeis herstellen                 | `b8-speiseeis/`                 | 🔲     |
+| `b9`          | b.9   | b.9 – Dessertprodukte herstellen           | `b9-dessert/`                   | 🔲     |
+| `b10`         | b.10  | b.10 – Butter herstellen                   | `b10-butter/`                   | 🔲     |
+| `b11`         | b.11  | b.11 – Milchpulver herstellen              | `b11-milchpulver/`              | 🔲     |
+| `d1`          | d.1   | d.1 – Hygiene                              | `d1-hygiene/`                   | 🔲     |
+| `d2`          | d.2   | d.2 – Reinigung und Entkeimung             | `d2-reinigung/`                 | 🔲     |
+| `d3`          | d.3   | d.3 – Basis-Analysen                       | `d3-analysen/`                  | 🔲     |
+| `d4`          | d.4   | d.4 – Qualitätsmanagement                  | `d4-qualitaet/`                 | 🔲     |
+| `e2`          | e.2   | e.2 – Umweltschutz                         | `e2-umweltschutz/`              | 🔲     |
+| `allgemein`   | Allg. | Allgemeine Tools                           | `tools/`                        | ✅     |
 
 ---
 
