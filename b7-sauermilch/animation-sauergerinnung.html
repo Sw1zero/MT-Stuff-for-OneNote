@@ -9,7 +9,7 @@
     body { display:flex; flex-direction:column; align-items:center; padding:28px 16px 56px; }
 
     .back-link {
-      font-size:0.78rem; color:var(--text-subtle); text-decoration:none;
+      font-size:.78rem; color:var(--text-subtle); text-decoration:none;
       display:inline-flex; align-items:center; gap:4px;
       margin-bottom:20px; align-self:flex-start;
     }
@@ -17,47 +17,23 @@
 
     .page-header { text-align:center; margin-bottom:20px; }
     .page-header h1 { font-size:1.1rem; font-weight:600; color:var(--text-muted); margin-bottom:4px; }
-    .page-header p  { font-size:0.82rem; color:var(--text-subtle); }
+    .page-header p  { font-size:.82rem; color:var(--text-subtle); }
 
-    .anim-wrap { width:560px; max-width:96vw; display:flex; flex-direction:column; gap:16px; }
+    .anim-wrap { width:580px; max-width:98vw; display:flex; flex-direction:column; gap:16px; }
 
-    /* Step-Dots */
     .step-dots { display:flex; justify-content:center; gap:12px; margin-bottom:4px; }
-    .step-dot {
-      width:11px; height:11px; border-radius:50%;
-      background:var(--border); cursor:pointer;
-      transition:background 0.2s, transform 0.15s;
-    }
-    .step-dot.active   { background:var(--blue-dark); transform:scale(1.25); }
-    .step-dot:hover    { background:#94a3b8; }
+    .step-dot  { width:11px; height:11px; border-radius:50%; background:var(--border); cursor:pointer; transition:background .2s,transform .15s; }
+    .step-dot.active { background:var(--blue-dark); transform:scale(1.25); }
+    .step-dot:hover  { background:#94a3b8; }
 
-    /* SVG-Karte */
-    .anim-card {
-      background:#f0f7ff;
-      border-radius:var(--radius-lg);
-      box-shadow:var(--shadow-sm);
-      overflow:hidden;
-    }
+    .anim-card { background:#f0f7ff; border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); overflow:hidden; }
     .anim-card svg { display:block; width:100%; height:auto; }
 
-    /* Beschreibungs-Karte */
-    .step-info {
-      background:var(--surface);
-      border-radius:var(--radius-lg);
-      box-shadow:var(--shadow-sm);
-      padding:20px 24px;
-      min-height:90px;
-    }
-    .step-title {
-      font-size:0.78rem; font-weight:700; color:var(--blue-dark);
-      text-transform:uppercase; letter-spacing:0.07em; margin-bottom:8px;
-    }
-    .step-text { font-size:0.9rem; color:var(--text); line-height:1.65; }
+    .step-info { background:var(--surface); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); padding:20px 24px; min-height:90px; }
+    .step-title { font-size:.78rem; font-weight:700; color:var(--blue-dark); text-transform:uppercase; letter-spacing:.07em; margin-bottom:8px; }
+    .step-text  { font-size:.9rem; color:var(--text); line-height:1.65; }
 
-    /* Navigation */
     .nav-row { display:flex; justify-content:center; gap:12px; }
-
-    /* Keyboard-Hinweis */
     .keyboard-hint { margin-top:10px; }
   </style>
 </head>
@@ -75,86 +51,98 @@
   <div class="step-dots" id="stepDots"></div>
 
   <div class="anim-card">
-    <svg id="animSvg" viewBox="0 0 530 310" xmlns="http://www.w3.org/2000/svg">
+    <!-- viewBox: 0-435 animation | 436-545 rechte Indikatoren -->
+    <svg id="animSvg" viewBox="0 0 545 310" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <!-- Gradient für pH-Balken -->
+        <pattern id="dotPat" width="20" height="20" patternUnits="userSpaceOnUse">
+          <circle cx="10" cy="10" r="1.2" fill="#bfdbfe" opacity="0.5"/>
+        </pattern>
+        <!-- Gradient pH-Balken -->
         <linearGradient id="phGrad" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%"   stop-color="#16a34a"/>
           <stop offset="55%"  stop-color="#f59e0b"/>
           <stop offset="100%" stop-color="#dc2626"/>
         </linearGradient>
-        <!-- Hintergrund-Gitter (Flüssigkeit) -->
-        <pattern id="dotPat" width="20" height="20" patternUnits="userSpaceOnUse">
-          <circle cx="10" cy="10" r="1.2" fill="#bfdbfe" opacity="0.5"/>
-        </pattern>
       </defs>
 
-      <!-- Hintergrund -->
-      <rect width="440" height="310" fill="url(#dotPat)"/>
-      <rect width="440" height="310" fill="#e0f2fe" opacity="0.25"/>
+      <!-- Hintergrund Animation-Bereich -->
+      <rect width="435" height="310" fill="url(#dotPat)"/>
+      <rect width="435" height="310" fill="#e0f2fe" opacity="0.25"/>
 
-      <!-- pH-Balken Hintergrund -->
-      <rect x="450" y="25" width="18" height="260" rx="9" fill="url(#phGrad)" opacity="0.9"/>
-      <!-- pH-Skala Ticks -->
-      <line x1="468" y1="25"  x2="475" y2="25"  stroke="#64748b" stroke-width="1.2"/>
-      <text x="477" y="29"  font-family="system-ui,sans-serif" font-size="10" fill="#64748b">7</text>
-      <line x1="468" y1="112" x2="475" y2="112" stroke="#64748b" stroke-width="1.2"/>
-      <text x="477" y="116" font-family="system-ui,sans-serif" font-size="10" fill="#64748b">6</text>
-      <line x1="468" y1="198" x2="475" y2="198" stroke="#64748b" stroke-width="1.2"/>
-      <text x="477" y="202" font-family="system-ui,sans-serif" font-size="10" fill="#64748b">5</text>
-      <line x1="468" y1="285" x2="475" y2="285" stroke="#64748b" stroke-width="1.2"/>
-      <text x="477" y="289" font-family="system-ui,sans-serif" font-size="10" fill="#64748b">4</text>
-      <text x="449" y="17"  font-family="system-ui,sans-serif" font-size="9" fill="#64748b" font-weight="600">pH</text>
-      <!-- pH-Marker -->
-      <polygon id="phMarker" points="440,0 447,4 447,-4" fill="#1e293b"/>
-      <!-- pH-Wert Text -->
-      <text id="phValue" x="450" y="300" font-family="system-ui,sans-serif" font-size="11" font-weight="700" fill="#1e293b" text-anchor="middle"></text>
+      <!-- ============================================================
+           RECHTE INDIKATOREN  (x 438–545)
+           ============================================================ -->
 
-      <!-- Netzwerklinien (Gallerte, Step 5) -->
-      <g id="netLines" opacity="0"></g>
+      <!-- MZ / MS Balken -->
+      <text x="448" y="17" font-family="system-ui,sans-serif" font-size="9" fill="#0369a1"  font-weight="700" text-anchor="middle">MZ</text>
+      <text x="448" y="300" font-family="system-ui,sans-serif" font-size="9" fill="#ea580c" font-weight="700" text-anchor="middle">MS</text>
+      <!-- Hintergrund-Rahmen -->
+      <rect x="440" y="25" width="16" height="260" rx="4" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1"/>
+      <!-- Milchzucker-Teil (blau, von oben) -->
+      <rect id="mzBar" x="440" y="25" width="16" height="260" rx="4" fill="#93c5fd"/>
+      <!-- Milchsäure-Teil (orange, von unten) -->
+      <rect id="msBar" x="440" y="285" width="16" height="0"   rx="4" fill="#fb923c"/>
+      <!-- Trennlinie -->
+      <line id="mzMsDivider" x1="438" y1="285" x2="458" y2="285" stroke="#1e293b" stroke-width="1.5"/>
 
-      <!-- Molke-Tröpfchen mit Molkenproteine (Step 5) -->
-      <g id="wheyDrops" opacity="0">
-        <circle cx="158" cy="127" r="9" fill="#bae6fd" opacity="0.8"/>
-        <circle cx="255" cy="122" r="7" fill="#bae6fd" opacity="0.8"/>
-        <circle cx="352" cy="128" r="8" fill="#bae6fd" opacity="0.8"/>
-        <circle cx="205" cy="212" r="8" fill="#bae6fd" opacity="0.8"/>
-        <circle cx="305" cy="210" r="7" fill="#bae6fd" opacity="0.8"/>
-        <!-- Legende -->
-        <rect x="4" y="285" width="176" height="18" rx="4" fill="white" fill-opacity="0.85"/>
-        <circle cx="14" cy="294" r="6" fill="#bae6fd"/>
-        <text x="24" y="298" font-family="system-ui,sans-serif" font-size="10" fill="#0369a1">= Molke mit Molkenproteinen (nicht gefällt)</text>
+      <!-- pH-Balken -->
+      <text x="470" y="17" font-family="system-ui,sans-serif" font-size="9" fill="#374151" font-weight="700" text-anchor="middle">pH</text>
+      <rect x="461" y="25" width="18" height="260" rx="9" fill="url(#phGrad)" opacity="0.9"/>
+      <!-- Skalenticks -->
+      <line x1="479" y1="25"  x2="484" y2="25"  stroke="#64748b" stroke-width="1.2"/>
+      <text x="486" y="29"   font-family="system-ui,sans-serif" font-size="10" fill="#64748b">7</text>
+      <line x1="479" y1="112" x2="484" y2="112" stroke="#64748b" stroke-width="1.2"/>
+      <text x="486" y="116"  font-family="system-ui,sans-serif" font-size="10" fill="#64748b">6</text>
+      <line x1="479" y1="198" x2="484" y2="198" stroke="#64748b" stroke-width="1.2"/>
+      <text x="486" y="202"  font-family="system-ui,sans-serif" font-size="10" fill="#64748b">5</text>
+      <line x1="479" y1="285" x2="484" y2="285" stroke="#64748b" stroke-width="1.2"/>
+      <text x="486" y="289"  font-family="system-ui,sans-serif" font-size="10" fill="#64748b">4</text>
+      <!-- pH-Marker: zeigt nach RECHTS (Spitze bei x=480) -->
+      <polygon id="phMarker" points="480,0 473,-4 473,4" fill="#1e293b"/>
+      <text id="phValue" x="505" y="4" font-family="system-ui,sans-serif" font-size="11" font-weight="700" fill="#1e293b" text-anchor="middle"></text>
+
+      <!-- ============================================================
+           ANIMATION-INHALT
+           ============================================================ -->
+
+      <!-- Ion-Verbindungen Schritt 3 (Aggregation) -->
+      <g id="ionBonds" opacity="0" style="transition:opacity .4s ease"></g>
+
+      <!-- Cube-Kanten Schritt 4 -->
+      <g id="netLines" opacity="0" style="transition:opacity .5s ease"></g>
+
+      <!-- H⁺ Ionen Schritt 2 -->
+      <g id="hplusIons" opacity="0" style="transition:opacity .5s ease">
+        <text x="55"  y="105" font-family="system-ui,sans-serif" font-size="12" font-weight="700" fill="#dc2626" opacity=".85">H⁺</text>
+        <text x="190" y="35"  font-family="system-ui,sans-serif" font-size="12" font-weight="700" fill="#dc2626" opacity=".85">H⁺</text>
+        <text x="305" y="42"  font-family="system-ui,sans-serif" font-size="12" font-weight="700" fill="#dc2626" opacity=".85">H⁺</text>
+        <text x="408" y="100" font-family="system-ui,sans-serif" font-size="12" font-weight="700" fill="#dc2626" opacity=".85">H⁺</text>
+        <text x="415" y="228" font-family="system-ui,sans-serif" font-size="12" font-weight="700" fill="#dc2626" opacity=".85">H⁺</text>
+        <text x="28"  y="270" font-family="system-ui,sans-serif" font-size="12" font-weight="700" fill="#dc2626" opacity=".85">H⁺</text>
+        <text x="215" y="260" font-family="system-ui,sans-serif" font-size="12" font-weight="700" fill="#dc2626" opacity=".85">H⁺</text>
       </g>
 
-      <!-- Milchsäurebakterien (ab Step 2) -->
-      <g id="bacteria" opacity="0">
+      <!-- Milchsäurebakterien Schritt 2–3 -->
+      <g id="bacteria" opacity="0" style="transition:opacity .5s ease">
         <g transform="translate(168,133) rotate(30)">
-          <ellipse rx="14" ry="6" fill="#064e3b" opacity="0.8"/>
+          <ellipse rx="14" ry="6" fill="#064e3b" opacity=".85"/>
           <text x="0" y="1" text-anchor="middle" dominant-baseline="middle" font-size="6" fill="white" font-family="system-ui">MSB</text>
         </g>
         <g transform="translate(295,143) rotate(-18)">
-          <ellipse rx="14" ry="6" fill="#064e3b" opacity="0.8"/>
+          <ellipse rx="14" ry="6" fill="#064e3b" opacity=".85"/>
           <text x="0" y="1" text-anchor="middle" dominant-baseline="middle" font-size="6" fill="white" font-family="system-ui">MSB</text>
         </g>
         <g transform="translate(88,148) rotate(12)">
-          <ellipse rx="14" ry="6" fill="#064e3b" opacity="0.8"/>
+          <ellipse rx="14" ry="6" fill="#064e3b" opacity=".85"/>
           <text x="0" y="1" text-anchor="middle" dominant-baseline="middle" font-size="6" fill="white" font-family="system-ui">MSB</text>
         </g>
         <g transform="translate(395,152) rotate(-35)">
-          <ellipse rx="14" ry="6" fill="#064e3b" opacity="0.8"/>
+          <ellipse rx="14" ry="6" fill="#064e3b" opacity=".85"/>
           <text x="0" y="1" text-anchor="middle" dominant-baseline="middle" font-size="6" fill="white" font-family="system-ui">MSB</text>
         </g>
-        <!-- Laktose → Milchsäure Pfeil -->
-        <text x="175" y="110" font-family="system-ui,sans-serif" font-size="9.5" fill="#064e3b" font-weight="600" text-anchor="middle">Laktose → Milchsäure</text>
-        <line x1="120" y1="113" x2="232" y2="113" stroke="#064e3b" stroke-width="1.2" stroke-dasharray="3,2" marker-end="url(#arr)"/>
-        <defs>
-          <marker id="arr" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto">
-            <path d="M0,0 L5,2.5 L0,5 Z" fill="#064e3b"/>
-          </marker>
-        </defs>
       </g>
 
-      <!-- Kasein-Partikel (werden per JS generiert) -->
+      <!-- Kasein-Partikel (per JS generiert) -->
       <g id="particleLayer"></g>
     </svg>
   </div>
@@ -168,296 +156,322 @@
     <button class="btn btn-ghost"   id="prevBtn" onclick="prevStep()">&#8592; Zurück</button>
     <button class="btn btn-primary" id="nextBtn" onclick="nextStep()">Weiter &#8594;</button>
   </div>
-
   <p class="keyboard-hint"><kbd>&#8592;</kbd> <kbd>&#8594;</kbd> navigieren</p>
 
 </div>
 
 <script>
-  /* ================================================================
-     DATEN
-     ================================================================ */
+/* ================================================================
+   DATEN – 4 Schritte, 8 Partikel
+   ================================================================ */
 
-  // Positionen pro Step [step][partikel] = {x, y}  (SVG-Koordinaten)
-  var POS = [
-    // Step 0: frei schwebend
-    [{x:75,y:65},{x:210,y:50},{x:358,y:68},
-     {x:50,y:183},{x:193,y:196},{x:352,y:180},
-     {x:108,y:278},{x:258,y:273},{x:400,y:272}],
-    // Step 1: gleich (Bakterien erscheinen)
-    [{x:75,y:65},{x:210,y:50},{x:358,y:68},
-     {x:50,y:183},{x:193,y:196},{x:352,y:180},
-     {x:108,y:278},{x:258,y:273},{x:400,y:272}],
-    // Step 2: etwas näher, Ladungen schwinden
-    [{x:92,y:80},{x:208,y:64},{x:342,y:82},
-     {x:68,y:180},{x:196,y:190},{x:335,y:180},
-     {x:118,y:268},{x:255,y:265},{x:388,y:263}],
-    // Step 3: Aggregation (3 Cluster)
-    [{x:108,y:88},{x:152,y:68},{x:133,y:128},
-     {x:292,y:88},{x:336,y:68},{x:318,y:128},
-     {x:190,y:245},{x:237,y:225},{x:285,y:248}],
-    // Step 4: Gallerte-Netzwerk
-    [{x:105,y:82},{x:205,y:78},{x:305,y:82},
-     {x:155,y:168},{x:255,y:163},{x:355,y:168},
-     {x:105,y:252},{x:255,y:248},{x:355,y:252}],
-  ];
+// Positionen [step][partikel] = {x,y} im SVG-Koordinatensystem (0-435)
+var POS = [
+  // Schritt 1: frei schwebend
+  [ {x:75,y:65},{x:215,y:50},{x:365,y:68},
+    {x:50,y:183},{x:195,y:195},{x:355,y:178},
+    {x:110,y:278},{x:262,y:272} ],
 
-  // Netzwerklinien (nur in Step 4)
-  var NET_PAIRS = [
-    [0,1],[1,2],       // obere Reihe
-    [3,4],[4,5],       // mittlere Reihe
-    [6,7],[7,8],       // untere Reihe
-    [0,3],[1,4],[2,5], // senkrecht
-    [3,6],[4,7],[5,8], // senkrecht
-    [0,4],[1,3],[2,4], // Diagonalen
-    [3,7],[4,8],[5,7], // Diagonalen
-  ];
+  // Schritt 2: gleich (H⁺ erscheinen, Bakterien aktiv)
+  [ {x:75,y:65},{x:215,y:50},{x:365,y:68},
+    {x:50,y:183},{x:195,y:195},{x:355,y:178},
+    {x:110,y:278},{x:262,y:272} ],
 
-  var STEPS = [
-    {
-      ph: 6.7,
-      title: 'Schritt 1 – Ausgangslage (pH 6.7)',
-      text:  'Kasein ist das Haupteiweiss der Milch. Bei normalem pH (~6.7) trägt Kasein überwiegend negative elektrische Ladungen (−). Gleichnamige Ladungen stossen sich ab → die Mizellen bleiben einzeln in der Lösung verteilt → Milch bleibt flüssig.',
-      chargeOpacity: 1.0,
-      showBact:  false,
-      showNet:   false,
-      showWhey:  false,
-    },
-    {
-      ph: 6.0,
-      title: 'Schritt 2 – Milchsäuregärung senkt den pH',
-      text:  'Milchsäurebakterien (MSB) gewinnen Energie aus Laktose. Als Nebenprodukt entsteht Milchsäure → pH-Wert sinkt. Die negativen Ladungen auf den Kaseinmizellen werden durch die Milchsäure zunehmend neutralisiert – die Abstossung lässt nach.',
-      chargeOpacity: 0.55,
-      showBact:  true,
-      showNet:   false,
-      showWhey:  false,
-    },
-    {
-      ph: 4.6,
-      title: 'Schritt 3 – Isoelektrischer Punkt (pH 4.6)',
-      text:  'Bei pH 4.6, dem isoelektrischen Punkt des Kaseins, sind alle negativen Ladungen vollständig neutralisiert. Die Nettolodung der Kaseinmizellen ist null → die gegenseitige Abstossung fällt weg → die Mizellen können sich annähern.',
-      chargeOpacity: 0.0,
-      showBact:  true,
-      showNet:   false,
-      showWhey:  false,
-    },
-    {
-      ph: 4.6,
-      title: 'Schritt 4 – Aggregation',
-      text:  'Ohne Abstossung ziehen sich die Kaseinmizellen an und lagern sich zusammen (Aggregation). Es bilden sich zunächst kleine Cluster. Wichtig: Molkenproteine werden durch Säure NICHT ausgefällt – sie bleiben gelöst.',
-      chargeOpacity: 0.0,
-      showBact:  true,
-      showNet:   false,
-      showWhey:  false,
-    },
-    {
-      ph: 4.5,
-      title: 'Schritt 5 – Gallerte entsteht (pH 4.5 = 36–38 °SH)',
-      text:  'Die Kaseinmizellen bilden ein dreidimensionales Proteinnetzwerk – die Gallerte. Nur Kasein wird ausgefällt. Molkenproteine (blaue Tröpfchen) werden durch Säure NICHT gefällt; sie verbleiben gelöst in der Molkenphase. Bei pH 4.5 (= 36–38 °SH) wird das Kühlen eingeleitet.',
-      chargeOpacity: 0.0,
-      showBact:  true,
-      showNet:   true,
-      showWhey:  true,
-    },
-  ];
+  // Schritt 3: Aggregation (zwei Cluster)
+  [ {x:122,y:105},{x:172,y:82},{x:160,y:150},{x:110,y:145},
+    {x:262,y:98},{x:310,y:78},{x:298,y:145},{x:250,y:150} ],
 
-  /* ================================================================
-     SVG AUFBAUEN
-     ================================================================ */
-  var CHARGE_OFFSETS = [
-    {dx:-26,dy:0},{dx:26,dy:0},
-    {dx:0,dy:-26},{dx:0,dy:26},
-    {dx:-19,dy:-19},{dx:19,dy:-19},
-    {dx:-19,dy:19},{dx:19,dy:19},
-  ];
+  // Schritt 4: 3D-Würfel (8 Ecken)
+  // Vorderseite: p0 TL, p1 TR, p2 BR, p3 BL
+  // Rückseite (+70, -45): p4 TL, p5 TR, p6 BR, p7 BL
+  [ {x:100,y:98},{x:250,y:98},{x:250,y:235},{x:100,y:235},
+    {x:170,y:53},{x:320,y:53},{x:320,y:190},{x:170,y:190} ],
+];
 
-  var NS = 'http://www.w3.org/2000/svg';
-  function el(tag, attrs) {
-    var e = document.createElementNS(NS, tag);
-    Object.keys(attrs).forEach(function(k) { e.setAttribute(k, attrs[k]); });
-    return e;
-  }
+// Würfel-Kanten (Schritt 4)
+var CUBE_PAIRS = [
+  [0,1],[1,2],[2,3],[3,0],   // Vorderseite
+  [4,5],[5,6],[6,7],[7,4],   // Rückseite
+  [0,4],[1,5],[2,6],[3,7],   // Tiefenkanten
+];
 
-  var layer = document.getElementById('particleLayer');
+// Ion-Verbindungspaare (Schritt 3)
+var ION_PAIRS = [
+  [0,1],[1,2],[2,3],[3,0],   // Cluster 1
+  [4,5],[5,6],[6,7],[7,4],   // Cluster 2
+];
 
-  // Partikel erstellen
-  for (var pi = 0; pi < 9; pi++) {
-    var g = el('g', {id:'p'+pi});
+// MZ-Fraktion (Milchzucker) pro Schritt (0=vollständig abgebaut)
+var MZ_FRAC = [1.0, 0.65, 0.25, 0.05];
 
-    // Kreis
-    g.appendChild(el('circle', {
-      r:'19', fill:'#e2e8f0', stroke:'#94a3b8', 'stroke-width':'2',
-    }));
-    // Kasein-Label
-    var lbl = el('text', {
-      x:'0', y:'1.5', 'text-anchor':'middle', 'dominant-baseline':'middle',
-      'font-size':'9', 'font-weight':'700', fill:'#475569', 'font-family':'system-ui,sans-serif',
+var STEPS = [
+  {
+    ph: 6.7,
+    title: 'Schritt 1 – Ausgangslage (pH 6.7)',
+    text:  'Kasein ist das Haupteiweiss der Milch. Bei normalem pH (~6.7) ist Kasein überwiegend negativ geladen (zu sehen an den roten −). Aufgrund der negativen Ladungen verteilt sich das Kasein gleichmässig in der Milch. Die Milch bleibt flüssig.',
+    chargeOpacity: 1.0,
+    showBact: false, showHplus: false, showIonBonds: false, showCube: false,
+  },
+  {
+    ph: 6.0,
+    title: 'Schritt 2 – Milchsäurebakterien sind aktiv',
+    text:  'Milchsäurebakterien (MSB) vergären Laktose. Als Abbauprodukt entsteht Milchsäure – der pH-Wert sinkt. Die dabei entstehenden H⁺-Ionen (rot) neutralisieren die negativen Ladungen auf den Kaseinmizellen. Dadurch stossen sich die Kaseinmizellen weniger ab.',
+    chargeOpacity: 0.5,
+    showBact: true, showHplus: true, showIonBonds: false, showCube: false,
+  },
+  {
+    ph: 4.6,
+    title: 'Schritt 3 – Aggregation',
+    text:  'Die Kaseine ziehen sich gegenseitig immer näher an. Die + und − Verbindungen zwischen den Kaseinmizellen zeigen, wie sie sich zusammenheften. Die Molkenproteine bleiben dabei weiterhin in der Milch vorhanden.',
+    chargeOpacity: 0.0,
+    showBact: true, showHplus: false, showIonBonds: true, showCube: false,
+  },
+  {
+    ph: 4.5,
+    title: 'Schritt 4 – Gallerte entsteht (pH 4.5 = 36–38 °SH)',
+    text:  'Es bildet sich ein dreidimensionales Gerüst über die positiven und negativen Ladungen an den Kaseinen. Molkenproteine, Wasser und Fett bleiben innerhalb des Gerüstes gefangen. Bei einem pH von 4.5 (= 36–38 °SH) beginnen Sie mit dem Kühlen des Joghurts.',
+    chargeOpacity: 0.0,
+    showBact: false, showHplus: false, showIonBonds: false, showCube: true,
+  },
+];
+
+/* ================================================================
+   SVG AUFBAUEN
+   ================================================================ */
+var NS = 'http://www.w3.org/2000/svg';
+function svgEl(tag, attrs) {
+  var e = document.createElementNS(NS, tag);
+  Object.keys(attrs).forEach(function(k) { e.setAttribute(k, attrs[k]); });
+  return e;
+}
+
+var CHARGE_OFFSETS = [
+  {dx:-26,dy:0},{dx:26,dy:0},{dx:0,dy:-26},{dx:0,dy:26},
+  {dx:-19,dy:-19},{dx:19,dy:-19},{dx:-19,dy:19},{dx:19,dy:19},
+];
+
+var layer = document.getElementById('particleLayer');
+
+// 8 Kasein-Partikel
+for (var pi = 0; pi < 8; pi++) {
+  var g = svgEl('g', {id:'p'+pi});
+  g.appendChild(svgEl('circle', {r:'19', fill:'#e2e8f0', stroke:'#94a3b8', 'stroke-width':'2'}));
+  var lbl = document.createElementNS(NS, 'text');
+  lbl.setAttribute('x','0'); lbl.setAttribute('y','1.5');
+  lbl.setAttribute('text-anchor','middle'); lbl.setAttribute('dominant-baseline','middle');
+  lbl.setAttribute('font-size','9'); lbl.setAttribute('font-weight','700');
+  lbl.setAttribute('fill','#475569'); lbl.setAttribute('font-family','system-ui,sans-serif');
+  lbl.textContent = 'Kasein';
+  g.appendChild(lbl);
+
+  for (var ci = 0; ci < CHARGE_OFFSETS.length; ci++) {
+    var off = CHARGE_OFFSETS[ci];
+    var ct = svgEl('text', {
+      id:'c'+pi+'_'+ci,
+      x:off.dx, y:off.dy,
+      'text-anchor':'middle', 'dominant-baseline':'middle',
+      'font-size':'13', 'font-weight':'900', fill:'#dc2626',
+      style:'transition:opacity .55s ease',
     });
-    lbl.textContent = 'Kasein';
-    g.appendChild(lbl);
-
-    // Ladungssymbole
-    for (var ci = 0; ci < CHARGE_OFFSETS.length; ci++) {
-      var off = CHARGE_OFFSETS[ci];
-      var ct = el('text', {
-        id:'c'+pi+'_'+ci,
-        x:off.dx, y:off.dy,
-        'text-anchor':'middle', 'dominant-baseline':'middle',
-        'font-size':'13', 'font-weight':'900', fill:'#dc2626',
-        style:'transition:opacity 0.55s ease',
-      });
-      ct.textContent = '−';
-      g.appendChild(ct);
-    }
-
-    layer.appendChild(g);
+    ct.textContent = '−';
+    g.appendChild(ct);
   }
+  layer.appendChild(g);
+}
 
-  // Netzwerklinien erstellen
-  var netLayer = document.getElementById('netLines');
-  NET_PAIRS.forEach(function(pair) {
-    netLayer.appendChild(el('line', {
-      id:'nl'+pair[0]+'_'+pair[1],
-      stroke:'#64748b', 'stroke-width':'2.5',
-      'stroke-dasharray':'5,3', 'stroke-linecap':'round',
-    }));
+// Würfel-Kanten vorbereiten
+var netLayer = document.getElementById('netLines');
+CUBE_PAIRS.forEach(function(pair, idx) {
+  netLayer.appendChild(svgEl('line', {
+    id:'nl'+idx, stroke:'#334155', 'stroke-width':'2.5',
+    'stroke-dasharray':'6,3', 'stroke-linecap':'round',
+  }));
+});
+
+// Ion-Verbindungen vorbereiten (Schritt 3)
+var ionLayer = document.getElementById('ionBonds');
+ION_PAIRS.forEach(function(pair, idx) {
+  ionLayer.appendChild(svgEl('line', {
+    id:'ib_l'+idx, stroke:'#f97316', 'stroke-width':'1.8',
+    'stroke-dasharray':'4,2',
+  }));
+  // "+" label (bei Partikel A)
+  var tp = svgEl('text', {
+    id:'ib_p'+idx,
+    'text-anchor':'middle', 'dominant-baseline':'middle',
+    'font-size':'11', 'font-weight':'900', fill:'#2563eb',
+    'font-family':'system-ui,sans-serif',
   });
-
-  /* ================================================================
-     ANIMATION ENGINE
-     ================================================================ */
-  var currentStep = 0;
-  var animating = false;
-  var startTime, startPos, targetPos;
-  var DURATION = 900; // ms
-
-  function easeInOut(t) {
-    return t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
-  }
-
-  function animFrame(now) {
-    var t = Math.min((now - startTime) / DURATION, 1);
-    var e = easeInOut(t);
-    for (var i = 0; i < 9; i++) {
-      var x = startPos[i].x + (targetPos[i].x - startPos[i].x) * e;
-      var y = startPos[i].y + (targetPos[i].y - startPos[i].y) * e;
-      document.getElementById('p'+i).setAttribute('transform', 'translate('+x+','+y+')');
-    }
-    if (t < 1) { requestAnimationFrame(animFrame); }
-    else {
-      animating = false;
-      // Netzwerklinien-Positionen aktualisieren (nach Animation)
-      updateNetLines();
-    }
-  }
-
-  function updateNetLines() {
-    var pos = POS[currentStep];
-    NET_PAIRS.forEach(function(pair) {
-      var a = pos[pair[0]], b = pos[pair[1]];
-      var nl = document.getElementById('nl'+pair[0]+'_'+pair[1]);
-      if (nl) {
-        nl.setAttribute('x1', a.x); nl.setAttribute('y1', a.y);
-        nl.setAttribute('x2', b.x); nl.setAttribute('y2', b.y);
-      }
-    });
-  }
-
-  function phToMarkerY(ph) {
-    return 25 + (7.0 - ph) / 3.0 * 260;
-  }
-
-  function goToStep(newStep, noAnimate) {
-    if (newStep < 0 || newStep >= STEPS.length) return;
-    if (animating) return;
-
-    var prevStep = currentStep;
-    currentStep = newStep;
-    var s = STEPS[currentStep];
-
-    // Partikel-Animation starten
-    if (!noAnimate && prevStep !== newStep) {
-      startPos    = POS[prevStep].map(function(p) { return {x:p.x, y:p.y}; });
-      targetPos   = POS[currentStep];
-      startTime   = performance.now();
-      animating   = true;
-      requestAnimationFrame(animFrame);
-    } else {
-      // Sofort positionieren
-      for (var i = 0; i < 9; i++) {
-        var p = POS[currentStep][i];
-        document.getElementById('p'+i).setAttribute('transform', 'translate('+p.x+','+p.y+')');
-      }
-      updateNetLines();
-    }
-
-    // Ladungen
-    for (var i = 0; i < 9; i++) {
-      for (var ci = 0; ci < CHARGE_OFFSETS.length; ci++) {
-        document.getElementById('c'+i+'_'+ci).style.opacity = s.chargeOpacity;
-      }
-    }
-
-    // Bakterien
-    var bact = document.getElementById('bacteria');
-    bact.style.transition = 'opacity 0.5s ease';
-    bact.style.opacity = s.showBact ? '1' : '0';
-
-    // Netzwerklinien
-    var net = document.getElementById('netLines');
-    net.style.transition = 'opacity 0.5s ease';
-    net.style.opacity = s.showNet ? '1' : '0';
-
-    // Molke-Tröpfchen
-    var whey = document.getElementById('wheyDrops');
-    whey.style.transition = 'opacity 0.5s ease';
-    whey.style.opacity = s.showWhey ? '1' : '0';
-
-    // pH-Marker
-    var markerY = phToMarkerY(s.ph);
-    document.getElementById('phMarker').setAttribute('transform', 'translate(0,' + markerY + ')');
-    document.getElementById('phValue').textContent = s.ph.toFixed(1);
-    document.getElementById('phValue').setAttribute('y', markerY + 20 > 295 ? 295 : markerY + 20);
-
-    // Step-Info
-    document.getElementById('stepTitle').textContent = s.title;
-    document.getElementById('stepText').textContent  = s.text;
-
-    // Buttons
-    document.getElementById('prevBtn').disabled = (currentStep === 0);
-    document.getElementById('nextBtn').disabled = (currentStep === STEPS.length - 1);
-    document.getElementById('nextBtn').textContent = currentStep === STEPS.length - 1 ? 'Fertig ✓' : 'Weiter →';
-
-    // Step-Dots
-    document.querySelectorAll('.step-dot').forEach(function(d, i) {
-      d.classList.toggle('active', i === currentStep);
-    });
-  }
-
-  function nextStep() { goToStep(currentStep + 1); }
-  function prevStep() { goToStep(currentStep - 1); }
-
-  /* ================================================================
-     DOTS + KEYBOARD
-     ================================================================ */
-  var dotsWrap = document.getElementById('stepDots');
-  for (var i = 0; i < STEPS.length; i++) {
-    (function(idx) {
-      var d = document.createElement('div');
-      d.className = 'step-dot';
-      d.title = STEPS[idx].title;
-      d.addEventListener('click', function() { goToStep(idx); });
-      dotsWrap.appendChild(d);
-    })(i);
-  }
-
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'ArrowRight') nextStep();
-    if (e.key === 'ArrowLeft')  prevStep();
+  tp.textContent = '+';
+  ionLayer.appendChild(tp);
+  // "−" label (bei Partikel B)
+  var tm = svgEl('text', {
+    id:'ib_m'+idx,
+    'text-anchor':'middle', 'dominant-baseline':'middle',
+    'font-size':'11', 'font-weight':'900', fill:'#dc2626',
+    'font-family':'system-ui,sans-serif',
   });
+  tm.textContent = '−';
+  ionLayer.appendChild(tm);
+});
 
-  // Init
-  goToStep(0, true);
+function updateIonBondPositions(stepIdx) {
+  var pos = POS[stepIdx];
+  ION_PAIRS.forEach(function(pair, idx) {
+    var a = pos[pair[0]], b = pos[pair[1]];
+    var line = document.getElementById('ib_l'+idx);
+    line.setAttribute('x1',a.x); line.setAttribute('y1',a.y);
+    line.setAttribute('x2',b.x); line.setAttribute('y2',b.y);
+    // "+" at 30% from A
+    var px = a.x + (b.x-a.x)*0.3, py = a.y + (b.y-a.y)*0.3;
+    var tp = document.getElementById('ib_p'+idx);
+    tp.setAttribute('x', px); tp.setAttribute('y', py);
+    // "−" at 70% from A
+    var mx = a.x + (b.x-a.x)*0.7, my = a.y + (b.y-a.y)*0.7;
+    var tm = document.getElementById('ib_m'+idx);
+    tm.setAttribute('x', mx); tm.setAttribute('y', my);
+  });
+}
+
+function updateCubeEdgePositions(stepIdx) {
+  var pos = POS[stepIdx];
+  CUBE_PAIRS.forEach(function(pair, idx) {
+    var a = pos[pair[0]], b = pos[pair[1]];
+    var line = document.getElementById('nl'+idx);
+    if (line) {
+      line.setAttribute('x1',a.x); line.setAttribute('y1',a.y);
+      line.setAttribute('x2',b.x); line.setAttribute('y2',b.y);
+    }
+  });
+}
+
+/* ================================================================
+   ANIMATION ENGINE
+   ================================================================ */
+var currentStep = 0;
+var animating   = false;
+var startTime, startPos, targetPos;
+var DURATION = 850;
+
+function easeInOut(t) { return t<.5 ? 2*t*t : -1+(4-2*t)*t; }
+
+function animFrame(now) {
+  var t = Math.min((now-startTime)/DURATION, 1);
+  var e = easeInOut(t);
+  for (var i = 0; i < 8; i++) {
+    var x = startPos[i].x + (targetPos[i].x-startPos[i].x)*e;
+    var y = startPos[i].y + (targetPos[i].y-startPos[i].y)*e;
+    document.getElementById('p'+i).setAttribute('transform','translate('+x+','+y+')');
+  }
+  if (t < 1) {
+    requestAnimationFrame(animFrame);
+  } else {
+    animating = false;
+    updateCubeEdgePositions(currentStep);
+    updateIonBondPositions(currentStep);
+  }
+}
+
+function phToMarkerY(ph) { return 25 + (7.0-ph)/3.0*260; }
+
+function updateMzMs(frac) {
+  var totalH = 260, topY = 25;
+  var mzH = Math.max(0, Math.round(frac * totalH));
+  var msH = totalH - mzH;
+  var divY = topY + mzH;
+  document.getElementById('mzBar').setAttribute('height', mzH);
+  document.getElementById('mzBar').setAttribute('y', topY);
+  document.getElementById('msBar').setAttribute('height', msH);
+  document.getElementById('msBar').setAttribute('y', divY);
+  document.getElementById('mzMsDivider').setAttribute('y1', divY);
+  document.getElementById('mzMsDivider').setAttribute('y2', divY);
+}
+
+function goToStep(newStep, noAnimate) {
+  if (newStep < 0 || newStep >= STEPS.length) return;
+  if (animating) return;
+
+  var prevStep = currentStep;
+  currentStep  = newStep;
+  var s = STEPS[currentStep];
+
+  // Partikel animieren
+  if (!noAnimate && prevStep !== newStep) {
+    startPos  = POS[prevStep].map(function(p) { return {x:p.x,y:p.y}; });
+    targetPos = POS[currentStep];
+    startTime = performance.now();
+    animating = true;
+    requestAnimationFrame(animFrame);
+  } else {
+    for (var i = 0; i < 8; i++) {
+      var p = POS[currentStep][i];
+      document.getElementById('p'+i).setAttribute('transform','translate('+p.x+','+p.y+')');
+    }
+    updateCubeEdgePositions(currentStep);
+    updateIonBondPositions(currentStep);
+  }
+
+  // Ladungen
+  for (var i = 0; i < 8; i++)
+    for (var ci = 0; ci < CHARGE_OFFSETS.length; ci++)
+      document.getElementById('c'+i+'_'+ci).style.opacity = s.chargeOpacity;
+
+  // Gruppen ein-/ausblenden
+  document.getElementById('bacteria').style.opacity  = s.showBact     ? '1' : '0';
+  document.getElementById('hplusIons').style.opacity = s.showHplus    ? '1' : '0';
+  document.getElementById('ionBonds').style.opacity  = s.showIonBonds ? '1' : '0';
+  document.getElementById('netLines').style.opacity  = s.showCube     ? '1' : '0';
+
+  // pH-Marker (Pfeil zeigt nach rechts → Spitze bei x=480)
+  var markerY = phToMarkerY(s.ph);
+  document.getElementById('phMarker').setAttribute('transform','translate(0,'+markerY+')');
+  var valEl = document.getElementById('phValue');
+  valEl.textContent = s.ph.toFixed(1);
+  valEl.setAttribute('y', Math.min(markerY+4, 295));
+
+  // MZ/MS Balken
+  updateMzMs(MZ_FRAC[currentStep]);
+
+  // Texte
+  document.getElementById('stepTitle').textContent = s.title;
+  document.getElementById('stepText').textContent  = s.text;
+
+  // Buttons
+  document.getElementById('prevBtn').disabled = (currentStep === 0);
+  var nb = document.getElementById('nextBtn');
+  nb.disabled     = (currentStep === STEPS.length-1);
+  nb.textContent  = (currentStep === STEPS.length-1) ? 'Fertig ✓' : 'Weiter →';
+
+  // Dots
+  document.querySelectorAll('.step-dot').forEach(function(d,i) {
+    d.classList.toggle('active', i === currentStep);
+  });
+}
+
+function nextStep() { goToStep(currentStep+1); }
+function prevStep() { goToStep(currentStep-1); }
+
+/* ================================================================
+   DOTS + KEYBOARD
+   ================================================================ */
+var dotsWrap = document.getElementById('stepDots');
+for (var i = 0; i < STEPS.length; i++) {
+  (function(idx) {
+    var d = document.createElement('div');
+    d.className = 'step-dot';
+    d.title = STEPS[idx].title;
+    d.addEventListener('click', function() { goToStep(idx); });
+    dotsWrap.appendChild(d);
+  })(i);
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key==='ArrowRight') nextStep();
+  if (e.key==='ArrowLeft')  prevStep();
+});
+
+// Starten
+goToStep(0, true);
 </script>
 </body>
 </html>
