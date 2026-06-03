@@ -221,7 +221,7 @@ var STEPS = [
   },
   {
     ph: 4.6,
-    title: 'Schritt 3 – Aggregation',
+    title: 'Schritt 3 – Anziehung',
     text:  'Die Kaseine ziehen sich gegenseitig immer näher an. Die + und − Verbindungen zwischen den Kaseinmizellen zeigen, wie sie sich zusammenheften. Die Molkenproteine bleiben dabei weiterhin in der Milch vorhanden.',
     chargeOpacity: 0.0,
     showBact: false, showHplus: false, showIonBonds: true, showCube: false,
@@ -266,15 +266,22 @@ for (var pi = 0; pi < 8; pi++) {
 
   for (var ci = 0; ci < CHARGE_OFFSETS.length; ci++) {
     var off = CHARGE_OFFSETS[ci];
-    var ct = svgEl('text', {
+    // Ladungskreis: roter Kreis mit − innen (50% von Kasein-Radius 19 → r=9)
+    var cg = svgEl('g', {
       id:'c'+pi+'_'+ci,
-      x:off.dx, y:off.dy,
-      'text-anchor':'middle', 'dominant-baseline':'middle',
-      'font-size':'13', 'font-weight':'900', fill:'#dc2626',
+      transform:'translate('+off.dx+','+off.dy+')',
       style:'transition:opacity .55s ease',
     });
+    cg.appendChild(svgEl('circle', {
+      r:'9', fill:'#fee2e2', stroke:'#dc2626', 'stroke-width':'1.5',
+    }));
+    var ct = document.createElementNS(NS,'text');
+    ct.setAttribute('text-anchor','middle'); ct.setAttribute('dominant-baseline','middle');
+    ct.setAttribute('font-size','11'); ct.setAttribute('font-weight','900');
+    ct.setAttribute('fill','#dc2626'); ct.setAttribute('font-family','system-ui,sans-serif');
     ct.textContent = '−';
-    g.appendChild(ct);
+    cg.appendChild(ct);
+    g.appendChild(cg);
   }
   layer.appendChild(g);
 }
@@ -292,27 +299,31 @@ CUBE_PAIRS.forEach(function(pair, idx) {
 var ionLayer = document.getElementById('ionBonds');
 ION_PAIRS.forEach(function(pair, idx) {
   ionLayer.appendChild(svgEl('line', {
-    id:'ib_l'+idx, stroke:'#f97316', 'stroke-width':'1.8',
+    id:'ib_l'+idx, stroke:'#94a3b8', 'stroke-width':'1.8',
     'stroke-dasharray':'4,2',
   }));
-  // "+" label (bei Partikel A)
-  var tp = svgEl('text', {
-    id:'ib_p'+idx,
-    'text-anchor':'middle', 'dominant-baseline':'middle',
-    'font-size':'11', 'font-weight':'900', fill:'#2563eb',
-    'font-family':'system-ui,sans-serif',
-  });
+
+  // Blauer Kreis "+" (Partikel-A-Seite)
+  var gp = svgEl('g', {id:'ib_p'+idx});
+  gp.appendChild(svgEl('circle', {r:'9', fill:'#dbeafe', stroke:'#2563eb', 'stroke-width':'1.5'}));
+  var tp = document.createElementNS(NS,'text');
+  tp.setAttribute('text-anchor','middle'); tp.setAttribute('dominant-baseline','middle');
+  tp.setAttribute('font-size','11'); tp.setAttribute('font-weight','900');
+  tp.setAttribute('fill','#2563eb'); tp.setAttribute('font-family','system-ui,sans-serif');
   tp.textContent = '+';
-  ionLayer.appendChild(tp);
-  // "−" label (bei Partikel B)
-  var tm = svgEl('text', {
-    id:'ib_m'+idx,
-    'text-anchor':'middle', 'dominant-baseline':'middle',
-    'font-size':'11', 'font-weight':'900', fill:'#dc2626',
-    'font-family':'system-ui,sans-serif',
-  });
+  gp.appendChild(tp);
+  ionLayer.appendChild(gp);
+
+  // Roter Kreis "−" (Partikel-B-Seite)
+  var gm = svgEl('g', {id:'ib_m'+idx});
+  gm.appendChild(svgEl('circle', {r:'9', fill:'#fee2e2', stroke:'#dc2626', 'stroke-width':'1.5'}));
+  var tm = document.createElementNS(NS,'text');
+  tm.setAttribute('text-anchor','middle'); tm.setAttribute('dominant-baseline','middle');
+  tm.setAttribute('font-size','11'); tm.setAttribute('font-weight','900');
+  tm.setAttribute('fill','#dc2626'); tm.setAttribute('font-family','system-ui,sans-serif');
   tm.textContent = '−';
-  ionLayer.appendChild(tm);
+  gm.appendChild(tm);
+  ionLayer.appendChild(gm);
 });
 
 function updateIonBondPositions(stepIdx) {
@@ -322,14 +333,12 @@ function updateIonBondPositions(stepIdx) {
     var line = document.getElementById('ib_l'+idx);
     line.setAttribute('x1',a.x); line.setAttribute('y1',a.y);
     line.setAttribute('x2',b.x); line.setAttribute('y2',b.y);
-    // "+" at 30% from A
+    // Blauer "+" Kreis bei 30%
     var px = a.x + (b.x-a.x)*0.3, py = a.y + (b.y-a.y)*0.3;
-    var tp = document.getElementById('ib_p'+idx);
-    tp.setAttribute('x', px); tp.setAttribute('y', py);
-    // "−" at 70% from A
+    document.getElementById('ib_p'+idx).setAttribute('transform','translate('+px+','+py+')');
+    // Roter "−" Kreis bei 70%
     var mx = a.x + (b.x-a.x)*0.7, my = a.y + (b.y-a.y)*0.7;
-    var tm = document.getElementById('ib_m'+idx);
-    tm.setAttribute('x', mx); tm.setAttribute('y', my);
+    document.getElementById('ib_m'+idx).setAttribute('transform','translate('+mx+','+my+')');
   });
 }
 
