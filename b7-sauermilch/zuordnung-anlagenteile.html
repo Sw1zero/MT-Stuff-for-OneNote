@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anlagenteile zuordnen – Stichfester Joghurt</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .back-link {
+      display: inline-block;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      margin-bottom: 1.5rem;
+      transition: color 0.15s;
+    }
+    .back-link:hover { color: var(--red); }
+
+    .schema-wrap {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .schema-wrap img {
+      width: 100%;
+      display: block;
+      border-radius: var(--radius-sm);
+    }
+
+    .instruction {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .word-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      background: var(--blue-light);
+      border-radius: var(--radius-md);
+      padding: 0.9rem 1rem;
+      margin-bottom: 1.5rem;
+      min-height: 56px;
+    }
+
+    .word-chip {
+      font-family: var(--font);
+      font-size: 0.82rem;
+      font-weight: 500;
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 20px;
+      padding: 0.3rem 0.85rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      color: var(--text);
+      line-height: 1.4;
+    }
+
+    .word-chip:hover {
+      border-color: var(--blue);
+      color: var(--blue);
+    }
+
+    .word-chip.selected {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(0,102,204,0.3);
+    }
+
+    .word-chip.used {
+      opacity: 0.25;
+      pointer-events: none;
+    }
+
+    .slots-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.55rem;
+      margin-bottom: 1.5rem;
+    }
+
+    @media (max-width: 480px) {
+      .slots-grid { grid-template-columns: 1fr; }
+    }
+
+    .slot-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .slot-num {
+      width: 30px;
+      height: 30px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      background: var(--red);
+      color: #fff;
+      font-size: 0.78rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .slot-box {
+      flex: 1;
+      min-height: 38px;
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.3rem 0.65rem;
+      font-size: 0.82rem;
+      font-family: var(--font);
+      color: var(--text-subtle);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      transition: all 0.15s;
+      background: var(--surface);
+    }
+
+    .slot-box.ready {
+      border-color: var(--blue);
+      border-style: solid;
+      background: #f0f7ff;
+    }
+
+    .slot-box.filled {
+      border-style: solid;
+      border-color: var(--blue);
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .slot-box.correct {
+      border-color: #16a34a !important;
+      background: #f0fdf4 !important;
+      color: #15803d !important;
+    }
+
+    .slot-box.wrong {
+      border-color: var(--red) !important;
+      background: var(--red-light) !important;
+      color: var(--red) !important;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .result-banner {
+      margin-top: 1.25rem;
+      padding: 0.9rem 1rem;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.92rem;
+      text-align: center;
+      display: none;
+    }
+
+    .result-banner.show { display: block; }
+    .result-banner.perfect { background: #f0fdf4; color: #15803d; border: 1.5px solid #bbf7d0; }
+    .result-banner.partial { background: #fff7ed; color: #c2410c; border: 1.5px solid #fed7aa; }
+  </style>
+</head>
+<body>
+
+<header class="bzwu-header">
+  <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologie EFZ · b.7</span>
+  <h1>Anlagenteile zuordnen</h1>
+  <p>Produktionsanlage – Stichfester Joghurt</p>
+</header>
+
+<main class="page-main">
+
+  <a class="back-link" href="../index.html">← Alle Lerntools</a>
+
+  <div class="schema-wrap">
+    <img src="images/b.7_Anlage_stichfest_Nummern.png" alt="Anlagenschema stichfester Joghurt mit nummerierten Anlagenteilen">
+  </div>
+
+  <p class="instruction">Wähle einen Begriff aus der Wortbank, dann klicke auf die passende Nummer. Klicke auf ein gefülltes Feld um es zu leeren.</p>
+
+  <div class="word-bank" id="wordBank"></div>
+
+  <div class="slots-grid" id="slotsGrid"></div>
+
+  <div class="btn-row">
+    <button type="button" class="btn btn-primary" onclick="checkAll()">Überprüfen</button>
+    <button type="button" class="btn btn-ghost" onclick="resetAll()">Zurücksetzen</button>
+  </div>
+
+  <div class="result-banner" id="resultBanner"></div>
+
+</main>
+
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologie EFZ · Philipp Neukomm
+</footer>
+
+<script>
+var ANSWERS = [
+  'Vorlaufgefäss',
+  'Pulver-/Aromazugabe',
+  'Homogenisator',
+  'Plattenwärmetauscher',
+  'Heisshalter',
+  'Tanks für Betriebskultur',
+  'Gebinde mit Fruchtgrundstoff',
+  'Online-Mischer',
+  'Puffertanks',
+  'Anwärmer',
+  'Abfülllinie',
+  'Brutzelle'
+];
+
+var selected = null;
+
+function shuffle(arr) {
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+  }
+  return a;
+}
+
+function init() {
+  var bank = document.getElementById('wordBank');
+  bank.innerHTML = '';
+  shuffle(ANSWERS).forEach(function(word) {
+    var chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'word-chip';
+    chip.textContent = word;
+    chip.dataset.word = word;
+    chip.onclick = function() { selectChip(this); };
+    bank.appendChild(chip);
+  });
+
+  var grid = document.getElementById('slotsGrid');
+  grid.innerHTML = '';
+  for (var i = 1; i <= 12; i++) {
+    var row = document.createElement('div');
+    row.className = 'slot-row';
+
+    var num = document.createElement('div');
+    num.className = 'slot-num';
+    num.textContent = i;
+
+    var box = document.createElement('div');
+    box.className = 'slot-box';
+    box.dataset.slot = i;
+    box.textContent = '—';
+    box.onclick = function() { fillSlot(this); };
+
+    row.appendChild(num);
+    row.appendChild(box);
+    grid.appendChild(row);
+  }
+
+  selected = null;
+  document.getElementById('resultBanner').className = 'result-banner';
+}
+
+function selectChip(chip) {
+  if (chip.classList.contains('selected')) {
+    chip.classList.remove('selected');
+    selected = null;
+    clearReady();
+    return;
+  }
+  document.querySelectorAll('.word-chip.selected').forEach(function(c) {
+    c.classList.remove('selected');
+  });
+  chip.classList.add('selected');
+  selected = chip.dataset.word;
+
+  document.querySelectorAll('.slot-box').forEach(function(s) {
+    s.classList.remove('ready');
+    if (!s.dataset.filled) s.classList.add('ready');
+  });
+}
+
+function fillSlot(box) {
+  if (box.dataset.filled) {
+    returnWord(box.dataset.filled);
+    delete box.dataset.filled;
+    box.textContent = '—';
+    box.className = 'slot-box';
+    if (selected) box.classList.add('ready');
+    return;
+  }
+  if (!selected) return;
+
+  box.dataset.filled = selected;
+  box.textContent = selected;
+  box.className = 'slot-box filled';
+
+  markChipUsed(selected);
+  selected = null;
+  clearReady();
+}
+
+function returnWord(word) {
+  document.querySelectorAll('.word-chip').forEach(function(c) {
+    if (c.dataset.word === word) {
+      c.classList.remove('used', 'selected');
+    }
+  });
+}
+
+function markChipUsed(word) {
+  document.querySelectorAll('.word-chip').forEach(function(c) {
+    if (c.dataset.word === word) {
+      c.classList.remove('selected');
+      c.classList.add('used');
+    }
+  });
+}
+
+function clearReady() {
+  document.querySelectorAll('.slot-box').forEach(function(s) {
+    s.classList.remove('ready');
+  });
+}
+
+function checkAll() {
+  var correct = 0;
+  var filled = 0;
+  document.querySelectorAll('.slot-box').forEach(function(box) {
+    var val = box.dataset.filled;
+    if (!val) return;
+    filled++;
+    var idx = parseInt(box.dataset.slot) - 1;
+    box.classList.remove('filled', 'ready');
+    if (val === ANSWERS[idx]) {
+      box.classList.add('correct');
+      correct++;
+    } else {
+      box.classList.add('wrong');
+    }
+  });
+
+  var banner = document.getElementById('resultBanner');
+  if (correct === 12) {
+    banner.textContent = 'Perfekt! Alle 12 Anlagenteile richtig zugeordnet.';
+    banner.className = 'result-banner show perfect';
+  } else {
+    banner.textContent = correct + ' von ' + filled + ' ausgefüllten Feldern korrekt. Rot markierte Felder nochmals überprüfen.';
+    banner.className = 'result-banner show partial';
+  }
+}
+
+function resetAll() {
+  init();
+}
+
+init();
+</script>
+
+</body>
+</html>
