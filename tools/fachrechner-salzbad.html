@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fachrechner Salzbad</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .back-link {
+      display: inline-block;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      margin-bottom: 1.5rem;
+      transition: color 0.15s;
+    }
+    .back-link:hover { color: var(--blue-dark); }
+
+    /* Tabs */
+    .tab-bar {
+      display: flex;
+      gap: 0;
+      background: var(--surface);
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      margin-bottom: 0;
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      font-family: var(--font);
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 0.75rem 1rem;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.15s;
+      white-space: nowrap;
+      flex: 1;
+      text-align: center;
+    }
+    .tab-btn:hover { color: var(--blue-dark); background: var(--blue-tint); }
+    .tab-btn.active {
+      color: var(--blue-dark);
+      border-bottom-color: var(--blue-dark);
+      background: var(--blue-tint);
+    }
+    .tab-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--border);
+      color: var(--text-muted);
+      font-size: 0.68rem;
+      margin-right: 5px;
+      transition: all 0.15s;
+    }
+    .tab-btn.active .tab-num {
+      background: var(--blue-dark);
+      color: #fff;
+    }
+
+    /* Panel */
+    .tab-panel {
+      display: none;
+      background: var(--surface);
+      border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .tab-panel.active { display: block; }
+
+    /* Form */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+    @media (max-width: 480px) { .form-grid { grid-template-columns: 1fr; } }
+
+    .form-group label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+    .input-row {
+      display: flex;
+      gap: 0.4rem;
+    }
+    .input-row input, .input-row select {
+      font-family: var(--font);
+      font-size: 0.92rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.45rem 0.7rem;
+      background: var(--bg);
+      color: var(--text);
+      transition: border-color 0.15s;
+    }
+    .input-row input { flex: 1; min-width: 0; }
+    .input-row input:focus, .input-row select:focus {
+      outline: none;
+      border-color: var(--blue-dark);
+    }
+    .input-row select { flex-shrink: 0; }
+
+    /* Rechenweg */
+    .rechenweg {
+      background: var(--bg);
+      border-radius: var(--radius-md);
+      padding: 1rem 1.25rem;
+      margin-top: 1.25rem;
+      display: none;
+    }
+    .rechenweg.show { display: block; }
+    .rechenweg-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-subtle);
+      margin-bottom: 0.75rem;
+    }
+    .rw-step {
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+      line-height: 1.5;
+    }
+    .rw-step strong { color: var(--text); }
+    .rw-result {
+      margin-top: 0.75rem;
+      padding: 0.65rem 1rem;
+      background: var(--blue-dark);
+      color: #fff;
+      border-radius: var(--radius-sm);
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    /* Mischungskreuz diagram */
+    .kreuz-wrap {
+      display: flex;
+      justify-content: center;
+      margin: 1rem 0;
+    }
+    .kreuz {
+      position: relative;
+      width: 280px;
+      height: 120px;
+    }
+    .kreuz svg { position: absolute; inset: 0; }
+    .kreuz-cell {
+      position: absolute;
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-align: center;
+    }
+    .kreuz-tl { left: 0; top: 10px; width: 80px; color: var(--blue-dark); }
+    .kreuz-bl { left: 0; bottom: 10px; width: 80px; color: #059669; }
+    .kreuz-c  { left: 50%; top: 50%; transform: translate(-50%,-50%); width: 60px; color: var(--text); }
+    .kreuz-tr { right: 0; top: 10px; width: 80px; color: #059669; font-size: 0.74rem; }
+    .kreuz-br { right: 0; bottom: 10px; width: 80px; color: var(--blue-dark); font-size: 0.74rem; }
+
+    /* Sub-toggle */
+    .sub-toggle {
+      display: flex;
+      gap: 0;
+      background: var(--bg);
+      border-radius: var(--radius-md);
+      padding: 3px;
+      margin-bottom: 1.25rem;
+      width: fit-content;
+    }
+    .sub-btn {
+      font-family: var(--font);
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.45rem 1rem;
+      border: none;
+      border-radius: calc(var(--radius-md) - 3px);
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .sub-btn.active { background: var(--blue-dark); color: #fff; }
+
+    /* Density table */
+    .density-toggle {
+      font-size: 0.78rem;
+      color: var(--blue-dark);
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: var(--font);
+      font-weight: 600;
+      padding: 0;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .density-table-wrap {
+      display: none;
+      overflow-x: auto;
+      margin-bottom: 1rem;
+    }
+    .density-table-wrap.show { display: block; }
+    .density-table {
+      border-collapse: collapse;
+      font-size: 0.78rem;
+      width: 100%;
+      max-width: 500px;
+    }
+    .density-table th {
+      background: var(--blue-dark);
+      color: #fff;
+      padding: 0.35rem 0.7rem;
+      text-align: center;
+    }
+    .density-table td {
+      padding: 0.3rem 0.7rem;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .density-table tr:last-child td { border-bottom: none; }
+    .density-table td.highlight { background: var(--blue-tint); font-weight: 700; color: var(--blue-dark); }
+
+    .btn-row { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1rem; }
+  </style>
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologie EFZ · Allgemein</span>
+    <h1>Fachrechner Salzbad</h1>
+    <p>Prozentrechnung · Volumen · Umrechnung · Mischungskreuz</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+  <a class="back-link" href="../index.html">← Alle Lerntools</a>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="showTab(1)"><span class="tab-num">1</span>Prozentrechnung</button>
+    <button class="tab-btn"        onclick="showTab(2)"><span class="tab-num">2</span>Volumen</button>
+    <button class="tab-btn"        onclick="showTab(3)"><span class="tab-num">3</span>Umrechnung</button>
+    <button class="tab-btn"        onclick="showTab(4)"><span class="tab-num">4</span>Mischungskreuz</button>
+  </div>
+
+  <!-- Tab 1: Prozentrechnung -->
+  <div class="tab-panel active" id="tab1">
+    <p style="font-size:0.84rem;color:var(--text-muted);margin-bottom:1.25rem;">
+      Wie viel Salz braucht es, um ein Salzbad mit einem bestimmten Gesamtgewicht und einer bestimmten Konzentration anzusetzen?
+    </p>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Gesamtgewicht des Salzbades</label>
+        <div class="input-row">
+          <input type="number" id="t1_gewicht" placeholder="z.B. 3200" min="0">
+          <select id="t1_einheit">
+            <option value="kg">kg</option>
+            <option value="t">t</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Salzkonzentration (%)</label>
+        <div class="input-row">
+          <input type="number" id="t1_konz" placeholder="z.B. 23" min="0" max="100" step="0.5">
+          <span style="padding:0.45rem 0.5rem;font-size:0.88rem;color:var(--text-muted)">%</span>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button type="button" class="btn btn-primary" onclick="calcT1()">Berechnen</button>
+      <button type="button" class="btn btn-ghost"   onclick="resetT1()">Zurücksetzen</button>
+    </div>
+    <div class="rechenweg" id="rw1"></div>
+  </div>
+
+  <!-- Tab 2: Volumen -->
+  <div class="tab-panel" id="tab2">
+    <p style="font-size:0.84rem;color:var(--text-muted);margin-bottom:1.25rem;">
+      Volumen eines Salzbades aus Länge, Breite und Höhe berechnen. Einheiten können gemischt werden.
+    </p>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Länge</label>
+        <div class="input-row">
+          <input type="number" id="t2_l" placeholder="z.B. 80" min="0">
+          <select id="t2_le"><option value="dm">dm</option><option value="m">m</option><option value="cm">cm</option></select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Breite</label>
+        <div class="input-row">
+          <input type="number" id="t2_b" placeholder="z.B. 120" min="0">
+          <select id="t2_be"><option value="cm">cm</option><option value="dm">dm</option><option value="m">m</option></select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Höhe</label>
+        <div class="input-row">
+          <input type="number" id="t2_h" placeholder="z.B. 1.80" min="0">
+          <select id="t2_he"><option value="m">m</option><option value="dm">dm</option><option value="cm">cm</option></select>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button type="button" class="btn btn-primary" onclick="calcT2()">Berechnen</button>
+      <button type="button" class="btn btn-ghost"   onclick="resetT2()">Zurücksetzen</button>
+    </div>
+    <div class="rechenweg" id="rw2"></div>
+  </div>
+
+  <!-- Tab 3: Umrechnung -->
+  <div class="tab-panel" id="tab3">
+    <p style="font-size:0.84rem;color:var(--text-muted);margin-bottom:1.25rem;">
+      Volumen des Salzbades in Gewicht umrechnen – nötig bevor das Mischungskreuz angewendet werden kann.
+    </p>
+    <button class="density-toggle" onclick="toggleDensity()">▶ Dichtetabelle anzeigen</button>
+    <div class="density-table-wrap" id="densityTable">
+      <table class="density-table">
+        <thead><tr><th>NaCl (%)</th><th>Dichte (kg/L)</th><th>NaCl (%)</th><th>Dichte (kg/L)</th></tr></thead>
+        <tbody>
+          <tr><td>16 %</td><td>1.119</td><td>21 %</td><td>1.159</td></tr>
+          <tr><td>17 %</td><td>1.127</td><td>22 %</td><td>1.167</td></tr>
+          <tr><td>18 %</td><td>1.135</td><td>23 %</td><td>1.175</td></tr>
+          <tr><td>19 %</td><td>1.143</td><td>24 %</td><td>1.183</td></tr>
+          <tr><td>20 %</td><td>1.151</td><td>25 %</td><td>1.191</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:0.74rem;color:var(--text-subtle);margin-top:0.5rem;">0.5 % mehr Salz = +0.004 kg/dm³</p>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Volumen des Salzbades</label>
+        <div class="input-row">
+          <input type="number" id="t3_vol" placeholder="z.B. 1540" min="0">
+          <span style="padding:0.45rem 0.5rem;font-size:0.88rem;color:var(--text-muted)">dm³/L</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Salzkonzentration (%)</label>
+        <div class="input-row">
+          <input type="number" id="t3_konz" placeholder="z.B. 22" min="16" max="25" step="0.5">
+          <span style="padding:0.45rem 0.5rem;font-size:0.88rem;color:var(--text-muted)">%</span>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button type="button" class="btn btn-primary" onclick="calcT3()">Berechnen</button>
+      <button type="button" class="btn btn-ghost"   onclick="resetT3()">Zurücksetzen</button>
+    </div>
+    <div class="rechenweg" id="rw3"></div>
+  </div>
+
+  <!-- Tab 4: Mischungskreuz -->
+  <div class="tab-panel" id="tab4">
+    <div class="sub-toggle">
+      <button type="button" class="sub-btn active" id="sbAuf" onclick="setMode('auf')">▲ Aufkonzentrieren (Salz)</button>
+      <button type="button" class="sub-btn"        id="sbAb"  onclick="setMode('ab')">▼ Abschwächen (Wasser)</button>
+    </div>
+    <p style="font-size:0.84rem;color:var(--text-muted);margin-bottom:1.25rem;" id="t4_desc">
+      Das Salzbad wird durch Zugabe von <strong>Salz (100%)</strong> auf eine höhere Konzentration gebracht.
+    </p>
+    <button class="density-toggle" onclick="toggleDensity4()">▶ Dichtetabelle anzeigen</button>
+    <div class="density-table-wrap" id="densityTable4">
+      <table class="density-table">
+        <thead><tr><th>NaCl (%)</th><th>Dichte (kg/L)</th><th>NaCl (%)</th><th>Dichte (kg/L)</th></tr></thead>
+        <tbody>
+          <tr><td>16 %</td><td>1.119</td><td>21 %</td><td>1.159</td></tr>
+          <tr><td>17 %</td><td>1.127</td><td>22 %</td><td>1.167</td></tr>
+          <tr><td>18 %</td><td>1.135</td><td>23 %</td><td>1.175</td></tr>
+          <tr><td>19 %</td><td>1.143</td><td>24 %</td><td>1.183</td></tr>
+          <tr><td>20 %</td><td>1.151</td><td>25 %</td><td>1.191</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:0.74rem;color:var(--text-subtle);margin-top:0.5rem;">0.5 % mehr Salz = +0.004 kg/dm³</p>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Volumen des Salzbades</label>
+        <div class="input-row">
+          <input type="number" id="t4_vol" placeholder="z.B. 6800" min="0">
+          <span style="padding:0.45rem 0.5rem;font-size:0.88rem;color:var(--text-muted)">dm³/L</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Aktuelle Konzentration (%)</label>
+        <div class="input-row">
+          <input type="number" id="t4_ist" placeholder="z.B. 19" min="16" max="25" step="0.5">
+          <span style="padding:0.45rem 0.5rem;font-size:0.88rem;color:var(--text-muted)">%</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Zielkonzentration (%)</label>
+        <div class="input-row">
+          <input type="number" id="t4_ziel" placeholder="z.B. 22" min="0" max="100" step="0.5">
+          <span style="padding:0.45rem 0.5rem;font-size:0.88rem;color:var(--text-muted)">%</span>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button type="button" class="btn btn-primary" onclick="calcT4()">Berechnen</button>
+      <button type="button" class="btn btn-ghost"   onclick="resetT4()">Zurücksetzen</button>
+    </div>
+    <div class="rechenweg" id="rw4"></div>
+  </div>
+
+</main>
+
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologie EFZ · Philipp Neukomm
+</footer>
+
+<script>
+/* ---- Dichtetabelle ---- */
+var DENSITY = {16:1.119,17:1.127,18:1.135,19:1.143,20:1.151,21:1.159,22:1.167,23:1.175,24:1.183,25:1.191};
+
+function getDensity(pct) {
+  var base = Math.floor(pct);
+  var frac = pct - base;
+  if (frac === 0) return DENSITY[base];
+  if (Math.abs(frac - 0.5) < 0.001) return (DENSITY[base] || 0) + 0.004;
+  return (DENSITY[base] || 0) + frac * 0.008;
+}
+
+function fmt(n, dec) {
+  dec = dec === undefined ? 2 : dec;
+  return n.toLocaleString('de-CH', {minimumFractionDigits: dec, maximumFractionDigits: dec});
+}
+
+/* ---- Tabs ---- */
+function showTab(n) {
+  for (var i = 1; i <= 4; i++) {
+    document.getElementById('tab' + i).classList.toggle('active', i === n);
+    document.querySelectorAll('.tab-btn')[i-1].classList.toggle('active', i === n);
+  }
+}
+
+/* ---- Dichtetabelle ein/ausblenden ---- */
+function toggleDensity() {
+  var wrap = document.getElementById('densityTable');
+  var btn  = wrap.previousElementSibling;
+  var show = !wrap.classList.contains('show');
+  wrap.classList.toggle('show', show);
+  btn.textContent = (show ? '▼' : '▶') + ' Dichtetabelle ' + (show ? 'ausblenden' : 'anzeigen');
+}
+function toggleDensity4() {
+  var wrap = document.getElementById('densityTable4');
+  var btn  = wrap.previousElementSibling;
+  var show = !wrap.classList.contains('show');
+  wrap.classList.toggle('show', show);
+  btn.textContent = (show ? '▼' : '▶') + ' Dichtetabelle ' + (show ? 'ausblenden' : 'anzeigen');
+}
+
+/* ---- Tab 4 Modus ---- */
+var t4Mode = 'auf';
+function setMode(m) {
+  t4Mode = m;
+  document.getElementById('sbAuf').classList.toggle('active', m === 'auf');
+  document.getElementById('sbAb').classList.toggle('active', m === 'ab');
+  document.getElementById('t4_desc').innerHTML = m === 'auf'
+    ? 'Das Salzbad wird durch Zugabe von <strong>Salz (100%)</strong> auf eine höhere Konzentration gebracht.'
+    : 'Das Salzbad wird durch Zugabe von <strong>Wasser (0%)</strong> auf eine tiefere Konzentration gebracht.';
+  document.getElementById('rw4').classList.remove('show');
+  document.getElementById('rw4').innerHTML = '';
+}
+
+/* ============================================================
+   Tab 1 – Prozentrechnung
+   ============================================================ */
+function calcT1() {
+  var gRaw   = parseFloat(document.getElementById('t1_gewicht').value);
+  var einh   = document.getElementById('t1_einheit').value;
+  var konz   = parseFloat(document.getElementById('t1_konz').value);
+  if (isNaN(gRaw) || isNaN(konz) || konz < 0 || konz > 100) { alert('Bitte alle Felder ausfüllen.'); return; }
+
+  var gewicht = einh === 't' ? gRaw * 1000 : gRaw;
+  var salz    = gewicht * konz / 100;
+
+  var rw = document.getElementById('rw1');
+  rw.innerHTML =
+    '<div class="rechenweg-title">Rechenweg</div>' +
+    '<div class="rw-step">Gesamtgewicht: <strong>' + fmt(gewicht, 0) + ' kg</strong></div>' +
+    '<div class="rw-step">Konzentration: <strong>' + konz + ' %</strong></div>' +
+    '<div class="rw-step">Formel: Salzmenge = Gesamtgewicht × Konzentration ÷ 100</div>' +
+    '<div class="rw-step">= ' + fmt(gewicht, 0) + ' kg × ' + konz + ' % ÷ 100</div>' +
+    '<div class="rw-result">Salzmenge = ' + fmt(salz, 1) + ' kg</div>';
+  rw.classList.add('show');
+}
+function resetT1() {
+  document.getElementById('t1_gewicht').value = '';
+  document.getElementById('t1_konz').value    = '';
+  document.getElementById('rw1').classList.remove('show');
+}
+
+/* ============================================================
+   Tab 2 – Volumenberechnung
+   ============================================================ */
+function toDm(val, unit) {
+  if (unit === 'm')  return val * 10;
+  if (unit === 'cm') return val / 10;
+  return val; // dm
+}
+
+function calcT2() {
+  var lv = parseFloat(document.getElementById('t2_l').value);
+  var bv = parseFloat(document.getElementById('t2_b').value);
+  var hv = parseFloat(document.getElementById('t2_h').value);
+  var le = document.getElementById('t2_le').value;
+  var be = document.getElementById('t2_be').value;
+  var he = document.getElementById('t2_he').value;
+  if (isNaN(lv) || isNaN(bv) || isNaN(hv)) { alert('Bitte alle Felder ausfüllen.'); return; }
+
+  var lDm = toDm(lv, le);
+  var bDm = toDm(bv, be);
+  var hDm = toDm(hv, he);
+  var vol = lDm * bDm * hDm;
+
+  function conv(v, u) {
+    if (u === 'dm') return v + ' dm';
+    if (u === 'm')  return v + ' m = ' + fmt(toDm(v,'m'),1) + ' dm';
+    return v + ' cm = ' + fmt(toDm(v,'cm'),2) + ' dm';
+  }
+
+  var rw = document.getElementById('rw2');
+  rw.innerHTML =
+    '<div class="rechenweg-title">Rechenweg</div>' +
+    '<div class="rw-step">Länge:  ' + conv(lv, le) + '</div>' +
+    '<div class="rw-step">Breite: ' + conv(bv, be) + '</div>' +
+    '<div class="rw-step">Höhe:   ' + conv(hv, he) + '</div>' +
+    '<div class="rw-step" style="margin-top:0.4rem">Formel: V = L × B × H</div>' +
+    '<div class="rw-step">= ' + fmt(lDm,2) + ' dm × ' + fmt(bDm,2) + ' dm × ' + fmt(hDm,2) + ' dm</div>' +
+    '<div class="rw-result">Volumen = ' + fmt(vol, 0) + ' dm³ (= ' + fmt(vol, 0) + ' Liter)</div>';
+  rw.classList.add('show');
+}
+function resetT2() {
+  ['t2_l','t2_b','t2_h'].forEach(function(id) { document.getElementById(id).value = ''; });
+  document.getElementById('rw2').classList.remove('show');
+}
+
+/* ============================================================
+   Tab 3 – Umrechnung Volumen → Gewicht
+   ============================================================ */
+function calcT3() {
+  var vol  = parseFloat(document.getElementById('t3_vol').value);
+  var konz = parseFloat(document.getElementById('t3_konz').value);
+  if (isNaN(vol) || isNaN(konz)) { alert('Bitte alle Felder ausfüllen.'); return; }
+  if (konz < 16 || konz > 25) { alert('Konzentration muss zwischen 16 % und 25 % liegen (Tabelle).'); return; }
+
+  var dichte  = getDensity(konz);
+  var gewicht = vol * dichte;
+
+  var rw = document.getElementById('rw3');
+  rw.innerHTML =
+    '<div class="rechenweg-title">Rechenweg</div>' +
+    '<div class="rw-step">Volumen: <strong>' + fmt(vol,0) + ' dm³/L</strong></div>' +
+    '<div class="rw-step">Konzentration: <strong>' + konz + ' %</strong> → Dichte laut Tabelle: <strong>' + dichte.toFixed(3) + ' kg/L</strong></div>' +
+    '<div class="rw-step" style="margin-top:0.4rem">Formel: Gewicht = Volumen × Dichte</div>' +
+    '<div class="rw-step">= ' + fmt(vol,0) + ' L × ' + dichte.toFixed(3) + ' kg/L</div>' +
+    '<div class="rw-result">Gewicht des Salzbades = ' + fmt(gewicht, 1) + ' kg</div>';
+  rw.classList.add('show');
+}
+function resetT3() {
+  document.getElementById('t3_vol').value  = '';
+  document.getElementById('t3_konz').value = '';
+  document.getElementById('rw3').classList.remove('show');
+}
+
+/* ============================================================
+   Tab 4 – Mischungskreuz
+   ============================================================ */
+function calcT4() {
+  var vol  = parseFloat(document.getElementById('t4_vol').value);
+  var ist  = parseFloat(document.getElementById('t4_ist').value);
+  var ziel = parseFloat(document.getElementById('t4_ziel').value);
+  if (isNaN(vol) || isNaN(ist) || isNaN(ziel)) { alert('Bitte alle Felder ausfüllen.'); return; }
+
+  if (t4Mode === 'auf' && ziel <= ist) { alert('Zielkonzentration muss grösser als aktuelle Konzentration sein.'); return; }
+  if (t4Mode === 'ab'  && ziel >= ist) { alert('Zielkonzentration muss kleiner als aktuelle Konzentration sein.'); return; }
+  if (ist < 16 || ist > 25) { alert('Aktuelle Konzentration muss zwischen 16 % und 25 % liegen.'); return; }
+
+  var dichte  = getDensity(ist);
+  var gewSalzbad = vol * dichte;
+
+  var html = '<div class="rechenweg-title">Rechenweg</div>';
+
+  // Schritt 1: Umrechnung
+  html += '<div class="rw-step"><strong>Schritt 1 – Volumen in Gewicht umrechnen</strong></div>';
+  html += '<div class="rw-step">Dichte bei ' + ist + ' %: <strong>' + dichte.toFixed(3) + ' kg/L</strong></div>';
+  html += '<div class="rw-step">' + fmt(vol,0) + ' L × ' + dichte.toFixed(3) + ' kg/L = <strong>' + fmt(gewSalzbad,1) + ' kg</strong></div>';
+
+  // Schritt 2: Mischungskreuz
+  html += '<div class="rw-step" style="margin-top:0.75rem"><strong>Schritt 2 – Mischungskreuz aufstellen</strong></div>';
+
+  var kompA, kompB, teileA, teileB, labelB, einheitB;
+  if (t4Mode === 'auf') {
+    kompA   = ist + ' %';
+    kompB   = '100 % (Salz)';
+    teileA  = 100 - ziel;
+    teileB  = ziel - ist;
+    labelB  = 'Salz';
+    einheitB = 'kg';
+  } else {
+    kompA   = ist + ' %';
+    kompB   = '0 % (Wasser)';
+    teileA  = ziel - 0;
+    teileB  = ist - ziel;
+    labelB  = 'Wasser';
+    einheitB = 'L';
+  }
+
+  html +=
+    '<div class="kreuz-wrap">' +
+    '<div class="kreuz">' +
+    '<svg viewBox="0 0 280 120"><line x1="80" y1="20" x2="200" y2="60" stroke="#cbd5e1" stroke-width="2"/>' +
+    '<line x1="80" y1="100" x2="200" y2="60" stroke="#cbd5e1" stroke-width="2"/></svg>' +
+    '<div class="kreuz-cell kreuz-tl">' + kompA + '</div>' +
+    '<div class="kreuz-cell kreuz-bl">' + kompB + '</div>' +
+    '<div class="kreuz-cell kreuz-c">' + ziel + ' %</div>' +
+    '<div class="kreuz-cell kreuz-tr">= ' + teileA + ' Teile<br>Salzbad</div>' +
+    '<div class="kreuz-cell kreuz-br">= ' + fmt(teileB,1) + ' Teile<br>' + labelB + '</div>' +
+    '</div></div>';
+
+  html += '<div class="rw-step">' + kompA + ' → Teile Salzbad: |' + (t4Mode==='auf'?'100':'0') + ' − ' + ziel + '| = <strong>' + teileA + '</strong></div>';
+  html += '<div class="rw-step">' + kompB + ' → Teile ' + labelB + ': |' + (t4Mode==='auf'?ziel:ist) + ' − ' + (t4Mode==='auf'?ist:ziel) + '| = <strong>' + fmt(teileB,1) + '</strong></div>';
+
+  // Schritt 3: Berechnung
+  html += '<div class="rw-step" style="margin-top:0.75rem"><strong>Schritt 3 – ' + labelB + 'menge berechnen</strong></div>';
+  var mengeB = gewSalzbad / teileA * teileB;
+  html += '<div class="rw-step">Gewicht Salzbad ÷ Teile Salzbad × Teile ' + labelB + '</div>';
+  html += '<div class="rw-step">= ' + fmt(gewSalzbad,1) + ' kg ÷ ' + teileA + ' × ' + fmt(teileB,1) + '</div>';
+
+  if (t4Mode === 'ab') {
+    html += '<div class="rw-step">= ' + fmt(mengeB,1) + ' kg Wasser</div>';
+    html += '<div class="rw-step">Wasser hat Dichte 1 kg/L → <strong>' + fmt(mengeB,1) + ' L Wasser</strong></div>';
+    html += '<div class="rw-result">Benötigtes Wasser = ' + fmt(mengeB,1) + ' kg = ' + fmt(mengeB,1) + ' L</div>';
+  } else {
+    html += '<div class="rw-result">Benötigtes Salz = ' + fmt(mengeB,1) + ' kg</div>';
+  }
+
+  var rw = document.getElementById('rw4');
+  rw.innerHTML = html;
+  rw.classList.add('show');
+}
+function resetT4() {
+  ['t4_vol','t4_ist','t4_ziel'].forEach(function(id) { document.getElementById(id).value = ''; });
+  document.getElementById('rw4').classList.remove('show');
+  document.getElementById('rw4').innerHTML = '';
+}
+</script>
+
+</body>
+</html>
