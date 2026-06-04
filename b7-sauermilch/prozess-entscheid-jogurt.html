@@ -15,10 +15,6 @@
     }
     .back-link:hover { color:var(--red); }
 
-    .page-header { text-align:center; margin-bottom:24px; }
-    .page-header h1 { font-size:1.1rem; font-weight:600; color:var(--text-muted); margin-bottom:4px; }
-    .page-header p  { font-size:.82rem; color:var(--text-subtle); }
-
     .game-wrap { width:580px; max-width:96vw; display:flex; flex-direction:column; gap:16px; }
 
     /* ---- Fortschrittsleiste ---- */
@@ -110,12 +106,19 @@
 </head>
 <body>
 
-<a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologie EFZ · b.7 Sauermilchprodukte</span>
+    <h1>Prozess-Entscheid – Jogurtherstellung</h1>
+    <p>Triff bei jedem Schritt die richtige Entscheidung</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
 
-<div class="page-header">
-  <h1>b.7 – Jogurtherstellung</h1>
-  <p>Triff bei jedem Schritt die richtige Entscheidung</p>
-</div>
+<a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
 
 <div class="game-wrap">
 
@@ -205,7 +208,7 @@
     },
     {
       name: 'Impfen',
-      situation: 'Die Milch hat 42 °C erreicht. Nun wird die Betriebskultur (Direktstarter oder Betriebskultur) zugegeben.',
+      situation: 'Die Milch hat 42 °C erreicht. Nun wird die Betriebskultur zugegeben.',
       question: 'Wie viel Betriebskultur geben Sie zur Jogurtmilch?',
       choices: [
         {
