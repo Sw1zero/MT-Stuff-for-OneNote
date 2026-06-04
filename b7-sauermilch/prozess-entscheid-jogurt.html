@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prozess-Entscheid – Jogurtherstellung</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    body { display:flex; flex-direction:column; align-items:center; padding:28px 16px 56px; }
+
+    .back-link {
+      font-size:.78rem; color:var(--text-subtle); text-decoration:none;
+      display:inline-flex; align-items:center; gap:4px;
+      margin-bottom:20px; align-self:flex-start;
+    }
+    .back-link:hover { color:var(--red); }
+
+    .page-header { text-align:center; margin-bottom:24px; }
+    .page-header h1 { font-size:1.1rem; font-weight:600; color:var(--text-muted); margin-bottom:4px; }
+    .page-header p  { font-size:.82rem; color:var(--text-subtle); }
+
+    .game-wrap { width:580px; max-width:96vw; display:flex; flex-direction:column; gap:16px; }
+
+    /* ---- Fortschrittsleiste ---- */
+    .progress-steps {
+      display:flex; align-items:center; justify-content:center;
+      gap:0; overflow-x:auto; padding:4px 0;
+    }
+    .ps-item { display:flex; flex-direction:column; align-items:center; gap:4px; flex-shrink:0; }
+    .ps-circle {
+      width:28px; height:28px; border-radius:50%;
+      border:2px solid var(--border); background:var(--surface);
+      display:flex; align-items:center; justify-content:center;
+      font-size:.7rem; font-weight:700; color:var(--text-subtle);
+      transition:all .3s;
+    }
+    .ps-circle.done    { background:var(--blue-dark); border-color:var(--blue-dark); color:#fff; }
+    .ps-circle.current { background:var(--surface); border-color:var(--blue-dark); color:var(--blue-dark); box-shadow:0 0 0 3px #dbeafe; }
+    .ps-label { font-size:.62rem; color:var(--text-subtle); font-weight:600; text-align:center; max-width:58px; line-height:1.2; }
+    .ps-label.current-lbl { color:var(--blue-dark); }
+    .ps-connector { width:24px; height:2px; background:var(--border); margin-bottom:18px; flex-shrink:0; }
+    .ps-connector.done-conn { background:var(--blue-dark); }
+
+    /* ---- Situation ---- */
+    .situation-card {
+      background:#f0f7ff; border-radius:var(--radius-lg);
+      padding:14px 20px; font-size:.85rem; color:var(--text-muted);
+      line-height:1.6; border-left:3px solid var(--blue-dark);
+    }
+
+    /* ---- Frage ---- */
+    .question-card {
+      background:var(--surface); border-radius:var(--radius-lg);
+      box-shadow:var(--shadow-sm); padding:22px 24px;
+    }
+    .question-label {
+      font-size:.68rem; font-weight:700; text-transform:uppercase;
+      letter-spacing:.08em; color:var(--text-subtle); margin-bottom:10px;
+    }
+    .question-text { font-size:1rem; font-weight:600; color:var(--text); line-height:1.5; }
+
+    /* ---- Antwort-Buttons ---- */
+    .choices { display:flex; flex-direction:column; gap:10px; }
+    .choice-btn {
+      font-family:var(--font); font-size:.9rem; font-weight:500;
+      padding:13px 18px; border-radius:var(--radius-sm);
+      border:1.5px solid var(--border); background:var(--surface);
+      color:var(--text); cursor:pointer; text-align:left;
+      transition:all .15s; line-height:1.4;
+    }
+    .choice-btn:hover:not(:disabled) { border-color:var(--blue-dark); background:#f0f7ff; color:var(--blue-dark); }
+    .choice-btn.correct-choice { border-color:#16a34a; background:#f0fff4; color:#166534; font-weight:600; }
+    .choice-btn.wrong-choice   { border-color:var(--red); background:var(--red-light); color:#991b1b; }
+    .choice-btn:disabled { cursor:default; }
+
+    /* ---- Feedback ---- */
+    .feedback-card {
+      border-radius:var(--radius-lg); padding:16px 20px;
+      font-size:.88rem; line-height:1.65; display:none;
+    }
+    .feedback-card.visible  { display:block; }
+    .feedback-card.correct-fb {
+      background:#f0fff4; border:1px solid #9ae6b4; color:#166534;
+    }
+    .feedback-card.wrong-fb {
+      background:var(--red-light); border:1px solid #fca5a5; color:#991b1b;
+    }
+    .feedback-card strong { display:block; margin-bottom:6px; font-size:.9rem; }
+
+    /* ---- Buttons ---- */
+    .action-row { display:flex; gap:10px; flex-wrap:wrap; }
+
+    /* ---- Erfolg-Bildschirm ---- */
+    .success-screen {
+      background:var(--surface); border-radius:var(--radius-lg);
+      box-shadow:var(--shadow-sm); padding:40px 32px; text-align:center;
+      display:none;
+    }
+    .success-screen.visible { display:block; }
+    .success-icon { font-size:2.5rem; margin-bottom:12px; }
+    .success-title { font-size:1.2rem; font-weight:700; color:var(--blue-dark); margin-bottom:8px; }
+    .success-sub   { font-size:.88rem; color:var(--text-subtle); margin-bottom:24px; line-height:1.6; }
+    .score-display {
+      display:inline-block; background:#f0f7ff; border:2px solid var(--blue-dark);
+      border-radius:var(--radius-lg); padding:12px 28px; margin-bottom:24px;
+    }
+    .score-num   { font-size:2rem; font-weight:800; color:var(--blue-dark); }
+    .score-label { font-size:.78rem; color:var(--text-subtle); margin-top:2px; }
+  </style>
+</head>
+<body>
+
+<a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+
+<div class="page-header">
+  <h1>b.7 – Jogurtherstellung</h1>
+  <p>Triff bei jedem Schritt die richtige Entscheidung</p>
+</div>
+
+<div class="game-wrap">
+
+  <!-- Fortschrittsleiste -->
+  <div class="progress-steps" id="progressSteps"></div>
+
+  <!-- Situation -->
+  <div class="situation-card" id="situationText"></div>
+
+  <!-- Frage + Antworten -->
+  <div class="question-card" id="questionCard">
+    <div class="question-label">Entscheidung</div>
+    <div class="question-text" id="questionText"></div>
+  </div>
+
+  <div class="choices" id="choicesArea"></div>
+
+  <!-- Feedback -->
+  <div class="feedback-card" id="feedbackCard"></div>
+
+  <!-- Aktions-Buttons -->
+  <div class="action-row" id="actionRow"></div>
+
+  <!-- Erfolgs-Bildschirm -->
+  <div class="success-screen" id="successScreen">
+    <div class="success-icon">🧪</div>
+    <div class="success-title">Jogurt erfolgreich hergestellt!</div>
+    <div class="success-sub">
+      Sie haben alle 6 Produktionsschritte korrekt entschieden.<br>
+      Jeder Fehler führte zur Erklärung des Zusammenhangs.
+    </div>
+    <div class="score-display">
+      <div class="score-num" id="scoreNum">–</div>
+      <div class="score-label">Versuche insgesamt</div>
+    </div>
+    <div style="font-size:.82rem;color:var(--text-subtle);margin-bottom:24px" id="scoreComment"></div>
+    <button class="btn btn-primary" onclick="restart()">Nochmals versuchen</button>
+  </div>
+
+</div>
+
+<script>
+  var STEPS = [
+    {
+      name: 'Hitzebehandlung',
+      situation: 'Die Jogurtmilch ist auf den richtigen Fettgehalt standardisiert und die fettfreie Trockenmasse wurde erhöht. Nun muss die Milch hitzebehandelt werden.',
+      question: 'Welche Temperatur und Zeit wählen Sie für die Hitzebehandlung der Jogurtmilch?',
+      choices: [
+        {
+          label: '72 °C, 15 Sekunden (Pasteurisierung)',
+          correct: false,
+          feedback: 'Bei 72 °C werden die Molkenproteine zu wenig denaturiert. Folge: Sie können nicht an der Gelbildung mitwirken → der Jogurt wird dünnflüssig und scheidet Molke ab (Molkenlässigkeit).'
+        },
+        {
+          label: '85–95 °C, 2–10 Minuten',
+          correct: true,
+          feedback: 'Richtig! Bei 85–95 °C werden die Molkenproteine ausreichend denaturiert. Sie vergrössern ihre Oberfläche und binden mehr Wasser → der Jogurt wird cremig und stabil.'
+        },
+        {
+          label: '120 °C, 5 Minuten (UHT)',
+          correct: false,
+          feedback: 'Bei 120 °C entsteht ein unerwünschter Kochgeschmack. Ausserdem werden Proteine zu stark verändert, was die Qualität beeinträchtigt.'
+        },
+      ]
+    },
+    {
+      name: 'Abkühlen',
+      situation: 'Die Hitzebehandlung war erfolgreich. Bevor die Kultur zugegeben wird, muss die Milch auf die richtige Temperatur abgekühlt werden.',
+      question: 'Auf welche Temperatur kühlen Sie die Jogurtmilch ab?',
+      choices: [
+        {
+          label: '25 °C',
+          correct: false,
+          feedback: 'Bei 25 °C arbeiten die thermophilen Jogurtbakterien (Sc. thermophilus, Lb. bulgaricus) nicht. Ihr Temperaturoptimum liegt bei 40–44 °C – bei 25 °C findet so gut wie keine Säuerung statt.'
+        },
+        {
+          label: '40–44 °C',
+          correct: true,
+          feedback: 'Richtig! 40–44 °C ist das Temperaturoptimum der Jogurtbakterien. Die Kultur wird jetzt zugegeben.'
+        },
+        {
+          label: '50 °C',
+          correct: false,
+          feedback: 'Bei 50 °C werden die Milchsäurebakterien stark geschädigt oder abgetötet. Ohne lebende Bakterien findet keine Milchsäuregärung statt – kein Jogurt.'
+        },
+      ]
+    },
+    {
+      name: 'Impfen',
+      situation: 'Die Milch hat 42 °C erreicht. Nun wird die Betriebskultur (Direktstarter oder Betriebskultur) zugegeben.',
+      question: 'Wie viel Betriebskultur geben Sie zur Jogurtmilch?',
+      choices: [
+        {
+          label: '0.5 %',
+          correct: false,
+          feedback: 'Zu wenig Kultur verlängert die Bebrütungszeit auf über 10 Stunden und liefert unzuverlässige Ergebnisse. Die Keimzahl im Endprodukt könnte zu tief sein (gesetzlich mind. 10 Mio. KBE/g).'
+        },
+        {
+          label: '2 %',
+          correct: true,
+          feedback: 'Richtig! 2 % Betriebskultur ist die Standarddosierung und führt zu einer Bebrütungszeit von 4–7 Stunden.'
+        },
+        {
+          label: '10 %',
+          correct: false,
+          feedback: 'Zu viel Kultur bewirkt eine zu schnelle, unkontrollierte Säuerung. Der pH-Wert fällt zu rasch, was die Qualität beeinträchtigt und die Produktion erschwert.'
+        },
+      ]
+    },
+    {
+      name: 'Bebrüten',
+      situation: 'Die Kultur wurde zugegeben. Nun bebrütet der Jogurt – entweder stichfest in der Verpackung oder gerührt im Tank.',
+      question: 'Bei welcher Temperatur bebrüten Sie den Jogurt?',
+      choices: [
+        {
+          label: '30 °C',
+          correct: false,
+          feedback: 'Zu kalt: Die thermophilen Bakterien arbeiten zu langsam. Risiko: fadenziehender Jogurt durch unausgeglichene Bakterienaktivität, und sehr lange Bebrütungszeiten.'
+        },
+        {
+          label: '40–44 °C',
+          correct: true,
+          feedback: 'Richtig! Bei 40–44 °C arbeiten Streptococcus thermophilus und Lactobacillus bulgaricus in Symbiose optimal zusammen und vergären die Laktose effizient zu Milchsäure.'
+        },
+        {
+          label: '50 °C',
+          correct: false,
+          feedback: 'Zu heiss: Bei 50 °C sterben die Milchsäurebakterien ab. Ohne aktive Bakterien findet keine Milchsäuregärung statt – der pH-Wert fällt nicht, kein Jogurt entsteht.'
+        },
+      ]
+    },
+    {
+      name: 'pH kontrollieren',
+      situation: 'Der Jogurt bebrütet. Sie messen den pH-Wert bzw. den Säuregrad (°SH) regelmässig. Der pH-Wert sinkt stetig.',
+      question: 'Bei welchem pH-Wert leiten Sie das Kühlen ein?',
+      choices: [
+        {
+          label: 'pH 5.0 (ca. 20 °SH)',
+          correct: false,
+          feedback: 'Zu früh: Der Jogurt ist noch nicht ausreichend gesäuert. Die Gallerte ist schwach, der Jogurt schmeckt fade und nicht charakteristisch säuerlich.'
+        },
+        {
+          label: 'pH 4.5 (36–38 °SH)',
+          correct: true,
+          feedback: 'Richtig! Bei pH 4.5 (= 36–38 °SH) hat die Säuerung den idealen Punkt erreicht. Jetzt muss rasch gekühlt werden, um Nachsäuerung zu verhindern.'
+        },
+        {
+          label: 'pH 4.0 (ca. 52 °SH)',
+          correct: false,
+          feedback: 'Zu spät: Bei pH 4.0 ist der Jogurt bereits übersäuert. Ausserdem setzt sich die Nachsäuerung während des Kühlens fort – der Jogurt wird noch saurer.'
+        },
+      ]
+    },
+    {
+      name: 'Kühlen',
+      situation: 'Der Säuregrad hat 36–38 °SH (pH 4.5) erreicht. Der Jogurt muss nun gekühlt werden, um die Bakterienaktivität zu stoppen.',
+      question: 'Wie schnell kühlen Sie den Jogurt?',
+      choices: [
+        {
+          label: 'Langsam über 4–5 Stunden auf < 10 °C',
+          correct: false,
+          feedback: 'Zu langsam: Die Milchsäurebakterien sind noch aktiv und vergären weiter (Nachsäuerung). Folge: Der Jogurt wird übersäuert und der pH-Wert sinkt unter 4.5.'
+        },
+        {
+          label: 'Rasch innerhalb 1 Stunde auf < 10 °C',
+          correct: true,
+          feedback: 'Richtig! Rasches Kühlen stoppt die Bakterienaktivität und verhindert Nachsäuerung. Der Jogurt bleibt bei pH 4.5 stabil.'
+        },
+      ]
+    },
+  ];
+
+  var currentStep  = 0;
+  var totalTries   = 0;
+  var stepTries    = 0;
+
+  /* ---- Fortschrittsleiste aufbauen ---- */
+  function buildProgress() {
+    var wrap = document.getElementById('progressSteps');
+    wrap.innerHTML = '';
+    STEPS.forEach(function(s, i) {
+      if (i > 0) {
+        var conn = document.createElement('div');
+        conn.className = 'ps-connector' + (i <= currentStep ? ' done-conn' : '');
+        wrap.appendChild(conn);
+      }
+      var item = document.createElement('div');
+      item.className = 'ps-item';
+
+      var circle = document.createElement('div');
+      var cls = 'ps-circle';
+      if (i < currentStep)       cls += ' done';
+      else if (i === currentStep) cls += ' current';
+      circle.className = cls;
+      circle.textContent = i < currentStep ? '✓' : (i + 1);
+      item.appendChild(circle);
+
+      var label = document.createElement('div');
+      label.className = 'ps-label' + (i === currentStep ? ' current-lbl' : '');
+      label.textContent = s.name;
+      item.appendChild(label);
+
+      wrap.appendChild(item);
+    });
+  }
+
+  /* ---- Schritt anzeigen ---- */
+  function showStep(idx) {
+    var s = STEPS[idx];
+    stepTries = 0;
+
+    buildProgress();
+
+    document.getElementById('situationText').textContent = s.situation;
+    document.getElementById('questionText').textContent  = s.question;
+    document.getElementById('feedbackCard').className    = 'feedback-card';
+    document.getElementById('feedbackCard').innerHTML    = '';
+    document.getElementById('actionRow').innerHTML       = '';
+
+    var area = document.getElementById('choicesArea');
+    area.innerHTML = '';
+    s.choices.forEach(function(c, ci) {
+      var btn = document.createElement('button');
+      btn.className   = 'choice-btn';
+      btn.textContent = c.label;
+      btn.addEventListener('click', function() { handleChoice(ci); });
+      area.appendChild(btn);
+    });
+
+    document.getElementById('questionCard').style.display    = '';
+    document.getElementById('choicesArea').style.display     = '';
+    document.getElementById('situationText').style.display   = '';
+  }
+
+  /* ---- Antwort auswerten ---- */
+  function handleChoice(ci) {
+    var s = STEPS[currentStep];
+    var c = s.choices[ci];
+    totalTries++;
+    stepTries++;
+
+    // Alle Buttons deaktivieren + markieren
+    var btns = document.getElementById('choicesArea').querySelectorAll('.choice-btn');
+    btns.forEach(function(b, bi) {
+      b.disabled = true;
+      if (bi === ci) {
+        b.classList.add(c.correct ? 'correct-choice' : 'wrong-choice');
+      }
+      if (!c.correct && s.choices[bi].correct) {
+        b.classList.add('correct-choice'); // richtige Antwort zeigen
+      }
+    });
+
+    var fb = document.getElementById('feedbackCard');
+    fb.innerHTML = '<strong>' + (c.correct ? '✓  Richtig!' : '✗  Nicht ganz.') + '</strong>' + c.feedback;
+    fb.className = 'feedback-card visible ' + (c.correct ? 'correct-fb' : 'wrong-fb');
+
+    var ar = document.getElementById('actionRow');
+    ar.innerHTML = '';
+
+    if (c.correct) {
+      if (currentStep < STEPS.length - 1) {
+        var next = document.createElement('button');
+        next.className   = 'btn btn-primary';
+        next.textContent = 'Weiter → ' + STEPS[currentStep + 1].name;
+        next.addEventListener('click', function() {
+          currentStep++;
+          showStep(currentStep);
+        });
+        ar.appendChild(next);
+      } else {
+        showSuccess();
+      }
+    } else {
+      var retry = document.createElement('button');
+      retry.className   = 'btn btn-ghost';
+      retry.textContent = 'Nochmals versuchen';
+      retry.addEventListener('click', function() { showStep(currentStep); });
+      ar.appendChild(retry);
+    }
+  }
+
+  /* ---- Erfolg ---- */
+  function showSuccess() {
+    document.getElementById('situationText').style.display = 'none';
+    document.getElementById('questionCard').style.display  = 'none';
+    document.getElementById('choicesArea').style.display   = 'none';
+    document.getElementById('feedbackCard').className      = 'feedback-card';
+    document.getElementById('actionRow').innerHTML         = '';
+
+    var mistakes = totalTries - STEPS.length;
+    document.getElementById('scoreNum').textContent = totalTries;
+
+    var comment;
+    if (mistakes === 0)      comment = 'Perfekt – kein einziger Fehler!';
+    else if (mistakes <= 2)  comment = 'Sehr gut – nur ' + mistakes + ' Fehler.';
+    else if (mistakes <= 4)  comment = 'Gut – ' + mistakes + ' Fehler. Wiederholen lohnt sich.';
+    else                     comment = mistakes + ' Fehler – die Erklärungen nochmals lesen empfohlen.';
+    document.getElementById('scoreComment').textContent = comment;
+
+    document.getElementById('successScreen').classList.add('visible');
+    buildProgress(); // alle Schritte grün zeigen
+  }
+
+  /* ---- Neustart ---- */
+  function restart() {
+    currentStep = 0;
+    totalTries  = 0;
+    stepTries   = 0;
+    document.getElementById('successScreen').classList.remove('visible');
+    document.getElementById('situationText').style.display = '';
+    document.getElementById('questionCard').style.display  = '';
+    document.getElementById('choicesArea').style.display   = '';
+    showStep(0);
+  }
+
+  /* ---- Start ---- */
+  showStep(0);
+</script>
+</body>
+</html>
