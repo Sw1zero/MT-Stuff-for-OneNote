@@ -18,16 +18,20 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 │       └── milchtechnologen.svg        ← Branchenlogo
 ├── b7-sauermilch/
 │   ├── images/
-│   │   └── b.7_Anlage_stichfest_Nummern.png
+│   │   ├── b.7_Anlage_stichfest_Nummern.png
+│   │   └── b.7_Anlage_geruehrt_Nummern.png
 │   ├── lernkaertchen.html
 │   ├── quiz-qualitaetsmaengel.html
+│   ├── quiz-gesetzliches.html
 │   ├── sortierer-jogurtherstellung.html
 │   ├── zuordnung-anlagenteile-stichfest.html
 │   ├── zuordnung-anlagenteile-geruehrt.html
 │   ├── lueckentext-saeuregerinnung.html
+│   ├── lueckentext-symbiose-kultur.html
 │   ├── fachrechner-mischungskreuz.html
 │   ├── wahr-falsch-sauermilch.html
 │   ├── tabellen-luecken-kulturen.html
+│   ├── tabellen-luecken-richtwerte.html
 │   └── prozessvergleich-jogurt.html
 ├── a2-rohstoffe-trennen/
 │   ├── images/
