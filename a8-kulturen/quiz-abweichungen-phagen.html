@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz a.8 – Abweichungen & Bakteriophagen</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .back-link { font-size:0.82rem; color:var(--text-muted); text-decoration:none; display:inline-flex; align-items:center; gap:4px; margin-bottom:20px; }
+    .back-link:hover { color:var(--red); }
+    .quiz-center { display:flex; flex-direction:column; align-items:center; }
+    .progress-text { margin-bottom:10px; }
+    .progress-bar-wrap { width:480px; max-width:92vw; margin-bottom:28px; }
+    .quiz-card { width:480px; max-width:92vw; background:var(--surface); border-radius:var(--radius-lg); box-shadow:var(--shadow-md); padding:32px 32px 28px; margin-bottom:16px; }
+    .question-badge { font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:var(--red); margin-bottom:12px; display:block; }
+    .question-text { font-size:1.02rem; font-weight:600; line-height:1.5; color:var(--text); margin-bottom:24px; }
+    .answers { display:flex; flex-direction:column; gap:10px; }
+    .answer-btn { font-family:var(--font); font-size:0.9rem; font-weight:500; text-align:left; background:#f8fafc; border:1.5px solid var(--border); border-radius:var(--radius-md); padding:12px 16px; cursor:pointer; transition:border-color 0.15s, background 0.15s, transform 0.1s; line-height:1.4; color:var(--text); display:flex; gap:12px; align-items:flex-start; }
+    .answer-btn:hover:not(:disabled) { border-color:var(--red); background:var(--red-light); }
+    .answer-btn:active:not(:disabled) { transform:scale(0.99); }
+    .answer-btn .letter { font-weight:700; font-size:0.78rem; background:var(--border); color:var(--text-muted); border-radius:6px; padding:2px 7px; flex-shrink:0; margin-top:1px; transition:background 0.15s, color 0.15s; }
+    .answer-btn.correct { border-color:#38a169; background:#f0fff4; }
+    .answer-btn.correct .letter { background:#38a169; color:#fff; }
+    .answer-btn.wrong { border-color:var(--red); background:var(--red-light); }
+    .answer-btn.wrong .letter { background:var(--red); color:#fff; }
+    .answer-btn.reveal { border-color:#38a169; background:#f0fff4; opacity:0.8; }
+    .answer-btn.reveal .letter { background:#38a169; color:#fff; }
+    .answer-btn:disabled { cursor:default; }
+    .feedback { margin-top:18px; padding:14px 16px; border-radius:var(--radius-md); font-size:0.88rem; line-height:1.5; display:none; }
+    .feedback.correct { background:#f0fff4; border:1px solid #9ae6b4; color:#276749; display:block; }
+    .feedback.wrong { background:var(--red-light); border:1px solid #fca5a5; color:var(--red-dark); display:block; }
+    .feedback-icon { font-size:1rem; margin-right:6px; }
+    .next-wrap { width:480px; max-width:92vw; display:flex; justify-content:flex-end; }
+    .end-screen { width:480px; max-width:92vw; background:var(--surface); border-radius:var(--radius-lg); box-shadow:var(--shadow-md); padding:40px 36px; text-align:center; display:none; }
+    .score-circle { width:100px; height:100px; border-radius:50%; border:5px solid var(--red); display:flex; flex-direction:column; align-items:center; justify-content:center; margin:0 auto 24px; }
+    .score-number { font-size:2rem; font-weight:700; color:var(--red); line-height:1; }
+    .score-total { font-size:0.78rem; color:var(--text-muted); margin-top:2px; }
+    .end-message { font-size:1.05rem; font-weight:600; color:var(--text); margin-bottom:8px; }
+    .end-sub { font-size:0.86rem; color:var(--text-muted); margin-bottom:28px; }
+    .end-actions { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  </style>
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologie EFZ · a.8</span>
+    <h1>Abweichungen & Bakteriophagen</h1>
+    <p>Ursachen, Massnahmen und Phagen</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+  <div class="quiz-center">
+    <div class="progress-text" id="progressText"></div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressBar"></div></div>
+    <div class="quiz-card" id="quizCard">
+      <span class="question-badge" id="questionBadge"></span>
+      <div class="question-text" id="questionText"></div>
+      <div class="answers" id="answersContainer"></div>
+      <div class="feedback" id="feedback"></div>
+    </div>
+    <div class="next-wrap" id="nextWrap" style="display:none">
+      <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()">Weiter &#8594;</button>
+    </div>
+    <div class="end-screen" id="endScreen">
+      <div class="score-circle"><div class="score-number" id="scoreNumber"></div><div class="score-total" id="scoreTotal"></div></div>
+      <div class="end-message" id="endMessage"></div>
+      <div class="end-sub" id="endSub"></div>
+      <div class="end-actions">
+        <button class="btn btn-ghost" onclick="location.href='../index.html'">&#8592; Alle Lerntools</button>
+        <button class="btn btn-primary" onclick="restartQuiz()">Nochmals versuchen</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+  const QUESTIONS = [
+    { badge:"Technische Ursache", question:"Der Säuregrad ist zu tief, die Kultur bleibt flüssig. Welche Ursache ist möglich?",
+      answers:["Zu hohe Bebrütungstemperatur","Zu tiefe Bebrütungstemperatur oder zu kurze Bebrütungszeit","Zu lange Bebrütungszeit","Zu hohe Impfmenge"],
+      correct:1, explanation:"Ein zu tiefer Säuregrad entsteht u. a. durch zu tiefe Temperatur, zu kurze Bebrütung, zu kleine Impfmenge oder einen Hemmstoff in der Milch." },
+    { badge:"Massnahme", question:"Sie vermuten einen Hemmstoff in der Ausgangsmilch. Welche Massnahme ist richtig?",
+      answers:["Impfmenge stark erhöhen","Hemmstoffnachweis durchführen (z. B. Delvo- oder SNAP-Test)","Temperatur senken","Länger bebrüten"],
+      correct:1, explanation:"Bei Hemmstoffverdacht wird ein Hemmstoffnachweis gemacht (z. B. Delvo- oder SNAP-Test). Hemmstoffe (Antibiotika) hemmen die Milchsäurebakterien massiv." },
+    { badge:"Technische Ursache", question:"Der Säuregrad ist zu hoch, die Kultur ist sehr sauer. Welche Ursache passt?",
+      answers:["Zu kurze Bebrütungszeit","Hemmstoff in der Milch","Zu hohe Bebrütungstemperatur oder zu lange Bebrütungszeit","Zu kleine Impfmenge"],
+      correct:2, explanation:"Ein zu hoher Säuregrad (zu tiefer pH) entsteht durch zu hohe Bebrütungstemperatur oder zu lange Bebrütungszeit." },
+    { badge:"Bakteriophagen", question:"Was sind Bakteriophagen?",
+      answers:["Bakterien, die andere Bakterien fressen","Viren, die Bakterien befallen","Hefen in der Kultur","Eine Form von Milchsäurebakterien"],
+      correct:1, explanation:"Bakteriophagen (kurz Phagen) sind die Viren der Bakterien. Sie benutzen Bakterien als Wirtszelle und vermehren sich darin um das 50- bis 300-Fache." },
+    { badge:"Bakteriophagen", question:"Welche Folge hat ein Phagenbefall in einer Milchsäurebakterienkultur?",
+      answers:["Bessere Aromabildung","Säuerungsstörung in der Fabrikation","Höhere Haltbarkeit der Kultur","Keine Auswirkung"],
+      correct:1, explanation:"Phagen zerstören die Milchsäurebakterien, die Folge ist eine Säuerungsstörung bei der Herstellung von Käse oder Sauermilchprodukten." },
+    { badge:"Vermehrungszyklus", question:"Was geschieht beim LYTISCHEN Vermehrungszyklus?",
+      answers:["Die Phagen-Erbsubstanz wird ins Bakterium eingebaut, ohne es zu schädigen","Das Bakterium wird zerstört und setzt 50–300 neue Phagen frei","Der Phage stirbt ab","Das Bakterium vermehrt sich schneller"],
+      correct:1, explanation:"Im lytischen Zyklus übernimmt die Phagen-Erbmasse das Kommando, die Zellwand wird aufgelöst und 50–300 neue Phagen werden freigesetzt (Kettenreaktion) → Säuerungsstörung." },
+    { badge:"Vermehrungszyklus", question:"Was kennzeichnet den LYSOGENEN Vermehrungszyklus?",
+      answers:["Die Bakterienzelle wird sofort zerstört","Die Phagen-Erbsubstanz (Prophage) ist im Bakterium eingebaut, meist keine Säuerungsstörung","Es entstehen sofort 300 neue Phagen","Der Phage kann sich nicht vermehren"],
+      correct:1, explanation:"Im lysogenen Zyklus bildet die Phagen-Erbsubstanz (Prophage) mit der Bakterien-Erbsubstanz eine Einheit. Das Bakterium arbeitet normal weiter, ein Übergang zum lytischen Zyklus ist aber möglich." },
+    { badge:"Eigenschaften", question:"Welche Aussage über Bakteriophagen stimmt?",
+      answers:["Sie sind hitzeempfindlicher als ihre Wirte","Sie sind weniger hitzeempfindlich als ihre Wirte und wirtsspezifisch","Sie befallen jede beliebige Bakterienart","Sie sind gegen Chlor und Peroxid unempfindlich"],
+      correct:1, explanation:"Phagen sind weniger hitzeempfindlich als ihre Wirte, aber empfindlich auf Chlor/Peroxid und auf pH < 3 bzw. > 11. Sie sind wirtsspezifisch (befallen nur wenige Stämme)." },
+    { badge:"Bekämpfung", question:"Welche Massnahme hilft GEGEN Phagen?",
+      answers:["Kulturen im Fabrikationsraum zubereiten","Kulturenrotation: alle 2–3 Tage die Kultur wechseln","Auf Desinfektion verzichten","Bebrütungsbedingungen ständig ändern"],
+      correct:1, explanation:"Wichtige Massnahmen: separater, sauberer Raum, aseptisches Arbeiten, Reinigung/Entkeimung, Spritzer vermeiden und Kulturenrotation alle 2–3 Tage, da nicht alle Kulturen gleich phagenempfindlich sind." },
+    { badge:"Bekämpfung", question:"Warum sollen Molke- und Milchproduktespritzer im Kulturenraum vermieden werden?",
+      answers:["Sie verändern den pH-Wert","Sie können grosse Mengen Phagen enthalten","Sie kühlen die Kultur ab","Sie enthalten Hemmstoffe"],
+      correct:1, explanation:"Molke- und Milchproduktespritzer können grosse Mengen Phagen enthalten und so die Kulturen infizieren, deshalb unbedingt vermeiden." },
+  ];
+
+  let currentIndex=0, score=0, answered=false, order=[];
+  function shuffle(arr){ for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];} return arr; }
+  function startQuiz(){ order=shuffle([...Array(QUESTIONS.length).keys()]); currentIndex=0; score=0; document.getElementById("endScreen").style.display="none"; document.getElementById("quizCard").style.display="block"; showQuestion(); }
+  function showQuestion(){
+    answered=false; const q=QUESTIONS[order[currentIndex]]; const total=QUESTIONS.length;
+    document.getElementById("progressText").textContent=`Frage ${currentIndex+1} von ${total}`;
+    document.getElementById("progressBar").style.width=`${((currentIndex+1)/total)*100}%`;
+    document.getElementById("questionBadge").textContent=q.badge;
+    document.getElementById("questionText").textContent=q.question;
+    const letters=["A","B","C","D"];
+    document.getElementById("answersContainer").innerHTML=q.answers.map((a,i)=>`<button class="answer-btn" onclick="selectAnswer(${i})" id="ans-${i}"><span class="letter">${letters[i]}</span><span>${a}</span></button>`).join("");
+    const fb=document.getElementById("feedback"); fb.className="feedback"; fb.textContent="";
+    document.getElementById("nextWrap").style.display="none";
+    document.getElementById("nextBtn").textContent=currentIndex<QUESTIONS.length-1?"Weiter →":"Ergebnis anzeigen";
+  }
+  function selectAnswer(chosen){
+    if(answered) return; answered=true;
+    const q=QUESTIONS[order[currentIndex]]; const correct=q.correct; const isCorrect=chosen===correct; if(isCorrect) score++;
+    for(let i=0;i<q.answers.length;i++){ const btn=document.getElementById(`ans-${i}`); btn.disabled=true;
+      if(i===correct&&i===chosen) btn.classList.add("correct"); else if(i===chosen&&!isCorrect) btn.classList.add("wrong"); else if(i===correct) btn.classList.add("reveal"); }
+    const fb=document.getElementById("feedback");
+    if(isCorrect){ fb.className="feedback correct"; fb.innerHTML=`<span class="feedback-icon">&#10003;</span><strong>Richtig!</strong> ${q.explanation}`; }
+    else { fb.className="feedback wrong"; fb.innerHTML=`<span class="feedback-icon">&#10007;</span><strong>Nicht ganz.</strong> ${q.explanation}`; }
+    document.getElementById("nextWrap").style.display="flex";
+  }
+  function nextQuestion(){ currentIndex++; if(currentIndex>=QUESTIONS.length) showEndScreen(); else showQuestion(); }
+  function showEndScreen(){
+    document.getElementById("quizCard").style.display="none"; document.getElementById("nextWrap").style.display="none";
+    document.getElementById("progressText").textContent=""; document.getElementById("progressBar").style.width="100%";
+    const total=QUESTIONS.length; const pct=Math.round((score/total)*100);
+    document.getElementById("scoreNumber").textContent=score; document.getElementById("scoreTotal").textContent=`von ${total}`;
+    let msg,sub;
+    if(pct===100){ msg="Ausgezeichnet!"; sub="Alle Fragen richtig. Sie kennen Ursachen, Massnahmen und Phagen bestens."; }
+    else if(pct>=75){ msg="Sehr gut!"; sub="Fast alle Fragen richtig. Wiederholen Sie die markierten Themen kurz."; }
+    else if(pct>=50){ msg="Gut gemacht."; sub="Mehr als die Hälfte richtig. Schauen Sie die falschen Antworten nochmals an."; }
+    else { msg="Weiter üben."; sub="Wiederholen Sie Abweichungen und Bakteriophagen und versuchen Sie es nochmals."; }
+    document.getElementById("endMessage").textContent=msg; document.getElementById("endSub").textContent=sub;
+    document.getElementById("endScreen").style.display="block";
+  }
+  function restartQuiz(){ startQuiz(); }
+  startQuiz();
+</script>
+</body>
+</html>

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kreuzworträtsel – Kulturen & Mikroorganismen</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .back-link { display:inline-block; font-size:0.82rem; color:var(--text-muted); text-decoration:none; margin-bottom:1.25rem; }
+    .back-link:hover { color:var(--red); }
+    .instruction { font-size:0.84rem; color:var(--text-muted); margin-bottom:1.25rem; text-align:center; }
+
+    .cw-layout { display:flex; gap:28px; flex-wrap:wrap; align-items:flex-start; }
+    .cw-gridwrap { overflow:auto; }
+    table.cw { border-collapse:collapse; }
+    table.cw td { width:32px; height:32px; padding:0; border:1px solid var(--border); position:relative; }
+    table.cw td.blocked { background:transparent; border:none; }
+    table.cw td.cell { background:var(--surface); }
+    table.cw td.cell input {
+      width:32px; height:32px; border:none; background:transparent; text-align:center;
+      font-family:var(--font); font-size:1rem; font-weight:600; text-transform:uppercase;
+      color:var(--blue-dark); outline:none; padding:0;
+    }
+    table.cw td.cell input:focus { background:#e0f2fe; }
+    table.cw td.cell.correct input { background:#f0fdf4; color:#15803d; }
+    table.cw td.cell.wrong input   { background:var(--red-light); color:var(--red); }
+    .cw-num { position:absolute; top:1px; left:2px; font-size:0.5rem; font-weight:700; color:var(--text-subtle); line-height:1; pointer-events:none; }
+
+    .clues { flex:1; min-width:260px; }
+    .clues h3 { font-size:0.78rem; text-transform:uppercase; letter-spacing:0.07em; color:var(--blue-dark); margin:0 0 8px; }
+    .clue-list { list-style:none; padding:0; margin:0 0 20px; }
+    .clue-list li { font-size:0.84rem; color:var(--text); line-height:1.5; margin-bottom:6px; }
+    .clue-list li b { color:var(--blue-dark); }
+
+    .btn-row { display:flex; gap:0.75rem; flex-wrap:wrap; margin-top:18px; }
+    .result-banner { margin-top:1.25rem; padding:0.9rem 1rem; border-radius:var(--radius-md); font-weight:600; font-size:0.92rem; text-align:center; display:none; }
+    .result-banner.show { display:block; }
+    .result-banner.perfect { background:#f0fdf4; color:#15803d; border:1.5px solid #bbf7d0; }
+    .result-banner.partial { background:#fff7ed; color:#c2410c; border:1.5px solid #fed7aa; }
+  </style>
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+  <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologie EFZ · a.8</span>
+  <h1>Kreuzworträtsel</h1>
+  <p>Kulturen & Mikroorganismen – Fachbegriffe</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+  <a class="back-link" href="../index.html">← Alle Lerntools</a>
+
+  <p class="instruction">Trage die Fachbegriffe ins Gitter ein. Umlaute werden ausgeschrieben (ä = AE, ö = OE, ü = UE) (hier aber nicht nötig).</p>
+
+  <div class="cw-layout">
+    <div class="cw-gridwrap"><table class="cw" id="cwGrid"></table></div>
+    <div class="clues">
+      <h3>Waagrecht</h3>
+      <ul class="clue-list" id="cluesAcross"></ul>
+      <h3>Senkrecht</h3>
+      <ul class="clue-list" id="cluesDown"></ul>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button type="button" class="btn btn-primary" onclick="checkAll()">Überprüfen</button>
+    <button type="button" class="btn btn-ghost"   onclick="showSolution()">Lösung zeigen</button>
+    <button type="button" class="btn btn-ghost"   onclick="resetAll()">Zurücksetzen</button>
+  </div>
+
+  <div class="result-banner" id="resultBanner"></div>
+</main>
+
+<footer class="bzwu-footer">BZWU Wil-Uzwil · Milchtechnologie EFZ · Philipp Neukomm</footer>
+
+<script>
+var WORDS = [
+  { a:'PSYCHROTROPH', c:'Kältetolerant: betreibt auch unter 7 °C noch Stoffwechsel' },
+  { a:'LEUCONOSTOC',  c:'Heterofermentative Kokkenart im Rahmsäurewecker' },
+  { a:'THERMOPHIL',   c:'Wärmeliebend (z. B. Joghurtbakterien, 40–45 °C)' },
+  { a:'HEMMSTOFF',    c:'Antibiotika-Rückstand, der die Milchsäurebakterien hemmt' },
+  { a:'DIACETYL',     c:'Aromastoff aus der heterofermentativen Gärung' },
+  { a:'PROPHAGE',     c:'In die Bakterien-Erbsubstanz eingebaute Phagensubstanz' },
+  { a:'MESOPHIL',     c:'Optimal bei mittleren Temperaturen (ca. 20–30 °C)' },
+  { a:'LYSOGEN',      c:'Vermehrungszyklus ohne Zerstörung des Bakteriums' },
+  { a:'LYTISCH',      c:'Vermehrungszyklus, der das Bakterium zerstört' },
+  { a:'LAKTOSE',      c:'Milchzucker, den die Milchsäurebakterien vergären' },
+  { a:'KOKKEN',       c:'Kugelförmige Milchsäurebakterien (Sammelbegriff)' }
+];
+
+/* ---- Gitter-Generator (deterministisch, greedy) ---- */
+var grid = {};      // "r_c" -> Buchstabe
+var placed = [];    // {word, r, c, dir}
+function key(r,c){ return r + '_' + c; }
+
+function canPlace(word, r, c, dir) {
+  var dr = dir === 'V' ? 1 : 0, dc = dir === 'H' ? 1 : 0;
+  if (grid[key(r-dr, c-dc)] !== undefined) return -1;                 // Zelle vor Wortanfang frei
+  if (grid[key(r+dr*word.length, c+dc*word.length)] !== undefined) return -1; // nach Wortende frei
+  var crossings = 0;
+  for (var k = 0; k < word.length; k++) {
+    var rr = r + dr*k, cc = c + dc*k, ex = grid[key(rr,cc)];
+    if (ex !== undefined) {
+      if (ex !== word[k]) return -1;
+      crossings++;
+    } else {
+      if (dir === 'H') {
+        if (grid[key(rr-1,cc)] !== undefined) return -1;
+        if (grid[key(rr+1,cc)] !== undefined) return -1;
+      } else {
+        if (grid[key(rr,cc-1)] !== undefined) return -1;
+        if (grid[key(rr,cc+1)] !== undefined) return -1;
+      }
+    }
+  }
+  return crossings;
+}
+function put(word, r, c, dir) {
+  var dr = dir === 'V' ? 1 : 0, dc = dir === 'H' ? 1 : 0;
+  for (var k = 0; k < word.length; k++) grid[key(r+dr*k, c+dc*k)] = word[k];
+  placed.push({ word: word, r: r, c: c, dir: dir });
+}
+
+function build() {
+  var words = WORDS.map(function(w){ return w.a; }).slice().sort(function(a,b){ return b.length - a.length; });
+  put(words[0], 0, 0, 'H');
+  var remaining = words.slice(1), passes = 0;
+  while (remaining.length && passes < 6) {
+    passes++;
+    var still = [];
+    remaining.forEach(function(word) {
+      var best = null, bestCross = 0;
+      for (var pk in grid) {
+        var parts = pk.split('_'), pr = +parts[0], pc = +parts[1], letter = grid[pk];
+        for (var li = 0; li < word.length; li++) {
+          if (word[li] !== letter) continue;
+          var crH = canPlace(word, pr, pc - li, 'H');
+          if (crH > bestCross) { best = { r: pr, c: pc - li, dir: 'H' }; bestCross = crH; }
+          var crV = canPlace(word, pr - li, pc, 'V');
+          if (crV > bestCross) { best = { r: pr - li, c: pc, dir: 'V' }; bestCross = crV; }
+        }
+      }
+      if (best) put(word, best.r, best.c, best.dir);
+      else still.push(word);
+    });
+    if (still.length === remaining.length) break;
+    remaining = still;
+  }
+}
+
+/* ---- Rendern ---- */
+var SOL = {};      // "r_c" -> Lösungsbuchstabe (normalisierte Koordinaten)
+var minR, minC;
+function render() {
+  var rs = [], cs = [];
+  for (var k in grid) { var p = k.split('_'); rs.push(+p[0]); cs.push(+p[1]); }
+  minR = Math.min.apply(null, rs); var maxR = Math.max.apply(null, rs);
+  minC = Math.min.apply(null, cs); var maxC = Math.max.apply(null, cs);
+
+  // Nummerierung
+  var num = {}, counter = 0;
+  for (var r = minR; r <= maxR; r++) {
+    for (var c = minC; c <= maxC; c++) {
+      if (grid[key(r,c)] === undefined) continue;
+      var leftEmpty = grid[key(r,c-1)] === undefined, rightFilled = grid[key(r,c+1)] !== undefined;
+      var topEmpty  = grid[key(r-1,c)] === undefined, botFilled  = grid[key(r+1,c)] !== undefined;
+      if ((leftEmpty && rightFilled) || (topEmpty && botFilled)) { counter++; num[key(r,c)] = counter; }
+    }
+  }
+
+  var table = document.getElementById('cwGrid'), html = '';
+  for (var r = minR; r <= maxR; r++) {
+    html += '<tr>';
+    for (var c = minC; c <= maxC; c++) {
+      var letter = grid[key(r,c)];
+      if (letter === undefined) { html += '<td class="blocked"></td>'; continue; }
+      SOL[key(r,c)] = letter;
+      var n = num[key(r,c)] ? '<span class="cw-num">' + num[key(r,c)] + '</span>' : '';
+      html += '<td class="cell" data-rc="' + r + '_' + c + '">' + n +
+              '<input maxlength="1" data-rc="' + r + '_' + c + '" autocomplete="off" spellcheck="false"></td>';
+    }
+    html += '</tr>';
+  }
+  table.innerHTML = html;
+
+  // Hinweise erzeugen
+  var across = [], down = [];
+  placed.forEach(function(p) {
+    var n = num[key(p.r, p.c)];
+    var clue = WORDS.filter(function(w){ return w.a === p.word; })[0].c;
+    var entry = { n: n, c: clue, len: p.word.length };
+    if (p.dir === 'H') across.push(entry); else down.push(entry);
+  });
+  across.sort(function(a,b){ return a.n - b.n; });
+  down.sort(function(a,b){ return a.n - b.n; });
+  document.getElementById('cluesAcross').innerHTML = across.map(function(e){ return '<li><b>' + e.n + '.</b> ' + e.c + ' (' + e.len + ')</li>'; }).join('');
+  document.getElementById('cluesDown').innerHTML   = down.map(function(e){ return '<li><b>' + e.n + '.</b> ' + e.c + ' (' + e.len + ')</li>'; }).join('');
+
+  // Auto-Weitersprung
+  table.querySelectorAll('input').forEach(function(inp, idx, all) {
+    inp.addEventListener('input', function() {
+      this.value = this.value.toUpperCase();
+      var td = this.closest('td'); td.classList.remove('correct','wrong');
+      if (this.value && idx + 1 < all.length) all[idx+1].focus();
+    });
+  });
+}
+
+function checkAll() {
+  var total = 0, correct = 0;
+  document.querySelectorAll('#cwGrid input').forEach(function(inp) {
+    total++;
+    var sol = SOL[inp.dataset.rc];
+    var td = inp.closest('td');
+    td.classList.remove('correct','wrong');
+    if ((inp.value || '').toUpperCase() === sol) { td.classList.add('correct'); correct++; }
+    else if (inp.value) { td.classList.add('wrong'); }
+  });
+  var banner = document.getElementById('resultBanner');
+  if (correct === total) { banner.textContent = 'Perfekt! Alle ' + total + ' Felder richtig.'; banner.className = 'result-banner show perfect'; }
+  else { banner.textContent = correct + ' von ' + total + ' Feldern korrekt. Rot markierte Felder nochmals überprüfen.'; banner.className = 'result-banner show partial'; }
+}
+
+function showSolution() {
+  document.querySelectorAll('#cwGrid input').forEach(function(inp) {
+    inp.value = SOL[inp.dataset.rc];
+    var td = inp.closest('td'); td.classList.remove('wrong'); td.classList.add('correct');
+  });
+  document.getElementById('resultBanner').className = 'result-banner';
+}
+
+function resetAll() {
+  document.querySelectorAll('#cwGrid input').forEach(function(inp) {
+    inp.value = ''; var td = inp.closest('td'); td.classList.remove('correct','wrong');
+  });
+  document.getElementById('resultBanner').className = 'result-banner';
+}
+
+build();
+render();
+</script>
+</body>
+</html>

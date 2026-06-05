@@ -44,6 +44,14 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 ├── a7-technische-einrichtungen/
 │   ├── tabellen-luecken-metalle.html
 │   └── quiz-werkstoffe-schmierstoffe.html
+├── a8-kulturen/
+│   ├── hotspot-bakterienzelle.html
+│   ├── tabellen-luecken-kuehlung.html
+│   ├── tabellen-luecken-kontrolle.html
+│   ├── tabellen-luecken-milchsaeuregaerung.html
+│   ├── quiz-kulturenformen.html
+│   ├── quiz-abweichungen-phagen.html
+│   └── kreuzwortraetsel-kulturen.html
 └── tools/
     └── einheiten-trainer.html
 ```
@@ -109,6 +117,7 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 | `tabellen-luecken` | Tabellen-Lücken   | `tabellen-luecken-kulturen.html`        | Vergleichstabelle mit Wortbank ausfüllen                |
 | `prozessvergleich` | Prozessvergleich  | `prozessvergleich-jogurt.html`          | Zwei Produktionswege nebeneinander, aufklappbare Details |
 | `hotspot`          | Hotspot           | `hotspot-bakterienzelle.html`           | Bild mit anklickbaren Zonen (Polygon/Kreis/Polylinie)   |
+| `kreuzwortraetsel` | Kreuzworträtsel   | `kreuzwortraetsel-kulturen.html`        | Auto-Gitter aus Fachbegriffen, Hinweise waagrecht/senkrecht |
 | `animation`        | Animation         | `animation-labgerinnung.html`           | Schrittweise SVG-Animation eines Prozesses mit Nav      |
 | `prozess-entscheid`| Prozess-Entscheid | `prozess-entscheid-jogurt.html`         | Entscheidung pro Prozessschritt mit Fehleranalyse       |
 
@@ -116,7 +125,6 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 
 | `data-type`        | Badge-Text        | Beschreibung                                                        |
 |--------------------|-------------------|---------------------------------------------------------------------|
-| `kreuzwortraetsel` | Kreuzworträtsel   | Klassisches Kreuzworträtsel aus Fachbegriffen                       |
 | `prozess-entscheid`| Prozess-Entscheid | Verzweigter Entscheidungsbaum: Was passiert wenn...?                |
 | `lueckendiagramm`  | Lückendiagramm    | Unvollständiges Flussdiagramm/Kurve ergänzen                        |
 | `fehlersuche`      | Fehlersuche       | Text mit eingebauten Fehlern – Lernende markieren und korrigieren   |
