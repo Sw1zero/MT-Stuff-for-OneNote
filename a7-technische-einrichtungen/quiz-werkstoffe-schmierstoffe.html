@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz a.7 – Werkstoffe & Schmierstoffe</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .back-link {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 20px;
+    }
+    .back-link:hover { color: var(--red); }
+
+    .quiz-center { display: flex; flex-direction: column; align-items: center; }
+
+    .progress-text  { margin-bottom: 10px; }
+    .progress-bar-wrap { width: 480px; max-width: 92vw; margin-bottom: 28px; }
+
+    .quiz-card {
+      width: 480px;
+      max-width: 92vw;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      padding: 32px 32px 28px;
+      margin-bottom: 16px;
+    }
+
+    .question-badge {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--red);
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .question-text {
+      font-size: 1.02rem;
+      font-weight: 600;
+      line-height: 1.5;
+      color: var(--text);
+      margin-bottom: 24px;
+    }
+
+    .answers { display: flex; flex-direction: column; gap: 10px; }
+
+    .answer-btn {
+      font-family: var(--font);
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-align: left;
+      background: #f8fafc;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s, transform 0.1s;
+      line-height: 1.4;
+      color: var(--text);
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .answer-btn:hover:not(:disabled) { border-color: var(--red); background: var(--red-light); }
+    .answer-btn:active:not(:disabled) { transform: scale(0.99); }
+
+    .answer-btn .letter {
+      font-weight: 700;
+      font-size: 0.78rem;
+      background: var(--border);
+      color: var(--text-muted);
+      border-radius: 6px;
+      padding: 2px 7px;
+      flex-shrink: 0;
+      margin-top: 1px;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .answer-btn.correct { border-color: #38a169; background: #f0fff4; }
+    .answer-btn.correct .letter { background: #38a169; color: #fff; }
+    .answer-btn.wrong { border-color: var(--red); background: var(--red-light); }
+    .answer-btn.wrong .letter { background: var(--red); color: #fff; }
+    .answer-btn.reveal { border-color: #38a169; background: #f0fff4; opacity: 0.8; }
+    .answer-btn.reveal .letter { background: #38a169; color: #fff; }
+    .answer-btn:disabled { cursor: default; }
+
+    .feedback {
+      margin-top: 18px;
+      padding: 14px 16px;
+      border-radius: var(--radius-md);
+      font-size: 0.88rem;
+      line-height: 1.5;
+      display: none;
+    }
+    .feedback.correct { background: #f0fff4; border: 1px solid #9ae6b4; color: #276749; display: block; }
+    .feedback.wrong { background: var(--red-light); border: 1px solid #fca5a5; color: var(--red-dark); display: block; }
+    .feedback-icon { font-size: 1rem; margin-right: 6px; }
+
+    .next-wrap { width: 480px; max-width: 92vw; display: flex; justify-content: flex-end; }
+
+    .end-screen {
+      width: 480px;
+      max-width: 92vw;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      padding: 40px 36px;
+      text-align: center;
+      display: none;
+    }
+    .score-circle {
+      width: 100px; height: 100px; border-radius: 50%;
+      border: 5px solid var(--red);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      margin: 0 auto 24px;
+    }
+    .score-number { font-size: 2rem; font-weight: 700; color: var(--red); line-height: 1; }
+    .score-total { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+    .end-message { font-size: 1.05rem; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+    .end-sub { font-size: 0.86rem; color: var(--text-muted); margin-bottom: 28px; }
+    .end-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologie EFZ · a.7</span>
+    <h1>Werkstoffe & Schmierstoffe</h1>
+    <p>Eigenschaften, Einsatz und Anforderungen</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+
+  <div class="quiz-center">
+    <div class="progress-text" id="progressText"></div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+
+    <div class="quiz-card" id="quizCard">
+      <span class="question-badge" id="questionBadge"></span>
+      <div class="question-text" id="questionText"></div>
+      <div class="answers" id="answersContainer"></div>
+      <div class="feedback" id="feedback"></div>
+    </div>
+
+    <div class="next-wrap" id="nextWrap" style="display:none">
+      <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()">Weiter &#8594;</button>
+    </div>
+
+    <div class="end-screen" id="endScreen">
+      <div class="score-circle">
+        <div class="score-number" id="scoreNumber"></div>
+        <div class="score-total" id="scoreTotal"></div>
+      </div>
+      <div class="end-message" id="endMessage"></div>
+      <div class="end-sub" id="endSub"></div>
+      <div class="end-actions">
+        <button class="btn btn-ghost" onclick="location.href='../index.html'">&#8592; Alle Lerntools</button>
+        <button class="btn btn-primary" onclick="restartQuiz()">Nochmals versuchen</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+  const QUESTIONS = [
+    {
+      badge: "Werkstoffe",
+      question: "Welche Eigenschaft muss eine Oberfläche aufweisen, die mit Milch und Reinigungslösung in Kontakt kommt?",
+      answers: [
+        "Möglichst rau, damit das Produkt haftet",
+        "Lebensmitteltauglich, glatt und leicht reinigbar",
+        "Magnetisch und elektrisch leitfähig",
+        "Möglichst weich und kratzbar"
+      ],
+      correct: 1,
+      explanation: "Milchberührte Oberflächen müssen lebensmitteltauglich (keine Veränderung des Produkts), glatt und einfach – möglichst im CIP-Kreislauf – reinigbar sein."
+    },
+    {
+      badge: "Werkstoffe",
+      question: "Welcher Werkstoff hat sich für fast alle milchberührten Anlagen (Tanks, Leitungen, Wärmetauscher) durchgesetzt?",
+      answers: ["Gusseisen", "Kupfer", "Chromnickelstahl", "Anticorodal"],
+      correct: 2,
+      explanation: "Chromnickelstahl (bzw. Chromnickel-Molybdänstahl) ist korrosionsbeständig, lebensmitteltauglich und gut reinigbar – daher Standard für fast alle Anwendungen."
+    },
+    {
+      badge: "Werkstoffe",
+      question: "Was kennzeichnet den Chromnickelstahl «V2A»?",
+      answers: [
+        "Ca. 18 % Chrom und 8 % Nickel",
+        "Ca. 3 % Kohlenstoff",
+        "Eine Aluminium-Magnesium-Legierung",
+        "Reines Kupfer mit Zinkanteil"
+      ],
+      correct: 0,
+      explanation: "V2A = Chromnickelstahl mit ca. 18 % Chrom und 8 % Nickel. Er ist korrosionsbeständig und nicht magnetisch."
+    },
+    {
+      badge: "Werkstoffe",
+      question: "Wodurch unterscheidet sich «V4A» von «V2A»?",
+      answers: [
+        "Durch einen höheren Kohlenstoffgehalt",
+        "Durch zusätzlich ca. 2 % Molybdän",
+        "Durch das Fehlen von Nickel",
+        "Durch einen Zusatz von Kupfer"
+      ],
+      correct: 1,
+      explanation: "V4A enthält zusätzlich ca. 2 % Molybdän und ist dadurch noch korrosionsbeständiger als V2A."
+    },
+    {
+      badge: "Metalle",
+      question: "Welche Eigenschaften hat Gusseisen?",
+      answers: [
+        "Weich und gut schmiedbar",
+        "Hart, spröd und nicht schmiedbar",
+        "Korrosionsbeständig und nicht magnetisch",
+        "Zäh, dehnbar und gut wärmeleitend"
+      ],
+      correct: 1,
+      explanation: "Gusseisen (Eisen-Kohlenstoff-Legierung mit ca. 3 % Kohlenstoff) ist hart, spröd und nicht schmiedbar – z. B. für Motorengehäuse und Riemenscheiben."
+    },
+    {
+      badge: "Metalle",
+      question: "Wofür wird Kupfer in der Milchwirtschaft eingesetzt – und warum?",
+      answers: [
+        "Für Milchleitungen, weil es korrosionsbeständig ist",
+        "Für das Käsereikessi, weil es gut wärmeleitend ist",
+        "Für Milchkannen, weil es sehr leicht ist",
+        "Für Motorengehäuse, weil es hart ist"
+      ],
+      correct: 1,
+      explanation: "Kupfer ist ein guter Wärmeleiter und wird für das Käsereikessi (Hartkäse) verwendet. Für andere Lebensmittel ist es nicht zugelassen – Ausnahmen: Käserei, Brauerei, Destillerie."
+    },
+    {
+      badge: "Metalle",
+      question: "Woraus besteht Anticorodal und wofür wird es typischerweise verwendet?",
+      answers: [
+        "Eisen-Kohlenstoff-Legierung – für Kesselbau",
+        "Aluminium-Magnesium-Silizium-Legierung – für Milchkannen",
+        "Chrom-Nickel-Legierung – für Tanks",
+        "Kupfer-Zink-Legierung – für Rohre"
+      ],
+      correct: 1,
+      explanation: "Anticorodal ist eine Aluminium-Magnesium-Silizium-Legierung. Durch Eloxieren wird sie korrosionsfester und wird für Milchkannen eingesetzt."
+    },
+    {
+      badge: "Begriffe",
+      question: "Was beschreibt der Begriff «Korrosionsbeständigkeit»?",
+      answers: [
+        "Den Widerstand gegen das Eindringen eines anderen festen Körpers",
+        "Den Widerstand gegen Verlängerung durch Zugkräfte",
+        "Den Widerstand gegen Wasser, Säuren, Laugen und Chemikalien",
+        "Die Fähigkeit, Wärme zu leiten"
+      ],
+      correct: 2,
+      explanation: "Korrosionsbeständigkeit = Widerstandsverhalten gegen den Angriff von Wasser, Gasen, Säuren, Laugen und weiteren Chemikalien. (Härte = Widerstand gegen Eindringen, Zugfestigkeit = Widerstand gegen Zugkräfte.)"
+    },
+    {
+      badge: "Schmierstoffe",
+      question: "Was ist eine zentrale Aufgabe eines Schmierstoffs?",
+      answers: [
+        "Er erhöht die Reibung zwischen den Teilen",
+        "Er ersetzt die Festkörperreibung durch die geringere Flüssigkeitsreibung",
+        "Er macht Metalle magnetisch",
+        "Er härtet die Oberflächen"
+      ],
+      correct: 1,
+      explanation: "Ein Schmierfilm trennt die Reibflächen: statt metallischer Festkörperreibung wirkt die viel geringere Flüssigkeitsreibung. Das mindert Verschleiss und Erwärmung und spart Energie."
+    },
+    {
+      badge: "Schmierstoffe",
+      question: "Worauf basieren die meisten Schmierstoffe?",
+      answers: ["Auf Mineralöl (Erdöl)", "Auf Wasser", "Auf Milchfett", "Auf Alkohol"],
+      correct: 0,
+      explanation: "Die meisten Schmierstoffe basieren auf Mineralöl (Erdöl). Für nahezu jeden Verwendungszweck gibt es ein passendes Mineralöl."
+    },
+    {
+      badge: "Schmierstoffe",
+      question: "Wann muss ein lebensmitteltaugliches Schmiermittel eingesetzt werden?",
+      answers: [
+        "Nur bei sehr hohen Temperaturen",
+        "Überall dort, wo Schmiermittel ins Lebensmittel gelangen könnte",
+        "Nur in der Kältetechnik",
+        "Nur bei elektrischen Antrieben"
+      ],
+      correct: 1,
+      explanation: "Gemäss Qualitätsmanagement muss überall dort, wo Schmiermittel ins Lebensmittel gelangen könnte, ein zugelassenes, lebensmitteltaugliches (nicht gesundheitsgefährdendes) Schmiermittel verwendet werden."
+    },
+    {
+      badge: "Kunststoffe",
+      question: "Welches ist ein typischer Nachteil von Kunststoffen?",
+      answers: [
+        "Hohe Härte und Kratzfestigkeit",
+        "Grosse Wärmeausdehnung",
+        "Sehr gute elektrische Leitfähigkeit",
+        "Hohe Dichte"
+      ],
+      correct: 1,
+      explanation: "Kunststoffe haben u. a. eine grosse Wärmeausdehnung, versprödung bei Kälte und geringe Härte. Vorteile sind z. B. geringe Dichte und gute Beständigkeit gegen Säuren und Laugen."
+    },
+  ];
+
+  let currentIndex = 0;
+  let score = 0;
+  let answered = false;
+  let order = [];
+
+  function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function startQuiz() {
+    order = shuffle([...Array(QUESTIONS.length).keys()]);
+    currentIndex = 0;
+    score = 0;
+    document.getElementById("endScreen").style.display = "none";
+    document.getElementById("quizCard").style.display = "block";
+    showQuestion();
+  }
+
+  function showQuestion() {
+    answered = false;
+    const q = QUESTIONS[order[currentIndex]];
+    const total = QUESTIONS.length;
+
+    document.getElementById("progressText").textContent = `Frage ${currentIndex + 1} von ${total}`;
+    document.getElementById("progressBar").style.width = `${((currentIndex + 1) / total) * 100}%`;
+
+    document.getElementById("questionBadge").textContent = q.badge;
+    document.getElementById("questionText").textContent = q.question;
+
+    const letters = ["A", "B", "C", "D"];
+    const container = document.getElementById("answersContainer");
+    container.innerHTML = q.answers.map((a, i) => `
+      <button class="answer-btn" onclick="selectAnswer(${i})" id="ans-${i}">
+        <span class="letter">${letters[i]}</span>
+        <span>${a}</span>
+      </button>
+    `).join("");
+
+    const fb = document.getElementById("feedback");
+    fb.className = "feedback";
+    fb.textContent = "";
+
+    document.getElementById("nextWrap").style.display = "none";
+    const nextBtn = document.getElementById("nextBtn");
+    nextBtn.textContent = currentIndex < QUESTIONS.length - 1 ? "Weiter →" : "Ergebnis anzeigen";
+  }
+
+  function selectAnswer(chosen) {
+    if (answered) return;
+    answered = true;
+
+    const q = QUESTIONS[order[currentIndex]];
+    const correct = q.correct;
+    const isCorrect = chosen === correct;
+    if (isCorrect) score++;
+
+    for (let i = 0; i < q.answers.length; i++) {
+      const btn = document.getElementById(`ans-${i}`);
+      btn.disabled = true;
+      if (i === correct && i === chosen) btn.classList.add("correct");
+      else if (i === chosen && !isCorrect) btn.classList.add("wrong");
+      else if (i === correct) btn.classList.add("reveal");
+    }
+
+    const fb = document.getElementById("feedback");
+    if (isCorrect) {
+      fb.className = "feedback correct";
+      fb.innerHTML = `<span class="feedback-icon">&#10003;</span><strong>Richtig!</strong> ${q.explanation}`;
+    } else {
+      fb.className = "feedback wrong";
+      fb.innerHTML = `<span class="feedback-icon">&#10007;</span><strong>Nicht ganz.</strong> ${q.explanation}`;
+    }
+
+    document.getElementById("nextWrap").style.display = "flex";
+  }
+
+  function nextQuestion() {
+    currentIndex++;
+    if (currentIndex >= QUESTIONS.length) {
+      showEndScreen();
+    } else {
+      showQuestion();
+    }
+  }
+
+  function showEndScreen() {
+    document.getElementById("quizCard").style.display = "none";
+    document.getElementById("nextWrap").style.display = "none";
+    document.getElementById("progressText").textContent = "";
+    document.getElementById("progressBar").style.width = "100%";
+
+    const total = QUESTIONS.length;
+    const pct = Math.round((score / total) * 100);
+
+    document.getElementById("scoreNumber").textContent = score;
+    document.getElementById("scoreTotal").textContent = `von ${total}`;
+
+    let msg, sub;
+    if (pct === 100) {
+      msg = "Ausgezeichnet!";
+      sub = "Alle Fragen richtig. Sie kennen Werkstoffe und Schmierstoffe bestens.";
+    } else if (pct >= 75) {
+      msg = "Sehr gut!";
+      sub = "Fast alle Fragen richtig. Wiederholen Sie die markierten Themen kurz.";
+    } else if (pct >= 50) {
+      msg = "Gut gemacht.";
+      sub = "Mehr als die Hälfte richtig. Schauen Sie die falschen Antworten nochmals an.";
+    } else {
+      msg = "Weiter üben.";
+      sub = "Wiederholen Sie den Stoff zu Werkstoffen und Schmierstoffen und versuchen Sie es nochmals.";
+    }
+
+    document.getElementById("endMessage").textContent = msg;
+    document.getElementById("endSub").textContent = sub;
+    document.getElementById("endScreen").style.display = "block";
+  }
+
+  function restartQuiz() { startQuiz(); }
+
+  startQuiz();
+</script>
+</body>
+</html>

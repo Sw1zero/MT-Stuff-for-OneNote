@@ -37,6 +37,9 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 │   ├── images/
 │   │   └── trommelbestandteile/        ← 11 PNG-Bilder
 │   └── memory-trommelbestandteile.html
+├── a7-technische-einrichtungen/
+│   ├── tabellen-luecken-metalle.html
+│   └── quiz-werkstoffe-schmierstoffe.html
 └── tools/
     └── einheiten-trainer.html
 ```
@@ -55,7 +58,7 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 | `a4`          | a.4   | a.4 – Wärmebehandlung durchführen          | `a4-waermebehandlung/`          | 🔲     |
 | `a5`          | a.5   | a.5 – Homogenisation durchführen           | `a5-homogenisation/`            | 🔲     |
 | `a6`          | a.6   | a.6 – Zutaten beimischen                   | `a6-zutaten/`                   | 🔲     |
-| `a7`          | a.7   | a.7 – Technische Einrichtungen bedienen    | `a7-technische-einrichtungen/`  | 🔲     |
+| `a7`          | a.7   | a.7 – Technische Einrichtungen bedienen    | `a7-technische-einrichtungen/`  | ✅     |
 | `a8`          | a.8   | a.8 – Kulturen herstellen                  | `a8-kulturen/`                  | ✅     |
 | `b1`          | b.1   | b.1 – Hartkäse herstellen                  | `b1-hartkaese/`                 | 🔲     |
 | `b2`          | b.2   | b.2 – Halbhartkäse herstellen              | `b2-halbhartkase/`              | 🔲     |
