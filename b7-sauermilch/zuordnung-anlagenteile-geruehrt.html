@@ -226,17 +226,18 @@
 <script>
 var ANSWERS = [
   'Vorlaufgefäss',
-  'Pulver-/Aromazugabe',
+  'Pulverzusatz',
   'Homogenisator',
   'Plattenwärmetauscher',
   'Heisshalter',
   'Tanks für Betriebskultur',
-  'Gebinde mit Fruchtgrundstoff',
-  'Online-Mischer',
+  'Bebrütungstanks für Joghurt',
+  'Spaltenfilter',
+  'Plattenwärmetauscher (Kühler)',
   'Puffertanks',
-  'Anwärmer',
-  'Abfülllinie',
-  'Brutzelle'
+  'Gebinde mit Fruchtgrundstoff',
+  'Mischer Joghurt - Fruchtgrundstoff',
+  'Abfülllinie'
 ];
 
 // --- Drag state ---
@@ -299,7 +300,7 @@ function buildBank() {
 function buildSlots() {
   var grid = document.getElementById('slotsGrid');
   grid.innerHTML = '';
-  for (var i = 1; i <= 12; i++) {
+  for (var i = 1; i <= ANSWERS.length; i++) {
     (function(num) {
       var row = document.createElement('div');
       row.className = 'slot-row';
@@ -473,8 +474,8 @@ function checkAll() {
   });
 
   var banner = document.getElementById('resultBanner');
-  if (correct === 12) {
-    banner.textContent = 'Perfekt! Alle 12 Anlagenteile richtig zugeordnet.';
+  if (correct === ANSWERS.length) {
+    banner.textContent = 'Perfekt! Alle ' + ANSWERS.length + ' Anlagenteile richtig zugeordnet.';
     banner.className = 'result-banner show perfect';
   } else {
     banner.textContent = correct + ' von ' + filled + ' Feldern korrekt. Rot markierte Felder nochmals überprüfen.';
