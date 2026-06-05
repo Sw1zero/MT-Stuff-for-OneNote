@@ -22,7 +22,8 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 │   ├── lernkaertchen.html
 │   ├── quiz-qualitaetsmaengel.html
 │   ├── sortierer-jogurtherstellung.html
-│   ├── zuordnung-anlagenteile.html
+│   ├── zuordnung-anlagenteile-stichfest.html
+│   ├── zuordnung-anlagenteile-geruehrt.html
 │   ├── lueckentext-saeuregerinnung.html
 │   ├── fachrechner-mischungskreuz.html
 │   ├── wahr-falsch-sauermilch.html
@@ -89,7 +90,7 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 | `quiz`             | Quiz              | `quiz-qualitaetsmaengel.html`           | Multiple-Choice mit Sofortfeedback und Erklärung        |
 | `memory`           | Memory            | `memory-trommelbestandteile.html`       | Paare aufdecken (Bild ↔ Name)                           |
 | `sortierer`        | Sortierer         | `sortierer-jogurtherstellung.html`      | Schritte per Drag & Drop in richtige Reihenfolge bringen |
-| `zuordnung`        | Zuordnung         | `zuordnung-anlagenteile.html`           | Begriffe per Drag & Drop auf Nummern/Positionen ziehen  |
+| `zuordnung`        | Zuordnung         | `zuordnung-anlagenteile-stichfest.html` | Begriffe per Drag & Drop auf Nummern/Positionen ziehen  |
 | `lueckentext`      | Lückentext        | `lueckentext-saeuregerinnung.html`      | Lücken füllen – Einfach (Wortbank) oder Schwer (Tippen) |
 | `fachrechner`      | Fachrechner       | `fachrechner-mischungskreuz.html`       | Fachspezifische Berechnung mit Rechenweg                |
 | `trainer`          | Trainer           | `einheiten-trainer.html`               | Randomisierte Aufgaben, nie gleiche Aufgabe zweimal     |
@@ -133,7 +134,7 @@ Beispiele:
   quiz-qualitaetsmaengel.html
   memory-trommelbestandteile.html
   sortierer-jogurtherstellung.html
-  zuordnung-anlagenteile.html
+  zuordnung-anlagenteile-stichfest.html
   lueckentext-saeuregerinnung.html
   fachrechner-mischungskreuz.html
   wahr-falsch-sauermilch.html

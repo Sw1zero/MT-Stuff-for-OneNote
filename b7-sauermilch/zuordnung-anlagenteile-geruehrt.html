@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anlagenteile zuordnen – Gerührter Joghurt</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .back-link {
+      display: inline-block;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      margin-bottom: 1.5rem;
+      transition: color 0.15s;
+    }
+    .back-link:hover { color: var(--red); }
+
+    .schema-wrap {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .schema-wrap img {
+      width: 100%;
+      display: block;
+      border-radius: var(--radius-sm);
+    }
+
+    .instruction {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    /* Word bank */
+    .word-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      background: var(--blue-light);
+      border-radius: var(--radius-md);
+      padding: 0.9rem 1rem;
+      margin-bottom: 1.5rem;
+      min-height: 56px;
+    }
+
+    .word-chip {
+      font-family: var(--font);
+      font-size: 0.82rem;
+      font-weight: 500;
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 20px;
+      padding: 0.32rem 0.85rem;
+      cursor: grab;
+      color: var(--text);
+      line-height: 1.4;
+      user-select: none;
+      touch-action: none;
+      transition: border-color 0.15s, box-shadow 0.15s, opacity 0.15s;
+    }
+    .word-chip:hover { border-color: var(--blue); }
+    .word-chip.dragging { opacity: 0.3; }
+    .word-chip.used { opacity: 0.2; pointer-events: none; }
+
+    /* Slots */
+    .slots-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.55rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 480px) {
+      .slots-grid { grid-template-columns: 1fr; }
+    }
+
+    .slot-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .slot-num {
+      width: 30px;
+      height: 30px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      background: var(--red);
+      color: #fff;
+      font-size: 0.78rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .slot-box {
+      flex: 1;
+      min-height: 38px;
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.3rem 0.65rem;
+      font-size: 0.82rem;
+      font-family: var(--font);
+      color: var(--text-subtle);
+      display: flex;
+      align-items: center;
+      transition: all 0.15s;
+      background: var(--surface);
+    }
+    .slot-box.over {
+      border-color: var(--blue);
+      border-style: solid;
+      background: #e8f4ff;
+    }
+    .slot-box.filled {
+      border-style: solid;
+      border-color: var(--blue);
+      color: var(--text);
+      font-weight: 500;
+      cursor: grab;
+      touch-action: none;
+      user-select: none;
+    }
+    .slot-box.correct {
+      border-color: #16a34a !important;
+      background: #f0fdf4 !important;
+      color: #15803d !important;
+      cursor: default;
+    }
+    .slot-box.wrong {
+      border-color: var(--red) !important;
+      background: var(--red-light) !important;
+      color: var(--red) !important;
+      cursor: default;
+    }
+
+    /* Touch drag clone */
+    #touchClone {
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.88;
+      transform: scale(1.06);
+      border-radius: 20px;
+      padding: 0.32rem 0.85rem;
+      background: var(--blue);
+      color: #fff;
+      font-family: var(--font);
+      font-size: 0.82rem;
+      font-weight: 500;
+      box-shadow: 0 4px 16px rgba(0,102,204,0.35);
+      white-space: nowrap;
+      display: none;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .result-banner {
+      margin-top: 1.25rem;
+      padding: 0.9rem 1rem;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.92rem;
+      text-align: center;
+      display: none;
+    }
+    .result-banner.show   { display: block; }
+    .result-banner.perfect { background: #f0fdf4; color: #15803d; border: 1.5px solid #bbf7d0; }
+    .result-banner.partial { background: #fff7ed; color: #c2410c; border: 1.5px solid #fed7aa; }
+  </style>
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+  <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologie EFZ · b.7</span>
+  <h1>Anlagenteile zuordnen</h1>
+  <p>Produktionsanlage – Gerührter Joghurt</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+
+  <a class="back-link" href="../index.html">← Alle Lerntools</a>
+
+  <div class="schema-wrap">
+    <img src="images/b.7_Anlage_geruehrt_Nummern.png" alt="Anlagenschema gerührter Joghurt mit nummerierten Anlagenteilen">
+    <p style="font-size:0.72rem;color:var(--text-subtle);margin-top:0.5rem;text-align:right;">
+      &copy; Tetra Pak Handbuch der Milch und Molkereitechnik, Gelsenkirchen (D)
+    </p>
+  </div>
+
+  <p class="instruction">Ziehe die Begriffe auf die richtige Nummer. Bereits platzierten Begriff zurückziehen um ihn zu tauschen.</p>
+
+  <div class="word-bank" id="wordBank"></div>
+  <div class="slots-grid" id="slotsGrid"></div>
+
+  <div class="btn-row">
+    <button type="button" class="btn btn-primary" onclick="checkAll()">Überprüfen</button>
+    <button type="button" class="btn btn-ghost" onclick="resetAll()">Zurücksetzen</button>
+  </div>
+
+  <div class="result-banner" id="resultBanner"></div>
+
+</main>
+
+<div id="touchClone"></div>
+
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologie EFZ · Philipp Neukomm
+</footer>
+
+<script>
+var ANSWERS = [
+  'Vorlaufgefäss',
+  'Pulver-/Aromazugabe',
+  'Homogenisator',
+  'Plattenwärmetauscher',
+  'Heisshalter',
+  'Tanks für Betriebskultur',
+  'Gebinde mit Fruchtgrundstoff',
+  'Online-Mischer',
+  'Puffertanks',
+  'Anwärmer',
+  'Abfülllinie',
+  'Brutzelle'
+];
+
+// --- Drag state ---
+var dragWord   = null;  // the word being dragged
+var dragSource = null;  // DOM element (chip or slot-box) where drag started
+
+// --- Touch state ---
+var touchWord   = null;
+var touchSource = null;
+var touchCloneEl = document.getElementById('touchClone');
+var touchOffX = 0, touchOffY = 0;
+
+function shuffle(arr) {
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+
+function init() {
+  buildBank();
+  buildSlots();
+  dragWord = dragSource = null;
+  touchWord = touchSource = null;
+  document.getElementById('resultBanner').className = 'result-banner';
+}
+
+// ---- Build word bank ----
+function buildBank() {
+  var bank = document.getElementById('wordBank');
+  bank.innerHTML = '';
+  shuffle(ANSWERS).forEach(function(word) {
+    var chip = document.createElement('span');
+    chip.className = 'word-chip';
+    chip.textContent = word;
+    chip.dataset.word = word;
+    chip.setAttribute('draggable', 'true');
+
+    // Mouse drag
+    chip.addEventListener('dragstart', function(e) {
+      dragWord   = word;
+      dragSource = chip;
+      chip.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    chip.addEventListener('dragend', function() {
+      chip.classList.remove('dragging');
+    });
+
+    // Touch drag
+    chip.addEventListener('touchstart', function(e) { onTouchStart(e, chip, word, false); }, {passive: false});
+
+    bank.appendChild(chip);
+  });
+}
+
+// ---- Build slots ----
+function buildSlots() {
+  var grid = document.getElementById('slotsGrid');
+  grid.innerHTML = '';
+  for (var i = 1; i <= 12; i++) {
+    (function(num) {
+      var row = document.createElement('div');
+      row.className = 'slot-row';
+
+      var badge = document.createElement('div');
+      badge.className = 'slot-num';
+      badge.textContent = num;
+
+      var box = document.createElement('div');
+      box.className = 'slot-box';
+      box.dataset.slot = num;
+      box.textContent = '—';
+
+      // Desktop drop target
+      box.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        if (!box.classList.contains('correct') && !box.classList.contains('wrong')) {
+          box.classList.add('over');
+        }
+      });
+      box.addEventListener('dragleave', function() {
+        box.classList.remove('over');
+      });
+      box.addEventListener('drop', function(e) {
+        e.preventDefault();
+        box.classList.remove('over');
+        dropOnSlot(box);
+      });
+
+      // Drag FROM filled slot
+      box.addEventListener('dragstart', function(e) {
+        if (!box.dataset.filled) { e.preventDefault(); return; }
+        dragWord   = box.dataset.filled;
+        dragSource = box;
+        box.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+      box.addEventListener('dragend', function() {
+        box.classList.remove('dragging');
+      });
+
+      // Touch drag from filled slot
+      box.addEventListener('touchstart', function(e) {
+        if (!box.dataset.filled) return;
+        onTouchStart(e, box, box.dataset.filled, true);
+      }, {passive: false});
+
+      row.appendChild(badge);
+      row.appendChild(box);
+      grid.appendChild(row);
+    })(i);
+  }
+}
+
+// ---- Drop logic ----
+function dropOnSlot(targetBox) {
+  if (!dragWord) return;
+  if (targetBox.classList.contains('correct') || targetBox.classList.contains('wrong')) return;
+
+  var displaced = targetBox.dataset.filled || null;
+
+  // Clear source
+  if (dragSource && dragSource.classList.contains('slot-box')) {
+    // Dragging from another slot
+    clearSlot(dragSource);
+    if (displaced) {
+      // Swap: put displaced word in source slot
+      fillSlot(dragSource, displaced);
+    }
+  } else if (dragSource) {
+    // Dragging from word bank chip
+    markChipUsed(dragWord);
+    if (displaced) returnWordToBank(displaced);
+  }
+
+  fillSlot(targetBox, dragWord);
+  dragWord = dragSource = null;
+}
+
+function fillSlot(box, word) {
+  box.dataset.filled = word;
+  box.textContent = word;
+  box.className = 'slot-box filled';
+  box.setAttribute('draggable', 'true');
+}
+
+function clearSlot(box) {
+  delete box.dataset.filled;
+  box.textContent = '—';
+  box.className = 'slot-box';
+  box.setAttribute('draggable', 'false');
+}
+
+function markChipUsed(word) {
+  document.querySelectorAll('.word-chip').forEach(function(c) {
+    if (c.dataset.word === word) c.classList.add('used');
+  });
+}
+
+function returnWordToBank(word) {
+  document.querySelectorAll('.word-chip').forEach(function(c) {
+    if (c.dataset.word === word) c.classList.remove('used');
+  });
+}
+
+// ---- Touch drag ----
+function onTouchStart(e, el, word, isSlot) {
+  if (e.touches.length !== 1) return;
+  e.preventDefault();
+  var touch = e.touches[0];
+  var rect = el.getBoundingClientRect();
+
+  touchWord   = word;
+  touchSource = {el: el, isSlot: isSlot};
+  touchOffX   = touch.clientX - rect.left;
+  touchOffY   = touch.clientY - rect.top;
+
+  touchCloneEl.textContent = word;
+  touchCloneEl.style.left  = (touch.clientX - touchOffX) + 'px';
+  touchCloneEl.style.top   = (touch.clientY - touchOffY) + 'px';
+  touchCloneEl.style.display = 'block';
+  el.style.opacity = '0.25';
+}
+
+document.addEventListener('touchmove', function(e) {
+  if (!touchWord) return;
+  e.preventDefault();
+  var touch = e.touches[0];
+  touchCloneEl.style.left = (touch.clientX - touchOffX) + 'px';
+  touchCloneEl.style.top  = (touch.clientY - touchOffY) + 'px';
+}, {passive: false});
+
+document.addEventListener('touchend', function(e) {
+  if (!touchWord) return;
+  var touch = e.changedTouches[0];
+
+  touchCloneEl.style.display = 'none';
+  touchSource.el.style.opacity = '';
+
+  // Find drop target
+  var underEl = document.elementFromPoint(touch.clientX, touch.clientY);
+  var targetBox = underEl ? underEl.closest('.slot-box') : null;
+
+  if (targetBox && !targetBox.classList.contains('correct') && !targetBox.classList.contains('wrong')) {
+    var displaced = targetBox.dataset.filled || null;
+
+    if (touchSource.isSlot) {
+      clearSlot(touchSource.el);
+      if (displaced) fillSlot(touchSource.el, displaced);
+    } else {
+      markChipUsed(touchWord);
+      if (displaced) returnWordToBank(displaced);
+    }
+    fillSlot(targetBox, touchWord);
+  }
+
+  touchWord = touchSource = null;
+});
+
+// ---- Check & Reset ----
+function checkAll() {
+  var correct = 0, filled = 0;
+  document.querySelectorAll('.slot-box').forEach(function(box) {
+    var val = box.dataset.filled;
+    if (!val) return;
+    filled++;
+    var idx = parseInt(box.dataset.slot) - 1;
+    box.classList.remove('filled');
+    if (val === ANSWERS[idx]) { box.classList.add('correct'); correct++; }
+    else                       { box.classList.add('wrong'); }
+  });
+
+  var banner = document.getElementById('resultBanner');
+  if (correct === 12) {
+    banner.textContent = 'Perfekt! Alle 12 Anlagenteile richtig zugeordnet.';
+    banner.className = 'result-banner show perfect';
+  } else {
+    banner.textContent = correct + ' von ' + filled + ' Feldern korrekt. Rot markierte Felder nochmals überprüfen.';
+    banner.className = 'result-banner show partial';
+  }
+}
+
+function resetAll() { init(); }
+
+init();
+</script>
+</body>
+</html>
