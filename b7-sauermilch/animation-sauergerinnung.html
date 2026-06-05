@@ -6,20 +6,14 @@
   <title>Animation – Säuregerinnung</title>
   <link rel="stylesheet" href="../style.css">
   <style>
-    body { display:flex; flex-direction:column; align-items:center; padding:28px 16px 56px; }
-
     .back-link {
-      font-size:.78rem; color:var(--text-subtle); text-decoration:none;
       display:inline-flex; align-items:center; gap:4px;
-      margin-bottom:20px; align-self:flex-start;
+      font-size:.82rem; color:var(--text-muted); text-decoration:none;
+      margin-bottom:18px;
     }
     .back-link:hover { color:var(--red); }
 
-    .page-header { text-align:center; margin-bottom:20px; }
-    .page-header h1 { font-size:1.1rem; font-weight:600; color:var(--text-muted); margin-bottom:4px; }
-    .page-header p  { font-size:.82rem; color:var(--text-subtle); }
-
-    .anim-wrap { width:580px; max-width:98vw; display:flex; flex-direction:column; gap:16px; }
+    .anim-wrap { width:600px; max-width:100%; margin:0 auto; display:flex; flex-direction:column; gap:16px; }
 
     .step-dots { display:flex; justify-content:center; gap:12px; margin-bottom:4px; }
     .step-dot  { width:11px; height:11px; border-radius:50%; background:var(--border); cursor:pointer; transition:background .2s,transform .15s; }
@@ -29,179 +23,150 @@
     .anim-card { background:#f0f7ff; border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); overflow:hidden; }
     .anim-card svg { display:block; width:100%; height:auto; }
 
-    .step-info { background:var(--surface); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); padding:20px 24px; min-height:90px; }
+    .step-info { background:var(--surface); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); padding:20px 24px; min-height:96px; }
     .step-title { font-size:.78rem; font-weight:700; color:var(--blue-dark); text-transform:uppercase; letter-spacing:.07em; margin-bottom:8px; }
     .step-text  { font-size:.9rem; color:var(--text); line-height:1.65; }
 
-    .nav-row { display:flex; justify-content:center; gap:12px; }
-    .keyboard-hint { margin-top:10px; }
+    .nav-row { display:flex; justify-content:center; gap:12px; flex-wrap:wrap; }
+    .keyboard-hint { margin-top:6px; text-align:center; }
   </style>
 </head>
 <body>
 
-<a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologie EFZ · b.7</span>
+    <h1>Säuregerinnung des Kaseins</h1>
+    <p>Wie Säure das Kasein ausfällt – Schritt für Schritt</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
 
-<div class="page-header">
-  <h1>b.7 – Säuregerinnung</h1>
-  <p>Klick «Weiter» um die einzelnen Schritte durchzugehen</p>
-</div>
+<main class="page-main">
 
-<div class="anim-wrap">
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
 
-  <div class="step-dots" id="stepDots"></div>
+  <div class="anim-wrap">
 
-  <div class="anim-card">
-    <!-- viewBox: 0-435 animation | 436-545 rechte Indikatoren -->
-    <svg id="animSvg" viewBox="0 0 545 310" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <pattern id="dotPat" width="20" height="20" patternUnits="userSpaceOnUse">
-          <circle cx="10" cy="10" r="1.2" fill="#bfdbfe" opacity="0.5"/>
-        </pattern>
-        <!-- Gradient pH-Balken -->
-        <linearGradient id="phGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stop-color="#16a34a"/>
-          <stop offset="55%"  stop-color="#f59e0b"/>
-          <stop offset="100%" stop-color="#dc2626"/>
-        </linearGradient>
-      </defs>
+    <div class="step-dots" id="stepDots"></div>
 
-      <!-- Hintergrund Animation-Bereich -->
-      <rect width="435" height="310" fill="url(#dotPat)"/>
-      <rect width="435" height="310" fill="#e0f2fe" opacity="0.25"/>
+    <div class="anim-card">
+      <!-- viewBox: 0–435 Animation | 436–545 rechte Indikatoren -->
+      <svg id="animSvg" viewBox="0 0 545 310" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="dotPat" width="20" height="20" patternUnits="userSpaceOnUse">
+            <circle cx="10" cy="10" r="1.2" fill="#bfdbfe" opacity="0.5"/>
+          </pattern>
+          <linearGradient id="phGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"   stop-color="#16a34a"/>
+            <stop offset="55%"  stop-color="#f59e0b"/>
+            <stop offset="100%" stop-color="#dc2626"/>
+          </linearGradient>
+        </defs>
 
-      <!-- ============================================================
-           RECHTE INDIKATOREN  (x 438–545)
-           ============================================================ -->
+        <!-- Hintergrund Animationsbereich -->
+        <rect width="435" height="310" fill="url(#dotPat)"/>
+        <rect width="435" height="310" fill="#e0f2fe" opacity="0.25"/>
 
-      <!-- MZ / MS Balken -->
-      <text x="448" y="17" font-family="system-ui,sans-serif" font-size="9" fill="#0369a1"  font-weight="700" text-anchor="middle">MZ</text>
-      <text x="448" y="300" font-family="system-ui,sans-serif" font-size="9" fill="#ea580c" font-weight="700" text-anchor="middle">MS</text>
-      <!-- Hintergrund-Rahmen -->
-      <rect x="440" y="25" width="16" height="260" rx="4" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1"/>
-      <!-- Milchzucker-Teil (blau, von oben) -->
-      <rect id="mzBar" x="440" y="25" width="16" height="260" rx="4" fill="#93c5fd"/>
-      <!-- Milchsäure-Teil (orange, von unten) -->
-      <rect id="msBar" x="440" y="285" width="16" height="0"   rx="4" fill="#fb923c"/>
-      <!-- Trennlinie -->
-      <line id="mzMsDivider" x1="438" y1="285" x2="458" y2="285" stroke="#1e293b" stroke-width="1.5"/>
+        <!-- ============================================================
+             RECHTE INDIKATOREN  (x 438–545)
+             ============================================================ -->
 
-      <!-- pH-Balken -->
-      <text x="470" y="17" font-family="system-ui,sans-serif" font-size="9" fill="#374151" font-weight="700" text-anchor="middle">pH</text>
-      <rect x="461" y="25" width="18" height="260" rx="9" fill="url(#phGrad)" opacity="0.9"/>
-      <!-- Skalenticks -->
-      <line x1="479" y1="25"  x2="484" y2="25"  stroke="#64748b" stroke-width="1.2"/>
-      <text x="486" y="29"   font-family="system-ui,sans-serif" font-size="10" fill="#64748b">7</text>
-      <line x1="479" y1="112" x2="484" y2="112" stroke="#64748b" stroke-width="1.2"/>
-      <text x="486" y="116"  font-family="system-ui,sans-serif" font-size="10" fill="#64748b">6</text>
-      <line x1="479" y1="198" x2="484" y2="198" stroke="#64748b" stroke-width="1.2"/>
-      <text x="486" y="202"  font-family="system-ui,sans-serif" font-size="10" fill="#64748b">5</text>
-      <line x1="479" y1="285" x2="484" y2="285" stroke="#64748b" stroke-width="1.2"/>
-      <text x="486" y="289"  font-family="system-ui,sans-serif" font-size="10" fill="#64748b">4</text>
-      <!-- pH-Marker: zeigt nach RECHTS (Spitze bei x=480) -->
-      <polygon id="phMarker" points="480,0 473,-4 473,4" fill="#1e293b"/>
-      <text id="phValue" x="505" y="4" font-family="system-ui,sans-serif" font-size="11" font-weight="700" fill="#1e293b" text-anchor="middle"></text>
+        <!-- MZ / MS Balken -->
+        <text x="448" y="17" font-family="system-ui,sans-serif" font-size="9" fill="#0369a1"  font-weight="700" text-anchor="middle">MZ</text>
+        <text x="448" y="300" font-family="system-ui,sans-serif" font-size="9" fill="#ea580c" font-weight="700" text-anchor="middle">MS</text>
+        <rect x="440" y="25" width="16" height="260" rx="4" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1"/>
+        <rect id="mzBar" x="440" y="25" width="16" height="260" rx="4" fill="#93c5fd"/>
+        <rect id="msBar" x="440" y="285" width="16" height="0"   rx="4" fill="#fb923c"/>
+        <line id="mzMsDivider" x1="438" y1="285" x2="458" y2="285" stroke="#1e293b" stroke-width="1.5"/>
 
-      <!-- ============================================================
-           ANIMATION-INHALT
-           ============================================================ -->
+        <!-- pH-Balken -->
+        <text x="470" y="17" font-family="system-ui,sans-serif" font-size="9" fill="#374151" font-weight="700" text-anchor="middle">pH</text>
+        <rect x="461" y="25" width="18" height="260" rx="9" fill="url(#phGrad)" opacity="0.9"/>
+        <line x1="479" y1="25"  x2="484" y2="25"  stroke="#64748b" stroke-width="1.2"/>
+        <text x="486" y="29"   font-family="system-ui,sans-serif" font-size="10" fill="#64748b">7</text>
+        <line x1="479" y1="112" x2="484" y2="112" stroke="#64748b" stroke-width="1.2"/>
+        <text x="486" y="116"  font-family="system-ui,sans-serif" font-size="10" fill="#64748b">6</text>
+        <line x1="479" y1="198" x2="484" y2="198" stroke="#64748b" stroke-width="1.2"/>
+        <text x="486" y="202"  font-family="system-ui,sans-serif" font-size="10" fill="#64748b">5</text>
+        <line x1="479" y1="285" x2="484" y2="285" stroke="#64748b" stroke-width="1.2"/>
+        <text x="486" y="289"  font-family="system-ui,sans-serif" font-size="10" fill="#64748b">4</text>
+        <polygon id="phMarker" points="480,0 473,-4 473,4" fill="#1e293b"/>
+        <text id="phValue" x="505" y="4" font-family="system-ui,sans-serif" font-size="11" font-weight="700" fill="#1e293b" text-anchor="middle"></text>
 
-      <!-- Ion-Verbindungen Schritt 3 (Aggregation) -->
-      <g id="ionBonds" opacity="0" style="transition:opacity .4s ease"></g>
+        <!-- ============================================================
+             ANIMATIONS-INHALT
+             ============================================================ -->
 
-      <!-- Cube-Kanten Schritt 4 -->
-      <g id="netLines" opacity="0" style="transition:opacity .5s ease"></g>
+        <!-- Ion-Verbindungen Schritt 3 (Aggregation) -->
+        <g id="ionBonds" opacity="0" style="transition:opacity .4s ease"></g>
 
-      <!-- H⁺ Ionen Schritt 2 – roter Kreis wie Ladungssymbole -->
-      <g id="hplusIons" opacity="0" style="transition:opacity .5s ease">
-        <g transform="translate(55,105)">  <circle r="9" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/><text text-anchor="middle" dominant-baseline="middle" font-size="8" font-weight="700" fill="#2563eb" font-family="system-ui">H⁺</text></g>
-        <g transform="translate(190,35)">  <circle r="9" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/><text text-anchor="middle" dominant-baseline="middle" font-size="8" font-weight="700" fill="#2563eb" font-family="system-ui">H⁺</text></g>
-        <g transform="translate(305,42)">  <circle r="9" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/><text text-anchor="middle" dominant-baseline="middle" font-size="8" font-weight="700" fill="#2563eb" font-family="system-ui">H⁺</text></g>
-        <g transform="translate(408,100)"> <circle r="9" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/><text text-anchor="middle" dominant-baseline="middle" font-size="8" font-weight="700" fill="#2563eb" font-family="system-ui">H⁺</text></g>
-        <g transform="translate(415,228)"> <circle r="9" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/><text text-anchor="middle" dominant-baseline="middle" font-size="8" font-weight="700" fill="#2563eb" font-family="system-ui">H⁺</text></g>
-        <g transform="translate(28,270)">  <circle r="9" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/><text text-anchor="middle" dominant-baseline="middle" font-size="8" font-weight="700" fill="#2563eb" font-family="system-ui">H⁺</text></g>
-        <g transform="translate(215,260)"> <circle r="9" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/><text text-anchor="middle" dominant-baseline="middle" font-size="8" font-weight="700" fill="#2563eb" font-family="system-ui">H⁺</text></g>
-      </g>
+        <!-- Würfel-Kanten Schritt 4 -->
+        <g id="netLines" opacity="0" style="transition:opacity .5s ease"></g>
 
-      <!-- Milchsäurebakterien Schritt 2–3 -->
-      <g id="bacteria" opacity="0" style="transition:opacity .5s ease">
-        <g transform="translate(168,133) rotate(30)">
-          <ellipse rx="14" ry="6" fill="#064e3b" opacity=".85"/>
-          <text x="0" y="1" text-anchor="middle" dominant-baseline="middle" font-size="6" fill="white" font-family="system-ui">MSB</text>
-        </g>
-        <g transform="translate(295,143) rotate(-18)">
-          <ellipse rx="14" ry="6" fill="#064e3b" opacity=".85"/>
-          <text x="0" y="1" text-anchor="middle" dominant-baseline="middle" font-size="6" fill="white" font-family="system-ui">MSB</text>
-        </g>
-        <g transform="translate(88,148) rotate(12)">
-          <ellipse rx="14" ry="6" fill="#064e3b" opacity=".85"/>
-          <text x="0" y="1" text-anchor="middle" dominant-baseline="middle" font-size="6" fill="white" font-family="system-ui">MSB</text>
-        </g>
-        <g transform="translate(395,152) rotate(-35)">
-          <ellipse rx="14" ry="6" fill="#064e3b" opacity=".85"/>
-          <text x="0" y="1" text-anchor="middle" dominant-baseline="middle" font-size="6" fill="white" font-family="system-ui">MSB</text>
-        </g>
-      </g>
+        <!-- H⁺ Ionen Schritt 2 -->
+        <g id="hplusIons" opacity="0" style="transition:opacity .5s ease"></g>
 
-      <!-- Kasein-Partikel (per JS generiert) -->
-      <g id="particleLayer"></g>
-    </svg>
+        <!-- Milchsäurebakterien Schritt 2–3 -->
+        <g id="bacteria" opacity="0" style="transition:opacity .5s ease"></g>
+
+        <!-- Kasein-Partikel (per JS erzeugt) -->
+        <g id="particleLayer"></g>
+      </svg>
+    </div>
+
+    <div class="step-info">
+      <div class="step-title" id="stepTitle"></div>
+      <div class="step-text"  id="stepText"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-ghost"   id="prevBtn" onclick="prevStep()">&#8592; Zurück</button>
+      <button class="btn btn-primary" id="playBtn" onclick="toggleAutoplay()">&#9654; Abspielen</button>
+      <button class="btn btn-ghost"   id="nextBtn" onclick="nextStep()">Weiter &#8594;</button>
+    </div>
+    <p class="keyboard-hint"><kbd>&#8592;</kbd> <kbd>&#8594;</kbd> navigieren · <kbd>Leertaste</kbd> abspielen</p>
+
   </div>
 
-  <div class="step-info">
-    <div class="step-title" id="stepTitle"></div>
-    <div class="step-text"  id="stepText"></div>
-  </div>
-
-  <div class="nav-row">
-    <button class="btn btn-ghost"   id="prevBtn" onclick="prevStep()">&#8592; Zurück</button>
-    <button class="btn btn-primary" id="nextBtn" onclick="nextStep()">Weiter &#8594;</button>
-  </div>
-  <p class="keyboard-hint"><kbd>&#8592;</kbd> <kbd>&#8594;</kbd> navigieren</p>
-
-</div>
+</main>
 
 <script>
 /* ================================================================
    DATEN – 4 Schritte, 8 Partikel
    ================================================================ */
-
-// Positionen [step][partikel] = {x,y} im SVG-Koordinatensystem (0-435)
+// Positionen [step][partikel] = {x,y} im SVG-Koordinatensystem (0–435)
 var POS = [
   // Schritt 1: frei schwebend
   [ {x:75,y:65},{x:215,y:50},{x:365,y:68},
     {x:50,y:183},{x:195,y:195},{x:355,y:178},
     {x:110,y:278},{x:262,y:272} ],
-
   // Schritt 2: gleich (H⁺ erscheinen, Bakterien aktiv)
   [ {x:75,y:65},{x:215,y:50},{x:365,y:68},
     {x:50,y:183},{x:195,y:195},{x:355,y:178},
     {x:110,y:278},{x:262,y:272} ],
-
-  // Schritt 3: Aggregation – zwei Cluster, Partikel ~100px Abstand
+  // Schritt 3: Aggregation – zwei Cluster
   [ {x:72,y:60},{x:178,y:58},{x:175,y:162},{x:68,y:162},
     {x:252,y:60},{x:358,y:58},{x:355,y:162},{x:248,y:162} ],
-
   // Schritt 4: 3D-Würfel (8 Ecken)
-  // Vorderseite: p0 TL, p1 TR, p2 BR, p3 BL
-  // Rückseite (+70, -45): p4 TL, p5 TR, p6 BR, p7 BL
   [ {x:100,y:98},{x:250,y:98},{x:250,y:235},{x:100,y:235},
     {x:170,y:53},{x:320,y:53},{x:320,y:190},{x:170,y:190} ],
 ];
 
-// Würfel-Kanten (Schritt 4)
 var CUBE_PAIRS = [
   [0,1],[1,2],[2,3],[3,0],   // Vorderseite
   [4,5],[5,6],[6,7],[7,4],   // Rückseite
   [0,4],[1,5],[2,6],[3,7],   // Tiefenkanten
 ];
-
-// Ion-Verbindungspaare (Schritt 3)
 var ION_PAIRS = [
   [0,1],[1,2],[2,3],[3,0],   // Cluster 1
   [4,5],[5,6],[6,7],[7,4],   // Cluster 2
 ];
 
-// MZ-Fraktion (Milchzucker) pro Schritt (0=vollständig abgebaut)
+// MZ-Fraktion (Milchzucker) pro Schritt (0 = vollständig abgebaut)
 var MZ_FRAC = [1.0, 0.65, 0.25, 0.05];
 
 var STEPS = [
@@ -209,28 +174,28 @@ var STEPS = [
     ph: 6.7,
     title: 'Schritt 1 – Ausgangslage (pH 6.7)',
     text:  'Kasein ist das Haupteiweiss der Milch. Bei normalem pH (~6.7) ist Kasein überwiegend negativ geladen (zu sehen an den roten −). Aufgrund der negativen Ladungen verteilt sich das Kasein gleichmässig in der Milch. Die Milch bleibt flüssig.',
-    chargeOpacity: 1.0,
+    chargeOpacity: 1.0, wobble: 5.0,
     showBact: false, showHplus: false, showIonBonds: false, showCube: false,
   },
   {
     ph: 6.0,
     title: 'Schritt 2 – Milchsäurebakterien sind aktiv',
     text:  'Milchsäurebakterien (MSB) vergären Laktose. Als Abbauprodukt entsteht Milchsäure – der pH-Wert sinkt. Die dabei entstehenden H⁺-Ionen (rot) neutralisieren die negativen Ladungen auf den Kaseinmizellen. Dadurch stossen sich die Kaseinmizellen weniger ab.',
-    chargeOpacity: 0.5,
+    chargeOpacity: 0.5, wobble: 4.0,
     showBact: true, showHplus: true, showIonBonds: false, showCube: false,
   },
   {
     ph: 4.6,
     title: 'Schritt 3 – Anziehung',
     text:  'Die Kaseine ziehen sich gegenseitig immer näher an. Die + und − Verbindungen zwischen den Kaseinmizellen zeigen, wie sie sich zusammenheften. Die Molkenproteine bleiben dabei weiterhin in der Milch vorhanden.',
-    chargeOpacity: 0.0,
+    chargeOpacity: 0.0, wobble: 2.5,
     showBact: false, showHplus: false, showIonBonds: true, showCube: false,
   },
   {
     ph: 4.5,
     title: 'Schritt 4 – Gallerte entsteht (pH 4.5 = 36–38 °SH)',
     text:  'Es bildet sich ein dreidimensionales Gerüst über die positiven und negativen Ladungen an den Kaseinen. Molkenproteine, Wasser und Fett bleiben innerhalb des Gerüstes gefangen. Bei einem pH von 4.5 (= 36–38 °SH) beginnen Sie mit dem Kühlen des Joghurts.',
-    chargeOpacity: 0.0,
+    chargeOpacity: 0.0, wobble: 1.8,
     showBact: false, showHplus: false, showIonBonds: false, showCube: true,
   },
 ];
@@ -244,15 +209,56 @@ function svgEl(tag, attrs) {
   Object.keys(attrs).forEach(function(k) { e.setAttribute(k, attrs[k]); });
   return e;
 }
+function chargeCircle(parent, fill, stroke, txt, txtColor, fontSize) {
+  parent.appendChild(svgEl('circle', {r:'9', fill:fill, stroke:stroke, 'stroke-width':'1.5'}));
+  var t = document.createElementNS(NS,'text');
+  t.setAttribute('text-anchor','middle'); t.setAttribute('dominant-baseline','middle');
+  t.setAttribute('font-size', fontSize||'11'); t.setAttribute('font-weight','900');
+  t.setAttribute('fill', txtColor); t.setAttribute('font-family','system-ui,sans-serif');
+  t.textContent = txt;
+  parent.appendChild(t);
+}
 
 var CHARGE_OFFSETS = [
   {dx:-26,dy:0},{dx:26,dy:0},{dx:0,dy:-26},{dx:0,dy:26},
   {dx:-19,dy:-19},{dx:19,dy:-19},{dx:-19,dy:19},{dx:19,dy:19},
 ];
 
-var layer = document.getElementById('particleLayer');
+/* ---- H⁺ Ionen (Schritt 2) ---- */
+var HPLUS_POS = [
+  {x:55,y:105},{x:190,y:35},{x:305,y:42},{x:408,y:100},{x:415,y:228},{x:28,y:270},{x:215,y:260}
+];
+var hplusLayer = document.getElementById('hplusIons');
+var hplusEls = [];
+HPLUS_POS.forEach(function(p) {
+  var g = svgEl('g', {transform:'translate('+p.x+','+p.y+')'});
+  chargeCircle(g, '#dbeafe', '#2563eb', 'H⁺', '#2563eb', '8');
+  hplusLayer.appendChild(g);
+  hplusEls.push({ el:g, x:p.x, y:p.y, ph:Math.random()*Math.PI*2 });
+});
 
-// 8 Kasein-Partikel
+/* ---- Milchsäurebakterien (Schritt 2–3) ---- */
+var BACT = [
+  {x:168,y:133,rot:30},{x:295,y:143,rot:-18},{x:88,y:148,rot:12},{x:395,y:152,rot:-35}
+];
+var bactLayer = document.getElementById('bacteria');
+var bactEls = [];
+BACT.forEach(function(b) {
+  var g = svgEl('g', {transform:'translate('+b.x+','+b.y+') rotate('+b.rot+')'});
+  g.appendChild(svgEl('ellipse', {rx:'14', ry:'6', fill:'#064e3b', opacity:'.85'}));
+  var t = document.createElementNS(NS,'text');
+  t.setAttribute('x','0'); t.setAttribute('y','1');
+  t.setAttribute('text-anchor','middle'); t.setAttribute('dominant-baseline','middle');
+  t.setAttribute('font-size','6'); t.setAttribute('fill','white'); t.setAttribute('font-family','system-ui');
+  t.textContent = 'MSB';
+  g.appendChild(t);
+  bactLayer.appendChild(g);
+  bactEls.push({ el:g, x:b.x, y:b.y, rot:b.rot, ph:Math.random()*Math.PI*2 });
+});
+
+/* ---- 8 Kasein-Partikel ---- */
+var layer = document.getElementById('particleLayer');
+var pEl = [];
 for (var pi = 0; pi < 8; pi++) {
   var g = svgEl('g', {id:'p'+pi});
   g.appendChild(svgEl('circle', {r:'19', fill:'#e2e8f0', stroke:'#94a3b8', 'stroke-width':'2'}));
@@ -266,27 +272,19 @@ for (var pi = 0; pi < 8; pi++) {
 
   for (var ci = 0; ci < CHARGE_OFFSETS.length; ci++) {
     var off = CHARGE_OFFSETS[ci];
-    // Ladungskreis: roter Kreis mit − innen (50% von Kasein-Radius 19 → r=9)
     var cg = svgEl('g', {
-      id:'c'+pi+'_'+ci,
+      'class':'neg-charge',
       transform:'translate('+off.dx+','+off.dy+')',
       style:'transition:opacity .55s ease',
     });
-    cg.appendChild(svgEl('circle', {
-      r:'9', fill:'#fee2e2', stroke:'#dc2626', 'stroke-width':'1.5',
-    }));
-    var ct = document.createElementNS(NS,'text');
-    ct.setAttribute('text-anchor','middle'); ct.setAttribute('dominant-baseline','middle');
-    ct.setAttribute('font-size','11'); ct.setAttribute('font-weight','900');
-    ct.setAttribute('fill','#dc2626'); ct.setAttribute('font-family','system-ui,sans-serif');
-    ct.textContent = '−';
-    cg.appendChild(ct);
+    chargeCircle(cg, '#fee2e2', '#dc2626', '−', '#dc2626', '11');
     g.appendChild(cg);
   }
   layer.appendChild(g);
+  pEl.push(g);
 }
 
-// Würfel-Kanten vorbereiten
+/* ---- Würfel-Kanten (Schritt 4) ---- */
 var netLayer = document.getElementById('netLines');
 CUBE_PAIRS.forEach(function(pair, idx) {
   netLayer.appendChild(svgEl('line', {
@@ -294,91 +292,56 @@ CUBE_PAIRS.forEach(function(pair, idx) {
     'stroke-dasharray':'6,3', 'stroke-linecap':'round',
   }));
 });
+function updateCubePositions(pos) {
+  CUBE_PAIRS.forEach(function(pair, idx) {
+    var a = pos[pair[0]], b = pos[pair[1]];
+    var line = document.getElementById('nl'+idx);
+    line.setAttribute('x1',a.x); line.setAttribute('y1',a.y);
+    line.setAttribute('x2',b.x); line.setAttribute('y2',b.y);
+  });
+}
 
-// Ion-Verbindungen vorbereiten (Schritt 3)
+/* ---- Ion-Verbindungen (Schritt 3) ---- */
 var ionLayer = document.getElementById('ionBonds');
 ION_PAIRS.forEach(function(pair, idx) {
   ionLayer.appendChild(svgEl('line', {
-    id:'ib_l'+idx, stroke:'#94a3b8', 'stroke-width':'1.8',
-    'stroke-dasharray':'4,2',
+    id:'ib_l'+idx, stroke:'#94a3b8', 'stroke-width':'1.8', 'stroke-dasharray':'4,2',
   }));
-
-  // Blauer Kreis "+" (Partikel-A-Seite)
   var gp = svgEl('g', {id:'ib_p'+idx});
-  gp.appendChild(svgEl('circle', {r:'9', fill:'#dbeafe', stroke:'#2563eb', 'stroke-width':'1.5'}));
-  var tp = document.createElementNS(NS,'text');
-  tp.setAttribute('text-anchor','middle'); tp.setAttribute('dominant-baseline','middle');
-  tp.setAttribute('font-size','11'); tp.setAttribute('font-weight','900');
-  tp.setAttribute('fill','#2563eb'); tp.setAttribute('font-family','system-ui,sans-serif');
-  tp.textContent = '+';
-  gp.appendChild(tp);
+  chargeCircle(gp, '#dbeafe', '#2563eb', '+', '#2563eb', '11');
   ionLayer.appendChild(gp);
-
-  // Roter Kreis "−" (Partikel-B-Seite)
   var gm = svgEl('g', {id:'ib_m'+idx});
-  gm.appendChild(svgEl('circle', {r:'9', fill:'#fee2e2', stroke:'#dc2626', 'stroke-width':'1.5'}));
-  var tm = document.createElementNS(NS,'text');
-  tm.setAttribute('text-anchor','middle'); tm.setAttribute('dominant-baseline','middle');
-  tm.setAttribute('font-size','11'); tm.setAttribute('font-weight','900');
-  tm.setAttribute('fill','#dc2626'); tm.setAttribute('font-family','system-ui,sans-serif');
-  tm.textContent = '−';
-  gm.appendChild(tm);
+  chargeCircle(gm, '#fee2e2', '#dc2626', '−', '#dc2626', '11');
   ionLayer.appendChild(gm);
 });
-
-function updateIonBondPositions(stepIdx) {
-  var pos = POS[stepIdx];
+function updateIonBondPositions(pos) {
   ION_PAIRS.forEach(function(pair, idx) {
     var a = pos[pair[0]], b = pos[pair[1]];
     var line = document.getElementById('ib_l'+idx);
     line.setAttribute('x1',a.x); line.setAttribute('y1',a.y);
     line.setAttribute('x2',b.x); line.setAttribute('y2',b.y);
-    // Blauer "+" Kreis bei 30%
-    var px = a.x + (b.x-a.x)*0.3, py = a.y + (b.y-a.y)*0.3;
-    document.getElementById('ib_p'+idx).setAttribute('transform','translate('+px+','+py+')');
-    // Roter "−" Kreis bei 70%
-    var mx = a.x + (b.x-a.x)*0.7, my = a.y + (b.y-a.y)*0.7;
-    document.getElementById('ib_m'+idx).setAttribute('transform','translate('+mx+','+my+')');
-  });
-}
-
-function updateCubeEdgePositions(stepIdx) {
-  var pos = POS[stepIdx];
-  CUBE_PAIRS.forEach(function(pair, idx) {
-    var a = pos[pair[0]], b = pos[pair[1]];
-    var line = document.getElementById('nl'+idx);
-    if (line) {
-      line.setAttribute('x1',a.x); line.setAttribute('y1',a.y);
-      line.setAttribute('x2',b.x); line.setAttribute('y2',b.y);
-    }
+    document.getElementById('ib_p'+idx).setAttribute('transform','translate('+(a.x+(b.x-a.x)*0.3)+','+(a.y+(b.y-a.y)*0.3)+')');
+    document.getElementById('ib_m'+idx).setAttribute('transform','translate('+(a.x+(b.x-a.x)*0.7)+','+(a.y+(b.y-a.y)*0.7)+')');
   });
 }
 
 /* ================================================================
-   ANIMATION ENGINE
+   ANIMATIONS-ENGINE – durchgehende Bewegung (requestAnimationFrame)
    ================================================================ */
-var currentStep = 0;
-var animating   = false;
-var startTime, startPos, targetPos;
-var DURATION = 850;
-
+function clone(arr) { return arr.map(function(p){ return {x:p.x, y:p.y}; }); }
 function easeInOut(t) { return t<.5 ? 2*t*t : -1+(4-2*t)*t; }
 
-function animFrame(now) {
-  var t = Math.min((now-startTime)/DURATION, 1);
-  var e = easeInOut(t);
-  for (var i = 0; i < 8; i++) {
-    var x = startPos[i].x + (targetPos[i].x-startPos[i].x)*e;
-    var y = startPos[i].y + (targetPos[i].y-startPos[i].y)*e;
-    document.getElementById('p'+i).setAttribute('transform','translate('+x+','+y+')');
-  }
-  if (t < 1) {
-    requestAnimationFrame(animFrame);
-  } else {
-    animating = false;
-    updateCubeEdgePositions(currentStep);
-    updateIonBondPositions(currentStep);
-  }
+var currentStep = 0;
+var basePos  = clone(POS[0]);
+var livePos  = clone(POS[0]);
+var fromPos  = clone(POS[0]);
+var transStart = null;
+var DURATION = 850;
+
+var phX = [], phY = [], frX = [], frY = [];
+for (var i = 0; i < 8; i++) {
+  phX.push(Math.random()*Math.PI*2); phY.push(Math.random()*Math.PI*2);
+  frX.push(620 + Math.random()*220); frY.push(720 + Math.random()*260);
 }
 
 function phToMarkerY(ph) { return 25 + (7.0-ph)/3.0*260; }
@@ -396,42 +359,69 @@ function updateMzMs(frac) {
   document.getElementById('mzMsDivider').setAttribute('y2', divY);
 }
 
-function goToStep(newStep, noAnimate) {
-  if (newStep < 0 || newStep >= STEPS.length) return;
-  if (animating) return;
-
-  var prevStep = currentStep;
-  currentStep  = newStep;
-  var s = STEPS[currentStep];
-
-  // Partikel animieren
-  if (!noAnimate && prevStep !== newStep) {
-    startPos  = POS[prevStep].map(function(p) { return {x:p.x,y:p.y}; });
-    targetPos = POS[currentStep];
-    startTime = performance.now();
-    animating = true;
-    requestAnimationFrame(animFrame);
-  } else {
+function clock(now) {
+  // 1) Schrittübergang
+  if (transStart !== null) {
+    var t = Math.min((now-transStart)/DURATION, 1);
+    var e = easeInOut(t);
     for (var i = 0; i < 8; i++) {
-      var p = POS[currentStep][i];
-      document.getElementById('p'+i).setAttribute('transform','translate('+p.x+','+p.y+')');
+      basePos[i].x = fromPos[i].x + (POS[currentStep][i].x - fromPos[i].x)*e;
+      basePos[i].y = fromPos[i].y + (POS[currentStep][i].y - fromPos[i].y)*e;
     }
-    updateCubeEdgePositions(currentStep);
-    updateIonBondPositions(currentStep);
+    if (t >= 1) transStart = null;
   }
 
-  // Ladungen
-  for (var i = 0; i < 8; i++)
-    for (var ci = 0; ci < CHARGE_OFFSETS.length; ci++)
-      document.getElementById('c'+i+'_'+ci).style.opacity = s.chargeOpacity;
+  var s = STEPS[currentStep];
+  var amp = s.wobble;
 
-  // Gruppen ein-/ausblenden
+  // 2) Wobble auf jede Basis-Position
+  for (var i = 0; i < 8; i++) {
+    var ox = Math.sin(now/frX[i] + phX[i]) * amp;
+    var oy = Math.cos(now/frY[i] + phY[i]) * amp;
+    livePos[i].x = basePos[i].x + ox;
+    livePos[i].y = basePos[i].y + oy;
+    pEl[i].setAttribute('transform','translate('+livePos[i].x+','+livePos[i].y+')');
+  }
+
+  // 3) Bindungen / Gerüst folgen
+  if (s.showIonBonds) updateIonBondPositions(livePos);
+  if (s.showCube)     updateCubePositions(livePos);
+
+  // 4) H⁺-Ionen driften
+  if (s.showHplus) {
+    hplusEls.forEach(function(he) {
+      var dx = Math.sin(now/780 + he.ph) * 4;
+      var dy = Math.cos(now/900 + he.ph) * 4;
+      he.el.setAttribute('transform','translate('+(he.x+dx)+','+(he.y+dy)+')');
+    });
+  }
+
+  // 5) Bakterien wackeln leicht
+  if (s.showBact) {
+    bactEls.forEach(function(be) {
+      var dx = Math.sin(now/950 + be.ph) * 3;
+      var dy = Math.cos(now/1100 + be.ph) * 3;
+      be.el.setAttribute('transform','translate('+(be.x+dx)+','+(be.y+dy)+') rotate('+be.rot+')');
+    });
+  }
+
+  requestAnimationFrame(clock);
+}
+
+/* ---- Schrittwechsel ---- */
+function applyStepVisuals() {
+  var s = STEPS[currentStep];
+
+  // Ladungen
+  document.querySelectorAll('.neg-charge').forEach(function(el) { el.style.opacity = s.chargeOpacity; });
+
+  // Gruppen
   document.getElementById('bacteria').style.opacity  = s.showBact     ? '1' : '0';
   document.getElementById('hplusIons').style.opacity = s.showHplus    ? '1' : '0';
   document.getElementById('ionBonds').style.opacity  = s.showIonBonds ? '1' : '0';
   document.getElementById('netLines').style.opacity  = s.showCube     ? '1' : '0';
 
-  // pH-Marker (Pfeil zeigt nach rechts → Spitze bei x=480)
+  // pH-Marker
   var markerY = phToMarkerY(s.ph);
   document.getElementById('phMarker').setAttribute('transform','translate(0,'+markerY+')');
   var valEl = document.getElementById('phValue');
@@ -447,9 +437,7 @@ function goToStep(newStep, noAnimate) {
 
   // Buttons
   document.getElementById('prevBtn').disabled = (currentStep === 0);
-  var nb = document.getElementById('nextBtn');
-  nb.disabled     = (currentStep === STEPS.length-1);
-  nb.textContent  = (currentStep === STEPS.length-1) ? 'Fertig ✓' : 'Weiter →';
+  document.getElementById('nextBtn').disabled = (currentStep === STEPS.length-1);
 
   // Dots
   document.querySelectorAll('.step-dot').forEach(function(d,i) {
@@ -457,12 +445,40 @@ function goToStep(newStep, noAnimate) {
   });
 }
 
+function goToStep(newStep) {
+  if (newStep < 0 || newStep >= STEPS.length) return;
+  fromPos = clone(basePos);
+  currentStep = newStep;
+  transStart = performance.now();
+  applyStepVisuals();
+}
+
 function nextStep() { goToStep(currentStep+1); }
 function prevStep() { goToStep(currentStep-1); }
 
-/* ================================================================
-   DOTS + KEYBOARD
-   ================================================================ */
+/* ---- Automatisch abspielen ---- */
+var autoplay = false, autoTimer = null;
+function scheduleNext() {
+  autoTimer = setTimeout(function() {
+    if (!autoplay) return;
+    goToStep((currentStep+1) % STEPS.length);
+    scheduleNext();
+  }, 3800);
+}
+function setPlayLabel() {
+  document.getElementById('playBtn').innerHTML = autoplay ? '&#10074;&#10074; Pause' : '&#9654; Abspielen';
+}
+function toggleAutoplay() {
+  autoplay = !autoplay;
+  setPlayLabel();
+  clearTimeout(autoTimer);
+  if (autoplay) {
+    if (currentStep === STEPS.length-1) goToStep(0);
+    scheduleNext();
+  }
+}
+
+/* ---- Dots + Tastatur ---- */
 var dotsWrap = document.getElementById('stepDots');
 for (var i = 0; i < STEPS.length; i++) {
   (function(idx) {
@@ -475,12 +491,15 @@ for (var i = 0; i < STEPS.length; i++) {
 }
 
 document.addEventListener('keydown', function(e) {
-  if (e.key==='ArrowRight') nextStep();
-  if (e.key==='ArrowLeft')  prevStep();
+  if (e.key === 'ArrowRight') { nextStep(); }
+  if (e.key === 'ArrowLeft')  { prevStep(); }
+  if (e.key === ' ')          { e.preventDefault(); toggleAutoplay(); }
 });
 
-// Starten
-goToStep(0, true);
+/* ---- Start ---- */
+applyStepVisuals();
+setPlayLabel();
+requestAnimationFrame(clock);
 </script>
 </body>
 </html>

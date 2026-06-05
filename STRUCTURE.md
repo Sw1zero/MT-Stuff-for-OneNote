@@ -56,7 +56,7 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 | `b2`          | b.2   | b.2 – Halbhartkäse herstellen              | `b2-halbhartkase/`              | 🔲     |
 | `b3`          | b.3   | b.3 – Weichkäse herstellen                 | `b3-weichkaese/`                | 🔲     |
 | `b4`          | b.4   | b.4 – Mozzarella herstellen                | `b4-mozzarella/`                | 🔲     |
-| `b5`          | b.5   | b.5 – Quark herstellen                     | `b5-quark/`                     | ✅     |
+| `b5`          | b.5   | b.5 – Quark herstellen                     | `b5-quark/`                     | ↗ Anim |
 | `b6`          | b.6   | b.6 – Konsummilch herstellen               | `b6-konsummilch/`               | 🔲     |
 | `b7`          | b.7   | b.7 – Sauermilchprodukte herstellen        | `b7-sauermilch/`                | ✅     |
 | `b8`          | b.8   | b.8 – Speiseeis herstellen                 | `b8-speiseeis/`                 | 🔲     |
@@ -69,6 +69,13 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 | `d4`          | d.4   | d.4 – Qualitätsmanagement                  | `d4-qualitaet/`                 | 🔲     |
 | `e2`          | e.2   | e.2 – Umweltschutz                         | `e2-umweltschutz/`              | 🔲     |
 | `allgemein`   | Allg. | Allgemeine Tools                           | `tools/`                        | ✅     |
+| `animationen` | –     | Animationen (modulübergreifende Rubrik)    | (Dateien im jeweiligen Modulordner) | ✅ |
+
+> **Animationen** ist eine eigenständige Rubrik (kein Modul). Tools vom Typ `animation` werden
+> mit `data-module="animationen"` ausgezeichnet und in der Sektion `#section-animationen` gesammelt.
+> Die Datei bleibt physisch im Themen-Modulordner (z. B. `b5-quark/`, `b7-sauermilch/`); das
+> Modul-Badge auf der Kachel zeigt weiterhin das Thema (b.5, b.7 …). `↗ Anim` in der Status-Spalte
+> oben heisst: Modul hat (nur) Tools, die unter der Rubrik Animationen gelistet sind.
 
 ---
 
