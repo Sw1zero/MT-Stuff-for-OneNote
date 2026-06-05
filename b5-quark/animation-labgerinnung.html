@@ -6,16 +6,14 @@
   <title>Animation – Labgerinnung des Kaseins</title>
   <link rel="stylesheet" href="../style.css">
   <style>
-    body { display:flex; flex-direction:column; align-items:center; padding:28px 16px 56px; }
-
     .back-link {
-      font-size:.78rem; color:var(--text-subtle); text-decoration:none;
       display:inline-flex; align-items:center; gap:4px;
-      margin-bottom:20px; align-self:flex-start;
+      font-size:.82rem; color:var(--text-muted); text-decoration:none;
+      margin-bottom:18px;
     }
     .back-link:hover { color:var(--red); }
 
-    .anim-wrap { width:600px; max-width:98vw; display:flex; flex-direction:column; gap:16px; }
+    .anim-wrap { width:600px; max-width:100%; margin:0 auto; display:flex; flex-direction:column; gap:16px; }
 
     .step-dots { display:flex; justify-content:center; gap:12px; margin-bottom:4px; }
     .step-dot  { width:11px; height:11px; border-radius:50%; background:var(--border); cursor:pointer; transition:background .2s,transform .15s; }
@@ -29,15 +27,15 @@
     .step-title { font-size:.78rem; font-weight:700; color:var(--blue-dark); text-transform:uppercase; letter-spacing:.07em; margin-bottom:8px; }
     .step-text  { font-size:.9rem; color:var(--text); line-height:1.65; }
 
-    .nav-row { display:flex; justify-content:center; gap:12px; }
-    .keyboard-hint { margin-top:10px; }
+    .nav-row { display:flex; justify-content:center; gap:12px; flex-wrap:wrap; }
+    .keyboard-hint { margin-top:6px; text-align:center; }
   </style>
 </head>
 <body>
 
 <header class="bzwu-header">
   <div class="header-text">
-    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologie EFZ · b.5 Quark</span>
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologie EFZ · b.5</span>
     <h1>Labgerinnung des Kaseins</h1>
     <p>Wie Lab das Kasein ausfällt – Schritt für Schritt</p>
   </div>
@@ -47,101 +45,106 @@
   </div>
 </header>
 
-<a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+<main class="page-main">
 
-<div class="anim-wrap">
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
 
-  <div class="step-dots" id="stepDots"></div>
+  <div class="anim-wrap">
 
-  <div class="anim-card">
-    <!-- viewBox: 0–405 Animation | 416–556 Legende -->
-    <svg id="animSvg" viewBox="0 0 560 310" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <pattern id="dotPat" width="20" height="20" patternUnits="userSpaceOnUse">
-          <circle cx="10" cy="10" r="1.2" fill="#bfdbfe" opacity="0.5"/>
-        </pattern>
-      </defs>
+    <div class="step-dots" id="stepDots"></div>
 
-      <!-- Hintergrund Animationsbereich -->
-      <rect width="405" height="310" fill="url(#dotPat)"/>
-      <rect width="405" height="310" fill="#e0f2fe" opacity="0.25"/>
+    <div class="anim-card">
+      <!-- viewBox: 0–405 Animation | 416–556 Legende -->
+      <svg id="animSvg" viewBox="0 0 560 310" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="dotPat" width="20" height="20" patternUnits="userSpaceOnUse">
+            <circle cx="10" cy="10" r="1.2" fill="#bfdbfe" opacity="0.5"/>
+          </pattern>
+        </defs>
 
-      <!-- ============================================================
-           LEGENDE  (x 416–556)
-           ============================================================ -->
-      <rect x="416" y="18" width="140" height="276" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
-      <text x="486" y="38" font-family="system-ui,sans-serif" font-size="11" font-weight="700" fill="#134061" text-anchor="middle">Legende</text>
+        <!-- Hintergrund Animationsbereich -->
+        <rect width="405" height="310" fill="url(#dotPat)"/>
+        <rect width="405" height="310" fill="#e0f2fe" opacity="0.25"/>
 
-      <!-- Kaseinteilchen -->
-      <circle cx="436" cy="60" r="9" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2"/>
-      <text x="452" y="63" font-family="system-ui,sans-serif" font-size="8.5" fill="#334155">Kaseinteilchen</text>
-      <!-- negative Ladung -->
-      <circle cx="436" cy="92" r="9" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/>
-      <text x="436" y="95.5" font-family="system-ui,sans-serif" font-size="11" font-weight="900" fill="#dc2626" text-anchor="middle">&#8722;</text>
-      <text x="452" y="95" font-family="system-ui,sans-serif" font-size="8.5" fill="#334155">negative Ladung</text>
-      <!-- positive Ladung -->
-      <circle cx="436" cy="124" r="9" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
-      <text x="436" y="127.5" font-family="system-ui,sans-serif" font-size="11" font-weight="900" fill="#2563eb" text-anchor="middle">+</text>
-      <text x="452" y="127" font-family="system-ui,sans-serif" font-size="8.5" fill="#334155">positive Ladung</text>
-      <!-- Kalzium -->
-      <circle cx="436" cy="156" r="9" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
-      <text x="436" y="159" font-family="system-ui,sans-serif" font-size="7" font-weight="800" fill="#b45309" text-anchor="middle">Ca</text>
-      <text x="452" y="159" font-family="system-ui,sans-serif" font-size="8.5" fill="#334155">Kalzium</text>
-      <!-- Sirte -->
-      <path d="M436,180 C440.5,184.5 442,188 436,196 C430,188 431.5,184.5 436,180 Z" fill="#60a5fa"/>
-      <text x="452" y="191" font-family="system-ui,sans-serif" font-size="8.5" fill="#334155">Sirte (Molke)</text>
+        <!-- ============================================================
+             LEGENDE  (x 416–556)
+             ============================================================ -->
+        <rect x="416" y="18" width="140" height="276" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+        <text x="486" y="38" font-family="system-ui,sans-serif" font-size="11" font-weight="700" fill="#134061" text-anchor="middle">Legende</text>
 
-      <!-- Hinweis Süssgerinnung -->
-      <line x1="428" y1="212" x2="544" y2="212" stroke="#e2e8f0" stroke-width="1"/>
-      <text x="486" y="232" font-family="system-ui,sans-serif" font-size="8.5" font-weight="700" fill="#0369a1" text-anchor="middle">Süssgerinnung</text>
-      <text x="486" y="247" font-family="system-ui,sans-serif" font-size="8" fill="#475569" text-anchor="middle">Der pH-Wert bleibt</text>
-      <text x="486" y="259" font-family="system-ui,sans-serif" font-size="8" fill="#475569" text-anchor="middle">unverändert (&#8776; 6.7).</text>
-      <text x="486" y="277" font-family="system-ui,sans-serif" font-size="8" fill="#475569" text-anchor="middle">Lab macht das Kasein</text>
-      <text x="486" y="289" font-family="system-ui,sans-serif" font-size="8" fill="#475569" text-anchor="middle">unlöslich.</text>
+        <!-- Kaseinteilchen -->
+        <circle cx="436" cy="60" r="9" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2"/>
+        <text x="452" y="63" font-family="system-ui,sans-serif" font-size="8.5" fill="#334155">Kaseinteilchen</text>
+        <!-- negative Ladung -->
+        <circle cx="436" cy="92" r="9" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/>
+        <text x="436" y="95.5" font-family="system-ui,sans-serif" font-size="11" font-weight="900" fill="#dc2626" text-anchor="middle">&#8722;</text>
+        <text x="452" y="95" font-family="system-ui,sans-serif" font-size="8.5" fill="#334155">negative Ladung</text>
+        <!-- positive Ladung -->
+        <circle cx="436" cy="124" r="9" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="436" y="127.5" font-family="system-ui,sans-serif" font-size="11" font-weight="900" fill="#2563eb" text-anchor="middle">+</text>
+        <text x="452" y="127" font-family="system-ui,sans-serif" font-size="8.5" fill="#334155">positive Ladung</text>
+        <!-- Kalzium -->
+        <circle cx="436" cy="156" r="9" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+        <text x="436" y="159" font-family="system-ui,sans-serif" font-size="7" font-weight="800" fill="#b45309" text-anchor="middle">Ca</text>
+        <text x="452" y="159" font-family="system-ui,sans-serif" font-size="8.5" fill="#334155">Kalzium</text>
+        <!-- Sirte -->
+        <path d="M436,180 C440.5,184.5 442,188 436,196 C430,188 431.5,184.5 436,180 Z" fill="#60a5fa"/>
+        <text x="452" y="191" font-family="system-ui,sans-serif" font-size="8.5" fill="#334155">Sirte (Molke)</text>
 
-      <!-- ============================================================
-           ANIMATIONS-INHALT
-           ============================================================ -->
+        <!-- Hinweis Süssgerinnung -->
+        <line x1="428" y1="212" x2="544" y2="212" stroke="#e2e8f0" stroke-width="1"/>
+        <text x="486" y="232" font-family="system-ui,sans-serif" font-size="8.5" font-weight="700" fill="#0369a1" text-anchor="middle">Süssgerinnung</text>
+        <text x="486" y="247" font-family="system-ui,sans-serif" font-size="8" fill="#475569" text-anchor="middle">Der pH-Wert bleibt</text>
+        <text x="486" y="259" font-family="system-ui,sans-serif" font-size="8" fill="#475569" text-anchor="middle">unverändert (&#8776; 6.7).</text>
+        <text x="486" y="277" font-family="system-ui,sans-serif" font-size="8" fill="#475569" text-anchor="middle">Lab macht das Kasein</text>
+        <text x="486" y="289" font-family="system-ui,sans-serif" font-size="8" fill="#475569" text-anchor="middle">unlöslich.</text>
 
-      <!-- Freie (abgespaltene) negative Ladungen in der Sirte -->
-      <g id="freeCharges" opacity="0" style="transition:opacity .5s ease"></g>
+        <!-- ============================================================
+             ANIMATIONS-INHALT
+             ============================================================ -->
 
-      <!-- Chymosin-Enzyme (Schritt 1) -->
-      <g id="chymosin" opacity="0" style="transition:opacity .5s ease"></g>
+        <!-- Freie (abgespaltene) negative Ladungen in der Sirte -->
+        <g id="freeCharges" opacity="0" style="transition:opacity .5s ease"></g>
 
-      <!-- Faden-Bindungen (Schritt 2) -->
-      <g id="threadBonds" opacity="0" style="transition:opacity .4s ease"></g>
+        <!-- Chymosin-Enzyme (Schritt 1) -->
+        <g id="chymosin" opacity="0" style="transition:opacity .5s ease"></g>
 
-      <!-- Kasein-Kalzium-Gerüst (Schritt 3–4) -->
-      <g id="cubeEdges" opacity="0" style="transition:opacity .5s ease"></g>
+        <!-- Faden-Bindungen (Schritt 2) -->
+        <g id="threadBonds" opacity="0" style="transition:opacity .4s ease"></g>
 
-      <!-- Abgepresste Sirte-Tröpfchen (Schritt 4 – Synärese) -->
-      <g id="sirteDrops" opacity="0" style="transition:opacity .5s ease"></g>
+        <!-- Kasein-Kalzium-Gerüst (Schritt 3–4) -->
+        <g id="cubeEdges" opacity="0" style="transition:opacity .5s ease"></g>
 
-      <!-- Kaseinteilchen (per JS erzeugt) -->
-      <g id="particleLayer"></g>
-    </svg>
+        <!-- Abgepresste Sirte-Tröpfchen (Schritt 4 – Synärese) -->
+        <g id="sirteDrops" opacity="0" style="transition:opacity .5s ease"></g>
+
+        <!-- Kaseinteilchen (per JS erzeugt) -->
+        <g id="particleLayer"></g>
+      </svg>
+    </div>
+
+    <div class="step-info">
+      <div class="step-title" id="stepTitle"></div>
+      <div class="step-text"  id="stepText"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-ghost"   id="prevBtn" onclick="prevStep()">&#8592; Zurück</button>
+      <button class="btn btn-primary" id="playBtn" onclick="toggleAutoplay()">&#9654; Abspielen</button>
+      <button class="btn btn-ghost"   id="nextBtn" onclick="nextStep()">Weiter &#8594;</button>
+    </div>
+    <p class="keyboard-hint"><kbd>&#8592;</kbd> <kbd>&#8594;</kbd> navigieren · <kbd>Leertaste</kbd> abspielen</p>
+
   </div>
 
-  <div class="step-info">
-    <div class="step-title" id="stepTitle"></div>
-    <div class="step-text"  id="stepText"></div>
-  </div>
-
-  <div class="nav-row">
-    <button class="btn btn-ghost"   id="prevBtn" onclick="prevStep()">&#8592; Zurück</button>
-    <button class="btn btn-primary" id="nextBtn" onclick="nextStep()">Weiter &#8594;</button>
-  </div>
-  <p class="keyboard-hint"><kbd>&#8592;</kbd> <kbd>&#8594;</kbd> navigieren</p>
-
-</div>
+</main>
 
 <script>
 /* ================================================================
    DATEN – 5 Schritte, 8 Kaseinteilchen
    ================================================================ */
 
-// Positionen [step][teilchen] = {x,y}  (Animationsbereich 0–405)
+// Ziel-Positionen [step][teilchen] = {x,y}  (Animationsbereich 0–405)
 var POS = [
   // Schritt 0: Ausgangslage – gleichmässig verteilt (stossen sich ab)
   [ {x:60,y:75},{x:165,y:62},{x:270,y:75},{x:372,y:62},
@@ -171,8 +174,7 @@ var CUBE_PAIRS = [
   [4,5],[5,6],[6,7],[7,4],   // Rückseite
   [0,4],[1,5],[2,6],[3,7],   // Tiefenkanten
 ];
-// Auf welchen Kanten ein «Ca»-Marker (Kalziumbrücke) sitzt
-var CA_EDGES = [0,2,4,6,8,10];
+var CA_EDGES = [0,2,4,6,8,10];   // Kanten mit «Ca»-Marker
 
 // Faden-Bindungen (Schritt 2) – zwei Ketten
 var THREAD_PAIRS = [
@@ -184,27 +186,27 @@ var STEPS = [
   {
     title: 'Ausgangslage',
     text:  'Unveränderte Kaseinteilchen tragen auf ihrer Oberfläche mehrheitlich negative Ladungen (−). Gleiche Ladungen stossen sich ab – darum verteilen sich die Kaseinteilchen gleichmässig in der Milch und lagern sich nicht zusammen. Auf der Oberfläche befindet sich ausserdem Kalzium.',
-    negOpacity:1, showChymosin:false, showFree:false, showThreads:false, showCube:false, showSirte:false,
+    negOpacity:1, wobble:5.5, showChymosin:false, showFree:false, showThreads:false, showCube:false, showSirte:false,
   },
   {
     title: '1. Schritt – Labenzym spaltet Ladungen ab',
     text:  'Das Enzym Chymosin aus dem Labextrakt spaltet die meisten negativen Ladungen von den Kaseinteilchen ab. Die abgespaltenen negativen Ladungen sind danach in der Sirte zu finden.',
-    negOpacity:0.12, showChymosin:true, showFree:true, showThreads:false, showCube:false, showSirte:false,
+    negOpacity:0.12, wobble:4.5, showChymosin:true, showFree:true, showThreads:false, showCube:false, showSirte:false,
   },
   {
     title: '2. Schritt – Kaseinteilchen lagern sich zusammen',
     text:  'Ohne die abstossenden negativen Ladungen ziehen sich die Kaseinteilchen dort an, wo eine positive (+) und eine negative (−) Ladung zusammentreffen. Sie bilden feine «Fäden». Die Milch ist dabei noch flüssig.',
-    negOpacity:0.12, showChymosin:false, showFree:true, showThreads:true, showCube:false, showSirte:false,
+    negOpacity:0.12, wobble:2.6, showChymosin:false, showFree:true, showThreads:true, showCube:false, showSirte:false,
   },
   {
     title: '3. Schritt – Kalzium vernetzt die Kaseinteilchen',
     text:  'Das Kalzium verbindet die Kaseinteilchen untereinander: Es bilden sich Kalziumbrücken. So entsteht ein dreidimensionales Kasein-Kalzium-Gerüst, in dem die übrigen Milchbestandteile eingeschlossen sind. Die Milch ist nun sichtbar geronnen – eine Labgallerte. Sie ist deutlich fester als die Säuregallerte.',
-    negOpacity:0.12, showChymosin:false, showFree:true, showThreads:false, showCube:true, showSirte:false,
+    negOpacity:0.12, wobble:1.8, showChymosin:false, showFree:true, showThreads:false, showCube:true, showSirte:false,
   },
   {
     title: '4. Schritt – Synärese',
     text:  'Die Kalziumbrücken wirken wie angespannte Gummibänder und ziehen sich zusammen. Dadurch wird Wasser (Sirte) aus der Gallerte abgepresst. Diesen Vorgang nennt man Synärese.',
-    negOpacity:0.12, showChymosin:false, showFree:true, showThreads:false, showCube:true, showSirte:true,
+    negOpacity:0.12, wobble:1.6, showChymosin:false, showFree:true, showThreads:false, showCube:true, showSirte:true,
   },
 ];
 
@@ -241,6 +243,7 @@ var CHARGE_DEFS = [
 ];
 
 var layer = document.getElementById('particleLayer');
+var pEl = [];
 
 for (var pi = 0; pi < 8; pi++) {
   var g = svgEl('g', {id:'p'+pi});
@@ -267,6 +270,7 @@ for (var pi = 0; pi < 8; pi++) {
     g.appendChild(cg);
   }
   layer.appendChild(g);
+  pEl.push(g);
 }
 
 /* ---- Freie negative Ladungen in der Sirte (Schritt 1+) ---- */
@@ -275,15 +279,18 @@ var FREE_POS = [
   {x:40,y:155},{x:205,y:300},{x:355,y:300},{x:30,y:300}
 ];
 var freeLayer = document.getElementById('freeCharges');
+var freeEls = [];
 FREE_POS.forEach(function(p) {
   var fg = svgEl('g', {transform:'translate('+p.x+','+p.y+')'});
   chargeCircle(fg, '#fee2e2', '#dc2626', '−', '#dc2626', '11');
   freeLayer.appendChild(fg);
+  freeEls.push({ el:fg, x:p.x, y:p.y, ph:Math.random()*Math.PI*2 });
 });
 
 /* ---- Chymosin-Enzyme (Schritt 1) ---- */
 var CHY_POS = [ {x:118,y:152},{x:212,y:158},{x:305,y:150} ];
 var chyLayer = document.getElementById('chymosin');
+var chyEls = [];
 CHY_POS.forEach(function(p) {
   var cg = svgEl('g', {transform:'translate('+p.x+','+p.y+')'});
   cg.appendChild(svgEl('rect', {x:'-26', y:'-9', width:'52', height:'18', rx:'9', fill:'#0d9488', stroke:'#0f766e', 'stroke-width':'1'}));
@@ -294,6 +301,7 @@ CHY_POS.forEach(function(p) {
   t.textContent = 'Chymosin';
   cg.appendChild(t);
   chyLayer.appendChild(cg);
+  chyEls.push({ el:cg, x:p.x, y:p.y, ph:Math.random()*Math.PI*2 });
 });
 
 /* ---- Faden-Bindungen (Schritt 2): Linie + «+» und «−» ---- */
@@ -309,17 +317,14 @@ THREAD_PAIRS.forEach(function(pair, idx) {
   chargeCircle(gm, '#fee2e2', '#dc2626', '−', '#dc2626', '11');
   threadLayer.appendChild(gm);
 });
-function updateThreadPositions(stepIdx) {
-  var pos = POS[stepIdx];
+function updateThreadPositions(pos) {
   THREAD_PAIRS.forEach(function(pair, idx) {
     var a = pos[pair[0]], b = pos[pair[1]];
     var line = document.getElementById('th_l'+idx);
     line.setAttribute('x1',a.x); line.setAttribute('y1',a.y);
     line.setAttribute('x2',b.x); line.setAttribute('y2',b.y);
-    var px = a.x + (b.x-a.x)*0.35, py = a.y + (b.y-a.y)*0.35;
-    document.getElementById('th_p'+idx).setAttribute('transform','translate('+px+','+py+')');
-    var mx = a.x + (b.x-a.x)*0.65, my = a.y + (b.y-a.y)*0.65;
-    document.getElementById('th_m'+idx).setAttribute('transform','translate('+mx+','+my+')');
+    document.getElementById('th_p'+idx).setAttribute('transform','translate('+(a.x+(b.x-a.x)*0.35)+','+(a.y+(b.y-a.y)*0.35)+')');
+    document.getElementById('th_m'+idx).setAttribute('transform','translate('+(a.x+(b.x-a.x)*0.65)+','+(a.y+(b.y-a.y)*0.65)+')');
   });
 }
 
@@ -335,8 +340,7 @@ CA_EDGES.forEach(function(edgeIdx) {
   chargeCircle(gc, '#fef3c7', '#d97706', 'Ca', '#b45309', '7');
   cubeLayer.appendChild(gc);
 });
-function updateCubePositions(stepIdx) {
-  var pos = POS[stepIdx];
+function updateCubePositions(pos) {
   CUBE_PAIRS.forEach(function(pair, idx) {
     var a = pos[pair[0]], b = pos[pair[1]];
     var line = document.getElementById('ce_l'+idx);
@@ -346,8 +350,7 @@ function updateCubePositions(stepIdx) {
   CA_EDGES.forEach(function(edgeIdx) {
     var pair = CUBE_PAIRS[edgeIdx];
     var a = pos[pair[0]], b = pos[pair[1]];
-    var mx = (a.x+b.x)/2, my = (a.y+b.y)/2;
-    document.getElementById('ca_'+edgeIdx).setAttribute('transform','translate('+mx+','+my+')');
+    document.getElementById('ca_'+edgeIdx).setAttribute('transform','translate('+((a.x+b.x)/2)+','+((a.y+b.y)/2)+')');
   });
 }
 
@@ -355,15 +358,19 @@ function updateCubePositions(stepIdx) {
 var DROP_POS = [
   {x:95,y:88},{x:330,y:88},{x:95,y:205},{x:330,y:205},{x:212,y:50},{x:212,y:242}
 ];
+var GEL_C = {x:212, y:146};   // Zentrum der Gallerte
 var dropLayer = document.getElementById('sirteDrops');
-DROP_POS.forEach(function(p) {
+var dropEls = [];
+DROP_POS.forEach(function(p, k) {
   var dg = svgEl('g', {transform:'translate('+p.x+','+p.y+')'});
-  dg.appendChild(svgEl('path', {d:'M0,-7 C4,-3 6,1.5 0,8 C-6,1.5 -4,-3 0,-7 Z', fill:'#60a5fa', opacity:'0.9'}));
+  dg.appendChild(svgEl('path', {d:'M0,-7 C4,-3 6,1.5 0,8 C-6,1.5 -4,-3 0,-7 Z', fill:'#60a5fa'}));
   dropLayer.appendChild(dg);
+  var vx = p.x-GEL_C.x, vy = p.y-GEL_C.y, len = Math.sqrt(vx*vx+vy*vy) || 1;
+  dropEls.push({ el:dg, x:p.x, y:p.y, dx:vx/len, dy:vy/len, off:k/DROP_POS.length });
 });
 // Beschriftung «Sirte»
 var dropLbl = document.createElementNS(NS,'text');
-dropLbl.setAttribute('x','212'); dropLbl.setAttribute('y','38');
+dropLbl.setAttribute('x','212'); dropLbl.setAttribute('y','36');
 dropLbl.setAttribute('text-anchor','middle'); dropLbl.setAttribute('font-size','9');
 dropLbl.setAttribute('font-weight','700'); dropLbl.setAttribute('fill','#2563eb');
 dropLbl.setAttribute('font-family','system-ui,sans-serif');
@@ -371,118 +378,141 @@ dropLbl.textContent = 'Sirte';
 dropLayer.appendChild(dropLbl);
 
 /* ================================================================
-   ANIMATIONS-ENGINE
+   ANIMATIONS-ENGINE – durchgehende Bewegung (requestAnimationFrame)
    ================================================================ */
-var currentStep = 0;
-var animating   = false;
-var startTime, startPos, targetPos;
-var DURATION = 850;
-
+function clone(arr) { return arr.map(function(p){ return {x:p.x, y:p.y}; }); }
 function easeInOut(t) { return t<.5 ? 2*t*t : -1+(4-2*t)*t; }
 
-function animFrame(now) {
-  var t = Math.min((now-startTime)/DURATION, 1);
-  var e = easeInOut(t);
+var currentStep = 0;
+var basePos  = clone(POS[0]);   // animierte Basis-Positionen (ohne Wobble)
+var livePos  = clone(POS[0]);   // Basis + Wobble (für Darstellung)
+var fromPos  = clone(POS[0]);
+var transStart = null;          // Zeitpunkt eines Schrittwechsels (null = kein Übergang)
+var DURATION = 850;
+
+// individuelle Phasen/Frequenzen pro Teilchen für ruhige Drift
+var phX = [], phY = [], frX = [], frY = [];
+for (var i = 0; i < 8; i++) {
+  phX.push(Math.random()*Math.PI*2); phY.push(Math.random()*Math.PI*2);
+  frX.push(620 + Math.random()*220); frY.push(720 + Math.random()*260);
+}
+
+function clock(now) {
+  // 1) Schrittübergang: Basis-Positionen interpolieren
+  if (transStart !== null) {
+    var t = Math.min((now-transStart)/DURATION, 1);
+    var e = easeInOut(t);
+    for (var i = 0; i < 8; i++) {
+      basePos[i].x = fromPos[i].x + (POS[currentStep][i].x - fromPos[i].x)*e;
+      basePos[i].y = fromPos[i].y + (POS[currentStep][i].y - fromPos[i].y)*e;
+    }
+    if (t >= 1) transStart = null;
+  }
+
+  var s = STEPS[currentStep];
+  var amp = s.wobble;
+
+  // 2) Wobble (Brown'sche Drift) auf jede Basis-Position legen
   for (var i = 0; i < 8; i++) {
-    var x = startPos[i].x + (targetPos[i].x-startPos[i].x)*e;
-    var y = startPos[i].y + (targetPos[i].y-startPos[i].y)*e;
-    document.getElementById('p'+i).setAttribute('transform','translate('+x+','+y+')');
+    var ox = Math.sin(now/frX[i] + phX[i]) * amp;
+    var oy = Math.cos(now/frY[i] + phY[i]) * amp;
+    livePos[i].x = basePos[i].x + ox;
+    livePos[i].y = basePos[i].y + oy;
+    pEl[i].setAttribute('transform','translate('+livePos[i].x+','+livePos[i].y+')');
   }
-  // Bindungen/Kanten mitführen
-  liveUpdateBonds(e);
-  if (t < 1) {
-    requestAnimationFrame(animFrame);
-  } else {
-    animating = false;
-    updateThreadPositions(currentStep);
-    updateCubePositions(currentStep);
+
+  // 3) Bindungen / Gerüst folgen der Bewegung
+  if (s.showThreads) updateThreadPositions(livePos);
+  if (s.showCube)    updateCubePositions(livePos);
+
+  // 4) Freie Ladungen driften in der Sirte
+  if (s.showFree) {
+    freeEls.forEach(function(fe) {
+      var dx = Math.sin(now/900 + fe.ph) * 4.5;
+      var dy = Math.cos(now/1050 + fe.ph) * 4.5;
+      fe.el.setAttribute('transform','translate('+(fe.x+dx)+','+(fe.y+dy)+')');
+    });
   }
+
+  // 5) Chymosin-Enzyme bewegen sich leicht
+  if (s.showChymosin) {
+    chyEls.forEach(function(ce) {
+      var dy = Math.sin(now/600 + ce.ph) * 3;
+      ce.el.setAttribute('transform','translate('+ce.x+','+(ce.y+dy)+')');
+    });
+  }
+
+  // 6) Synärese: Sirte-Tröpfchen strömen nach aussen und verblassen
+  if (s.showSirte) {
+    dropEls.forEach(function(de) {
+      var ph = ((now/1700)/1 + de.off) % 1;
+      var d  = ph * 22;
+      de.el.setAttribute('transform','translate('+(de.x+de.dx*d)+','+(de.y+de.dy*d)+')');
+      de.el.setAttribute('opacity', (Math.sin(ph*Math.PI)*0.95).toFixed(3));
+    });
+  }
+
+  requestAnimationFrame(clock);
 }
 
-// Während der Bewegung Linien zwischen den interpolierten Positionen zeichnen
-function liveUpdateBonds(e) {
-  var sp = startPos, tp = targetPos;
-  function lerp(i) {
-    return { x: sp[i].x + (tp[i].x-sp[i].x)*e, y: sp[i].y + (tp[i].y-sp[i].y)*e };
-  }
-  THREAD_PAIRS.forEach(function(pair, idx) {
-    var a = lerp(pair[0]), b = lerp(pair[1]);
-    var line = document.getElementById('th_l'+idx);
-    line.setAttribute('x1',a.x); line.setAttribute('y1',a.y);
-    line.setAttribute('x2',b.x); line.setAttribute('y2',b.y);
-    document.getElementById('th_p'+idx).setAttribute('transform','translate('+(a.x+(b.x-a.x)*0.35)+','+(a.y+(b.y-a.y)*0.35)+')');
-    document.getElementById('th_m'+idx).setAttribute('transform','translate('+(a.x+(b.x-a.x)*0.65)+','+(a.y+(b.y-a.y)*0.65)+')');
-  });
-  CUBE_PAIRS.forEach(function(pair, idx) {
-    var a = lerp(pair[0]), b = lerp(pair[1]);
-    var line = document.getElementById('ce_l'+idx);
-    line.setAttribute('x1',a.x); line.setAttribute('y1',a.y);
-    line.setAttribute('x2',b.x); line.setAttribute('y2',b.y);
-  });
-  CA_EDGES.forEach(function(edgeIdx) {
-    var pair = CUBE_PAIRS[edgeIdx];
-    var a = lerp(pair[0]), b = lerp(pair[1]);
-    document.getElementById('ca_'+edgeIdx).setAttribute('transform','translate('+((a.x+b.x)/2)+','+((a.y+b.y)/2)+')');
-  });
-}
-
-function goToStep(newStep, noAnimate) {
-  if (newStep < 0 || newStep >= STEPS.length) return;
-  if (animating) return;
-
-  var prevStep = currentStep;
-  currentStep  = newStep;
+/* ---- Schrittwechsel ---- */
+function applyStepVisuals() {
   var s = STEPS[currentStep];
 
-  if (!noAnimate && prevStep !== newStep) {
-    startPos  = POS[prevStep].map(function(p) { return {x:p.x,y:p.y}; });
-    targetPos = POS[currentStep];
-    startTime = performance.now();
-    animating = true;
-    requestAnimationFrame(animFrame);
-  } else {
-    for (var i = 0; i < 8; i++) {
-      var p = POS[currentStep][i];
-      document.getElementById('p'+i).setAttribute('transform','translate('+p.x+','+p.y+')');
-    }
-    updateThreadPositions(currentStep);
-    updateCubePositions(currentStep);
-  }
+  document.querySelectorAll('.neg-charge').forEach(function(el) { el.style.opacity = s.negOpacity; });
 
-  // negative Ladungen auf den Teilchen
-  document.querySelectorAll('.neg-charge').forEach(function(el) {
-    el.style.opacity = s.negOpacity;
-  });
+  document.getElementById('chymosin').style.opacity    = s.showChymosin ? '1' : '0';
+  document.getElementById('freeCharges').style.opacity = s.showFree     ? '1' : '0';
+  document.getElementById('threadBonds').style.opacity = s.showThreads  ? '1' : '0';
+  document.getElementById('cubeEdges').style.opacity   = s.showCube     ? '1' : '0';
+  document.getElementById('sirteDrops').style.opacity  = s.showSirte    ? '1' : '0';
 
-  // Gruppen ein-/ausblenden
-  document.getElementById('chymosin').style.opacity   = s.showChymosin ? '1' : '0';
-  document.getElementById('freeCharges').style.opacity= s.showFree     ? '1' : '0';
-  document.getElementById('threadBonds').style.opacity= s.showThreads  ? '1' : '0';
-  document.getElementById('cubeEdges').style.opacity  = s.showCube     ? '1' : '0';
-  document.getElementById('sirteDrops').style.opacity = s.showSirte    ? '1' : '0';
-
-  // Texte
   document.getElementById('stepTitle').textContent = s.title;
   document.getElementById('stepText').textContent  = s.text;
 
-  // Buttons
   document.getElementById('prevBtn').disabled = (currentStep === 0);
-  var nb = document.getElementById('nextBtn');
-  nb.disabled    = (currentStep === STEPS.length-1);
-  nb.textContent = (currentStep === STEPS.length-1) ? 'Fertig ✓' : 'Weiter →';
+  document.getElementById('nextBtn').disabled = (currentStep === STEPS.length-1);
 
-  // Dots
   document.querySelectorAll('.step-dot').forEach(function(d,i) {
     d.classList.toggle('active', i === currentStep);
   });
 }
 
+function goToStep(newStep) {
+  if (newStep < 0 || newStep >= STEPS.length) return;
+  fromPos = clone(basePos);          // vom aktuellen Stand aus überblenden
+  currentStep = newStep;
+  transStart = performance.now();
+  applyStepVisuals();
+}
+
 function nextStep() { goToStep(currentStep+1); }
 function prevStep() { goToStep(currentStep-1); }
 
-/* ================================================================
-   DOTS + KEYBOARD
-   ================================================================ */
+/* ---- Automatisch abspielen ---- */
+var autoplay = false, autoTimer = null;
+function scheduleNext() {
+  autoTimer = setTimeout(function() {
+    if (!autoplay) return;
+    goToStep((currentStep+1) % STEPS.length);
+    scheduleNext();
+  }, 3800);
+}
+function setPlayLabel() {
+  document.getElementById('playBtn').innerHTML = autoplay ? '&#10074;&#10074; Pause' : '&#9654; Abspielen';
+}
+function toggleAutoplay() {
+  autoplay = !autoplay;
+  setPlayLabel();
+  clearTimeout(autoTimer);
+  if (autoplay) {
+    // Während Autoplay sind Vor/Zurück trotzdem nutzbar; Buttons nicht hart sperren
+    if (currentStep === STEPS.length-1) goToStep(0);
+    scheduleNext();
+  }
+}
+
+/* ---- Dots + Tastatur ---- */
 var dotsWrap = document.getElementById('stepDots');
 for (var i = 0; i < STEPS.length; i++) {
   (function(idx) {
@@ -495,12 +525,15 @@ for (var i = 0; i < STEPS.length; i++) {
 }
 
 document.addEventListener('keydown', function(e) {
-  if (e.key==='ArrowRight') nextStep();
-  if (e.key==='ArrowLeft')  prevStep();
+  if (e.key === 'ArrowRight') { nextStep(); }
+  if (e.key === 'ArrowLeft')  { prevStep(); }
+  if (e.key === ' ')          { e.preventDefault(); toggleAutoplay(); }
 });
 
-// Starten
-goToStep(0, true);
+/* ---- Start ---- */
+applyStepVisuals();
+setPlayLabel();
+requestAnimationFrame(clock);
 </script>
 </body>
 </html>
