@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zuordnung – Verordnungen</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .back-link {
+      display: inline-block;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      margin-bottom: 1.5rem;
+      transition: color 0.15s;
+    }
+    .back-link:hover { color: var(--red); }
+
+    .instruction {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      margin-bottom: 1.25rem;
+      text-align: center;
+    }
+
+    .word-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      background: var(--blue-light);
+      border-radius: var(--radius-md);
+      padding: 0.9rem 1rem;
+      margin-bottom: 1.5rem;
+      min-height: 52px;
+    }
+    .word-chip {
+      font-family: var(--font);
+      font-size: 0.82rem;
+      font-weight: 600;
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 20px;
+      padding: 0.3rem 0.85rem;
+      cursor: pointer;
+      color: var(--text);
+      transition: all 0.15s;
+      line-height: 1.4;
+    }
+    .word-chip:hover   { border-color: var(--blue); }
+    .word-chip.selected { background: var(--blue); border-color: var(--blue); color: #fff; }
+    .word-chip.used     { opacity: 0.22; pointer-events: none; }
+
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.5rem;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+    .compare-table th,
+    .compare-table td {
+      padding: 0.7rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.88rem;
+      vertical-align: middle;
+    }
+    .compare-table tr:last-child td { border-bottom: none; }
+    .compare-table thead th {
+      background: var(--red);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.82rem;
+    }
+    .compare-table thead th:first-child { background: #c40027; }
+    .compare-table td.prop-label {
+      font-weight: 500;
+      color: var(--text);
+      background: #f8f9fb;
+      width: 62%;
+      line-height: 1.4;
+    }
+
+    .blank-cell {
+      min-width: 140px;
+      min-height: 36px;
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.3rem 0.65rem;
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--text-subtle);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      transition: all 0.15s;
+    }
+    .blank-cell.ready  { border-color: var(--blue); border-style: solid; background: #f0f7ff; }
+    .blank-cell.filled { border-style: solid; border-color: var(--blue); color: var(--text); }
+    .blank-cell.correct { border-color: #16a34a !important; background: #f0fdf4 !important; color: #15803d !important; }
+    .blank-cell.wrong   { border-color: var(--red) !important; background: var(--red-light) !important; color: var(--red) !important; }
+    .blank-cell.over    { border-color: var(--blue); border-style: solid; background: #e0f2fe; }
+    .word-chip.dragging { opacity: 0.4; }
+
+    #touchClone {
+      position: fixed; z-index: 1000; display: none; pointer-events: none;
+      background: var(--blue); color: #fff; border-radius: 20px;
+      padding: 0.3rem 0.85rem; font-size: 0.82rem; font-weight: 600;
+      box-shadow: var(--shadow-md);
+    }
+
+    .info-box {
+      background: #f0f7ff;
+      border-left: 3px solid var(--blue);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 0.75rem 1rem;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+    .info-box strong { color: var(--text); }
+
+    .btn-row { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+    .result-banner {
+      margin-top: 1.25rem;
+      padding: 0.9rem 1rem;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.92rem;
+      text-align: center;
+      display: none;
+    }
+    .result-banner.show    { display: block; }
+    .result-banner.perfect { background: #f0fdf4; color: #15803d; border: 1.5px solid #bbf7d0; }
+    .result-banner.partial { background: #fff7ed; color: #c2410c; border: 1.5px solid #fed7aa; }
+
+    @media (max-width: 500px) {
+      .compare-table th,
+      .compare-table td { padding: 0.5rem 0.55rem; font-size: 0.76rem; }
+      .blank-cell { min-width: 100px; font-size: 0.76rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+  <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologie EFZ · b.1</span>
+  <h1>Zuordnung</h1>
+  <p>Welche Verordnung regelt was?</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+  <a class="back-link" href="../index.html">← Alle Lerntools</a>
+
+  <p class="instruction">Ordne jeder Aufgabe die richtige Verordnung bzw. Institution zu – per Klick, Drag &amp; Drop oder Touch.</p>
+
+  <div class="word-bank" id="wordBank"></div>
+
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th>Aufgabe / Inhalt</th>
+        <th>Verordnung / Institution</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="prop-label">Sachbezeichnung «Käse», Einteilung nach Fett i.T. &amp; wff, geschützte Bezeichnung</td><td><span class="blank-cell" data-answer="VLtH">—</span></td></tr>
+      <tr><td class="prop-label">Zulässige Zusatzstoffe (Positivliste)</td><td><span class="blank-cell" data-answer="ZuV">—</span></td></tr>
+      <tr><td class="prop-label">Allgemeine Hygienevorschriften &amp; mikrobiologische Grenzwerte</td><td><span class="blank-cell" data-answer="HyV">—</span></td></tr>
+      <tr><td class="prop-label">Geschützte Ursprungsbezeichnung mit Pflichtenheft &amp; unabhängiger Kontrolle</td><td><span class="blank-cell" data-answer="AOP / GUB">—</span></td></tr>
+      <tr><td class="prop-label">Privatrechtlicher Zusammenschluss von Milchproduzent, Käsehersteller &amp; Vermarkter</td><td><span class="blank-cell" data-answer="Sortenorganisation">—</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="info-box">
+    <strong>Merke:</strong> <em>VLtH</em>, <em>ZuV</em> und <em>HyV</em> sind öffentlich-rechtliche Verordnungen.
+    <em>AOP/GUB</em> schützt die Ursprungsbezeichnung. <em>Sortenorganisationen</em> treffen privatrechtliche Abmachungen –
+    diese dürfen nie gegen öffentliches Recht verstossen.
+  </div>
+
+  <div class="btn-row">
+    <button type="button" class="btn btn-primary" onclick="checkAll()">Überprüfen</button>
+    <button type="button" class="btn btn-ghost"   onclick="resetAll()">Zurücksetzen</button>
+  </div>
+
+  <div class="result-banner" id="resultBanner"></div>
+
+</main>
+
+<div id="touchClone"></div>
+
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologie EFZ · Philipp Neukomm
+</footer>
+
+<script>
+var ANSWERS = [
+  'VLtH',
+  'ZuV',
+  'HyV',
+  'AOP / GUB',
+  'Sortenorganisation'
+];
+
+var selected   = null;
+var dragWord   = null;
+var touchWord  = null, touchSrc = null;
+var touchClone = document.getElementById('touchClone');
+var touchOffX  = 0, touchOffY = 0;
+
+function shuffle(arr) {
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+
+function isLocked(cell) { return cell.classList.contains('correct') || cell.classList.contains('wrong'); }
+
+function init() {
+  var bank = document.getElementById('wordBank');
+  bank.innerHTML = '';
+  shuffle(ANSWERS).forEach(function(word) {
+    var chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'word-chip';
+    chip.textContent = word;
+    chip.dataset.word = word;
+    chip.setAttribute('draggable', 'true');
+    chip.onclick = function() { selectChip(this); };
+    chip.addEventListener('dragstart', function(e) {
+      dragWord = word; e.dataTransfer.effectAllowed = 'move'; chip.classList.add('dragging');
+    });
+    chip.addEventListener('dragend', function() { chip.classList.remove('dragging'); });
+    chip.addEventListener('touchstart', function(e) { onChipTouchStart(e, chip, word); }, {passive: false});
+    bank.appendChild(chip);
+  });
+
+  document.querySelectorAll('.blank-cell').forEach(function(cell) {
+    cell.textContent = '—';
+    cell.className = 'blank-cell';
+    delete cell.dataset.filled;
+    cell.onclick = function() { clickCell(this); };
+    cell.addEventListener('dragover', function(e) { e.preventDefault(); if (!isLocked(cell) && !cell.dataset.filled) cell.classList.add('over'); });
+    cell.addEventListener('dragleave', function() { cell.classList.remove('over'); });
+    cell.addEventListener('drop', function(e) {
+      e.preventDefault(); cell.classList.remove('over');
+      if (dragWord) { placeInCell(cell, dragWord); dragWord = null; }
+    });
+  });
+
+  selected = null;
+  document.getElementById('resultBanner').className = 'result-banner';
+}
+
+function selectChip(chip) {
+  if (chip.classList.contains('selected')) {
+    chip.classList.remove('selected');
+    selected = null;
+    clearReady();
+    return;
+  }
+  document.querySelectorAll('.word-chip.selected').forEach(function(c) { c.classList.remove('selected'); });
+  chip.classList.add('selected');
+  selected = chip.dataset.word;
+
+  document.querySelectorAll('.blank-cell').forEach(function(c) {
+    c.classList.remove('ready');
+    if (!c.dataset.filled && !isLocked(c)) c.classList.add('ready');
+  });
+}
+
+function clickCell(cell) {
+  if (isLocked(cell)) return;
+  if (cell.dataset.filled) {
+    returnWord(cell.dataset.filled);
+    delete cell.dataset.filled;
+    cell.textContent = '—';
+    cell.className = 'blank-cell';
+    if (selected) cell.classList.add('ready');
+    return;
+  }
+  if (!selected) return;
+  placeInCell(cell, selected);
+}
+
+function placeInCell(cell, word) {
+  if (isLocked(cell)) return;
+  var displaced = cell.dataset.filled || null;
+  cell.dataset.filled = word;
+  cell.textContent = word;
+  cell.className = 'blank-cell filled';
+  markUsed(word);
+  if (displaced && displaced !== word) returnWord(displaced);
+  selected = null;
+  clearSelectedChip();
+  clearReady();
+}
+
+function clearSelectedChip() {
+  document.querySelectorAll('.word-chip.selected').forEach(function(c) { c.classList.remove('selected'); });
+}
+
+function returnWord(word) {
+  document.querySelectorAll('.word-chip').forEach(function(c) {
+    if (c.dataset.word === word) c.classList.remove('used', 'selected');
+  });
+}
+
+function markUsed(word) {
+  document.querySelectorAll('.word-chip').forEach(function(c) {
+    if (c.dataset.word === word) { c.classList.remove('selected'); c.classList.add('used'); }
+  });
+}
+
+function clearReady() {
+  document.querySelectorAll('.blank-cell').forEach(function(c) { c.classList.remove('ready'); });
+}
+
+// ---- Touch-Drag ----
+function onChipTouchStart(e, chip, word) {
+  if (chip.classList.contains('used')) return;
+  if (e.touches.length !== 1) return;
+  e.preventDefault();
+  var t = e.touches[0], r = chip.getBoundingClientRect();
+  touchWord = word; touchSrc = chip;
+  touchOffX = t.clientX - r.left; touchOffY = t.clientY - r.top;
+  touchClone.textContent = word;
+  touchClone.style.left = (t.clientX - touchOffX) + 'px';
+  touchClone.style.top  = (t.clientY - touchOffY) + 'px';
+  touchClone.style.display = 'block';
+  chip.style.opacity = '0.25';
+}
+
+document.addEventListener('touchmove', function(e) {
+  if (!touchWord) return;
+  e.preventDefault();
+  var t = e.touches[0];
+  touchClone.style.left = (t.clientX - touchOffX) + 'px';
+  touchClone.style.top  = (t.clientY - touchOffY) + 'px';
+}, {passive: false});
+
+document.addEventListener('touchend', function(e) {
+  if (!touchWord) return;
+  var t = e.changedTouches[0];
+  touchClone.style.display = 'none';
+  if (touchSrc) touchSrc.style.opacity = '';
+  var under = document.elementFromPoint(t.clientX, t.clientY);
+  var cell  = under ? under.closest('.blank-cell') : null;
+  if (cell && !isLocked(cell)) placeInCell(cell, touchWord);
+  touchWord = null; touchSrc = null;
+});
+
+function checkAll() {
+  var correct = 0, filled = 0;
+  document.querySelectorAll('.blank-cell').forEach(function(cell) {
+    var val = cell.dataset.filled;
+    if (!val) return;
+    filled++;
+    cell.classList.remove('filled', 'ready');
+    if (val === cell.dataset.answer) { cell.classList.add('correct'); correct++; }
+    else                              { cell.classList.add('wrong'); }
+  });
+
+  var banner = document.getElementById('resultBanner');
+  if (correct === ANSWERS.length) {
+    banner.textContent = 'Perfekt! Alle ' + ANSWERS.length + ' richtig zugeordnet.';
+    banner.className = 'result-banner show perfect';
+  } else {
+    banner.textContent = correct + ' von ' + filled + ' Feldern korrekt. Rot markierte Felder nochmals überprüfen.';
+    banner.className = 'result-banner show partial';
+  }
+}
+
+function resetAll() { init(); }
+
+init();
+</script>
+
+</body>
+</html>

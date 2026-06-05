@@ -16,6 +16,10 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 │   └── logos/
 │       ├── bzwu.png                    ← BZWU-Logo (weisser Hintergrund)
 │       └── milchtechnologen.svg        ← Branchenlogo
+├── b1-hartkaese/
+│   ├── quiz-gesetzliches-kaese.html
+│   ├── tabellen-luecken-vlth-artikel.html
+│   └── zuordnung-verordnungen.html
 ├── b7-sauermilch/
 │   ├── images/
 │   │   ├── b.7_Anlage_stichfest_Nummern.png
@@ -60,7 +64,7 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 | `a6`          | a.6   | a.6 – Zutaten beimischen                   | `a6-zutaten/`                   | 🔲     |
 | `a7`          | a.7   | a.7 – Technische Einrichtungen bedienen    | `a7-technische-einrichtungen/`  | ✅     |
 | `a8`          | a.8   | a.8 – Kulturen herstellen                  | `a8-kulturen/`                  | ✅     |
-| `b1`          | b.1   | b.1 – Hartkäse herstellen                  | `b1-hartkaese/`                 | 🔲     |
+| `b1`          | b.1   | b.1 – Hartkäse herstellen                  | `b1-hartkaese/`                 | ✅     |
 | `b2`          | b.2   | b.2 – Halbhartkäse herstellen              | `b2-halbhartkase/`              | 🔲     |
 | `b3`          | b.3   | b.3 – Weichkäse herstellen                 | `b3-weichkaese/`                | 🔲     |
 | `b4`          | b.4   | b.4 – Mozzarella herstellen                | `b4-mozzarella/`                | 🔲     |

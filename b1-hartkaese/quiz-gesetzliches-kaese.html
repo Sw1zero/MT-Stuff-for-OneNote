@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz b.1 – Gesetzliche Vorgaben</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .back-link {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 20px;
+    }
+    .back-link:hover { color: var(--red); }
+
+    .quiz-center { display: flex; flex-direction: column; align-items: center; }
+
+    .progress-text  { margin-bottom: 10px; }
+    .progress-bar-wrap { width: 480px; max-width: 92vw; margin-bottom: 28px; }
+
+    .quiz-card {
+      width: 480px;
+      max-width: 92vw;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      padding: 32px 32px 28px;
+      margin-bottom: 16px;
+    }
+
+    .question-badge {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--red);
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .question-text {
+      font-size: 1.02rem;
+      font-weight: 600;
+      line-height: 1.5;
+      color: var(--text);
+      margin-bottom: 24px;
+    }
+
+    .answers { display: flex; flex-direction: column; gap: 10px; }
+
+    .answer-btn {
+      font-family: var(--font);
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-align: left;
+      background: #f8fafc;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s, transform 0.1s;
+      line-height: 1.4;
+      color: var(--text);
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .answer-btn:hover:not(:disabled) { border-color: var(--red); background: var(--red-light); }
+    .answer-btn:active:not(:disabled) { transform: scale(0.99); }
+
+    .answer-btn .letter {
+      font-weight: 700;
+      font-size: 0.78rem;
+      background: var(--border);
+      color: var(--text-muted);
+      border-radius: 6px;
+      padding: 2px 7px;
+      flex-shrink: 0;
+      margin-top: 1px;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .answer-btn.correct { border-color: #38a169; background: #f0fff4; }
+    .answer-btn.correct .letter { background: #38a169; color: #fff; }
+    .answer-btn.wrong { border-color: var(--red); background: var(--red-light); }
+    .answer-btn.wrong .letter { background: var(--red); color: #fff; }
+    .answer-btn.reveal { border-color: #38a169; background: #f0fff4; opacity: 0.8; }
+    .answer-btn.reveal .letter { background: #38a169; color: #fff; }
+    .answer-btn:disabled { cursor: default; }
+
+    .feedback {
+      margin-top: 18px;
+      padding: 14px 16px;
+      border-radius: var(--radius-md);
+      font-size: 0.88rem;
+      line-height: 1.5;
+      display: none;
+    }
+    .feedback.correct { background: #f0fff4; border: 1px solid #9ae6b4; color: #276749; display: block; }
+    .feedback.wrong { background: var(--red-light); border: 1px solid #fca5a5; color: var(--red-dark); display: block; }
+    .feedback-icon { font-size: 1rem; margin-right: 6px; }
+
+    .next-wrap { width: 480px; max-width: 92vw; display: flex; justify-content: flex-end; }
+
+    .end-screen {
+      width: 480px;
+      max-width: 92vw;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      padding: 40px 36px;
+      text-align: center;
+      display: none;
+    }
+    .score-circle {
+      width: 100px; height: 100px; border-radius: 50%;
+      border: 5px solid var(--red);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      margin: 0 auto 24px;
+    }
+    .score-number { font-size: 2rem; font-weight: 700; color: var(--red); line-height: 1; }
+    .score-total { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+    .end-message { font-size: 1.05rem; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+    .end-sub { font-size: 0.86rem; color: var(--text-muted); margin-bottom: 28px; }
+    .end-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologie EFZ · b.1</span>
+    <h1>Gesetzliche Vorgaben – Käse</h1>
+    <p>VLtH, ZuV, HyV, AOP/GUB & Sortenorganisationen</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+
+  <div class="quiz-center">
+    <div class="progress-text" id="progressText"></div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+
+    <div class="quiz-card" id="quizCard">
+      <span class="question-badge" id="questionBadge"></span>
+      <div class="question-text" id="questionText"></div>
+      <div class="answers" id="answersContainer"></div>
+      <div class="feedback" id="feedback"></div>
+    </div>
+
+    <div class="next-wrap" id="nextWrap" style="display:none">
+      <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()">Weiter &#8594;</button>
+    </div>
+
+    <div class="end-screen" id="endScreen">
+      <div class="score-circle">
+        <div class="score-number" id="scoreNumber"></div>
+        <div class="score-total" id="scoreTotal"></div>
+      </div>
+      <div class="end-message" id="endMessage"></div>
+      <div class="end-sub" id="endSub"></div>
+      <div class="end-actions">
+        <button class="btn btn-ghost" onclick="location.href='../index.html'">&#8592; Alle Lerntools</button>
+        <button class="btn btn-primary" onclick="restartQuiz()">Nochmals versuchen</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+  const QUESTIONS = [
+    {
+      badge: "Verordnungen",
+      question: "Welche Verordnung ist die zentrale gesetzliche Grundlage für Käse (Sachbezeichnung, Fettgehalts- und Festigkeitsstufe)?",
+      answers: [
+        "Zusatzstoffverordnung (ZuV)",
+        "Verordnung über Lebensmittel tierischer Herkunft (VLtH)",
+        "Hygieneverordnung (HyV)",
+        "Gewässerschutzverordnung"
+      ],
+      correct: 1,
+      explanation: "Die VLtH definiert u. a. die Sachbezeichnung «Käse» (Art. 50), die Einteilung nach Fett i.T. und wff (Art. 52) und die geschützten Bezeichnungen (Art. 53)."
+    },
+    {
+      badge: "VLtH",
+      question: "Was trifft auf einen Verarbeitungshilfsstoff (z. B. Lab) zu?",
+      answers: [
+        "Er ist unverzichtbar für die Käseherstellung",
+        "Er ist nicht zwingend nötig",
+        "Er muss immer deklariert werden",
+        "Er ist bei AOP-Käse verboten"
+      ],
+      correct: 0,
+      explanation: "Verarbeitungshilfsstoffe (z. B. Lab) sind unverzichtbar zur Käseherstellung. Zusatzstoffe dagegen sind nicht zwingend nötig – das ist der entscheidende Unterschied (VLtH Art. 51)."
+    },
+    {
+      badge: "ZuV",
+      question: "Was regelt die Zusatzstoffverordnung (ZuV) mit ihren «Positivlisten»?",
+      answers: [
+        "Nur was aufgeführt ist, darf verwendet werden – alles andere ist verboten",
+        "Alles ist erlaubt, ausser was ausdrücklich verboten ist",
+        "Sie regelt die Hygiene des Personals",
+        "Sie regelt die thermische Milchbehandlung"
+      ],
+      correct: 0,
+      explanation: "Eine Positivliste heisst: Nur ausdrücklich aufgeführte Zusatzstoffe sind zugelassen; alles Nichtgenannte ist verboten."
+    },
+    {
+      badge: "ZuV",
+      question: "Dürfen bei der Herstellung von AOP-Käse Zusatzstoffe verwendet werden?",
+      answers: [
+        "Ja, uneingeschränkt",
+        "Ja, aber nur Farbstoffe",
+        "Nein, sie sind verboten",
+        "Nur mit Bewilligung"
+      ],
+      correct: 2,
+      explanation: "Bei AOP-Käsen ist die Verwendung von Zusatzstoffen verboten. Auch sonst werden Zusatzstoffe in der Schweiz sehr zurückhaltend eingesetzt."
+    },
+    {
+      badge: "ZuV",
+      question: "Welcher Stoff muss bei Käse NICHT deklariert werden, obwohl er manchmal zugesetzt wird?",
+      answers: ["Rindenfarbe", "Kalzium", "Konservierungsmittel", "Aromastoffe"],
+      correct: 1,
+      explanation: "Kalzium (z. B. Kalziumchlorid bei Pastmilchkäse) muss nicht deklariert werden, weil Kalzium im Käse natürlicherweise bereits angereichert vorkommt."
+    },
+    {
+      badge: "AOP / GUB",
+      question: "Wofür steht die Abkürzung AOP?",
+      answers: [
+        "Appellation d’Origine Protégée (geschützte Ursprungsbezeichnung)",
+        "Allgemeine Ordnung für Produktion",
+        "Anerkannte Oberflächen-Pflege",
+        "Amtliche Original-Prüfung"
+      ],
+      correct: 0,
+      explanation: "AOP = Appellation d’Origine Protégée (deutsch GUB = Geschützte Ursprungsbezeichnung, ital. DOP). Sie ersetzt die frühere Bezeichnung AOC."
+    },
+    {
+      badge: "AOP / GUB",
+      question: "Was ist bei einer AOP-Käsespezialität sichergestellt?",
+      answers: [
+        "Sie darf in der ganzen Schweiz produziert werden",
+        "Milch aus definierter Region, vor Ort verkäst und gereift, nach Pflichtenheft mit unabhängiger Kontrolle",
+        "Sie darf Zusatzstoffe enthalten",
+        "Sie wird ausschliesslich aus pasteurisierter Milch hergestellt"
+      ],
+      correct: 1,
+      explanation: "Bei AOP kommt die Milch aus einer klar definierten Gegend, wird dort verkäst und bis zur Reife gepflegt. Der Hersteller hält das Pflichtenheft ein; eine unabhängige Kontrollstelle überprüft dies."
+    },
+    {
+      badge: "AOP / GUB",
+      question: "Wozu dient die Kaseinmarke auf einem Käselaib?",
+      answers: [
+        "Zur Aromatisierung der Rinde",
+        "Zur Identifikation jedes einzelnen Käselaibes",
+        "Als Zusatzstoff",
+        "Zur Festlegung der Fettgehaltsstufe"
+      ],
+      correct: 1,
+      explanation: "Die Kaseinmarke dient der Identifikation jedes einzelnen Laibes (z. B. Logo, Laib-Nr., Jahr, Betriebsnummer) und sichert die Unverfälschbarkeit."
+    },
+    {
+      badge: "HyV",
+      question: "Was legt die Hygieneverordnung des EDI (HyV) fest?",
+      answers: [
+        "Die Fettgehaltsstufen",
+        "Die geschützten Ursprungsbezeichnungen",
+        "Hygienevorschriften und mikrobiologische Grenzwerte",
+        "Die zugelassenen Zusatzstoffe"
+      ],
+      correct: 2,
+      explanation: "Die HyV regelt die allgemeinen Hygienevorschriften (Personal, Verfahren, Anlagen, Räume) und enthält die mikrobiologischen Grenzwerte; bei deren Überschreitung gilt ein Produkt als gesundheitsgefährdend."
+    },
+    {
+      badge: "Sortenorganisation",
+      question: "Was gilt für die privatrechtlichen Abmachungen der Sortenorganisationen?",
+      answers: [
+        "Sie stehen über dem öffentlichen Recht",
+        "Sie dürfen nie gegen öffentliches Recht verstossen",
+        "Sie ersetzen die VLtH",
+        "Sie gelten nur für Importkäse"
+      ],
+      correct: 1,
+      explanation: "Sortenorganisationen (Milchproduzenten, Käsehersteller, Vermarkter) treffen privatrechtliche Abmachungen – diese dürfen nie gegen öffentliches Recht verstossen. Ziele: Schutz der Sortenbezeichnung, Pflichtenheft, Qualitäts- und Verkaufsförderung."
+    },
+    {
+      badge: "Milchbehandlung",
+      question: "Wann darf ein Käse die Bezeichnung «Rohmilchkäse» tragen?",
+      answers: [
+        "Wenn die Milch auf 57–68 °C thermisiert wurde",
+        "Wenn die Milch pasteurisiert wurde",
+        "Wenn die Milch nie über 40 °C erwärmt wurde",
+        "Wenn die Bruchwärmtemperatur unter 50 °C liegt"
+      ],
+      correct: 2,
+      explanation: "Als Rohmilch gilt Milch, die nie über 40 °C erwärmt wurde. Voraussetzung sind sehr gute Rohmilchqualität und Bruchwärmtemperaturen über 50 °C."
+    },
+  ];
+
+  let currentIndex = 0;
+  let score = 0;
+  let answered = false;
+  let order = [];
+
+  function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function startQuiz() {
+    order = shuffle([...Array(QUESTIONS.length).keys()]);
+    currentIndex = 0;
+    score = 0;
+    document.getElementById("endScreen").style.display = "none";
+    document.getElementById("quizCard").style.display = "block";
+    showQuestion();
+  }
+
+  function showQuestion() {
+    answered = false;
+    const q = QUESTIONS[order[currentIndex]];
+    const total = QUESTIONS.length;
+
+    document.getElementById("progressText").textContent = `Frage ${currentIndex + 1} von ${total}`;
+    document.getElementById("progressBar").style.width = `${((currentIndex + 1) / total) * 100}%`;
+
+    document.getElementById("questionBadge").textContent = q.badge;
+    document.getElementById("questionText").textContent = q.question;
+
+    const letters = ["A", "B", "C", "D"];
+    const container = document.getElementById("answersContainer");
+    container.innerHTML = q.answers.map((a, i) => `
+      <button class="answer-btn" onclick="selectAnswer(${i})" id="ans-${i}">
+        <span class="letter">${letters[i]}</span>
+        <span>${a}</span>
+      </button>
+    `).join("");
+
+    const fb = document.getElementById("feedback");
+    fb.className = "feedback";
+    fb.textContent = "";
+
+    document.getElementById("nextWrap").style.display = "none";
+    const nextBtn = document.getElementById("nextBtn");
+    nextBtn.textContent = currentIndex < QUESTIONS.length - 1 ? "Weiter →" : "Ergebnis anzeigen";
+  }
+
+  function selectAnswer(chosen) {
+    if (answered) return;
+    answered = true;
+
+    const q = QUESTIONS[order[currentIndex]];
+    const correct = q.correct;
+    const isCorrect = chosen === correct;
+    if (isCorrect) score++;
+
+    for (let i = 0; i < q.answers.length; i++) {
+      const btn = document.getElementById(`ans-${i}`);
+      btn.disabled = true;
+      if (i === correct && i === chosen) btn.classList.add("correct");
+      else if (i === chosen && !isCorrect) btn.classList.add("wrong");
+      else if (i === correct) btn.classList.add("reveal");
+    }
+
+    const fb = document.getElementById("feedback");
+    if (isCorrect) {
+      fb.className = "feedback correct";
+      fb.innerHTML = `<span class="feedback-icon">&#10003;</span><strong>Richtig!</strong> ${q.explanation}`;
+    } else {
+      fb.className = "feedback wrong";
+      fb.innerHTML = `<span class="feedback-icon">&#10007;</span><strong>Nicht ganz.</strong> ${q.explanation}`;
+    }
+
+    document.getElementById("nextWrap").style.display = "flex";
+  }
+
+  function nextQuestion() {
+    currentIndex++;
+    if (currentIndex >= QUESTIONS.length) {
+      showEndScreen();
+    } else {
+      showQuestion();
+    }
+  }
+
+  function showEndScreen() {
+    document.getElementById("quizCard").style.display = "none";
+    document.getElementById("nextWrap").style.display = "none";
+    document.getElementById("progressText").textContent = "";
+    document.getElementById("progressBar").style.width = "100%";
+
+    const total = QUESTIONS.length;
+    const pct = Math.round((score / total) * 100);
+
+    document.getElementById("scoreNumber").textContent = score;
+    document.getElementById("scoreTotal").textContent = `von ${total}`;
+
+    let msg, sub;
+    if (pct === 100) {
+      msg = "Ausgezeichnet!";
+      sub = "Alle Fragen richtig. Sie kennen die gesetzlichen Vorgaben bestens.";
+    } else if (pct >= 75) {
+      msg = "Sehr gut!";
+      sub = "Fast alle Fragen richtig. Wiederholen Sie die markierten Themen kurz.";
+    } else if (pct >= 50) {
+      msg = "Gut gemacht.";
+      sub = "Mehr als die Hälfte richtig. Schauen Sie die falschen Antworten nochmals an.";
+    } else {
+      msg = "Weiter üben.";
+      sub = "Wiederholen Sie die Verordnungen (VLtH, ZuV, HyV, AOP) und versuchen Sie es nochmals.";
+    }
+
+    document.getElementById("endMessage").textContent = msg;
+    document.getElementById("endSub").textContent = sub;
+    document.getElementById("endScreen").style.display = "block";
+  }
+
+  function restartQuiz() { startQuiz(); }
+
+  startQuiz();
+</script>
+</body>
+</html>
