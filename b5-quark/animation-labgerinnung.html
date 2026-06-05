@@ -95,8 +95,11 @@
              ANIMATIONS-INHALT
              ============================================================ -->
 
-        <!-- Freie (abgespaltene) negative Ladungen in der Sirte -->
+        <!-- Freie (abgespaltene) negative Ladungen in der Sirte (Schritt 1–2) -->
         <g id="freeCharges" opacity="0" style="transition:opacity .5s ease"></g>
+
+        <!-- Negative Ladungen, die in Schritt 3–4 um das Gerüst schweben -->
+        <g id="ambientNeg" opacity="0" style="transition:opacity .5s ease"></g>
 
         <!-- Chymosin-Enzyme (Schritt 1) -->
         <g id="chymosin" opacity="0" style="transition:opacity .5s ease"></g>
@@ -179,27 +182,27 @@ var STEPS = [
   {
     title: 'Ausgangslage',
     text:  'Unveränderte Kaseinteilchen tragen auf ihrer Oberfläche mehrheitlich negative Ladungen (−). Gleiche Ladungen stossen sich ab, deshalb verteilen sich die Kaseinteilchen gleichmässig in der Milch und lagern sich nicht zusammen. Auf der Oberfläche befindet sich ausserdem Kalzium.',
-    negOpacity:1, surface:true, wobble:5.5, showChymosin:false, showFree:false, showThreads:false, showCube:false, showSirte:false,
+    negOpacity:1, surface:true, wobble:5.5, showChymosin:false, showFree:false, showAmbient:false, showThreads:false, showCube:false, showSirte:false,
   },
   {
     title: '1. Schritt – Labenzym spaltet Ladungen ab',
     text:  'Das Enzym Chymosin aus dem Labextrakt spaltet die meisten negativen Ladungen von den Kaseinteilchen ab. Die abgespaltenen negativen Ladungen sind danach in der Sirte zu finden.',
-    negOpacity:0, surface:true, wobble:4.5, showChymosin:true, showFree:true, showThreads:false, showCube:false, showSirte:false,
+    negOpacity:0, surface:true, wobble:4.5, showChymosin:true, showFree:true, showAmbient:false, showThreads:false, showCube:false, showSirte:false,
   },
   {
     title: '2. Schritt – Kaseinteilchen lagern sich zusammen',
     text:  'Ohne die abstossenden negativen Ladungen ziehen sich die Kaseinteilchen dort an, wo eine positive (+) und eine negative (−) Ladung zusammentreffen. Sie bilden feine «Fäden». Die Milch ist dabei noch flüssig.',
-    negOpacity:0, surface:true, wobble:2.6, showChymosin:false, showFree:true, showThreads:true, showCube:false, showSirte:false,
+    negOpacity:0, surface:true, wobble:2.6, showChymosin:false, showFree:true, showAmbient:false, showThreads:true, showCube:false, showSirte:false,
   },
   {
     title: '3. Schritt – Kalzium vernetzt die Kaseinteilchen',
     text:  'Das Kalzium verbindet die Kaseinteilchen untereinander: Es bilden sich Kalziumbrücken. So entsteht ein dreidimensionales Kasein-Kalzium-Gerüst, in dem die übrigen Milchbestandteile eingeschlossen sind. Die Milch ist nun sichtbar geronnen, es wird eine Labgallerte. Sie ist deutlich fester als bei der Säuregerinnung.',
-    negOpacity:0, surface:false, wobble:1.8, showChymosin:false, showFree:true, showThreads:false, showCube:true, showSirte:false,
+    negOpacity:0, surface:false, wobble:1.8, showChymosin:false, showFree:false, showAmbient:true, showThreads:false, showCube:true, showSirte:false,
   },
   {
     title: '4. Schritt – Synärese',
     text:  'Die Kalziumbrücken wirken wie angespannte Gummibänder und ziehen sich zusammen. Dadurch wird Wasser (Sirte) aus der Gallerte abgepresst und tropft ab. Diesen Vorgang nennt man Synärese.',
-    negOpacity:0, surface:false, wobble:1.6, showChymosin:false, showFree:true, showThreads:false, showCube:true, showSirte:true,
+    negOpacity:0, surface:false, wobble:1.6, showChymosin:false, showFree:false, showAmbient:true, showThreads:false, showCube:true, showSirte:true,
   },
 ];
 
@@ -288,6 +291,26 @@ FREE_POS.forEach(function(p, k) {
   chargeCircle(fg, '#fee2e2', '#dc2626', '−', '#dc2626', '11');
   freeLayer.appendChild(fg);
   freeEls.push({ el:fg, x:p.x, y:p.y, ph:Math.random()*Math.PI*2 });
+});
+
+/* ---- Negative Ladungen, die in Schritt 3–4 um das Gerüst schweben ----
+   kleiner + halbtransparent + am Rand (Abstand zum Würfel), damit der Fokus
+   auf dem Kasein-Kalzium-Gerüst bleibt. */
+var AMB_POS = [
+  {x:36,y:30},{x:115,y:24},{x:300,y:26},{x:382,y:32},
+  {x:22,y:108},{x:24,y:200},{x:388,y:106},{x:390,y:200},
+  {x:38,y:288},{x:118,y:294},{x:298,y:294},{x:382,y:286},
+  {x:210,y:22},{x:210,y:294}
+];
+var ambLayer = document.getElementById('ambientNeg');
+var ambEls = [];
+AMB_POS.forEach(function(p) {
+  var outer = svgEl('g', {transform:'translate('+p.x+','+p.y+')'});
+  var inner = svgEl('g', {transform:'scale(0.62)'});
+  chargeCircle(inner, '#fee2e2', '#dc2626', '−', '#dc2626', '11');
+  outer.appendChild(inner);
+  ambLayer.appendChild(outer);
+  ambEls.push({ el:outer, x:p.x, y:p.y, ph:Math.random()*Math.PI*2 });
 });
 
 /* ---- Chymosin-Enzyme (Schritt 1) – sitzen an Kaseinteilchen und "schneiden" ---- */
@@ -444,6 +467,15 @@ function clock(now) {
     });
   }
 
+  // 4b) Rand-Ladungen schweben in Schritt 3–4 um das Gerüst
+  if (s.showAmbient) {
+    ambEls.forEach(function(ae) {
+      var dx = Math.sin(now/1000 + ae.ph) * 4;
+      var dy = Math.cos(now/1150 + ae.ph) * 4;
+      ae.el.setAttribute('transform','translate('+(ae.x+dx)+','+(ae.y+dy)+')');
+    });
+  }
+
   // 5) Chymosin-Enzyme "schneiden" (Bewegung Richtung Kaseinteilchen)
   if (s.showChymosin) {
     chyEls.forEach(function(ce) {
@@ -475,6 +507,7 @@ function applyStepVisuals() {
 
   document.getElementById('chymosin').style.opacity    = s.showChymosin ? '1' : '0';
   document.getElementById('freeCharges').style.opacity = s.showFree     ? '1' : '0';
+  document.getElementById('ambientNeg').style.opacity  = s.showAmbient  ? '0.55' : '0';
   document.getElementById('threadBonds').style.opacity = s.showThreads  ? '1' : '0';
   document.getElementById('cubeEdges').style.opacity   = s.showCube     ? '1' : '0';
   document.getElementById('sirteDrops').style.opacity  = s.showSirte    ? '1' : '0';
