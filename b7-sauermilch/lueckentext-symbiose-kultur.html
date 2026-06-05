@@ -152,6 +152,16 @@
     }
     .word-chip:hover { border-color: var(--blue); background: var(--blue-light); color: var(--blue-dark); }
     .word-chip.used { opacity: 0.3; pointer-events: none; }
+    .word-chip.dragging { opacity: 0.4; }
+
+    .blank-slot.drop-over { border-bottom-color: var(--blue); background: var(--blue-light); border-radius: 4px 4px 0 0; }
+
+    #touchClone {
+      position: fixed; z-index: 1000; display: none; pointer-events: none;
+      background: var(--blue); color: #fff; border-radius: 20px;
+      padding: 0.3rem 0.85rem; font-size: 0.84rem; font-weight: 600;
+      box-shadow: var(--shadow-md);
+    }
 
     .result-box {
       width: 560px;
@@ -219,6 +229,8 @@
     </div>
   </div>
 
+  <div id="touchClone"></div>
+
   <script>
     var SEGMENTS = [
       {t: 'Joghurt wird mit den Bakterienarten Streptococcus thermophilus und Lactobacillus bulgaricus gesäuert. Diese beiden leben in '},
@@ -271,6 +283,10 @@
     var difficulty    = null;
     var selectedSlot  = null;
     var filledWords   = [];
+    var dragWord      = null;   // Maus-Drag
+    var touchWord     = null, touchSrc = null;
+    var touchOffX     = 0, touchOffY = 0;
+    var touchClone    = document.getElementById('touchClone');
 
     function setDifficulty(mode) {
       difficulty   = mode;
@@ -303,6 +319,12 @@
       if (difficulty === 'easy') {
         card.querySelectorAll('.blank-slot').forEach(function(el) {
           el.addEventListener('click', function() { clickSlot(parseInt(el.dataset.id)); });
+          el.addEventListener('dragover', function(e) { e.preventDefault(); el.classList.add('drop-over'); });
+          el.addEventListener('dragleave', function() { el.classList.remove('drop-over'); });
+          el.addEventListener('drop', function(e) {
+            e.preventDefault(); el.classList.remove('drop-over');
+            if (dragWord !== null) { placeWordInSlot(parseInt(el.dataset.id), dragWord); dragWord = null; }
+          });
         });
       }
     }
@@ -330,14 +352,67 @@
 
     function buildWordBank() {
       var shuffled = ANSWERS.slice().sort(function() { return Math.random() - 0.5; });
-      var html = '';
+      var wrap = document.getElementById('wordChips');
+      wrap.innerHTML = '';
       shuffled.forEach(function(word) {
-        html += '<button type="button" class="word-chip" data-word="' + escHtml(word) + '"' +
-          ' onclick="clickWord(\'' + escHtml(word) + '\')">' + escHtml(word) + '</button>';
+        var chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'word-chip';
+        chip.dataset.word = word;
+        chip.textContent = word;
+        chip.setAttribute('draggable', 'true');
+        chip.addEventListener('click', function() { clickWord(word); });
+        chip.addEventListener('dragstart', function(e) {
+          dragWord = word; e.dataTransfer.effectAllowed = 'move'; chip.classList.add('dragging');
+        });
+        chip.addEventListener('dragend', function() { chip.classList.remove('dragging'); });
+        chip.addEventListener('touchstart', function(e) { onChipTouchStart(e, chip, word); }, {passive: false});
+        wrap.appendChild(chip);
       });
-      document.getElementById('wordChips').innerHTML = html;
       updateChips();
     }
+
+    // Wort in eine bestimmte Lücke setzen (Klick-Zuordnung, Drag, Touch)
+    function placeWordInSlot(i, word) {
+      filledWords[i] = word;
+      selectedSlot   = null;
+      refreshAllSlots();
+      updateChips();
+    }
+
+    // ---- Touch-Drag ----
+    function onChipTouchStart(e, chip, word) {
+      if (chip.classList.contains('used')) return;
+      if (e.touches.length !== 1) return;
+      e.preventDefault();
+      var t = e.touches[0], r = chip.getBoundingClientRect();
+      touchWord = word; touchSrc = chip;
+      touchOffX = t.clientX - r.left; touchOffY = t.clientY - r.top;
+      touchClone.textContent = word;
+      touchClone.style.left = (t.clientX - touchOffX) + 'px';
+      touchClone.style.top  = (t.clientY - touchOffY) + 'px';
+      touchClone.style.display = 'block';
+      chip.style.opacity = '0.25';
+    }
+
+    document.addEventListener('touchmove', function(e) {
+      if (!touchWord) return;
+      e.preventDefault();
+      var t = e.touches[0];
+      touchClone.style.left = (t.clientX - touchOffX) + 'px';
+      touchClone.style.top  = (t.clientY - touchOffY) + 'px';
+    }, {passive: false});
+
+    document.addEventListener('touchend', function(e) {
+      if (!touchWord) return;
+      var t = e.changedTouches[0];
+      touchClone.style.display = 'none';
+      if (touchSrc) touchSrc.style.opacity = '';
+      var under = document.elementFromPoint(t.clientX, t.clientY);
+      var slot  = under ? under.closest('.blank-slot') : null;
+      if (slot) placeWordInSlot(parseInt(slot.dataset.id), touchWord);
+      touchWord = null; touchSrc = null;
+    });
 
     function updateChips() {
       var used = filledWords.filter(function(w) { return w !== null; });

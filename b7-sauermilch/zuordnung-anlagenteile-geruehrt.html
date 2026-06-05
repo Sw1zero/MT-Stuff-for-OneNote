@@ -66,6 +66,8 @@
     .word-chip:hover { border-color: var(--blue); }
     .word-chip.dragging { opacity: 0.3; }
     .word-chip.used { opacity: 0.2; pointer-events: none; }
+    .word-chip.selected { background: var(--blue); border-color: var(--blue); color: #fff; }
+    .slot-box.ready { border-color: var(--blue); border-style: solid; background: #f0f7ff; }
 
     /* Slots */
     .slots-grid {
@@ -243,6 +245,7 @@ var ANSWERS = [
 // --- Drag state ---
 var dragWord   = null;  // the word being dragged
 var dragSource = null;  // DOM element (chip or slot-box) where drag started
+var selectedWord = null; // click-to-place: currently selected chip word
 
 // --- Touch state ---
 var touchWord   = null;
@@ -264,6 +267,7 @@ function init() {
   buildSlots();
   dragWord = dragSource = null;
   touchWord = touchSource = null;
+  selectedWord = null;
   document.getElementById('resultBanner').className = 'result-banner';
 }
 
@@ -292,8 +296,49 @@ function buildBank() {
     // Touch drag
     chip.addEventListener('touchstart', function(e) { onTouchStart(e, chip, word, false); }, {passive: false});
 
+    // Klick zum Auswählen
+    chip.addEventListener('click', function() { selectChipZ(chip, word); });
+
     bank.appendChild(chip);
   });
+}
+
+// ---- Klick-Bedienung ----
+function selectChipZ(chip, word) {
+  if (chip.classList.contains('selected')) {
+    chip.classList.remove('selected');
+    selectedWord = null;
+    clearReadySlots();
+    return;
+  }
+  document.querySelectorAll('.word-chip.selected').forEach(function(c) { c.classList.remove('selected'); });
+  chip.classList.add('selected');
+  selectedWord = word;
+  document.querySelectorAll('.slot-box').forEach(function(b) {
+    b.classList.remove('ready');
+    if (!b.dataset.filled && !b.classList.contains('correct') && !b.classList.contains('wrong')) b.classList.add('ready');
+  });
+}
+
+function clickBoxZ(box) {
+  if (box.classList.contains('correct') || box.classList.contains('wrong')) return;
+  // Gefülltes Feld per Klick zurückgeben
+  if (box.dataset.filled) {
+    returnWordToBank(box.dataset.filled);
+    clearSlot(box);
+    if (selectedWord) box.classList.add('ready');
+    return;
+  }
+  if (!selectedWord) return;
+  fillSlot(box, selectedWord);
+  markChipUsed(selectedWord);
+  selectedWord = null;
+  document.querySelectorAll('.word-chip.selected').forEach(function(c) { c.classList.remove('selected'); });
+  clearReadySlots();
+}
+
+function clearReadySlots() {
+  document.querySelectorAll('.slot-box').forEach(function(b) { b.classList.remove('ready'); });
 }
 
 // ---- Build slots ----
@@ -347,6 +392,9 @@ function buildSlots() {
         if (!box.dataset.filled) return;
         onTouchStart(e, box, box.dataset.filled, true);
       }, {passive: false});
+
+      // Klick: ausgewähltes Wort setzen / gefülltes Feld leeren
+      box.addEventListener('click', function() { clickBoxZ(box); });
 
       row.appendChild(badge);
       row.appendChild(box);

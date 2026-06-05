@@ -114,6 +114,15 @@
     .blank-cell.filled { border-style: solid; border-color: var(--blue); color: var(--text); font-weight: 500; }
     .blank-cell.correct { border-color: #16a34a !important; background: #f0fdf4 !important; color: #15803d !important; }
     .blank-cell.wrong   { border-color: var(--red) !important; background: var(--red-light) !important; color: var(--red) !important; }
+    .blank-cell.over    { border-color: var(--blue); border-style: solid; background: #e0f2fe; }
+    .word-chip.dragging { opacity: 0.4; }
+
+    #touchClone {
+      position: fixed; z-index: 1000; display: none; pointer-events: none;
+      background: var(--blue); color: #fff; border-radius: 20px;
+      padding: 0.3rem 0.85rem; font-size: 0.82rem; font-weight: 600;
+      box-shadow: var(--shadow-md);
+    }
 
     /* Symbiose info box */
     .info-box {
@@ -227,6 +236,8 @@
 
 </main>
 
+<div id="touchClone"></div>
+
 <footer class="bzwu-footer">
   BZWU Wil-Uzwil · Milchtechnologie EFZ · Philipp Neukomm
 </footer>
@@ -245,7 +256,11 @@ var ANSWERS = [
   'liefert Aminosäuren'
 ];
 
-var selected = null;
+var selected   = null;   // angeklickter Chip
+var dragWord   = null;   // Maus-Drag
+var touchWord  = null, touchSrc = null;
+var touchClone = document.getElementById('touchClone');
+var touchOffX  = 0, touchOffY = 0;
 
 function shuffle(arr) {
   var a = arr.slice();
@@ -256,8 +271,9 @@ function shuffle(arr) {
   return a;
 }
 
+function isLocked(cell) { return cell.classList.contains('correct') || cell.classList.contains('wrong'); }
+
 function init() {
-  // Build word bank
   var bank = document.getElementById('wordBank');
   bank.innerHTML = '';
   shuffle(ANSWERS).forEach(function(word) {
@@ -266,16 +282,27 @@ function init() {
     chip.className = 'word-chip';
     chip.textContent = word;
     chip.dataset.word = word;
+    chip.setAttribute('draggable', 'true');
     chip.onclick = function() { selectChip(this); };
+    chip.addEventListener('dragstart', function(e) {
+      dragWord = word; e.dataTransfer.effectAllowed = 'move'; chip.classList.add('dragging');
+    });
+    chip.addEventListener('dragend', function() { chip.classList.remove('dragging'); });
+    chip.addEventListener('touchstart', function(e) { onChipTouchStart(e, chip, word); }, {passive: false});
     bank.appendChild(chip);
   });
 
-  // Reset all blank cells
   document.querySelectorAll('.blank-cell').forEach(function(cell) {
     cell.textContent = '—';
     cell.className = 'blank-cell';
     delete cell.dataset.filled;
-    cell.onclick = function() { fillCell(this); };
+    cell.onclick = function() { clickCell(this); };
+    cell.addEventListener('dragover', function(e) { e.preventDefault(); if (!isLocked(cell) && !cell.dataset.filled) cell.classList.add('over'); });
+    cell.addEventListener('dragleave', function() { cell.classList.remove('over'); });
+    cell.addEventListener('drop', function(e) {
+      e.preventDefault(); cell.classList.remove('over');
+      if (dragWord) { placeInCell(cell, dragWord); dragWord = null; }
+    });
   });
 
   selected = null;
@@ -295,13 +322,13 @@ function selectChip(chip) {
 
   document.querySelectorAll('.blank-cell').forEach(function(c) {
     c.classList.remove('ready');
-    if (!c.dataset.filled) c.classList.add('ready');
+    if (!c.dataset.filled && !isLocked(c)) c.classList.add('ready');
   });
 }
 
-function fillCell(cell) {
+function clickCell(cell) {
+  if (isLocked(cell)) return;
   if (cell.dataset.filled) {
-    // Clear cell, return word
     returnWord(cell.dataset.filled);
     delete cell.dataset.filled;
     cell.textContent = '—';
@@ -310,14 +337,24 @@ function fillCell(cell) {
     return;
   }
   if (!selected) return;
+  placeInCell(cell, selected);
+}
 
-  cell.dataset.filled = selected;
-  cell.textContent = selected;
+function placeInCell(cell, word) {
+  if (isLocked(cell)) return;
+  var displaced = cell.dataset.filled || null;
+  cell.dataset.filled = word;
+  cell.textContent = word;
   cell.className = 'blank-cell filled';
-
-  markUsed(selected);
+  markUsed(word);
+  if (displaced && displaced !== word) returnWord(displaced);
   selected = null;
+  clearSelectedChip();
   clearReady();
+}
+
+function clearSelectedChip() {
+  document.querySelectorAll('.word-chip.selected').forEach(function(c) { c.classList.remove('selected'); });
 }
 
 function returnWord(word) {
@@ -336,6 +373,40 @@ function clearReady() {
   document.querySelectorAll('.blank-cell').forEach(function(c) { c.classList.remove('ready'); });
 }
 
+// ---- Touch-Drag ----
+function onChipTouchStart(e, chip, word) {
+  if (chip.classList.contains('used')) return;
+  if (e.touches.length !== 1) return;
+  e.preventDefault();
+  var t = e.touches[0], r = chip.getBoundingClientRect();
+  touchWord = word; touchSrc = chip;
+  touchOffX = t.clientX - r.left; touchOffY = t.clientY - r.top;
+  touchClone.textContent = word;
+  touchClone.style.left = (t.clientX - touchOffX) + 'px';
+  touchClone.style.top  = (t.clientY - touchOffY) + 'px';
+  touchClone.style.display = 'block';
+  chip.style.opacity = '0.25';
+}
+
+document.addEventListener('touchmove', function(e) {
+  if (!touchWord) return;
+  e.preventDefault();
+  var t = e.touches[0];
+  touchClone.style.left = (t.clientX - touchOffX) + 'px';
+  touchClone.style.top  = (t.clientY - touchOffY) + 'px';
+}, {passive: false});
+
+document.addEventListener('touchend', function(e) {
+  if (!touchWord) return;
+  var t = e.changedTouches[0];
+  touchClone.style.display = 'none';
+  if (touchSrc) touchSrc.style.opacity = '';
+  var under = document.elementFromPoint(t.clientX, t.clientY);
+  var cell  = under ? under.closest('.blank-cell') : null;
+  if (cell && !isLocked(cell)) placeInCell(cell, touchWord);
+  touchWord = null; touchSrc = null;
+});
+
 function checkAll() {
   var correct = 0, filled = 0;
   document.querySelectorAll('.blank-cell').forEach(function(cell) {
@@ -348,8 +419,8 @@ function checkAll() {
   });
 
   var banner = document.getElementById('resultBanner');
-  if (correct === 10) {
-    banner.textContent = 'Perfekt! Alle 10 Felder richtig ausgefüllt.';
+  if (correct === ANSWERS.length) {
+    banner.textContent = 'Perfekt! Alle ' + ANSWERS.length + ' Felder richtig ausgefüllt.';
     banner.className = 'result-banner show perfect';
   } else {
     banner.textContent = correct + ' von ' + filled + ' Feldern korrekt. Rot markierte Felder nochmals überprüfen.';
