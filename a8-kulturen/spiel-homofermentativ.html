@@ -105,27 +105,43 @@ var HETERO = [
 var bucket = { w:150, h:48, x:(W-150)/2, y:H-62 };
 var tokens = [];
 var score = 0, lives = 3, running = false;
-var baseSpeed = 1.7, spawnEvery = 1150, lastSpawn = 0, lastFrame = 0;
+var lastSpawn = 0, lastFrame = 0, startTime = 0;
 var pointerX = null, leftKey = false, rightKey = false;
 var flash = 0;            // rote Korb-Markierung bei Fehler
-var TOKEN_FONT = '600 13px Inter, system-ui, sans-serif';
+var TOKEN_W = 104;        // feste Kärtchenbreite (würfelig) – Name wird umbrochen
+var LINE_H = 14;
+var TOKEN_FONT = '600 11px Inter, system-ui, sans-serif';
 
 function rand(a,b){ return a + Math.random()*(b-a); }
+
+function wrapLines(name) {
+  ctx.font = TOKEN_FONT;
+  var maxW = TOKEN_W - 14;
+  var words = name.split(' ');
+  var lines = [], cur = '';
+  words.forEach(function(w) {
+    var test = cur ? cur + ' ' + w : w;
+    if (!cur || ctx.measureText(test).width <= maxW) { cur = test; }
+    else { lines.push(cur); cur = w; }
+  });
+  if (cur) lines.push(cur);
+  return lines;
+}
 
 function spawn() {
   var isHomo = Math.random() < 0.5;
   var pool = isHomo ? HOMO : HETERO;
   var name = pool[Math.floor(Math.random()*pool.length)];
-  ctx.font = TOKEN_FONT;
-  var w = ctx.measureText(name).width + 26;
-  var h = 38;
+  var lines = wrapLines(name);
+  var w = TOKEN_W;
+  var h = lines.length * LINE_H + 16;
   var cx = rand(w/2, W - w/2);
-  tokens.push({ name:name, homo:isHomo, cx:cx, y:-h, w:w, h:h, resolved:false });
+  tokens.push({ name:name, lines:lines, homo:isHomo, cx:cx, y:-h, w:w, h:h, resolved:false });
 }
 
 function startGame() {
   tokens = []; score = 0; lives = 3; running = true;
-  baseSpeed = 1.7; spawnEvery = 1150; lastSpawn = 0; flash = 0;
+  lastSpawn = 0; flash = 0; startTime = performance.now();
   bucket.x = (W - bucket.w)/2;
   document.getElementById('startScreen').classList.add('hidden');
   document.getElementById('endScreen').classList.add('hidden');
@@ -159,10 +175,12 @@ function loop(now) {
   if (!running) return;
   var dt = now - lastFrame; lastFrame = now;
   var f = Math.min(dt/16.67, 3);   // Framerate-Ausgleich
-  var speed = Math.min(baseSpeed + score*0.05, 5.0);
+  var elapsed = (now - startTime) / 1000;
+  var speed = Math.min(1.7 + elapsed*0.05, 6.5);          // wird mit der Zeit schneller
+  var spawnTarget = Math.max(330, 1150 - elapsed*14);      // Spawn-Intervall sinkt stetig
 
   // Spawnen
-  if (now - lastSpawn > spawnEvery) { spawn(); lastSpawn = now; spawnEvery = Math.max(650, spawnEvery - 8); }
+  if (now - lastSpawn > spawnTarget) { spawn(); lastSpawn = now; }
 
   // Korb steuern
   if (pointerX !== null) bucket.x = pointerX - bucket.w/2;
@@ -214,11 +232,13 @@ function draw() {
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   tokens.forEach(function(t) {
     var x = t.cx - t.w/2;
-    roundRect(x, t.y, t.w, t.h, 12);
+    roundRect(x, t.y, t.w, t.h, 10);
     ctx.fillStyle = '#eaf2fb'; ctx.fill();
     ctx.lineWidth = 2; ctx.strokeStyle = '#69A9C9'; ctx.stroke();
     ctx.fillStyle = '#134061';
-    ctx.fillText(t.name, t.cx, t.y + t.h/2 + 1);
+    for (var li = 0; li < t.lines.length; li++) {
+      ctx.fillText(t.lines[li], t.cx, t.y + 8 + 7 + li*LINE_H);
+    }
   });
 
   // Korb
