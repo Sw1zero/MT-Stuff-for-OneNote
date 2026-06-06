@@ -47,7 +47,7 @@
 <main class="page-main">
   <a class="back-link" href="../index.html">← Alle Lerntools</a>
 
-  <p class="instruction">Bewege den Korb mit Maus, Finger oder den Pfeiltasten. Fange nur die <strong>homofermentativen</strong> Bakterien!</p>
+  <p class="instruction">Bewege den Korb mit Maus, Finger oder den Pfeiltasten. Fange nur die <strong>homofermentativen</strong> Bakterien! (+50 gefangen · −80 verpasst · Leben weg bei heterofermentativen)</p>
 
   <div class="game-wrap">
     <div class="hud">
@@ -61,7 +61,8 @@
       <div class="overlay" id="startScreen">
         <h2>Homofermentative fangen</h2>
         <p>Es fallen Milchsäurebakterien herunter. Fange mit dem Korb «Homofermentativ» nur die <strong>homofermentativen</strong> Arten.<br><br>
-        Jede falsch gefangene (heterofermentative) Bakterie und jede verpasste homofermentative kostet ein Leben. Du hast 3 Leben.</p>
+        Gefangen: <strong>+50</strong> Punkte · verpasst (durchgefallen): <strong>−80</strong> Punkte.<br>
+        Fängst du eine <strong>heterofermentative</strong>, verlierst du ein Leben – du hast 3 Leben.</p>
         <button class="btn btn-primary" onclick="startGame()">Spiel starten</button>
       </div>
 
@@ -154,8 +155,8 @@ function endGame() {
   running = false;
   document.getElementById('endScore').textContent = score;
   var msg;
-  if (score >= 25) msg = 'Stark! Du erkennst die homofermentativen Arten sicher.';
-  else if (score >= 12) msg = 'Gut gemacht – schau dir die heterofermentativen (Ln, Lb. casei) nochmals an.';
+  if (score >= 600) msg = 'Stark! Du erkennst die homofermentativen Arten sicher.';
+  else if (score >= 250) msg = 'Gut gemacht – schau dir die heterofermentativen (Ln, Lb. casei) nochmals an.';
   else msg = 'Übung macht den Meister: Leuconostoc (Ln) und Lb. casei sind heterofermentativ.';
   document.getElementById('endMsg').textContent = msg;
   document.getElementById('endScreen').classList.remove('hidden');
@@ -200,8 +201,8 @@ function loop(now) {
         // Unterkante ist in der Korböffnung – nur jetzt fangbar
         if (t.cx >= bucket.x && t.cx <= bucket.x + bucket.w) {
           t.resolved = true;
-          if (t.homo) { score++; updateHud(); }
-          else { loseLife(); }
+          if (t.homo) { score += 50; updateHud(); }   // richtig gefangen
+          else { loseLife(); }                          // heterofermentativ = Leben weg
           tokens.splice(i,1);
           continue;
         }
@@ -210,8 +211,8 @@ function loop(now) {
         t.resolved = true;
       }
     }
-    if (t.y > H + 4) {           // unten durchgefallen
-      if (t.homo) loseLife();    // verpasste homofermentative = Fehler
+    if (t.y > H + 4) {                          // unten durchgefallen
+      if (t.homo) { score -= 80; updateHud(); } // verpasste homofermentative = Punktabzug
       tokens.splice(i,1);
     }
   }
