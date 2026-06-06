@@ -102,7 +102,7 @@ var HETERO = [
   'Lb. casei'
 ];
 
-var bucket = { w:150, h:48, x:(W-150)/2, y:H-62 };
+var bucket = { w:96, h:46, x:(W-96)/2, y:H-60 };
 var tokens = [];
 var score = 0, lives = 3, running = false;
 var lastSpawn = 0, lastFrame = 0, startTime = 0;
@@ -190,18 +190,24 @@ function loop(now) {
   if (bucket.x > W - bucket.w) bucket.x = W - bucket.w;
 
   // Bewegen + Auswerten
-  var rimY = bucket.y + 12;
+  var bTop = bucket.y, bBot = bucket.y + bucket.h + 6;   // Fang-Fenster = Korböffnung
   for (var i = tokens.length-1; i >= 0; i--) {
     var t = tokens[i];
     t.y += speed * f;
-    if (!t.resolved && t.y + t.h >= rimY) {
-      t.resolved = true;
-      if (t.cx >= bucket.x && t.cx <= bucket.x + bucket.w) {
-        // gefangen
-        if (t.homo) { score++; updateHud(); }
-        else { loseLife(); }
-        tokens.splice(i,1);
-        continue;
+    var bottom = t.y + t.h;
+    if (!t.resolved) {
+      if (bottom >= bTop && bottom <= bBot) {
+        // Unterkante ist in der Korböffnung – nur jetzt fangbar
+        if (t.cx >= bucket.x && t.cx <= bucket.x + bucket.w) {
+          t.resolved = true;
+          if (t.homo) { score++; updateHud(); }
+          else { loseLife(); }
+          tokens.splice(i,1);
+          continue;
+        }
+      } else if (bottom > bBot) {
+        // unterhalb der Korböffnung vorbei – ab jetzt nicht mehr fangbar
+        t.resolved = true;
       }
     }
     if (t.y > H + 4) {           // unten durchgefallen
@@ -254,9 +260,10 @@ function draw() {
   // Korbrand
   ctx.fillStyle = flash > 0 ? '#CC3333' : '#0f3350';
   roundRect(bx-4, by-8, bw+8, 12, 5); ctx.fill();
-  // Beschriftung
-  ctx.fillStyle = '#fff'; ctx.font = '700 13px Inter, system-ui, sans-serif';
-  ctx.fillText('Homofermentativ', bx + bw/2, by + bh/2 + 2);
+  // Beschriftung (zweizeilig, passt in den schmalen Korb)
+  ctx.fillStyle = '#fff'; ctx.font = '700 10px Inter, system-ui, sans-serif';
+  ctx.fillText('Homo-',       bx + bw/2, by + bh/2 - 5);
+  ctx.fillText('fermentativ', bx + bw/2, by + bh/2 + 7);
 }
 
 /* ---- Steuerung ---- */
