@@ -109,11 +109,16 @@ var score = 0, lives = 3, running = false;
 var lastSpawn = 0, lastFrame = 0, startTime = 0;
 var pointerX = null, leftKey = false, rightKey = false;
 var flash = 0;            // rote Korb-Markierung bei Fehler
+var floaters = [];        // schwebende Punkt-/Herz-Anzeigen
 var TOKEN_W = 104;        // feste Kärtchenbreite (würfelig) – Name wird umbrochen
 var LINE_H = 14;
 var TOKEN_FONT = '600 11px Inter, system-ui, sans-serif';
 
 function rand(a,b){ return a + Math.random()*(b-a); }
+
+function addFloater(x, y, text, color) {
+  floaters.push({ x:x, y:y, text:text, color:color, life:1 });
+}
 
 function wrapLines(name) {
   ctx.font = TOKEN_FONT;
@@ -141,7 +146,7 @@ function spawn() {
 }
 
 function startGame() {
-  tokens = []; score = 0; lives = 3; running = true;
+  tokens = []; floaters = []; score = 0; lives = 3; running = true;
   lastSpawn = 0; flash = 0; startTime = performance.now();
   bucket.x = (W - bucket.w)/2;
   document.getElementById('startScreen').classList.add('hidden');
@@ -177,8 +182,8 @@ function loop(now) {
   var dt = now - lastFrame; lastFrame = now;
   var f = Math.min(dt/16.67, 3);   // Framerate-Ausgleich
   var elapsed = (now - startTime) / 1000;
-  var speed = Math.min(1.7 + elapsed*0.05, 6.5);          // wird mit der Zeit schneller
-  var spawnTarget = Math.max(330, 1150 - elapsed*14);      // Spawn-Intervall sinkt stetig
+  var speed = Math.min(1.3 + elapsed*0.045, 6.5);          // langsamer Start, wird mit der Zeit schneller
+  var spawnTarget = Math.max(330, 1400 - elapsed*13);      // Start mit grösserem Abstand, sinkt stetig
 
   // Spawnen
   if (now - lastSpawn > spawnTarget) { spawn(); lastSpawn = now; }
@@ -201,8 +206,13 @@ function loop(now) {
         // Unterkante ist in der Korböffnung – nur jetzt fangbar
         if (t.cx >= bucket.x && t.cx <= bucket.x + bucket.w) {
           t.resolved = true;
-          if (t.homo) { score += 50; updateHud(); }   // richtig gefangen
-          else { loseLife(); }                          // heterofermentativ = Leben weg
+          if (t.homo) {
+            score += 50; updateHud();
+            addFloater(t.cx, bucket.y - 6, '+50', '#16a34a');     // grün: Punkt gewonnen
+          } else {
+            loseLife();
+            addFloater(t.cx, bucket.y - 6, '💔', '#CC3333');       // zerbrochenes Herz
+          }
           tokens.splice(i,1);
           continue;
         }
@@ -212,9 +222,20 @@ function loop(now) {
       }
     }
     if (t.y > H + 4) {                          // unten durchgefallen
-      if (t.homo) { score -= 80; updateHud(); } // verpasste homofermentative = Punktabzug
+      if (t.homo) {
+        score -= 80; updateHud();
+        addFloater(t.cx, H - 28, '−80', '#CC3333');   // rot: Punkt verloren
+      }
       tokens.splice(i,1);
     }
+  }
+
+  // Schwebende Anzeigen aktualisieren
+  for (var fi = floaters.length-1; fi >= 0; fi--) {
+    var fl = floaters[fi];
+    fl.y -= 0.6 * f;
+    fl.life -= dt / 900;
+    if (fl.life <= 0) floaters.splice(fi, 1);
   }
 
   draw();
@@ -265,6 +286,18 @@ function draw() {
   ctx.fillStyle = '#fff'; ctx.font = '700 10px Inter, system-ui, sans-serif';
   ctx.fillText('Homo-',       bx + bw/2, by + bh/2 - 5);
   ctx.fillText('fermentativ', bx + bw/2, by + bh/2 + 7);
+
+  // Schwebende Punkt-/Herz-Anzeigen
+  ctx.font = '800 22px Inter, system-ui, sans-serif';
+  for (var fi = 0; fi < floaters.length; fi++) {
+    var fl = floaters[fi];
+    ctx.globalAlpha = Math.max(0, Math.min(1, fl.life));
+    ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+    ctx.strokeText(fl.text, fl.x, fl.y);
+    ctx.fillStyle = fl.color;
+    ctx.fillText(fl.text, fl.x, fl.y);
+  }
+  ctx.globalAlpha = 1;
 }
 
 /* ---- Steuerung ---- */
