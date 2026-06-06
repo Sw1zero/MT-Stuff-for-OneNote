@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spiel – Homofermentative fangen</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .back-link { display:inline-block; font-size:0.82rem; color:var(--text-muted); text-decoration:none; margin-bottom:1rem; }
+    .back-link:hover { color:var(--red); }
+    .instruction { font-size:0.84rem; color:var(--text-muted); margin-bottom:1rem; text-align:center; }
+
+    .game-wrap { max-width:640px; margin:0 auto; }
+    .hud { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-weight:700; font-size:0.95rem; color:var(--blue-dark); }
+    .hud .lives { color:var(--red); letter-spacing:2px; }
+
+    .stage { position:relative; width:100%; }
+    canvas#game { display:block; width:100%; height:auto; background:#f0f7ff; border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); touch-action:none; cursor:none; }
+
+    .overlay {
+      position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+      text-align:center; background:rgba(19,64,97,0.86); color:#fff; border-radius:var(--radius-lg); padding:24px;
+    }
+    .overlay.hidden { display:none; }
+    .overlay h2 { font-size:1.3rem; font-weight:700; margin-bottom:10px; }
+    .overlay p { font-size:0.9rem; line-height:1.6; max-width:420px; margin-bottom:18px; color:rgba(255,255,255,0.9); }
+    .overlay .big-score { font-size:2.2rem; font-weight:800; margin:6px 0 14px; }
+
+    .legend { margin-top:14px; font-size:0.78rem; color:var(--text-subtle); text-align:center; line-height:1.6; }
+    .legend b { color:var(--blue-dark); }
+  </style>
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+  <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologie EFZ · a.8</span>
+  <h1>Homofermentative fangen</h1>
+  <p>Fang die richtigen Milchsäurebakterien im Korb</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+  <a class="back-link" href="../index.html">← Alle Lerntools</a>
+
+  <p class="instruction">Bewege den Korb mit Maus, Finger oder den Pfeiltasten. Fange nur die <strong>homofermentativen</strong> Bakterien!</p>
+
+  <div class="game-wrap">
+    <div class="hud">
+      <span>Punkte: <span id="score">0</span></span>
+      <span class="lives" id="lives">♥ ♥ ♥</span>
+    </div>
+
+    <div class="stage">
+      <canvas id="game" width="640" height="460"></canvas>
+
+      <div class="overlay" id="startScreen">
+        <h2>Homofermentative fangen</h2>
+        <p>Es fallen Milchsäurebakterien herunter. Fange mit dem Korb «Homofermentativ» nur die <strong>homofermentativen</strong> Arten.<br><br>
+        Jede falsch gefangene (heterofermentative) Bakterie und jede verpasste homofermentative kostet ein Leben. Du hast 3 Leben.</p>
+        <button class="btn btn-primary" onclick="startGame()">Spiel starten</button>
+      </div>
+
+      <div class="overlay hidden" id="endScreen">
+        <h2 id="endTitle">Game Over</h2>
+        <div class="big-score"><span id="endScore">0</span> Punkte</div>
+        <p id="endMsg"></p>
+        <button class="btn btn-primary" onclick="startGame()">Nochmals spielen</button>
+      </div>
+    </div>
+
+    <div class="legend">
+      <b>Homofermentativ</b> = bildet fast nur Milchsäure (&gt; 90 %).
+      Heterofermentative (z. B. <i>Leuconostoc</i>) bilden zusätzlich Essigsäure, CO₂ und Aroma – die gehören <b>nicht</b> in den Korb.
+    </div>
+  </div>
+</main>
+
+<footer class="bzwu-footer">BZWU Wil-Uzwil · Milchtechnologie EFZ · Philipp Neukomm</footer>
+
+<script>
+var cvs = document.getElementById('game');
+var ctx = cvs.getContext('2d');
+var W = cvs.width, H = cvs.height;
+
+// Bakterien aus a.8 (Kokken- und Stäbchentabelle)
+var HOMO = [
+  'Lc. lactis ssp. lactis',
+  'Lc. lactis ssp. cremoris',
+  'Sc. thermophilus',
+  'Lb. delbrueckii ssp. lactis',
+  'Lb. delbrueckii ssp. bulgaricus',
+  'Lb. helveticus'
+];
+var HETERO = [
+  'Ln. mesenteroides ssp. cremoris',
+  'Ln. mesenteroides ssp. dextranicum',
+  'Lb. casei'
+];
+
+var bucket = { w:150, h:48, x:(W-150)/2, y:H-62 };
+var tokens = [];
+var score = 0, lives = 3, running = false;
+var baseSpeed = 1.7, spawnEvery = 1150, lastSpawn = 0, lastFrame = 0;
+var pointerX = null, leftKey = false, rightKey = false;
+var flash = 0;            // rote Korb-Markierung bei Fehler
+var TOKEN_FONT = '600 13px Inter, system-ui, sans-serif';
+
+function rand(a,b){ return a + Math.random()*(b-a); }
+
+function spawn() {
+  var isHomo = Math.random() < 0.5;
+  var pool = isHomo ? HOMO : HETERO;
+  var name = pool[Math.floor(Math.random()*pool.length)];
+  ctx.font = TOKEN_FONT;
+  var w = ctx.measureText(name).width + 26;
+  var h = 38;
+  var cx = rand(w/2, W - w/2);
+  tokens.push({ name:name, homo:isHomo, cx:cx, y:-h, w:w, h:h, resolved:false });
+}
+
+function startGame() {
+  tokens = []; score = 0; lives = 3; running = true;
+  baseSpeed = 1.7; spawnEvery = 1150; lastSpawn = 0; flash = 0;
+  bucket.x = (W - bucket.w)/2;
+  document.getElementById('startScreen').classList.add('hidden');
+  document.getElementById('endScreen').classList.add('hidden');
+  updateHud();
+  lastFrame = performance.now();
+  requestAnimationFrame(loop);
+}
+
+function endGame() {
+  running = false;
+  document.getElementById('endScore').textContent = score;
+  var msg;
+  if (score >= 25) msg = 'Stark! Du erkennst die homofermentativen Arten sicher.';
+  else if (score >= 12) msg = 'Gut gemacht – schau dir die heterofermentativen (Ln, Lb. casei) nochmals an.';
+  else msg = 'Übung macht den Meister: Leuconostoc (Ln) und Lb. casei sind heterofermentativ.';
+  document.getElementById('endMsg').textContent = msg;
+  document.getElementById('endScreen').classList.remove('hidden');
+}
+
+function updateHud() {
+  document.getElementById('score').textContent = score;
+  document.getElementById('lives').textContent = lives > 0 ? Array(lives+1).join('♥ ').trim() : '–';
+}
+
+function loseLife() {
+  lives--; flash = 14; updateHud();
+  if (lives <= 0) { updateHud(); endGame(); }
+}
+
+function loop(now) {
+  if (!running) return;
+  var dt = now - lastFrame; lastFrame = now;
+  var f = Math.min(dt/16.67, 3);   // Framerate-Ausgleich
+  var speed = Math.min(baseSpeed + score*0.05, 5.0);
+
+  // Spawnen
+  if (now - lastSpawn > spawnEvery) { spawn(); lastSpawn = now; spawnEvery = Math.max(650, spawnEvery - 8); }
+
+  // Korb steuern
+  if (pointerX !== null) bucket.x = pointerX - bucket.w/2;
+  if (leftKey)  bucket.x -= 7*f;
+  if (rightKey) bucket.x += 7*f;
+  if (bucket.x < 0) bucket.x = 0;
+  if (bucket.x > W - bucket.w) bucket.x = W - bucket.w;
+
+  // Bewegen + Auswerten
+  var rimY = bucket.y + 12;
+  for (var i = tokens.length-1; i >= 0; i--) {
+    var t = tokens[i];
+    t.y += speed * f;
+    if (!t.resolved && t.y + t.h >= rimY) {
+      t.resolved = true;
+      if (t.cx >= bucket.x && t.cx <= bucket.x + bucket.w) {
+        // gefangen
+        if (t.homo) { score++; updateHud(); }
+        else { loseLife(); }
+        tokens.splice(i,1);
+        continue;
+      }
+    }
+    if (t.y > H + 4) {           // unten durchgefallen
+      if (t.homo) loseLife();    // verpasste homofermentative = Fehler
+      tokens.splice(i,1);
+    }
+  }
+
+  draw();
+  if (running) requestAnimationFrame(loop);
+}
+
+function roundRect(x,y,w,h,r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+
+function draw() {
+  ctx.clearRect(0,0,W,H);
+
+  // Tokens (alle gleich – kein Farb-Hinweis auf den Typ)
+  ctx.font = TOKEN_FONT;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  tokens.forEach(function(t) {
+    var x = t.cx - t.w/2;
+    roundRect(x, t.y, t.w, t.h, 12);
+    ctx.fillStyle = '#eaf2fb'; ctx.fill();
+    ctx.lineWidth = 2; ctx.strokeStyle = '#69A9C9'; ctx.stroke();
+    ctx.fillStyle = '#134061';
+    ctx.fillText(t.name, t.cx, t.y + t.h/2 + 1);
+  });
+
+  // Korb
+  var bx = bucket.x, by = bucket.y, bw = bucket.w, bh = bucket.h;
+  ctx.beginPath();
+  ctx.moveTo(bx, by);
+  ctx.lineTo(bx + bw, by);
+  ctx.lineTo(bx + bw - 14, by + bh);
+  ctx.lineTo(bx + 14, by + bh);
+  ctx.closePath();
+  ctx.fillStyle = flash > 0 ? '#CC3333' : '#134061'; ctx.fill();
+  if (flash > 0) flash--;
+  // Korbrand
+  ctx.fillStyle = flash > 0 ? '#CC3333' : '#0f3350';
+  roundRect(bx-4, by-8, bw+8, 12, 5); ctx.fill();
+  // Beschriftung
+  ctx.fillStyle = '#fff'; ctx.font = '700 13px Inter, system-ui, sans-serif';
+  ctx.fillText('Homofermentativ', bx + bw/2, by + bh/2 + 2);
+}
+
+/* ---- Steuerung ---- */
+function pointerToX(clientX) {
+  var rect = cvs.getBoundingClientRect();
+  return (clientX - rect.left) * (W / rect.width);
+}
+cvs.addEventListener('pointermove', function(e){ pointerX = pointerToX(e.clientX); });
+cvs.addEventListener('pointerdown', function(e){ pointerX = pointerToX(e.clientX); });
+cvs.addEventListener('pointerleave', function(){ pointerX = null; });
+document.addEventListener('keydown', function(e){
+  if (e.key === 'ArrowLeft')  { leftKey = true;  pointerX = null; }
+  if (e.key === 'ArrowRight') { rightKey = true; pointerX = null; }
+});
+document.addEventListener('keyup', function(e){
+  if (e.key === 'ArrowLeft')  leftKey = false;
+  if (e.key === 'ArrowRight') rightKey = false;
+});
+
+// Erststand zeichnen
+draw();
+</script>
+</body>
+</html>

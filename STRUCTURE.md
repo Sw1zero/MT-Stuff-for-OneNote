@@ -51,7 +51,8 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 │   ├── tabellen-luecken-milchsaeuregaerung.html
 │   ├── quiz-kulturenformen.html
 │   ├── quiz-abweichungen-phagen.html
-│   └── kreuzwortraetsel-kulturen.html
+│   ├── kreuzwortraetsel-kulturen.html
+│   └── spiel-homofermentativ.html
 └── tools/
     └── einheiten-trainer.html
 ```
@@ -118,6 +119,7 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 | `prozessvergleich` | Prozessvergleich  | `prozessvergleich-jogurt.html`          | Zwei Produktionswege nebeneinander, aufklappbare Details |
 | `hotspot`          | Hotspot           | `hotspot-bakterienzelle.html`           | Bild mit anklickbaren Zonen (Polygon/Kreis/Polylinie)   |
 | `kreuzwortraetsel` | Kreuzworträtsel   | `kreuzwortraetsel-kulturen.html`        | Auto-Gitter aus Fachbegriffen, Hinweise waagrecht/senkrecht |
+| `spiel`            | Spiel             | `spiel-homofermentativ.html`            | Geschicklichkeitsspiel (Canvas), Maus/Touch/Tasten, 3 Leben |
 | `animation`        | Animation         | `animation-labgerinnung.html`           | Schrittweise SVG-Animation eines Prozesses mit Nav      |
 | `prozess-entscheid`| Prozess-Entscheid | `prozess-entscheid-jogurt.html`         | Entscheidung pro Prozessschritt mit Fehleranalyse       |
 
