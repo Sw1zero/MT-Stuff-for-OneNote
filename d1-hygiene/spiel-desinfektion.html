@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spiel – Mikroorganismen desinfizieren</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .back-link { display:inline-block; font-size:0.82rem; color:var(--text-muted); text-decoration:none; margin-bottom:1rem; }
+    .back-link:hover { color:var(--red); }
+    .instruction { font-size:0.84rem; color:var(--text-muted); margin-bottom:1rem; text-align:center; }
+
+    .game-wrap { max-width:640px; margin:0 auto; }
+    .hud { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-weight:700; font-size:0.95rem; color:var(--blue-dark); }
+    .hud .lives { color:var(--red); letter-spacing:2px; }
+
+    .stage { position:relative; width:100%; }
+    canvas#game { display:block; width:100%; height:auto; background:#f0f7ff; border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); touch-action:none; cursor:none; }
+
+    .overlay {
+      position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+      text-align:center; background:rgba(19,64,97,0.86); color:#fff; border-radius:var(--radius-lg); padding:24px;
+    }
+    .overlay.hidden { display:none; }
+    .overlay h2 { font-size:1.3rem; font-weight:700; margin-bottom:10px; }
+    .overlay p { font-size:0.9rem; line-height:1.6; max-width:440px; margin-bottom:18px; color:rgba(255,255,255,0.9); }
+    .overlay .big-score { font-size:2.2rem; font-weight:800; margin:6px 0 14px; }
+
+    .legend { margin-top:14px; font-size:0.78rem; color:var(--text-muted); line-height:1.7; }
+    .legend .row { margin-bottom:4px; }
+    .legend b { color:var(--blue-dark); }
+    .legend .tag { font-weight:700; }
+    .legend .green { color:#15803d; }
+    .legend .red   { color:#9a3412; }
+    .legend .skull { color:#CC3333; }
+  </style>
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+  <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologie EFZ · d.1</span>
+  <h1>Mikroorganismen desinfizieren</h1>
+  <p>Spritze schädliche und krankheitserregende Keime weg – verschone die nützlichen!</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+  <a class="back-link" href="../index.html">← Alle Lerntools</a>
+
+  <p class="instruction">Ziele mit Maus / Finger (oder Pfeiltasten), spritze mit <strong>Klick / Tippen / Leertaste</strong>. Triff <strong>schädliche &amp; krankheitserregende</strong> Keime, bevor sie ins Produkt fallen – aber <strong>nicht</strong> die nützlichen Kulturen!</p>
+
+  <div class="game-wrap">
+    <div class="hud">
+      <span>Punkte: <span id="score">0</span></span>
+      <span class="lives" id="lives">♥ ♥ ♥</span>
+    </div>
+
+    <div class="stage">
+      <canvas id="game" width="640" height="480"></canvas>
+
+      <div class="overlay" id="startScreen">
+        <h2>Mikroorganismen desinfizieren</h2>
+        <p>Keime fallen Richtung Produkt. Spritze <strong>Desinfektionsmittel</strong> auf <strong>schädliche</strong> (Verderb) und <strong>krankheitserregende</strong> (pathogene) Keime: <strong>+50</strong> Punkte.<br><br>
+        Triffst du eine <strong>nützliche Kultur</strong>, zerstörst du sie → Leben weg.<br>
+        Lässt du einen schädlichen/pathogenen Keim ins Produkt → Kontamination → Leben weg.<br>
+        Du hast 3 Leben.</p>
+        <button class="btn btn-primary" onclick="startGame()">Spiel starten</button>
+      </div>
+
+      <div class="overlay hidden" id="endScreen">
+        <h2 id="endTitle">Game Over</h2>
+        <div class="big-score"><span id="endScore">0</span> Punkte</div>
+        <p id="endMsg"></p>
+        <button class="btn btn-primary" onclick="startGame()">Nochmals spielen</button>
+      </div>
+    </div>
+
+    <div class="legend">
+      <div class="row"><span class="tag green">● Nützlich – NICHT spritzen:</span> Milchsäure- &amp; Probiotische Bakterien, Reifungskulturen (<i>Brevibacterium linens</i>, <i>Penicillium</i>, <i>Geotrichum candidum</i>).</div>
+      <div class="row"><span class="tag red">● Schädlich – spritzen:</span> Coliforme, Clostridien, <i>Lb. fermentum</i>, Pseudomonaden, salztolerante Bakterien, Schimmel, Hefen → Qualitätsfehler.</div>
+      <div class="row"><span class="tag skull">● Krankheitserregend – spritzen:</span> Salmonellen, <i>Listeria</i>, <i>E. coli</i>, <i>Staph. aureus</i>, <i>Campylobacter</i>, Brucellen, <i>Aspergillus flavus</i> …</div>
+    </div>
+  </div>
+</main>
+
+<footer class="bzwu-footer">BZWU Wil-Uzwil · Milchtechnologie EFZ · Philipp Neukomm</footer>
+
+<script>
+var cvs = document.getElementById('game');
+var ctx = cvs.getContext('2d');
+var W = cvs.width, H = cvs.height;
+
+// Mikroorganismen aus d.1 (nützlich / schädlich / krankheitserregend)
+var NUETZLICH = [
+  'Lc. lactis ssp. lactis',
+  'Lc. lactis ssp. cremoris',
+  'Sc. thermophilus',
+  'Lb. delbrueckii ssp. bulgaricus',
+  'Lb. helveticus',
+  'Lactobacillus acidophilus',
+  'Bifidusbakterien',
+  'Brevibacterium linens',
+  'Penicillium camemberti',
+  'Penicillium roqueforti',
+  'Geotrichum candidum'
+];
+var SCHAEDLICH = [
+  'Coliforme Bakterien',
+  'Cl. butyricum',
+  'Cl. tyrobutyricum',
+  'Cl. sporogenes',
+  'Lb. fermentum',
+  'Pseudomonaden',
+  'Salztolerante Bakterien',
+  'Mucor-Schimmel',
+  'Hefen'
+];
+var PATHOGEN = [
+  'Salmonellen',
+  'Escherichia coli',
+  'Staphylococcus aureus',
+  'Listeria monocytogenes',
+  'Campylobacter',
+  'Brucellen',
+  'Aspergillus flavus',
+  'Bacillus cereus',
+  'Clostridium botulinum',
+  'Mycobacterium tuberculosis'
+];
+
+var PRODUCT_H = 34;
+var PRODUCT_Y = H - PRODUCT_H;
+
+var TOKEN_W = 128;
+var LINE_H = 14;
+var TOKEN_FONT = '600 11px Inter, system-ui, sans-serif';
+var HIT_R = 48;            // Sprüh-Trefferradius
+
+var germs = [];
+var sprays = [];           // Sprüh-Effekte
+var floaters = [];         // schwebende Punkt-/Hinweis-Anzeigen
+var score = 0, lives = 3, running = false;
+var lastSpawn = 0, lastFrame = 0, startTime = 0, lastFire = 0;
+var aimX = W/2, aimY = H/2 - 30;
+var leftKey = false, rightKey = false, upKey = false, downKey = false;
+var flash = 0;             // roter Rand bei Fehler
+
+function rand(a,b){ return a + Math.random()*(b-a); }
+
+function addFloater(x, y, text, color) {
+  floaters.push({ x:x, y:y, text:text, color:color, life:1 });
+}
+
+function wrapLines(name) {
+  ctx.font = TOKEN_FONT;
+  var maxW = TOKEN_W - 16;
+  var words = name.split(' ');
+  var lines = [], cur = '';
+  words.forEach(function(w) {
+    var test = cur ? cur + ' ' + w : w;
+    if (!cur || ctx.measureText(test).width <= maxW) { cur = test; }
+    else { lines.push(cur); cur = w; }
+  });
+  if (cur) lines.push(cur);
+  return lines;
+}
+
+function spawn() {
+  var r = Math.random();
+  var cat, pool;
+  if (r < 0.40)      { cat = 'nuetzlich';  pool = NUETZLICH; }
+  else if (r < 0.72) { cat = 'schaedlich'; pool = SCHAEDLICH; }
+  else               { cat = 'pathogen';   pool = PATHOGEN; }
+  var name = pool[Math.floor(Math.random()*pool.length)];
+  var lines = wrapLines(name);
+  var w = TOKEN_W;
+  var h = lines.length * LINE_H + 18;
+  var cx = rand(w/2 + 4, W - w/2 - 4);
+  germs.push({ name:name, lines:lines, cat:cat, cx:cx, y:-h, w:w, h:h, resolved:false, wobble:rand(0,6.28) });
+}
+
+function startGame() {
+  germs = []; sprays = []; floaters = [];
+  score = 0; lives = 3; running = true;
+  lastSpawn = 0; flash = 0; startTime = performance.now();
+  document.getElementById('startScreen').classList.add('hidden');
+  document.getElementById('endScreen').classList.add('hidden');
+  updateHud();
+  lastFrame = performance.now();
+  requestAnimationFrame(loop);
+}
+
+function endGame() {
+  running = false;
+  document.getElementById('endScore').textContent = score;
+  var msg;
+  if (score >= 700)      msg = 'Hervorragend! Du erkennst nützliche, schädliche und pathogene Keime sicher.';
+  else if (score >= 350) msg = 'Gut gemacht – achte weiter darauf, die nützlichen Kulturen zu verschonen.';
+  else                   msg = 'Übung macht den Meister: Milchsäure-, Probiotik- und Reifungskulturen sind nützlich – alle anderen wegspritzen.';
+  document.getElementById('endMsg').textContent = msg;
+  document.getElementById('endScreen').classList.remove('hidden');
+}
+
+function updateHud() {
+  document.getElementById('score').textContent = score;
+  document.getElementById('lives').textContent = lives > 0 ? Array(lives+1).join('♥ ').trim() : '–';
+}
+
+function loseLife() {
+  lives--; flash = 14; updateHud();
+  if (lives <= 0) { updateHud(); endGame(); }
+}
+
+function fire() {
+  var now = performance.now();
+  if (now - lastFire < 90) return;
+  lastFire = now;
+  sprays.push({ x:aimX, y:aimY, life:1 });
+
+  // nächstgelegenen Keim im Trefferradius suchen
+  var best = -1, bestD = HIT_R;
+  for (var i = 0; i < germs.length; i++) {
+    var g = germs[i];
+    if (g.resolved) continue;
+    var gx = g.cx, gy = g.y + g.h/2;
+    var d = Math.sqrt((gx-aimX)*(gx-aimX) + (gy-aimY)*(gy-aimY));
+    if (d <= bestD) { bestD = d; best = i; }
+  }
+  if (best < 0) return;
+
+  var t = germs[best];
+  t.resolved = true;
+  var cx = t.cx, cy = t.y + t.h/2;
+  if (t.cat === 'nuetzlich') {
+    addFloater(cx, cy, 'Nützlich!', '#CC3333');
+    germs.splice(best, 1);
+    loseLife();
+  } else {
+    score += 50; updateHud();
+    addFloater(cx, cy, '+50', '#16a34a');
+    germs.splice(best, 1);
+  }
+}
+
+function loop(now) {
+  if (!running) return;
+  var dt = now - lastFrame; lastFrame = now;
+  var f = Math.min(dt/16.67, 3);
+  var elapsed = (now - startTime) / 1000;
+  var speed = Math.min(1.0 + elapsed*0.04, 5.5);          // langsamer Start, wird schneller
+  var spawnTarget = Math.max(430, 1500 - elapsed*12);     // Abstand sinkt mit der Zeit
+
+  if (now - lastSpawn > spawnTarget) { spawn(); lastSpawn = now; }
+
+  // Zielkreuz per Tastatur bewegen
+  if (leftKey)  aimX -= 7*f;
+  if (rightKey) aimX += 7*f;
+  if (upKey)    aimY -= 7*f;
+  if (downKey)  aimY += 7*f;
+  if (aimX < 0) aimX = 0; if (aimX > W) aimX = W;
+  if (aimY < 0) aimY = 0; if (aimY > PRODUCT_Y) aimY = PRODUCT_Y;
+
+  // Keime bewegen + auswerten
+  for (var i = germs.length-1; i >= 0; i--) {
+    var g = germs[i];
+    g.y += speed * f;
+    g.wobble += 0.05 * f;
+    if (g.y + g.h >= PRODUCT_Y) {
+      if (g.cat === 'nuetzlich') {
+        // gehört ins Produkt – passiert ohne Strafe
+      } else {
+        addFloater(g.cx, PRODUCT_Y - 14, 'kontaminiert!', '#CC3333');
+        loseLife();
+      }
+      germs.splice(i, 1);
+    }
+  }
+
+  // Sprüh-Effekte
+  for (var si = sprays.length-1; si >= 0; si--) {
+    sprays[si].life -= dt / 320;
+    if (sprays[si].life <= 0) sprays.splice(si, 1);
+  }
+
+  // Schwebende Anzeigen
+  for (var fi = floaters.length-1; fi >= 0; fi--) {
+    floaters[fi].y -= 0.6 * f;
+    floaters[fi].life -= dt / 950;
+    if (floaters[fi].life <= 0) floaters.splice(fi, 1);
+  }
+
+  draw();
+  if (running) requestAnimationFrame(loop);
+}
+
+function roundRect(x,y,w,h,r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+
+function draw() {
+  ctx.clearRect(0,0,W,H);
+
+  // Produkt-Zone unten
+  roundRect(0, PRODUCT_Y, W, PRODUCT_H, 0);
+  ctx.fillStyle = '#dbeeff'; ctx.fillRect(0, PRODUCT_Y, W, PRODUCT_H);
+  ctx.strokeStyle = '#69A9C9'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(0, PRODUCT_Y); ctx.lineTo(W, PRODUCT_Y); ctx.stroke();
+  ctx.fillStyle = '#1e4e8c'; ctx.font = '700 12px Inter, system-ui, sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('PRODUKT (Milch)', W/2, PRODUCT_Y + PRODUCT_H/2);
+
+  // Keime – alle gleich (kein Farb-Hinweis auf den Typ)
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  germs.forEach(function(g) {
+    var x = g.cx - g.w/2;
+    // kleine "Geissel"-Striche als Deko (neutral)
+    ctx.strokeStyle = '#9bb6c9'; ctx.lineWidth = 1.5;
+    var wob = Math.sin(g.wobble) * 3;
+    ctx.beginPath();
+    ctx.moveTo(x - 4, g.y + 8);  ctx.lineTo(x - 9 + wob, g.y + 3);
+    ctx.moveTo(x + g.w + 4, g.y + 8); ctx.lineTo(x + g.w + 9 - wob, g.y + 3);
+    ctx.stroke();
+    // Zellkörper
+    roundRect(x, g.y, g.w, g.h, 12);
+    ctx.fillStyle = '#eef3f8'; ctx.fill();
+    ctx.lineWidth = 2; ctx.strokeStyle = '#7f9fb5'; ctx.stroke();
+    // Innen-Punkte (Textur)
+    ctx.fillStyle = 'rgba(127,159,181,0.35)';
+    ctx.beginPath(); ctx.arc(x + 14, g.y + g.h - 9, 2.2, 0, 6.28); ctx.fill();
+    ctx.beginPath(); ctx.arc(x + g.w - 14, g.y + 9, 1.8, 0, 6.28); ctx.fill();
+    // Name
+    ctx.font = TOKEN_FONT; ctx.fillStyle = '#134061';
+    for (var li = 0; li < g.lines.length; li++) {
+      ctx.fillText(g.lines[li], g.cx, g.y + 9 + 7 + li*LINE_H);
+    }
+  });
+
+  // Sprüh-Effekte (Tröpfchen-Ring)
+  for (var si = 0; si < sprays.length; si++) {
+    var s = sprays[si];
+    var p = 1 - s.life;
+    var r = 8 + p * HIT_R;
+    ctx.globalAlpha = Math.max(0, s.life);
+    ctx.strokeStyle = '#69A9C9'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(s.x, s.y, r, 0, 6.28); ctx.stroke();
+    ctx.fillStyle = '#69A9C9';
+    for (var k = 0; k < 6; k++) {
+      var ang = k * 1.047 + p;
+      ctx.beginPath();
+      ctx.arc(s.x + Math.cos(ang)*r, s.y + Math.sin(ang)*r, 2.2, 0, 6.28);
+      ctx.fill();
+    }
+  }
+  ctx.globalAlpha = 1;
+
+  // Zielkreuz (Sprühdüse)
+  ctx.strokeStyle = flash > 0 ? '#CC3333' : '#134061';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([5,5]);
+  ctx.beginPath(); ctx.arc(aimX, aimY, HIT_R, 0, 6.28); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.beginPath();
+  ctx.moveTo(aimX - 12, aimY); ctx.lineTo(aimX + 12, aimY);
+  ctx.moveTo(aimX, aimY - 12); ctx.lineTo(aimX, aimY + 12);
+  ctx.stroke();
+  ctx.fillStyle = flash > 0 ? '#CC3333' : '#134061';
+  ctx.beginPath(); ctx.arc(aimX, aimY, 3, 0, 6.28); ctx.fill();
+  if (flash > 0) flash--;
+
+  // Schwebende Anzeigen
+  ctx.font = '800 20px Inter, system-ui, sans-serif';
+  for (var fi = 0; fi < floaters.length; fi++) {
+    var fl = floaters[fi];
+    ctx.globalAlpha = Math.max(0, Math.min(1, fl.life));
+    ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+    ctx.strokeText(fl.text, fl.x, fl.y);
+    ctx.fillStyle = fl.color;
+    ctx.fillText(fl.text, fl.x, fl.y);
+  }
+  ctx.globalAlpha = 1;
+}
+
+/* ---- Steuerung ---- */
+function pointerToCanvas(clientX, clientY) {
+  var rect = cvs.getBoundingClientRect();
+  return {
+    x: (clientX - rect.left) * (W / rect.width),
+    y: (clientY - rect.top)  * (H / rect.height)
+  };
+}
+cvs.addEventListener('pointermove', function(e){
+  var p = pointerToCanvas(e.clientX, e.clientY); aimX = p.x; aimY = p.y;
+});
+cvs.addEventListener('pointerdown', function(e){
+  e.preventDefault();
+  var p = pointerToCanvas(e.clientX, e.clientY); aimX = p.x; aimY = p.y;
+  if (running) fire();
+});
+document.addEventListener('keydown', function(e){
+  if (e.key === 'ArrowLeft')  { leftKey = true;  e.preventDefault(); }
+  if (e.key === 'ArrowRight') { rightKey = true; e.preventDefault(); }
+  if (e.key === 'ArrowUp')    { upKey = true;    e.preventDefault(); }
+  if (e.key === 'ArrowDown')  { downKey = true;  e.preventDefault(); }
+  if ((e.key === ' ' || e.key === 'Enter') && running) { e.preventDefault(); fire(); }
+});
+document.addEventListener('keyup', function(e){
+  if (e.key === 'ArrowLeft')  leftKey = false;
+  if (e.key === 'ArrowRight') rightKey = false;
+  if (e.key === 'ArrowUp')    upKey = false;
+  if (e.key === 'ArrowDown')  downKey = false;
+});
+
+// Erststand zeichnen
+draw();
+</script>
+</body>
+</html>

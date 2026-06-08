@@ -60,6 +60,8 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 │   ├── quiz-abweichungen-phagen.html
 │   ├── kreuzwortraetsel-kulturen.html
 │   └── spiel-homofermentativ.html
+├── d1-hygiene/
+│   └── spiel-desinfektion.html
 └── tools/
     ├── einheiten-trainer.html
     ├── fachrechner-salzbad.html
@@ -93,7 +95,7 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 | `b9`          | b.9   | b.9 – Dessertprodukte herstellen           | `b9-dessert/`                   | 🔲     |
 | `b10`         | b.10  | b.10 – Butter herstellen                   | `b10-butter/`                   | 🔲     |
 | `b11`         | b.11  | b.11 – Milchpulver herstellen              | `b11-milchpulver/`              | 🔲     |
-| `d1`          | d.1   | d.1 – Hygiene                              | `d1-hygiene/`                   | 🔲     |
+| `d1`          | d.1   | d.1 – Hygiene                              | `d1-hygiene/`                   | ✅     |
 | `d2`          | d.2   | d.2 – Reinigung und Entkeimung             | `d2-reinigung/`                 | 🔲     |
 | `d3`          | d.3   | d.3 – Basis-Analysen                       | `d3-analysen/`                  | 🔲     |
 | `d4`          | d.4   | d.4 – Qualitätsmanagement                  | `d4-qualitaet/`                 | 🔲     |
