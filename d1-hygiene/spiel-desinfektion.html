@@ -66,7 +66,7 @@
       <div class="overlay" id="startScreen">
         <h2>Mikroorganismen desinfizieren</h2>
         <p>Keime fallen Richtung Produkt. Spritze <strong>Desinfektionsmittel</strong> auf <strong>schädliche</strong> (Verderb) und <strong>krankheitserregende</strong> (pathogene) Keime: <strong>+50</strong> Punkte.<br><br>
-        Triffst du eine <strong>nützliche Kultur</strong>, zerstörst du sie → Leben weg.<br>
+        Triffst du eine <strong>nützliche Kultur</strong>, zerstörst du sie → <strong>−50</strong> Punkte.<br>
         Lässt du einen schädlichen/pathogenen Keim ins Produkt → Kontamination → Leben weg.<br>
         Du hast 3 Leben.</p>
         <button class="btn btn-primary" onclick="startGame()">Spiel starten</button>
@@ -237,9 +237,10 @@ function fire() {
   t.resolved = true;
   var cx = t.cx, cy = t.y + t.h/2;
   if (t.cat === 'nuetzlich') {
-    addFloater(cx, cy, 'Nützlich!', '#CC3333');
+    score = Math.max(0, score - 50); updateHud();
+    flash = 14;
+    addFloater(cx, cy, 'Nützlich! −50', '#CC3333');
     germs.splice(best, 1);
-    loseLife();
   } else {
     score += 50; updateHud();
     addFloater(cx, cy, '+50', '#16a34a');
