@@ -20,11 +20,14 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 │   ├── quiz-gesetzliches-kaese.html
 │   ├── tabellen-luecken-vlth-artikel.html
 │   └── zuordnung-verordnungen.html
+├── b5-quark/
+│   └── animation-labgerinnung.html
 ├── b7-sauermilch/
 │   ├── images/
 │   │   ├── b.7_Anlage_stichfest_Nummern.png
 │   │   └── b.7_Anlage_geruehrt_Nummern.png
 │   ├── lernkaertchen.html
+│   ├── qualitaetsmaengel-jogurt.html
 │   ├── quiz-qualitaetsmaengel.html
 │   ├── quiz-gesetzliches.html
 │   ├── sortierer-jogurtherstellung.html
@@ -36,7 +39,9 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 │   ├── wahr-falsch-sauermilch.html
 │   ├── tabellen-luecken-kulturen.html
 │   ├── tabellen-luecken-richtwerte.html
-│   └── prozessvergleich-jogurt.html
+│   ├── prozessvergleich-jogurt.html
+│   ├── prozess-entscheid-jogurt.html
+│   └── animation-sauergerinnung.html
 ├── a2-rohstoffe-trennen/
 │   ├── images/
 │   │   └── trommelbestandteile/        ← 11 PNG-Bilder
@@ -45,6 +50,8 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 │   ├── tabellen-luecken-metalle.html
 │   └── quiz-werkstoffe-schmierstoffe.html
 ├── a8-kulturen/
+│   ├── images/
+│   │   └── a.8_Bakterienzelle_leer.png
 │   ├── hotspot-bakterienzelle.html
 │   ├── tabellen-luecken-kuehlung.html
 │   ├── tabellen-luecken-kontrolle.html
@@ -54,7 +61,9 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 │   ├── kreuzwortraetsel-kulturen.html
 │   └── spiel-homofermentativ.html
 └── tools/
-    └── einheiten-trainer.html
+    ├── einheiten-trainer.html
+    ├── fachrechner-salzbad.html
+    └── fachrechner-fettgehalt.html
 ```
 
 ---
@@ -127,7 +136,6 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 
 | `data-type`        | Badge-Text        | Beschreibung                                                        |
 |--------------------|-------------------|---------------------------------------------------------------------|
-| `prozess-entscheid`| Prozess-Entscheid | Verzweigter Entscheidungsbaum: Was passiert wenn...?                |
 | `lueckendiagramm`  | Lückendiagramm    | Unvollständiges Flussdiagramm/Kurve ergänzen                        |
 | `fehlersuche`      | Fehlersuche       | Text mit eingebauten Fehlern – Lernende markieren und korrigieren   |
 
