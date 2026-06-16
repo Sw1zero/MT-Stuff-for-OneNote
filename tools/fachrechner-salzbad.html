@@ -552,7 +552,7 @@
       <button class="quiz-new-btn" onclick="newSBQuestion()">Neue Aufgabe</button>
     </div>
     <div id="sbQuizBody">
-      <div class="quiz-empty-sb">Klick auf «Neue Aufgabe» um zu starten.</div>
+      <div class="quiz-empty-sb">Klicken Sie auf «Neue Aufgabe», um zu starten.</div>
     </div>
   </div>
 </div>
@@ -805,7 +805,8 @@ function resetT4() {
 var sbQuizType = 'proz';
 var sbAnswer   = null;
 
-var SB_VOLS   = [2000,2500,3000,3500,4000,4500,5000,5500,6000,6500,7000,7500,8000];
+var SB_VOLS   = [];
+for (var _sv = 2000; _sv <= 8000; _sv += 100) SB_VOLS.push(_sv);  // 2000–8000 in 100er-Schritten
 var SB_KONZ   = [18,19,20,21,22,23,24];
 var LAENGEN   = [3.0,3.5,4.0,4.5,5.0,5.5,6.0,7.0];
 var BREITEN   = [1.5,2.0,2.5,3.0];
@@ -825,7 +826,7 @@ function setQuizType(t) {
   event.currentTarget.classList.add('active');
   var titles = {proz:'Prozentrechnung', vol:'Volumen', umr:'Umrechnung', mix:'Mischungskreuz'};
   document.getElementById('quizCardTitle').textContent = titles[t];
-  document.getElementById('sbQuizBody').innerHTML = '<div class="quiz-empty-sb">Klick auf «Neue Aufgabe» um zu starten.</div>';
+  document.getElementById('sbQuizBody').innerHTML = '<div class="quiz-empty-sb">Klicken Sie auf «Neue Aufgabe», um zu starten.</div>';
   sbAnswer = null;
 }
 
