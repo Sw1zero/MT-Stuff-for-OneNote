@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fliessschema – Stichfester Joghurt</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .back-link { display:inline-block; font-size:0.82rem; color:var(--text-muted); text-decoration:none; margin-bottom:1rem; }
+    .back-link:hover { color:var(--red); }
+
+    .intro {
+      background: var(--blue-tint);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      font-size: 0.86rem;
+      color: #1e4e8c;
+      line-height: 1.55;
+      margin-bottom: 20px;
+    }
+    .intro strong { color: var(--blue-dark); }
+
+    .toolbar {
+      display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+      justify-content: center; margin-bottom: 18px;
+    }
+    .toggle {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.8rem; color: var(--text-muted); cursor: pointer; user-select: none;
+    }
+    .toggle input { accent-color: var(--blue-dark); width: 16px; height: 16px; }
+
+    .flow { max-width: 560px; margin: 0 auto; }
+
+    .flow-step { display: flex; align-items: flex-start; gap: 12px; }
+
+    .step-num {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: #edf2f7; color: var(--text-muted);
+      font-size: 0.8rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 6px;
+      transition: background 0.2s, color 0.2s;
+    }
+    .step-box {
+      flex: 1;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 8px 12px;
+      box-shadow: var(--shadow-sm);
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .step-box input {
+      width: 100%; border: none; outline: none; background: transparent;
+      font-family: var(--font); font-size: 0.92rem; font-weight: 600; color: var(--text);
+      padding: 4px 2px;
+    }
+    .step-box input::placeholder { color: var(--text-subtle); font-weight: 400; }
+
+    .step-hint {
+      font-size: 0.74rem; color: var(--text-muted); margin-top: 2px;
+      display: none;
+    }
+    .step-hint.show { display: block; }
+
+    .step-solution {
+      font-size: 0.76rem; font-weight: 600; margin-top: 4px; display: none;
+    }
+    .step-solution.show { display: block; }
+
+    .flow-step.correct .step-box { border-color: #38a169; background: #f0fff4; }
+    .flow-step.correct .step-num { background: #38a169; color: #fff; }
+    .flow-step.wrong   .step-box { border-color: var(--red); background: var(--red-light); }
+    .flow-step.wrong   .step-num { background: var(--red); color: #fff; }
+    .flow-step.wrong   .step-solution { color: var(--red-dark); }
+    .flow-step.correct .step-solution { color: #276749; }
+
+    .arrow { text-align: left; color: var(--blue-light); font-size: 1.1rem; line-height: 1; margin: 2px 0 2px 12px; }
+
+    .score-bar {
+      max-width: 560px; margin: 0 auto 16px;
+      display: none; align-items: center; gap: 12px;
+    }
+    .score-bar.visible { display: flex; }
+    .score-text { font-size: 0.86rem; font-weight: 600; color: var(--text-muted); white-space: nowrap; }
+
+    .success-banner {
+      max-width: 560px; margin: 0 auto 18px;
+      background: #f0fff4; border: 1.5px solid #9ae6b4; border-radius: var(--radius-md);
+      padding: 14px 18px; text-align: center; display: none;
+    }
+    .success-banner.visible { display: block; }
+    .success-banner strong { font-size: 1rem; color: #276749; display: block; margin-bottom: 2px; }
+    .success-banner span { font-size: 0.84rem; color: #2f855a; }
+
+    .controls { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 4px; }
+  </style>
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+  <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologie EFZ · b.7</span>
+  <h1>Fliessschema: Stichfester Joghurt</h1>
+  <p>Schreibe die Produktionsschritte selbst auf – von der Rohmilch bis zur Kühllagerung.</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+  <a class="back-link" href="../index.html">← Alle Lerntools</a>
+
+  <div class="intro">
+    <strong>Aufgabe:</strong> Tippe in jedes Kästchen den passenden Produktionsschritt – in der <strong>richtigen Reihenfolge</strong> (oben = zuerst).
+    Denk an die Besonderheit von <strong>stichfestem</strong> Joghurt: Er wird <strong>in der Verpackung bebrütet</strong> – also zuerst abgefüllt, dann bebrütet.
+    Rechtschreibung muss nicht perfekt sein; Synonyme sind erlaubt.
+  </div>
+
+  <div class="toolbar">
+    <label class="toggle"><input type="checkbox" id="hintToggle" onchange="toggleHints()"> Tipps anzeigen</label>
+  </div>
+
+  <div class="success-banner" id="successBanner">
+    <strong>Perfekt!</strong>
+    <span>Du hast das ganze Fliessschema richtig aufgeschrieben.</span>
+  </div>
+
+  <div class="score-bar" id="scoreBar">
+    <div class="progress-bar-wrap" style="flex:1; margin:0;">
+      <div class="progress-bar-fill" id="scoreBarFill" style="background:#38a169;"></div>
+    </div>
+    <span class="score-text" id="scoreText"></span>
+  </div>
+
+  <div class="flow" id="flow"></div>
+
+  <div class="controls">
+    <button class="btn btn-ghost"   onclick="resetFlow()">↺ Zurücksetzen</button>
+    <button class="btn btn-secondary" onclick="revealFlow()">Lösung anzeigen</button>
+    <button class="btn btn-primary" onclick="checkFlow()">Überprüfen</button>
+  </div>
+</main>
+
+<footer class="bzwu-footer">BZWU Wil-Uzwil · Milchtechnologie EFZ · Philipp Neukomm</footer>
+
+<script>
+// Fliessschema stichfester Joghurt (b.7) – Schritte konsistent mit dem Prozessvergleich
+var STEPS = [
+  { label: 'Rohmilch vorbehandeln',
+    hint:  'Verunreinigungen entfernen; mikrobiologische Qualität sichern.',
+    detail:'Sieben, filtrieren oder separieren; thermisieren/pasteurisieren.',
+    keys:  ['vorbehand','vorbereit','sieb','filtrier','separier','thermisier'] },
+  { label: 'Fettgehalt standardisieren',
+    hint:  'Auf den Rezepturwert einstellen (z. B. Vollmilch ≥ 35 g/kg).',
+    detail:'Fettgehalt gemäss Rezeptur einstellen.',
+    keys:  ['standardisier','fettgehalt'] },
+  { label: 'Trockenmasse erhöhen',
+    hint:  'Feste Bestandteile zugeben → Viskosität ↑, Synärese ↓ (1,5–3 %).',
+    detail:'1,5–3 % Magermilchpulver oder Molkenproteinkonzentrat beimischen.',
+    keys:  ['trockenmasse','magermilchpulver','molkenprotein','feststoff'] },
+  { label: 'Homogenisieren',
+    hint:  'Mind. 65 °C, 180–220 bar – verhindert Aufrahmen.',
+    detail:'Mind. 65 °C, 180–220 bar.',
+    keys:  ['homogenisier'] },
+  { label: 'Hitzebehandlung',
+    hint:  '85–95 °C, mehrere Minuten – Molkenproteine denaturieren.',
+    detail:'85–95 °C, 2–10 Minuten heiss halten.',
+    keys:  ['hitze','erhitz','pasteur','heisshalt'] },
+  { label: 'Auf Impftemperatur kühlen',
+    hint:  'Auf 40–44 °C bringen – optimal für die Milchsäurebakterien.',
+    detail:'Abkühlen auf 40–44 °C.',
+    keys:  ['impftemp','abkuehl','kuehl'] },
+  { label: 'Impfen',
+    hint:  'Ca. 2 % Betriebskultur in die Milch einbringen.',
+    detail:'Ca. 2 % Betriebskultur oder Direktstarter zugeben.',
+    keys:  ['impfen','beimpf','animpf','kultur','starter'] },
+  { label: 'Frucht / Aroma beimischen',
+    hint:  'Geschmackgebende Zutaten zugeben (Online-Mischer).',
+    detail:'Fruchtpüree/Aroma über Online-Mischer; Farb-/Süssstoffe erst nach der Hitzebehandlung.',
+    keys:  ['frucht','aroma','pueree','puree','suess','zucker','geschmack'] },
+  { label: 'Anwärmen auf Bebrütungstemperatur',
+    hint:  'Kalt zwischengelagerte Milch wieder auf ~42 °C bringen.',
+    detail:'Anwärmverfahren: Milch kalt lagern, kurz vor dem Abfüllen auf 40–44 °C anwärmen.',
+    keys:  ['anwaerm','anwarm','erwaerm','aufwaerm'] },
+  { label: 'Abfüllen in die Endverpackung',
+    hint:  'Jetzt ins Endgebinde bringen (max. 50 °C) – noch flüssig.',
+    detail:'In Becher/Glas füllen, max. 50 °C, gleichmässige Temperatur in allen Gebinden.',
+    keys:  ['abfuell','abfuel','verpack','becher','gebinde','glas'] },
+  { label: 'Bebrüten in der Verpackung',
+    hint:  '40–44 °C bis pH 4,5 – keine Bewegung! Im Gebinde.',
+    detail:'Brutzelle 40–44 °C bis pH 4,5; Erschütterungen vermeiden (sonst Molkenabscheidung).',
+    keys:  ['bebruet','bebrut','brut','inkub','reif'] },
+  { label: 'Kühlen / Kühllagerung',
+    hint:  'Möglichst schnell < 5 °C; MHD 18–28 Tage.',
+    detail:'Rasch auf < 5 °C kühlen; reduziert Nachsäuern. Lagerung < 5 °C.',
+    keys:  ['kuehl','lager','kalt'] }
+];
+
+function fold(s) {
+  return s.toLowerCase()
+    .replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss')
+    .replace(/[^a-z0-9]+/g,' ')
+    .replace(/\s+/g,' ').trim();
+}
+
+function matches(input, keys) {
+  var f = fold(input);
+  if (!f) return false;
+  for (var i = 0; i < keys.length; i++) {
+    if (f.indexOf(keys[i]) !== -1) return true;
+  }
+  return false;
+}
+
+function buildFlow() {
+  var flow = document.getElementById('flow');
+  flow.innerHTML = '';
+  STEPS.forEach(function(step, idx) {
+    var row = document.createElement('div');
+    row.className = 'flow-step';
+    row.id = 'step-' + idx;
+    row.innerHTML =
+      '<span class="step-num">' + (idx + 1) + '</span>' +
+      '<div class="step-box">' +
+        '<input type="text" id="in-' + idx + '" autocomplete="off" spellcheck="false" placeholder="Schritt ' + (idx + 1) + ' eintippen …">' +
+        '<div class="step-hint" id="hint-' + idx + '">' + step.hint + '</div>' +
+        '<div class="step-solution" id="sol-' + idx + '"></div>' +
+      '</div>';
+    flow.appendChild(row);
+
+    if (idx < STEPS.length - 1) {
+      var arr = document.createElement('div');
+      arr.className = 'arrow';
+      arr.textContent = '↓';
+      flow.appendChild(arr);
+    }
+  });
+
+  // Enter springt zum nächsten Feld
+  STEPS.forEach(function(step, idx) {
+    var inp = document.getElementById('in-' + idx);
+    inp.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        var next = document.getElementById('in-' + (idx + 1));
+        if (next) next.focus(); else checkFlow();
+      }
+    });
+  });
+}
+
+function toggleHints() {
+  var show = document.getElementById('hintToggle').checked;
+  STEPS.forEach(function(step, idx) {
+    document.getElementById('hint-' + idx).classList.toggle('show', show);
+  });
+}
+
+function checkFlow() {
+  var correct = 0;
+  STEPS.forEach(function(step, idx) {
+    var row = document.getElementById('step-' + idx);
+    var inp = document.getElementById('in-' + idx);
+    var sol = document.getElementById('sol-' + idx);
+    row.classList.remove('correct', 'wrong');
+    if (matches(inp.value, step.keys)) {
+      row.classList.add('correct');
+      sol.textContent = '✓ ' + step.label;
+      sol.classList.add('show');
+      correct++;
+    } else {
+      row.classList.add('wrong');
+      sol.textContent = '→ richtig: ' + step.label;
+      sol.classList.add('show');
+    }
+  });
+
+  var total = STEPS.length;
+  var pct = Math.round((correct / total) * 100);
+  document.getElementById('scoreBar').classList.add('visible');
+  document.getElementById('scoreBarFill').style.width = pct + '%';
+  document.getElementById('scoreText').textContent = correct + ' / ' + total + ' richtig';
+  document.getElementById('successBanner').classList.toggle('visible', correct === total);
+}
+
+function revealFlow() {
+  STEPS.forEach(function(step, idx) {
+    var inp = document.getElementById('in-' + idx);
+    var sol = document.getElementById('sol-' + idx);
+    var row = document.getElementById('step-' + idx);
+    inp.value = step.label;
+    row.classList.remove('wrong');
+    row.classList.add('correct');
+    sol.textContent = step.detail;
+    sol.classList.add('show');
+  });
+  document.getElementById('scoreBar').classList.remove('visible');
+  document.getElementById('successBanner').classList.remove('visible');
+}
+
+function resetFlow() {
+  document.getElementById('scoreBar').classList.remove('visible');
+  document.getElementById('successBanner').classList.remove('visible');
+  buildFlow();
+  toggleHints();
+}
+
+buildFlow();
+</script>
+</body>
+</html>

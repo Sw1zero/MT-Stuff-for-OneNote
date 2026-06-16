@@ -41,6 +41,7 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 │   ├── tabellen-luecken-richtwerte.html
 │   ├── prozessvergleich-jogurt.html
 │   ├── prozess-entscheid-jogurt.html
+│   ├── fliessschema-stichfest.html
 │   └── animation-sauergerinnung.html
 ├── a2-rohstoffe-trennen/
 │   ├── images/
@@ -133,6 +134,7 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 | `spiel`            | Spiel             | `spiel-homofermentativ.html`            | Geschicklichkeitsspiel (Canvas), Maus/Touch/Tasten, 3 Leben |
 | `animation`        | Animation         | `animation-labgerinnung.html`           | Schrittweise SVG-Animation eines Prozesses mit Nav      |
 | `prozess-entscheid`| Prozess-Entscheid | `prozess-entscheid-jogurt.html`         | Entscheidung pro Prozessschritt mit Fehleranalyse       |
+| `fliessschema`     | Fliessschema      | `fliessschema-stichfest.html`           | Produktionsschritte frei in leere, verkettete Kästchen eintippen |
 
 ### Geplant / Ideen
 
