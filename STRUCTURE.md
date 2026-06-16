@@ -17,6 +17,9 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 │       ├── bzwu.png                    ← BZWU-Logo (weisser Hintergrund)
 │       └── milchtechnologen.svg        ← Branchenlogo
 ├── b1-hartkaese/
+│   ├── images/
+│   │   └── aop-memory/                 ← 12 PNG/JPEG (Schweizer AOP-Käse)
+│   ├── memory-aop-kaese.html
 │   ├── quiz-gesetzliches-kaese.html
 │   ├── tabellen-luecken-vlth-artikel.html
 │   └── zuordnung-verordnungen.html

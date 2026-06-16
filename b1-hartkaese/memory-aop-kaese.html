@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Memory – Schweizer AOP-Käse</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .back-link {
+      display: inline-block;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      margin-bottom: 1.25rem;
+      transition: color 0.15s;
+    }
+    .back-link:hover { color: var(--red); }
+
+    .diff-row {
+      display: flex; gap: 8px; flex-wrap: wrap;
+      justify-content: center; align-items: center;
+      margin-bottom: 1rem;
+    }
+    .diff-row .lbl { font-size: 0.78rem; color: var(--text-muted); margin-right: 2px; }
+
+    .stats-bar {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      margin-bottom: 1.25rem;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+    .stats-bar strong { color: var(--text); }
+
+    .win-screen {
+      display: none;
+      text-align: center;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      box-shadow: var(--shadow-md);
+      margin-bottom: 1.5rem;
+      border: 1.5px solid #bbf7d0;
+    }
+    .win-screen.show { display: block; }
+    .win-screen h2 { font-size: 1.3rem; margin-bottom: 0.4rem; color: #15803d; }
+    .win-screen p  { color: var(--text-muted); font-size: 0.88rem; }
+
+    .memory-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.7rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 560px) {
+      .memory-grid { grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
+    }
+    @media (max-width: 360px) {
+      .memory-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* Flip card */
+    .memory-card {
+      aspect-ratio: 1;
+      cursor: pointer;
+      perspective: 800px;
+      border-radius: var(--radius-md);
+    }
+    .memory-card:focus-visible { outline: 3px solid var(--blue); }
+
+    .card-inner {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.38s ease;
+      border-radius: var(--radius-md);
+    }
+    .memory-card.flipped .card-inner,
+    .memory-card.matched  .card-inner { transform: rotateY(180deg); }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    /* Back (face down) */
+    .card-back {
+      background: var(--blue-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card-back-text {
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      color: rgba(255,255,255,0.65);
+      text-transform: uppercase;
+    }
+
+    /* Front (face up) – image */
+    .card-front {
+      transform: rotateY(180deg);
+      background: var(--surface);
+      box-shadow: var(--shadow-sm);
+    }
+    .card-front.is-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    /* Front – name */
+    .card-front.is-name {
+      background: var(--blue);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem;
+      text-align: center;
+    }
+    .card-front.is-name .c-name {
+      color: #fff;
+      font-size: 0.8rem;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+    .card-front.is-name .c-region {
+      color: rgba(255,255,255,0.82);
+      font-size: 0.64rem;
+      font-weight: 500;
+      margin-top: 4px;
+      line-height: 1.2;
+    }
+
+    /* Matched: fade slightly so new pairs stand out */
+    .memory-card.matched .card-face.card-front { opacity: 0.45; }
+    .memory-card.matched { cursor: default; }
+  </style>
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+  <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologie EFZ · b.1</span>
+  <h1>Memory – Schweizer AOP-Käse</h1>
+  <p>Finde die Bild-Name-Paare der 12 Schweizer Käse mit AOP-Eintrag</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+  <a class="back-link" href="../index.html">← Alle Lerntools</a>
+
+  <div class="diff-row">
+    <span class="lbl">Paare:</span>
+    <button type="button" class="filter-btn" data-pairs="6"  onclick="setPairs(6)">6</button>
+    <button type="button" class="filter-btn" data-pairs="9"  onclick="setPairs(9)">9</button>
+    <button type="button" class="filter-btn active" data-pairs="12" onclick="setPairs(12)">Alle 12</button>
+  </div>
+
+  <div class="stats-bar">
+    <span>Gefunden: <strong id="pairsFound">0</strong> / <span id="pairsTotal">12</span></span>
+    <span>Versuche: <strong id="attempts">0</strong></span>
+  </div>
+
+  <div class="win-screen" id="winScreen">
+    <h2>Alle Paare gefunden!</h2>
+    <p id="winMsg"></p>
+    <button type="button" class="btn btn-primary" style="margin-top:1rem" onclick="startGame()">Nochmals spielen</button>
+  </div>
+
+  <div class="memory-grid" id="memoryGrid"></div>
+
+  <div style="text-align:center">
+    <button type="button" class="btn btn-ghost" onclick="startGame()">Neu mischen</button>
+  </div>
+</main>
+
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologie EFZ · Philipp Neukomm
+</footer>
+
+<script>
+var PAIRS_ALL = [
+  { id:  1, name: 'Berner Alpkäse AOP',      region: 'Berner Oberland',        img: 'images/aop-memory/berner_alpkaese.jpeg' },
+  { id:  2, name: 'Bloder-Sauerkäse AOP',    region: 'Werdenberg / Liechtenstein', img: 'images/aop-memory/bloder_kaese.jpeg' },
+  { id:  3, name: 'Emmentaler AOP',          region: 'Emmental / Mittelland',  img: 'images/aop-memory/emmentaler.png' },
+  { id:  4, name: "L'Etivaz AOP",            region: 'Waadtländer Alpen',      img: 'images/aop-memory/etivaz.jpeg' },
+  { id:  5, name: 'Glarner Alpkäse AOP',     region: 'Glarnerland',            img: 'images/aop-memory/glarner_alpkaese.jpeg' },
+  { id:  6, name: 'Le Gruyère AOP',          region: 'Freiburg / Greyerz',     img: 'images/aop-memory/gruyere.jpeg' },
+  { id:  7, name: 'Raclette du Valais AOP',  region: 'Wallis',                 img: 'images/aop-memory/raclette-du-valais.jpeg' },
+  { id:  8, name: 'Sbrinz AOP',              region: 'Zentralschweiz',         img: 'images/aop-memory/sbrinz.jpeg' },
+  { id:  9, name: 'Tessiner Alpkäse AOP',    region: 'Tessin',                 img: 'images/aop-memory/tessiner_alpkaese.jpeg' },
+  { id: 10, name: 'Tête de Moine AOP',       region: 'Berner Jura (Bellelay)', img: 'images/aop-memory/tete-de-moine.jpeg' },
+  { id: 11, name: 'Vacherin Fribourgeois AOP', region: 'Freiburg',            img: 'images/aop-memory/vacherin.jpeg' },
+  { id: 12, name: "Vacherin Mont-d'Or AOP",  region: 'Waadtländer Jura',       img: 'images/aop-memory/vacherin-mont-dor.jpeg' }
+];
+
+var pairCount = 12;
+var activePairs = [];
+var flipped  = [];
+var matched  = 0;
+var attempts = 0;
+var locked   = false;
+
+function shuffle(arr) {
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+
+function setPairs(n) {
+  pairCount = n;
+  var btns = document.querySelectorAll('.diff-row .filter-btn');
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].classList.toggle('active', parseInt(btns[i].dataset.pairs, 10) === n);
+  }
+  startGame();
+}
+
+function startGame() {
+  flipped = []; matched = 0; attempts = 0; locked = false;
+  activePairs = shuffle(PAIRS_ALL).slice(0, pairCount);
+  document.getElementById('pairsFound').textContent = '0';
+  document.getElementById('pairsTotal').textContent = pairCount;
+  document.getElementById('attempts').textContent   = '0';
+  document.getElementById('winScreen').className     = 'win-screen';
+  buildGrid();
+}
+
+function buildGrid() {
+  var grid = document.getElementById('memoryGrid');
+  grid.innerHTML = '';
+
+  var cards = [];
+  activePairs.forEach(function(p) {
+    cards.push({ pairId: p.id, type: 'image', img: p.img, name: p.name, region: p.region });
+    cards.push({ pairId: p.id, type: 'name',  img: p.img, name: p.name, region: p.region });
+  });
+
+  shuffle(cards).forEach(function(card) {
+    var el = document.createElement('div');
+    el.className      = 'memory-card';
+    el.dataset.pairId = card.pairId;
+    el.dataset.type   = card.type;
+    el.setAttribute('tabindex', '0');
+    el.setAttribute('role', 'button');
+
+    var inner = document.createElement('div');
+    inner.className = 'card-inner';
+
+    // Back
+    var back = document.createElement('div');
+    back.className = 'card-face card-back';
+    back.innerHTML = '<span class="card-back-text">AOP</span>';
+
+    // Front
+    var front = document.createElement('div');
+    if (card.type === 'image') {
+      front.className = 'card-face card-front is-image';
+      var img = document.createElement('img');
+      img.src = card.img;
+      img.alt = card.name;
+      front.appendChild(img);
+    } else {
+      front.className = 'card-face card-front is-name';
+      var nm = document.createElement('span');
+      nm.className = 'c-name';
+      nm.textContent = card.name;
+      var rg = document.createElement('span');
+      rg.className = 'c-region';
+      rg.textContent = card.region;
+      front.appendChild(nm);
+      front.appendChild(rg);
+    }
+
+    inner.appendChild(back);
+    inner.appendChild(front);
+    el.appendChild(inner);
+
+    el.addEventListener('click', function() { flipCard(el); });
+    el.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flipCard(el); }
+    });
+
+    grid.appendChild(el);
+  });
+}
+
+function flipCard(card) {
+  if (locked) return;
+  if (card.classList.contains('flipped') || card.classList.contains('matched')) return;
+  if (flipped.length >= 2) return;
+
+  card.classList.add('flipped');
+  flipped.push(card);
+
+  if (flipped.length === 2) {
+    attempts++;
+    document.getElementById('attempts').textContent = attempts;
+    checkMatch();
+  }
+}
+
+function checkMatch() {
+  var a = flipped[0], b = flipped[1];
+  var isMatch = (a.dataset.pairId === b.dataset.pairId) && (a.dataset.type !== b.dataset.type);
+
+  if (isMatch) {
+    matched++;
+    document.getElementById('pairsFound').textContent = matched;
+    setTimeout(function() {
+      a.classList.replace('flipped', 'matched');
+      b.classList.replace('flipped', 'matched');
+      flipped = [];
+      if (matched === activePairs.length) showWin();
+    }, 600);
+  } else {
+    locked = true;
+    setTimeout(function() {
+      a.classList.remove('flipped');
+      b.classList.remove('flipped');
+      flipped = [];
+      locked  = false;
+    }, 1100);
+  }
+}
+
+function showWin() {
+  document.getElementById('winMsg').textContent =
+    'Alle ' + activePairs.length + ' Paare in ' + attempts + ' Versuchen gefunden.';
+  document.getElementById('winScreen').className = 'win-screen show';
+}
+
+startGame();
+</script>
+</body>
+</html>
