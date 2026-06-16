@@ -36,7 +36,7 @@
   <div class="header-text">
   <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologie EFZ · a.8</span>
   <h1>Homofermentative fangen</h1>
-  <p>Fang die richtigen Milchsäurebakterien im Korb</p>
+  <p>Fangen Sie die richtigen Milchsäurebakterien im Korb</p>
   </div>
   <div class="header-logos">
     <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
@@ -47,7 +47,7 @@
 <main class="page-main">
   <a class="back-link" href="../index.html">← Alle Lerntools</a>
 
-  <p class="instruction">Bewege den Korb mit Maus, Finger oder den Pfeiltasten. Fange nur die <strong>homofermentativen</strong> Bakterien! (+50 gefangen · −80 verpasst · Leben weg bei heterofermentativen)</p>
+  <p class="instruction">Bewegen Sie den Korb mit Maus, Finger oder den Pfeiltasten. Fangen Sie nur die <strong>homofermentativen</strong> Bakterien! (+50 gefangen · −80 verpasst · Leben weg bei heterofermentativen)</p>
 
   <div class="game-wrap">
     <div class="hud">
@@ -60,9 +60,9 @@
 
       <div class="overlay" id="startScreen">
         <h2>Homofermentative fangen</h2>
-        <p>Es fallen Milchsäurebakterien herunter. Fange mit dem Korb «Homofermentativ» nur die <strong>homofermentativen</strong> Arten.<br><br>
+        <p>Es fallen Milchsäurebakterien herunter. Fangen Sie mit dem Korb «Homofermentativ» nur die <strong>homofermentativen</strong> Arten.<br><br>
         Gefangen: <strong>+50</strong> Punkte · verpasst (durchgefallen): <strong>−80</strong> Punkte.<br>
-        Fängst du eine <strong>heterofermentative</strong>, verlierst du ein Leben – du hast 3 Leben.</p>
+        Fangen Sie eine <strong>heterofermentative</strong>, verlieren Sie ein Leben – Sie haben 3 Leben.</p>
         <button class="btn btn-primary" onclick="startGame()">Spiel starten</button>
       </div>
 
@@ -160,8 +160,8 @@ function endGame() {
   running = false;
   document.getElementById('endScore').textContent = score;
   var msg;
-  if (score >= 600) msg = 'Stark! Du erkennst die homofermentativen Arten sicher.';
-  else if (score >= 250) msg = 'Gut gemacht – schau dir die heterofermentativen (Ln, Lb. casei) nochmals an.';
+  if (score >= 600) msg = 'Stark! Sie erkennen die homofermentativen Arten sicher.';
+  else if (score >= 250) msg = 'Gut gemacht – schauen Sie sich die heterofermentativen (Ln, Lb. casei) nochmals an.';
   else msg = 'Übung macht den Meister: Leuconostoc (Ln) und Lb. casei sind heterofermentativ.';
   document.getElementById('endMsg').textContent = msg;
   document.getElementById('endScreen').classList.remove('hidden');

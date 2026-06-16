@@ -622,9 +622,9 @@ function showEnd() {
   var pct = Math.round(scoreCorrect / CARDS.length * 100);
   document.getElementById('endScore').innerHTML = scoreCorrect + ' <span>/ 20</span>';
   document.getElementById('endMsg').textContent =
-    pct >= 85 ? 'Ausgezeichnet! Du kennst die Sauermilchprodukte sehr gut.' :
+    pct >= 85 ? 'Ausgezeichnet! Sie kennen die Sauermilchprodukte sehr gut.' :
     pct >= 60 ? 'Gut gemacht! Einige Punkte nochmals wiederholen.' :
-                'Übe weiter – schau nochmals ins Lehrmittel.';
+                'Üben Sie weiter – schauen Sie nochmals ins Lehrmittel.';
   document.getElementById('endScreen').className = 'end-screen show';
 }
 

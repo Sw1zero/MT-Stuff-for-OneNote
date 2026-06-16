@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lernsession – Sbrinz AOP</title>
+  <title>Lernsession: Sbrinz AOP</title>
   <link rel="stylesheet" href="../style.css">
   <style>
     .back-link { display:inline-block; font-size:0.82rem; color:var(--text-muted); text-decoration:none; margin-bottom:1rem; }
@@ -173,7 +173,7 @@
   <div class="header-text">
   <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologie EFZ · b.1</span>
   <h1>Lernsession: Sbrinz AOP</h1>
-  <p>Geführter Lernpfad in 13 Stationen – mit Lesetexten, XP-Punkten und Abzeichen</p>
+  <p>Geführter Lernpfad in 13 Stationen mit Lesetexten, XP-Punkten und Abzeichen</p>
   </div>
   <div class="header-logos">
     <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
@@ -210,18 +210,18 @@
 
 <script>
 /* ============================================================
-   Lernsession Sbrinz AOP – Inhalte aus b.1 Lehrmittel
+   Lernsession Sbrinz AOP, Inhalte aus b.1 Lehrmittel
    13 Stationen mit Lesetexten + Gamification (XP, Streak, Abzeichen)
    ============================================================ */
 var STATIONS = [
   /* 0 */ {
     kicker: 'Info · Grundlagen', title: 'Was ist Sbrinz AOP?',
-    lead: 'Lies den Steckbrief – gleich danach prüfst du dein Wissen.',
+    lead: 'Lesen Sie den Steckbrief. Gleich danach prüfen Sie Ihr Wissen.',
     type: 'info',
     read:
       '<p><b>Sbrinz AOP</b> ist der älteste Schweizer Käse und ein <b>Extrahartkäse</b> aus der Zentralschweiz. Er wird aus <b>roher Kuhmilch</b> hergestellt und reift <b>2–4 Jahre</b>.</p>' +
       '<h4>Herkunft des Namens</h4>' +
-      '<p>Der Name geht vermutlich auf den Handelsort <b>Brienz</b> zurück – im Mittelalter Ausgangspunkt der Käsetransporte über die Alpenpässe nach Italien. Italienische Händler machten aus „Brienz“ vermutlich „Sbrinz“.</p>' +
+      '<p>Der Name geht vermutlich auf den Handelsort <b>Brienz</b> zurück: im Mittelalter Ausgangspunkt der Käsetransporte über die Alpenpässe nach Italien. Italienische Händler machten aus „Brienz“ vermutlich „Sbrinz“.</p>' +
       '<h4>Zahlen &amp; Fakten</h4>' +
       '<ul>' +
         '<li>Herstellgebiet: <b>LU, SZ, OW, NW, ZG, AG</b> (Zentralschweiz)</li>' +
@@ -229,7 +229,7 @@ var STATIONS = [
         '<li>Jahresproduktion ca. <b>1500 Tonnen</b>, Exportanteil ca. 15 %</li>' +
         '<li>Laib: <b>35–48 kg</b>, Durchmesser 50–62 cm</li>' +
       '</ul>' +
-      '<div class="factbox">Typische Verwendung: fein <b>gehobelt</b> (Möckli) oder gerieben – dank des extraharten, gut reibfähigen Teigs.</div>'
+      '<div class="factbox">Typische Verwendung: fein <b>gehobelt</b> (Möckli) oder gerieben, dank des extraharten, gut reibfähigen Teigs.</div>'
   },
   /* 1 */ {
     kicker: 'Quiz', title: 'Steckbrief',
@@ -249,20 +249,20 @@ var STATIONS = [
     lead: 'Warum darf nicht jeder Hartkäse „Sbrinz“ heissen?',
     type: 'info',
     read:
-      '<p><b>AOP</b> steht für <i>Appellation d’Origine Protégée</i> – „geschützte Ursprungsbezeichnung“. Nur Käse, der ein verbindliches <b>Pflichtenheft</b> einhält, darf den Namen Sbrinz AOP tragen.</p>' +
+      '<p><b>AOP</b> steht für <i>Appellation d’Origine Protégée</i>, „geschützte Ursprungsbezeichnung“. Nur Käse, der ein verbindliches <b>Pflichtenheft</b> einhält, darf den Namen Sbrinz AOP tragen.</p>' +
       '<h4>Wichtige Pflichtenheft-Vorgaben</h4>' +
       '<ul>' +
         '<li>Verarbeitung im <b>Kupferkessi / Kupferfertiger</b></li>' +
-        '<li><b>Rohmilch</b> – kein Thermisieren, Pasteurisieren, Baktofugieren, Filtrieren</li>' +
-        '<li>Nur <b>thermophile Kulturen, Lab und Speisesalz</b> – keine GVO</li>' +
+        '<li><b>Rohmilch</b> (kein Thermisieren, Pasteurisieren, Baktofugieren, Filtrieren)</li>' +
+        '<li>Nur <b>thermophile Kulturen, Lab und Speisesalz</b> (keine GVO)</li>' +
         '<li>Milch spätestens <b>24 h</b> nach dem ältesten Gemelk verarbeiten</li>' +
         '<li>Salzbad <b>mind. 15 Tage</b>; erste <b>12 Monate</b> Reifung im AOP-Gebiet</li>' +
       '</ul>' +
-      '<div class="factbox">Die <b>Kaseinmarke</b> im Laib weist Herkunft, Laib-Nummer, Jahr und Betrieb nach – der „Ausweis“ jedes Sbrinz.</div>',
+      '<div class="factbox">Die <b>Kaseinmarke</b> im Laib weist Herkunft, Laib-Nummer, Jahr und Betrieb nach: der „Ausweis“ jedes Sbrinz.</div>',
     media:
       '<figure class="media-figure" style="margin-bottom:12px;">' +
         '<img src="images/lernsession-sbrinz/kupferfertiger.jpg" alt="Kupferfertiger zur Sbrinz-Herstellung" loading="lazy">' +
-        '<figcaption>Verarbeitung im Kupferfertiger – Pflichtenheft-Vorgabe</figcaption>' +
+        '<figcaption>Verarbeitung im Kupferfertiger (Pflichtenheft-Vorgabe)</figcaption>' +
       '</figure>' +
       '<a class="pdf-link" href="images/lernsession-sbrinz/Pflichtenheft_Sbrinz.pdf" target="_blank" rel="noopener">📄 Pflichtenheft Sbrinz AOP öffnen (PDF, 5 Seiten)</a>'
   },
@@ -272,7 +272,7 @@ var STATIONS = [
     type: 'tf',
     items: [
       { s: 'Die Rohmilch wird im Kupferkessi oder Kupferfertiger verarbeitet.', a: true,  e: 'Pflichtenheft: Verarbeitung im Kupferkessi/Kupferfertiger.' },
-      { s: 'Die Milch darf thermisiert oder pasteurisiert werden.',             a: false, e: 'Nur Rohmilch – kein Thermisieren, Pasteurisieren, Baktofugieren oder Filtrieren.' },
+      { s: 'Die Milch darf thermisiert oder pasteurisiert werden.',             a: false, e: 'Nur Rohmilch: kein Thermisieren, Pasteurisieren, Baktofugieren oder Filtrieren.' },
       { s: 'Das Salzbad dauert mindestens 15 Tage.',                            a: true,  e: 'Mindestens 15 Tage (heute üblich 18–20 Tage).' },
       { s: 'Sbrinz muss die ersten 12 Monate im AOP-Gebiet reifen.',           a: true,  e: 'So schreibt es das Pflichtenheft vor.' },
       { s: 'Erlaubt sind nur thermophile Kulturen, Lab und Speisesalz.',        a: true,  e: 'Weitere Zusatz-/Hilfsstoffe sind untersagt, ebenso GVO.' },
@@ -289,15 +289,15 @@ var STATIONS = [
       '<p>Beim Sbrinz wird (ausser Spülwasser, max. 2 %) <b>kein Wasser zugesetzt</b>. So bleibt viel Milchzucker erhalten → viel Milchsäure → diese löst Kalzium aus dem Kaseingerüst → <b>fester, kerniger, brüchiger</b> Teig.</p>' +
       '<h4>Anforderungen an die Kulturen</h4>' +
       '<ul>' +
-        '<li><b>thermophil</b> – überleben die hohe Brenntemperatur (55–57 °C)</li>' +
-        '<li><b>homofermentativ</b> – keine Gasbildung, sonst Risse / „Gläs“</li>' +
+        '<li><b>thermophil</b>: überleben die hohe Brenntemperatur (55–57 °C)</li>' +
+        '<li><b>homofermentativ</b>: keine Gasbildung, sonst Risse / „Gläs“</li>' +
         '<li>Zusatz ca. 2–2,5 ‰, Vorreifung ca. 30 min</li>' +
       '</ul>' +
       '<div class="factbox">Fettgehalt der Verarbeitungsmilch: <b>2,9–3,0 %</b>. Zu viel Fett → weicher, schmieriger Teig, der beim Reiben verklebt.</div>'
   },
   /* 5 */ {
     kicker: 'Lückentext', title: 'Milch & Kulturen',
-    lead: 'Wähle in jeder Lücke den richtigen Begriff.',
+    lead: 'Wählen Sie in jeder Lücke den richtigen Begriff.',
     type: 'gaps',
     parts: [
       'Die Milch soll möglichst wenige ',
@@ -315,7 +315,7 @@ var STATIONS = [
   },
   /* 6 */ {
     kicker: 'Info · Herstellung', title: 'Vom Kessi zum Bruch',
-    lead: 'Einlaben, schneiden und brennen – Schritt für Schritt.',
+    lead: 'Einlaben, schneiden und brennen, Schritt für Schritt.',
     type: 'info',
     read:
       '<p>Im <b>Kupferkessi</b> wird die Rohmilch mit Kultur und Lab dickgelegt.</p>' +
@@ -333,42 +333,42 @@ var STATIONS = [
       '<div class="factbox">Der langsame Start verhindert das Überschiessen der Bruchkörner. Die hohe Endtemperatur reduziert Fremdkeime und fördert die Synärese (Entsirten).</div>'
   },
   /* 7 */ {
-    kicker: 'Entscheidung', title: 'Bruch brennen – die richtige Temperatur',
-    lead: 'Der Sbrinz-Bruch ist geschnitten und gerührt. Jetzt wird gebrannt. <b>Welche Brenntemperatur wählst du?</b>',
+    kicker: 'Entscheidung', title: 'Bruch brennen: die richtige Temperatur',
+    lead: 'Der Sbrinz-Bruch ist geschnitten und gerührt. Jetzt wird gebrannt. <b>Welche Brenntemperatur wählen Sie?</b>',
     type: 'decide',
     options: [
       { t: 'unter 55 °C', correct: false,
         fb: 'Zu tief: Propionsäure- und salztolerante Fremdkeime (Staphylo-/Mikrokokken) werden ungenügend reduziert → erhöhtes Nachgärungs- und „Gläs“-Risiko.' },
       { t: '55–56 °C', correct: true,
-        fb: 'Richtig! Am Maximum der thermophilen Kulturen: Fremdkeime werden stark reduziert und die Synärese gefördert – ohne die erwünschten Milchsäurebakterien zu stark zu schädigen.' },
+        fb: 'Richtig! Am Maximum der thermophilen Kulturen: Fremdkeime werden stark reduziert und die Synärese gefördert, ohne die erwünschten Milchsäurebakterien zu stark zu schädigen.' },
       { t: 'über 56 °C', correct: false,
         fb: 'Zu hoch: auch die erwünschten Milchsäurebakterien werden reduziert → verzögerte Anfangssäuerung; Sporenbildner (Buttersäure, Putrifikus) keimen eher aus.' }
     ]
   },
   /* 8 */ {
     kicker: 'Info · Reifung', title: 'Salzen & Reifung',
-    lead: 'Schau dir das Salzbad und die Reifung an – inkl. Video aus dem Sbrinz-Lager.',
+    lead: 'Schauen Sie sich das Salzbad und die Reifung an, inkl. Video aus dem Sbrinz-Lager.',
     type: 'info',
     read:
-      '<p>Nach dem Pressen kommt der Sbrinz ins <b>Salzbad</b> – mit <b>mind. 15 Tagen</b> (heute 18–20) extrem lang.</p>' +
+      '<p>Nach dem Pressen kommt der Sbrinz ins <b>Salzbad</b>, das mit <b>mind. 15 Tagen</b> (heute 18–20) extrem lang.</p>' +
       '<h4>Ideale Salzbad-Werte</h4>' +
       '<ul>' +
         '<li>Konzentration <b>20–22 °Bé</b> (zu tief und zu hoch verzögern die Aufnahme)</li>' +
         '<li>Temperatur <b>12–15 °C</b></li>' +
         '<li>Ziel-Salzgehalt im Käse: mind. <b>10–15 g/kg</b></li>' +
       '</ul>' +
-      '<p>Der hohe Salzgehalt verfestigt Narben und Teig, hemmt die <b>Nachgärung</b> und unterstützt das Aroma. <b>Nachsalzen</b> wird nicht empfohlen – es führt zu Verfärbungen.</p>' +
+      '<p>Der hohe Salzgehalt verfestigt Narben und Teig, hemmt die <b>Nachgärung</b> und unterstützt das Aroma. <b>Nachsalzen</b> wird nicht empfohlen, es führt zu Verfärbungen.</p>' +
       '<h4>Reifung</h4>' +
       '<ul>' +
         '<li><b>Abschwitzen</b> im Gärkeller (12–18 °C): wöchentlich wenden und das geschwitzte Fett verreiben</li>' +
         '<li>Danach Reifung bei 9–14 °C, <b>stehend im Stotzgestell</b></li>' +
-        '<li>Gesamtreifung <b>2–4 Jahre</b> – keine zweite Gärung, langsame, intensive Aromabildung</li>' +
+        '<li>Gesamtreifung <b>2–4 Jahre</b>: keine zweite Gärung, langsame, intensive Aromabildung</li>' +
       '</ul>',
     media:
       '<div class="media-grid">' +
         '<figure class="media-figure">' +
           '<img src="images/lernsession-sbrinz/nachsalzen.jpg" alt="Nachsalzen eines Sbrinz-Laibs" loading="lazy">' +
-          '<figcaption>Nachsalzen – ergänzt das Salzbad von Hand</figcaption>' +
+          '<figcaption>Nachsalzen: ergänzt das Salzbad von Hand</figcaption>' +
         '</figure>' +
         '<figure class="media-figure">' +
           '<img src="images/lernsession-sbrinz/stotzgestelle.jpg" alt="Sbrinz-Laibe stehend im Stotzgestell" loading="lazy">' +
@@ -384,7 +384,7 @@ var STATIONS = [
   },
   /* 9 */ {
     kicker: 'Lückentext', title: 'Salzbad & Reifung',
-    lead: 'Trage die typischen Sbrinz-Werte ein.',
+    lead: 'Tragen Sie die typischen Sbrinz-Werte ein.',
     type: 'gaps',
     parts: [
       'Das Salzbad dauert mindestens ',
@@ -402,17 +402,17 @@ var STATIONS = [
   },
   /* 10 */ {
     kicker: 'Info · Qualität', title: 'Qualität & typische Fehler',
-    lead: 'Woran erkennt man einen guten Sbrinz – und was geht schief?',
+    lead: 'Woran erkennt man einen guten Sbrinz, und was geht schief?',
     type: 'info',
     read:
-      '<p>Der grösste Feind des Sbrinz ist die <b>Nachgärung durch Propionsäurebakterien</b>: Sie bilden in der langen Reifung Gas → <b>Löcher, Risse und „Gläs“</b> – plus atypischer Geschmack. Solcher Käse darf nicht als Sbrinz verkauft werden.</p>' +
+      '<p>Der grösste Feind des Sbrinz ist die <b>Nachgärung durch Propionsäurebakterien</b>: Sie bilden in der langen Reifung Gas → <b>Löcher, Risse und „Gläs“</b>, plus atypischer Geschmack. Solcher Käse darf nicht als Sbrinz verkauft werden.</p>' +
       '<h4>So soll ein guter Sbrinz sein</h4>' +
       '<ul>' +
         '<li>Teig <b>elfenbein- bis hellgelb</b>, leicht bis mittel brüchig, eher trocken</li>' +
         '<li>Lochung: keine oder nur kleine, runde Löcher (bis ca. 6 mm), griessige Kristalle</li>' +
         '<li>Geschmack: salzig, sauer, leicht süsslich, fruchtig-geröstete Note</li>' +
       '</ul>' +
-      '<div class="factbox"><b>Klassierung:</b> Taxierung mit max. 20 Punkten. Als Sbrinz AOP zugelassen nur mit <b>mind. 18 Punkten</b> und keinem Kriterium unter 4 – sonst 2. Klasse → Reib-/Schmelzkäse.</div>',
+      '<div class="factbox"><b>Klassierung:</b> Taxierung mit max. 20 Punkten. Als Sbrinz AOP zugelassen nur mit <b>mind. 18 Punkten</b> und keinem Kriterium unter 4, sonst 2. Klasse → Reib-/Schmelzkäse.</div>',
     media:
       '<div class="media-grid">' +
         '<figure class="media-figure">' +
@@ -427,7 +427,7 @@ var STATIONS = [
   },
   /* 11 */ {
     kicker: 'Fehlersuche', title: 'Herstellungsprotokoll', id: 'fehler',
-    lead: 'In diesem Protokoll haben sich Fehler eingeschlichen. <b>Klicke alle falschen Angaben an</b>, dann werte aus.',
+    lead: 'In diesem Protokoll haben sich Fehler eingeschlichen. <b>Klicken Sie alle falschen Angaben an</b>, dann werten Sie aus.',
     type: 'errors',
     items: [
       { label: 'Milch: Rohmilch, verarbeitet im',  value: 'Chromstahlkessi', wrong: true,  corr: 'Kupferkessi (Pflichtenheft)' },
@@ -440,7 +440,7 @@ var STATIONS = [
   },
   /* 12 */ {
     kicker: 'Meisterprüfung', title: 'Sbrinz-Meisterprüfung', id: 'boss', boss: true,
-    lead: 'Die Schlussrunde quer durch alle Stationen – jede richtige Antwort gibt extra XP!',
+    lead: 'Die Schlussrunde quer durch alle Stationen, jede richtige Antwort gibt extra XP!',
     type: 'quiz',
     questions: [
       { q: 'Warum wird beim Sbrinz (fast) kein Wasser zugesetzt?',
@@ -710,7 +710,7 @@ function buildErrors(body, idx, st) {
   st.items.forEach(function(it) { if (it.wrong) wrongCount++; });
   maxPts[idx] = wrongCount;
 
-  var html = '<div class="err-intro">Tippe die falschen Angaben an:</div>';
+  var html = '<div class="err-intro">Tippen Sie die falschen Angaben an:</div>';
   st.items.forEach(function(it, ii) {
     html += '<div class="err-line">' + it.label + ' ' +
       '<span class="err-chip" data-i="' + ii + '">' + it.value + '</span>' +
@@ -847,7 +847,7 @@ function showFinish() {
     '<div class="score-sub">' + total + ' / ' + max + ' Wissenspunkte (' + pct + ' %) · längste Serie 🔥 ' + bestStreak + ' · ' + gotCount + '/' + badges.length + ' Abzeichen</div>' +
     '<div class="badges">' + badgeHtml + '</div>' +
     '<ul>' +
-      '<li><b>Rohmilch</b> im Kupferkessi, kein Thermisieren – Salzbad ≥ 15 Tage, 12 Monate im AOP-Gebiet.</li>' +
+      '<li><b>Rohmilch</b> im Kupferkessi, kein Thermisieren, Salzbad ≥ 15 Tage, 12 Monate im AOP-Gebiet.</li>' +
       '<li>Kulturen <b>thermophil + homofermentativ</b>; Fett 2,9–3,0 %; kein Wasserzusatz → extraharter Teig.</li>' +
       '<li>Brennen bei <b>55–56 °C</b> reduziert Fremdkeime, ohne die Säuerung zu stoppen.</li>' +
       '<li>Langes Salzbad (20–22 °Bé, 12–15 °C) + hoher Salzgehalt hemmen die <b>Nachgärung</b>.</li>' +

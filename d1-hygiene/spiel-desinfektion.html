@@ -41,7 +41,7 @@
   <div class="header-text">
   <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologie EFZ · d.1</span>
   <h1>Mikroorganismen desinfizieren</h1>
-  <p>Spritze schädliche und krankheitserregende Keime weg – verschone die nützlichen!</p>
+  <p>Spritzen Sie schädliche und krankheitserregende Keime weg – verschonen Sie die nützlichen!</p>
   </div>
   <div class="header-logos">
     <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
@@ -52,7 +52,7 @@
 <main class="page-main">
   <a class="back-link" href="../index.html">← Alle Lerntools</a>
 
-  <p class="instruction">Ziele mit Maus / Finger (oder Pfeiltasten), spritze mit <strong>Klick / Tippen / Leertaste</strong>. Triff <strong>schädliche &amp; krankheitserregende</strong> Keime, bevor sie ins Produkt fallen – aber <strong>nicht</strong> die nützlichen Kulturen!</p>
+  <p class="instruction">Zielen Sie mit Maus / Finger (oder Pfeiltasten), spritzen Sie mit <strong>Klick / Tippen / Leertaste</strong>. Treffen Sie <strong>schädliche &amp; krankheitserregende</strong> Keime, bevor sie ins Produkt fallen – aber <strong>nicht</strong> die nützlichen Kulturen!</p>
 
   <div class="game-wrap">
     <div class="hud">
@@ -65,10 +65,10 @@
 
       <div class="overlay" id="startScreen">
         <h2>Mikroorganismen desinfizieren</h2>
-        <p>Keime fallen Richtung Produkt. Spritze <strong>Desinfektionsmittel</strong> auf <strong>schädliche</strong> (Verderb) und <strong>krankheitserregende</strong> (pathogene) Keime: <strong>+50</strong> Punkte.<br><br>
-        Triffst du eine <strong>nützliche Kultur</strong>, zerstörst du sie → <strong>−50</strong> Punkte.<br>
-        Lässt du einen schädlichen/pathogenen Keim ins Produkt → Kontamination → Leben weg.<br>
-        Du hast 3 Leben.</p>
+        <p>Keime fallen Richtung Produkt. Spritzen Sie <strong>Desinfektionsmittel</strong> auf <strong>schädliche</strong> (Verderb) und <strong>krankheitserregende</strong> (pathogene) Keime: <strong>+50</strong> Punkte.<br><br>
+        Treffen Sie eine <strong>nützliche Kultur</strong>, zerstören Sie sie → <strong>−50</strong> Punkte.<br>
+        Lassen Sie einen schädlichen/pathogenen Keim ins Produkt → Kontamination → Leben weg.<br>
+        Sie haben 3 Leben.</p>
         <button class="btn btn-primary" onclick="startGame()">Spiel starten</button>
       </div>
 
@@ -199,8 +199,8 @@ function endGame() {
   running = false;
   document.getElementById('endScore').textContent = score;
   var msg;
-  if (score >= 700)      msg = 'Hervorragend! Du erkennst nützliche, schädliche und pathogene Keime sicher.';
-  else if (score >= 350) msg = 'Gut gemacht – achte weiter darauf, die nützlichen Kulturen zu verschonen.';
+  if (score >= 700)      msg = 'Hervorragend! Sie erkennen nützliche, schädliche und pathogene Keime sicher.';
+  else if (score >= 350) msg = 'Gut gemacht – achten Sie weiter darauf, die nützlichen Kulturen zu verschonen.';
   else                   msg = 'Übung macht den Meister: Milchsäure-, Probiotik- und Reifungskulturen sind nützlich – alle anderen wegspritzen.';
   document.getElementById('endMsg').textContent = msg;
   document.getElementById('endScreen').classList.remove('hidden');
