@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lernsession – Sbrinz AOP</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .back-link { display:inline-block; font-size:0.82rem; color:var(--text-muted); text-decoration:none; margin-bottom:1rem; }
+    .back-link:hover { color:var(--red); }
+
+    .ls-wrap { max-width: 640px; margin: 0 auto; }
+
+    /* Fortschritt */
+    .ls-meta { font-size:0.8rem; font-weight:600; color:var(--text-muted); text-align:center; margin-bottom:6px; }
+    .ls-dots { display:flex; gap:6px; justify-content:center; margin-bottom:20px; flex-wrap:wrap; }
+    .ls-dot {
+      width:30px; height:30px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      font-size:0.74rem; font-weight:700;
+      background:#edf2f7; color:var(--text-subtle); border:2px solid transparent;
+    }
+    .ls-dot.active { border-color:var(--blue-dark); color:var(--blue-dark); }
+    .ls-dot.done   { background:#38a169; color:#fff; }
+
+    /* Station */
+    .station {
+      background:var(--surface); border-radius:var(--radius-lg);
+      box-shadow:var(--shadow-sm); padding:24px; margin-bottom:18px;
+    }
+    .station.hidden { display:none; }
+    .station-kicker { font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--blue-light); margin-bottom:4px; }
+    .station-title { font-size:1.15rem; font-weight:700; color:var(--blue-dark); margin-bottom:10px; }
+    .station-lead { font-size:0.9rem; color:var(--text); line-height:1.6; margin-bottom:18px; }
+    .station-lead b { color:var(--blue-dark); }
+
+    /* Medien (Bilder / Video / PDF) */
+    .station-media { margin-bottom:18px; }
+    .media-grid { display:flex; gap:10px; flex-wrap:wrap; }
+    .media-grid .media-figure { flex:1; min-width:180px; }
+    .media-figure { margin:0; }
+    .media-figure img {
+      width:100%; height:auto; display:block;
+      border-radius:var(--radius-md); border:1px solid var(--border); box-shadow:var(--shadow-sm);
+    }
+    .media-figure figcaption { font-size:0.74rem; color:var(--text-subtle); margin-top:5px; text-align:center; line-height:1.4; }
+    .video-wrap {
+      position:relative; padding-bottom:56.25%; height:0; overflow:hidden;
+      border-radius:var(--radius-md); box-shadow:var(--shadow-sm);
+    }
+    .video-wrap iframe { position:absolute; top:0; left:0; width:100%; height:100%; border:0; }
+    .pdf-link {
+      display:inline-flex; align-items:center; gap:8px;
+      font-size:0.85rem; font-weight:600; color:var(--blue-dark);
+      background:var(--blue-tint); border:1.5px solid var(--blue-light);
+      border-radius:var(--radius-md); padding:10px 16px; text-decoration:none; transition:all 0.15s;
+    }
+    .pdf-link:hover { background:var(--blue-light); color:#fff; }
+
+    /* Fragen / Optionen (Quiz + Decide) */
+    .q-block { margin-bottom:18px; }
+    .q-block:last-child { margin-bottom:0; }
+    .q-text { font-size:0.92rem; font-weight:600; margin-bottom:10px; }
+    .opt {
+      display:block; width:100%; text-align:left;
+      font-family:var(--font); font-size:0.88rem; color:var(--text);
+      background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius-md);
+      padding:11px 14px; margin-bottom:8px; cursor:pointer; transition:all 0.15s; line-height:1.4;
+    }
+    .opt:hover:not(:disabled) { border-color:var(--blue-light); }
+    .opt:disabled { cursor:default; }
+    .opt.correct { border-color:#38a169; background:#f0fff4; }
+    .opt.wrong   { border-color:var(--red); background:var(--red-light); }
+    .fb { font-size:0.82rem; line-height:1.5; margin-top:8px; padding:10px 12px; border-radius:var(--radius-sm); display:none; }
+    .fb.show { display:block; }
+    .fb.ok  { background:#f0fff4; color:#276749; }
+    .fb.no  { background:var(--red-light); color:var(--red-dark); }
+
+    /* Wahr/Falsch */
+    .tf-item { padding:12px 0; border-bottom:1px solid var(--border); }
+    .tf-item:last-child { border-bottom:none; }
+    .tf-statement { font-size:0.9rem; margin-bottom:8px; }
+    .tf-btns { display:flex; gap:8px; }
+    .tf-btn {
+      font-family:var(--font); font-size:0.82rem; font-weight:600;
+      padding:7px 18px; border-radius:20px; border:1.5px solid var(--border);
+      background:var(--surface); color:var(--text-muted); cursor:pointer; transition:all 0.15s;
+    }
+    .tf-btn:hover:not(:disabled) { border-color:var(--blue-light); }
+    .tf-btn:disabled { cursor:default; }
+    .tf-btn.sel-correct { background:#38a169; border-color:#38a169; color:#fff; }
+    .tf-btn.sel-wrong   { background:var(--red); border-color:var(--red); color:#fff; }
+    .tf-btn.reveal      { border-color:#38a169; color:#276749; }
+    .tf-exp { font-size:0.78rem; color:var(--text-muted); margin-top:8px; display:none; }
+    .tf-exp.show { display:block; }
+
+    /* Lücken */
+    .gap-text { font-size:0.95rem; line-height:2.1; }
+    .gap-text select {
+      font-family:var(--font); font-size:0.85rem; font-weight:600;
+      border:1.5px solid var(--blue-light); border-radius:var(--radius-sm);
+      padding:3px 6px; background:var(--blue-tint); color:var(--blue-dark);
+    }
+    .gap-text select.correct { border-color:#38a169; background:#f0fff4; color:#276749; }
+    .gap-text select.wrong   { border-color:var(--red); background:var(--red-light); color:var(--red-dark); }
+
+    /* Fehlersuche */
+    .err-intro { font-size:0.84rem; color:var(--text-muted); margin-bottom:12px; }
+    .err-line {
+      display:flex; flex-wrap:wrap; align-items:center; gap:6px;
+      padding:9px 0; border-bottom:1px solid var(--border); font-size:0.9rem;
+    }
+    .err-line:last-child { border-bottom:none; }
+    .err-chip {
+      font-weight:700; padding:3px 10px; border-radius:14px;
+      border:1.5px dashed var(--blue-light); background:var(--blue-tint); color:var(--blue-dark);
+      cursor:pointer; transition:all 0.12s;
+    }
+    .err-chip:hover:not(.locked) { border-style:solid; }
+    .err-chip.marked { background:var(--red); border-color:var(--red); border-style:solid; color:#fff; }
+    .err-chip.locked { cursor:default; }
+    .err-chip.is-correct-mark { background:#38a169; border-color:#38a169; color:#fff; }
+    .err-chip.missed { background:#fff3cd; border-color:#d97706; color:#92400e; border-style:solid; }
+    .err-corr { font-size:0.76rem; color:var(--red-dark); width:100%; display:none; }
+    .err-corr.show { display:block; }
+
+    .check-btn-row { margin-top:16px; }
+
+    /* Auswertung */
+    .finish { text-align:center; }
+    .finish .big-score { font-size:2.4rem; font-weight:800; color:var(--blue-dark); margin:6px 0 4px; }
+    .finish .score-sub { font-size:0.86rem; color:var(--text-muted); margin-bottom:18px; }
+    .finish ul { text-align:left; max-width:480px; margin:0 auto 20px; font-size:0.86rem; color:var(--text); line-height:1.6; }
+    .finish li { margin-bottom:6px; }
+
+    /* Navigation */
+    .ls-nav { display:flex; justify-content:space-between; gap:10px; }
+    .ls-nav .spacer { flex:1; }
+  </style>
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+  <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologie EFZ · b.1</span>
+  <h1>Lernsession: Sbrinz AOP</h1>
+  <p>Geführter Lernpfad in 6 Stationen – vom Pflichtenheft bis zur Fehlersuche</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+  <a class="back-link" href="../index.html">← Alle Lerntools</a>
+
+  <div class="ls-wrap">
+    <div class="ls-meta" id="lsMeta"></div>
+    <div class="ls-dots" id="lsDots"></div>
+
+    <div id="stage"></div>
+
+    <div class="ls-nav">
+      <button class="btn btn-ghost" id="prevBtn" onclick="goPrev()">← Zurück</button>
+      <span class="spacer"></span>
+      <button class="btn btn-primary" id="nextBtn" onclick="goNext()">Weiter →</button>
+    </div>
+  </div>
+</main>
+
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologie EFZ · Philipp Neukomm
+</footer>
+
+<script>
+/* ============================================================
+   Lernsession Sbrinz AOP – Inhalte aus b.1 Lehrmittel
+   ============================================================ */
+var STATIONS = [
+  {
+    kicker: 'Station 1', title: 'Steckbrief',
+    lead: 'Sbrinz AOP ist der älteste Schweizer <b>Extrahartkäse</b>, hergestellt in der Zentralschweiz (LU, SZ, OW, NW, ZG, AG). Der Name geht vermutlich auf den Handelsort <b>Brienz</b> zurück. Jahresproduktion rund 1500 Tonnen, Reifung 2–4 Jahre.',
+    media:
+      '<div class="media-grid">' +
+        '<figure class="media-figure">' +
+          '<img src="images/lernsession-sbrinz/herstellregion.png" alt="Sbrinz-Herstellregion in der Zentralschweiz" loading="lazy">' +
+          '<figcaption>Herstellregion: Zentralschweiz (LU, SZ, OW, NW, ZG, AG)</figcaption>' +
+        '</figure>' +
+        '<figure class="media-figure">' +
+          '<img src="images/lernsession-sbrinz/kaseinmarke.png" alt="Kaseinmarke des Sbrinz AOP" loading="lazy">' +
+          '<figcaption>Kaseinmarke – Herkunfts- und Echtheitsnachweis</figcaption>' +
+        '</figure>' +
+      '</div>',
+    type: 'quiz',
+    questions: [
+      { q: 'Zu welcher Käsegruppe zählt Sbrinz AOP?',
+        opts: ['Extrahartkäse', 'Halbhartkäse', 'Weichkäse'], correct: 0 },
+      { q: 'Wie lange reift Sbrinz mindestens?',
+        opts: ['Mindestens 18 Monate', 'Etwa 3 Monate', 'Etwa 6 Wochen'], correct: 0 }
+    ]
+  },
+  {
+    kicker: 'Station 2', title: 'AOP-Pflichtenheft',
+    lead: 'Das Pflichtenheft enthält verbindliche Vorgaben. Entscheide bei jeder Aussage: <b>wahr</b> oder <b>falsch</b>?',
+    media:
+      '<figure class="media-figure" style="margin-bottom:12px;">' +
+        '<img src="images/lernsession-sbrinz/kupferfertiger.jpg" alt="Kupferfertiger zur Sbrinz-Herstellung" loading="lazy">' +
+        '<figcaption>Verarbeitung im Kupferfertiger – Pflichtenheft-Vorgabe</figcaption>' +
+      '</figure>' +
+      '<a class="pdf-link" href="images/lernsession-sbrinz/Pflichtenheft_Sbrinz.pdf" target="_blank" rel="noopener">📄 Pflichtenheft Sbrinz AOP öffnen (PDF, 5 Seiten)</a>',
+    type: 'tf',
+    items: [
+      { s: 'Die Rohmilch wird im Kupferkessi oder Kupferfertiger verarbeitet.', a: true,  e: 'Pflichtenheft: Verarbeitung im Kupferkessi/Kupferfertiger.' },
+      { s: 'Die Milch darf thermisiert oder pasteurisiert werden.',             a: false, e: 'Nur Rohmilch – kein Thermisieren, Pasteurisieren, Baktofugieren oder Filtrieren.' },
+      { s: 'Das Salzbad dauert mindestens 15 Tage.',                            a: true,  e: 'Mindestens 15 Tage (heute üblich 18–20 Tage).' },
+      { s: 'Sbrinz muss die ersten 12 Monate im AOP-Gebiet reifen.',           a: true,  e: 'So schreibt es das Pflichtenheft vor.' },
+      { s: 'Erlaubt sind nur thermophile Kulturen, Lab und Speisesalz.',        a: true,  e: 'Weitere Zusatz-/Hilfsstoffe sind untersagt, ebenso GVO.' },
+      { s: 'Die Milch darf bis 48 Stunden nach dem Melken verarbeitet werden.', a: false, e: 'Spätestens 24 Stunden nach Gewinnung des ältesten Gemelks.' }
+    ]
+  },
+  {
+    kicker: 'Station 3', title: 'Milch & Kulturen',
+    lead: 'Wähle in jeder Lücke den richtigen Begriff.',
+    type: 'gaps',
+    parts: [
+      'Die Milch soll möglichst wenige ',
+      { opts: ['Propionsäure', 'Milchsäure', 'Hefe'], correct: 0 },
+      '- und Buttersäurebakterien enthalten, sonst droht in der langen Reifung eine ',
+      { opts: ['Nachgärung', 'Aufrahmung', 'Synärese'], correct: 0 },
+      '. Der Fettgehalt wird auf ',
+      { opts: ['2,9–3,0 %', '3,8–4,0 %', '1,5 %'], correct: 0 },
+      ' eingestellt. Die Kulturen müssen ',
+      { opts: ['thermophil', 'psychrotroph', 'mesophil'], correct: 0 },
+      ' sein (sie überleben die hohe Brenntemperatur) und ',
+      { opts: ['homofermentativ', 'heterofermentativ', 'proteolytisch'], correct: 0 },
+      ' (keine Gasbildung, sonst entstehen Risse / „Gläs“).'
+    ]
+  },
+  {
+    kicker: 'Station 4', title: 'Bruch brennen – die richtige Temperatur',
+    lead: 'Der Sbrinz-Bruch ist geschnitten und gerührt. Jetzt wird gebrannt (gewärmt). <b>Welche Brenntemperatur wählst du?</b>',
+    type: 'decide',
+    options: [
+      { t: 'unter 55 °C', correct: false,
+        fb: 'Zu tief: Propionsäure- und salztolerante Fremdkeime (Staphylo-/Mikrokokken) werden ungenügend reduziert → erhöhtes Nachgärungs- und „Gläs“-Risiko.' },
+      { t: '55–56 °C', correct: true,
+        fb: 'Richtig! Am Maximum der thermophilen Kulturen: Fremdkeime werden stark reduziert und die Synärese (Entsirten) gefördert – ohne die erwünschten Milchsäurebakterien zu stark zu schädigen.' },
+      { t: 'über 56 °C', correct: false,
+        fb: 'Zu hoch: auch die erwünschten Milchsäurebakterien werden reduziert → verzögerte Anfangssäuerung; Sporenbildner (Buttersäure, Putrifikus) keimen eher aus.' }
+    ]
+  },
+  {
+    kicker: 'Station 5', title: 'Salzbad & Reifung',
+    lead: 'Trage die typischen Sbrinz-Werte ein.',
+    media:
+      '<div class="media-grid">' +
+        '<figure class="media-figure">' +
+          '<img src="images/lernsession-sbrinz/nachsalzen.jpg" alt="Nachsalzen eines Sbrinz-Laibs" loading="lazy">' +
+          '<figcaption>Nachsalzen – ergänzt das Salzbad von Hand</figcaption>' +
+        '</figure>' +
+        '<figure class="media-figure">' +
+          '<img src="images/lernsession-sbrinz/stotzgestelle.jpg" alt="Sbrinz-Laibe stehend im Stotzgestell" loading="lazy">' +
+          '<figcaption>Reifung stehend im Stotzgestell</figcaption>' +
+        '</figure>' +
+      '</div>' +
+      '<figure class="media-figure" style="margin-top:12px;">' +
+        '<div class="video-wrap">' +
+          '<iframe src="https://www.youtube.com/embed/EUITEmX9TJQ" title="Einlagern und Reifen des Sbrinz" loading="lazy" allowfullscreen></iframe>' +
+        '</div>' +
+        '<figcaption>Video: Einlagern und Reifen im Luzerner Sbrinz-Lager</figcaption>' +
+      '</figure>',
+    type: 'gaps',
+    parts: [
+      'Das Salzbad dauert mindestens ',
+      { opts: ['15 Tage', '3 Tage', '30 Tage'], correct: 0 },
+      ' bei einer Konzentration von ',
+      { opts: ['20–22 °Bé', '5–8 °Bé', '30 °Bé'], correct: 0 },
+      ' und ',
+      { opts: ['12–15 °C', '2–4 °C', '25 °C'], correct: 0 },
+      '. Der hohe Salzgehalt (mind. 10–15 g/kg) hemmt die Nachgärung. Danach reift der Sbrinz ',
+      { opts: ['2–4 Jahre', '2–4 Wochen', '6 Monate'], correct: 0 },
+      ', stehend im ',
+      { opts: ['Stotzgestell', 'Salzbad', 'Kupferkessi'], correct: 0 },
+      '.'
+    ]
+  },
+  {
+    kicker: 'Station 6', title: 'Fehlersuche – Herstellungsprotokoll',
+    lead: 'In diesem Protokoll haben sich Fehler eingeschlichen. <b>Klicke alle falschen Angaben an</b>, dann werte aus.',
+    media:
+      '<div class="media-grid">' +
+        '<figure class="media-figure">' +
+          '<img src="images/lernsession-sbrinz/korrekter_sbrinz_teig.jpg" alt="Korrekter, geschlossener Sbrinz-Teig" loading="lazy">' +
+          '<figcaption>Korrekt: geschlossener, gleichmässiger Teig</figcaption>' +
+        '</figure>' +
+        '<figure class="media-figure">' +
+          '<img src="images/lernsession-sbrinz/fehler_propionsaeurebakterien.png" alt="Fehlerbild: Nachgärung durch Propionsäurebakterien" loading="lazy">' +
+          '<figcaption>Fehler: Nachgärung durch Propionsäurebakterien (Risse / „Gläs“)</figcaption>' +
+        '</figure>' +
+      '</div>',
+    type: 'errors',
+    items: [
+      { label: 'Milch: Rohmilch, verarbeitet im',  value: 'Chromstahlkessi', wrong: true,  corr: 'Kupferkessi (Pflichtenheft)' },
+      { label: 'Fettgehalt eingestellt auf',        value: '3,8 %',          wrong: true,  corr: '2,9–3,0 %' },
+      { label: 'Kultur:',                            value: 'mesophil',       wrong: true,  corr: 'thermophil' },
+      { label: 'Bruch gebrannt bei',                 value: '55–56 °C',       wrong: false },
+      { label: 'Salzbad:',                           value: '5 Tage',         wrong: true,  corr: 'mindestens 15 Tage' },
+      { label: 'Reifung:',                           value: '2–4 Jahre, stehend im Stotzgestell', wrong: false }
+    ]
+  }
+];
+
+var N = STATIONS.length;
+var current = 0;
+var solved  = [];
+var earned  = [];
+var maxPts  = [];
+for (var i = 0; i < N; i++) { solved[i] = false; earned[i] = 0; maxPts[i] = 0; }
+
+/* ---------- Aufbau aller Stationen ---------- */
+function buildAll() {
+  var stage = document.getElementById('stage');
+  stage.innerHTML = '';
+  STATIONS.forEach(function(st, idx) {
+    var card = document.createElement('div');
+    card.className = 'station' + (idx === 0 ? '' : ' hidden');
+    card.id = 'station-' + idx;
+    card.innerHTML =
+      '<div class="station-kicker">' + st.kicker + '</div>' +
+      '<div class="station-title">' + st.title + '</div>' +
+      '<div class="station-lead">' + st.lead + '</div>' +
+      (st.media ? '<div class="station-media">' + st.media + '</div>' : '') +
+      '<div class="station-body" id="body-' + idx + '"></div>';
+    stage.appendChild(card);
+    buildBody(idx, st);
+  });
+
+  // Auswertungs-Screen
+  var fin = document.createElement('div');
+  fin.className = 'station hidden';
+  fin.id = 'station-finish';
+  fin.innerHTML = '<div class="finish" id="finishBody"></div>';
+  stage.appendChild(fin);
+}
+
+function buildBody(idx, st) {
+  var body = document.getElementById('body-' + idx);
+  if (st.type === 'quiz')   buildQuiz(body, idx, st);
+  if (st.type === 'tf')     buildTF(body, idx, st);
+  if (st.type === 'gaps')   buildGaps(body, idx, st);
+  if (st.type === 'decide') buildDecide(body, idx, st);
+  if (st.type === 'errors') buildErrors(body, idx, st);
+}
+
+/* ---------- Quiz ---------- */
+function buildQuiz(body, idx, st) {
+  maxPts[idx] = st.questions.length;
+  st.questions.forEach(function(qq, qi) {
+    var block = document.createElement('div');
+    block.className = 'q-block';
+    var h = '<div class="q-text">' + (qi + 1) + '. ' + qq.q + '</div>';
+    qq.opts.forEach(function(opt, oi) {
+      h += '<button class="opt" data-q="' + qi + '" data-o="' + oi + '">' + opt + '</button>';
+    });
+    block.innerHTML = h;
+    body.appendChild(block);
+  });
+  body.querySelectorAll('.opt').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var qi = +btn.dataset.q, oi = +btn.dataset.o;
+      var qq = st.questions[qi];
+      // Schon beantwortet? (eine Option dieser Frage disabled)
+      if (body.querySelector('.opt[data-q="' + qi + '"]:disabled')) return;
+      body.querySelectorAll('.opt[data-q="' + qi + '"]').forEach(function(b) {
+        b.disabled = true;
+        if (+b.dataset.o === qq.correct) b.classList.add('correct');
+      });
+      if (oi !== qq.correct) btn.classList.add('wrong');
+      else earned[idx]++;
+      evalQuiz(idx, st);
+    });
+  });
+}
+function evalQuiz(idx, st) {
+  var answered = 0;
+  for (var qi = 0; qi < st.questions.length; qi++) {
+    if (document.querySelector('#body-' + idx + ' .opt[data-q="' + qi + '"]:disabled')) answered++;
+  }
+  if (answered === st.questions.length) solved[idx] = true;
+  updateNav();
+}
+
+/* ---------- Wahr / Falsch ---------- */
+function buildTF(body, idx, st) {
+  maxPts[idx] = st.items.length;
+  st.items.forEach(function(it, ii) {
+    var item = document.createElement('div');
+    item.className = 'tf-item';
+    item.innerHTML =
+      '<div class="tf-statement">' + it.s + '</div>' +
+      '<div class="tf-btns">' +
+        '<button class="tf-btn" data-i="' + ii + '" data-v="true">Wahr</button>' +
+        '<button class="tf-btn" data-i="' + ii + '" data-v="false">Falsch</button>' +
+      '</div>' +
+      '<div class="tf-exp" id="tfexp-' + idx + '-' + ii + '">' + it.e + '</div>';
+    body.appendChild(item);
+  });
+  body.querySelectorAll('.tf-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var ii = +btn.dataset.i;
+      var pick = btn.dataset.v === 'true';
+      if (body.querySelector('.tf-btn[data-i="' + ii + '"]:disabled')) return;
+      var it = st.items[ii];
+      body.querySelectorAll('.tf-btn[data-i="' + ii + '"]').forEach(function(b) {
+        b.disabled = true;
+        if ((b.dataset.v === 'true') === it.a) b.classList.add('reveal');
+      });
+      if (pick === it.a) { btn.classList.add('sel-correct'); earned[idx]++; }
+      else btn.classList.add('sel-wrong');
+      document.getElementById('tfexp-' + idx + '-' + ii).classList.add('show');
+      evalTF(idx, st);
+    });
+  });
+}
+function evalTF(idx, st) {
+  var answered = 0;
+  for (var ii = 0; ii < st.items.length; ii++) {
+    if (document.querySelector('#body-' + idx + ' .tf-btn[data-i="' + ii + '"]:disabled')) answered++;
+  }
+  if (answered === st.items.length) solved[idx] = true;
+  updateNav();
+}
+
+/* ---------- Lücken (Dropdown) ---------- */
+function buildGaps(body, idx, st) {
+  var gapCount = 0;
+  var html = '<div class="gap-text">';
+  st.parts.forEach(function(part) {
+    if (typeof part === 'string') {
+      html += part;
+    } else {
+      var gi = gapCount++;
+      var opts = shuffleIdx(part.opts.length);
+      html += '<select data-g="' + gi + '" data-correct="' + part.correct + '"><option value="-1">…</option>';
+      opts.forEach(function(oi) {
+        html += '<option value="' + oi + '">' + part.opts[oi] + '</option>';
+      });
+      html += '</select>';
+    }
+  });
+  html += '</div><div class="check-btn-row"><button class="btn btn-primary" id="gapcheck-' + idx + '">Prüfen</button></div>';
+  body.innerHTML = html;
+  maxPts[idx] = gapCount;
+  document.getElementById('gapcheck-' + idx).addEventListener('click', function() {
+    var sels = body.querySelectorAll('select');
+    var ok = 0;
+    sels.forEach(function(sel) {
+      sel.classList.remove('correct', 'wrong');
+      if (+sel.value === +sel.dataset.correct) { sel.classList.add('correct'); ok++; }
+      else sel.classList.add('wrong');
+      sel.disabled = true;
+    });
+    earned[idx] = ok;
+    solved[idx] = true;
+    this.disabled = true;
+    updateNav();
+  });
+}
+
+/* ---------- Prozess-Entscheid ---------- */
+function buildDecide(body, idx, st) {
+  maxPts[idx] = 1;
+  var block = document.createElement('div');
+  block.className = 'q-block';
+  var h = '';
+  st.options.forEach(function(op, oi) {
+    h += '<button class="opt" data-o="' + oi + '">' + op.t + '</button>';
+  });
+  h += '<div class="fb" id="decfb-' + idx + '"></div>';
+  block.innerHTML = h;
+  body.appendChild(block);
+  var triedWrong = false;
+  body.querySelectorAll('.opt').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      if (solved[idx]) return;
+      var oi = +btn.dataset.o;
+      var op = st.options[oi];
+      var fb = document.getElementById('decfb-' + idx);
+      body.querySelectorAll('.opt').forEach(function(b) { b.classList.remove('wrong', 'correct'); });
+      fb.className = 'fb show ' + (op.correct ? 'ok' : 'no');
+      fb.innerHTML = op.fb;
+      if (op.correct) {
+        btn.classList.add('correct');
+        body.querySelectorAll('.opt').forEach(function(b) { b.disabled = true; });
+        if (!triedWrong) earned[idx] = 1;
+        solved[idx] = true;
+        updateNav();
+      } else {
+        btn.classList.add('wrong');
+        triedWrong = true;
+      }
+    });
+  });
+}
+
+/* ---------- Fehlersuche ---------- */
+function buildErrors(body, idx, st) {
+  var wrongCount = 0;
+  st.items.forEach(function(it) { if (it.wrong) wrongCount++; });
+  maxPts[idx] = wrongCount;
+
+  var html = '<div class="err-intro">Tippe die falschen Angaben an:</div>';
+  st.items.forEach(function(it, ii) {
+    html += '<div class="err-line">' + it.label + ' ' +
+      '<span class="err-chip" data-i="' + ii + '">' + it.value + '</span>' +
+      '<span class="err-corr" id="errcorr-' + idx + '-' + ii + '">→ richtig: ' + (it.corr || '') + '</span>' +
+      '</div>';
+  });
+  html += '<div class="check-btn-row"><button class="btn btn-primary" id="errcheck-' + idx + '">Auswerten</button></div>';
+  body.innerHTML = html;
+
+  body.querySelectorAll('.err-chip').forEach(function(chip) {
+    chip.addEventListener('click', function() {
+      if (chip.classList.contains('locked')) return;
+      chip.classList.toggle('marked');
+    });
+  });
+
+  document.getElementById('errcheck-' + idx).addEventListener('click', function() {
+    var score = 0;
+    body.querySelectorAll('.err-chip').forEach(function(chip) {
+      var ii = +chip.dataset.i;
+      var it = st.items[ii];
+      var marked = chip.classList.contains('marked');
+      chip.classList.add('locked');
+      if (it.wrong && marked) { chip.classList.remove('marked'); chip.classList.add('is-correct-mark'); document.getElementById('errcorr-' + idx + '-' + ii).classList.add('show'); score++; }
+      else if (it.wrong && !marked) { chip.classList.add('missed'); document.getElementById('errcorr-' + idx + '-' + ii).classList.add('show'); }
+      else if (!it.wrong && marked) { /* falsch markiert */ chip.classList.add('wrong'); chip.style.background = 'var(--red-light)'; chip.style.color = 'var(--red-dark)'; chip.style.borderColor = 'var(--red)'; score--; }
+    });
+    earned[idx] = Math.max(0, score);
+    solved[idx] = true;
+    this.disabled = true;
+    updateNav();
+  });
+}
+
+/* ---------- Hilfen ---------- */
+function shuffleIdx(n) {
+  var a = [];
+  for (var i = 0; i < n; i++) a.push(i);
+  for (var j = a.length - 1; j > 0; j--) {
+    var k = Math.floor(Math.random() * (j + 1));
+    var t = a[j]; a[j] = a[k]; a[k] = t;
+  }
+  return a;
+}
+
+/* ---------- Navigation & Fortschritt ---------- */
+function renderProgress() {
+  var dots = document.getElementById('lsDots');
+  dots.innerHTML = '';
+  for (var i = 0; i < N; i++) {
+    var d = document.createElement('div');
+    d.className = 'ls-dot' + (i === current ? ' active' : '') + (solved[i] ? ' done' : '');
+    d.textContent = solved[i] ? '✓' : (i + 1);
+    dots.appendChild(d);
+  }
+  if (current < N) {
+    document.getElementById('lsMeta').textContent = 'Station ' + (current + 1) + ' von ' + N;
+  } else {
+    document.getElementById('lsMeta').textContent = 'Auswertung';
+  }
+}
+
+function showCard(which) {
+  document.querySelectorAll('.station').forEach(function(c) { c.classList.add('hidden'); });
+  if (which === 'finish') document.getElementById('station-finish').classList.remove('hidden');
+  else document.getElementById('station-' + which).classList.remove('hidden');
+}
+
+function updateNav() {
+  var nextBtn = document.getElementById('nextBtn');
+  var prevBtn = document.getElementById('prevBtn');
+  prevBtn.style.visibility = (current === 0) ? 'hidden' : 'visible';
+  if (current < N) {
+    nextBtn.disabled = !solved[current];
+    nextBtn.textContent = (current === N - 1) ? 'Zur Auswertung →' : 'Weiter →';
+  }
+  renderProgress();
+}
+
+function goNext() {
+  if (current < N) {
+    if (!solved[current]) return;
+    current++;
+    if (current < N) { showCard(current); updateNav(); }
+    else { showFinish(); }
+  }
+}
+function goPrev() {
+  if (current === 0) return;
+  if (current >= N) current = N - 1;   // von Auswertung zurück
+  else current--;
+  showCard(current);
+  document.getElementById('nextBtn').disabled = false;
+  updateNav();
+}
+
+function showFinish() {
+  var total = 0, max = 0;
+  for (var i = 0; i < N; i++) { total += earned[i]; max += maxPts[i]; }
+  var pct = Math.round(total / max * 100);
+  var msg;
+  if (pct >= 85)      msg = 'Stark! Du beherrschst die Sbrinz-AOP-Grundlagen sicher.';
+  else if (pct >= 55) msg = 'Gut gemacht – schau dir die markierten Punkte nochmals an.';
+  else                msg = 'Wiederhole die Stationen, dann sitzt der Sbrinz-Stoff.';
+
+  document.getElementById('finishBody').innerHTML =
+    '<div class="station-kicker">Geschafft</div>' +
+    '<div class="station-title">Lernsession abgeschlossen</div>' +
+    '<div class="big-score">' + total + ' / ' + max + '</div>' +
+    '<div class="score-sub">' + pct + ' % · ' + msg + '</div>' +
+    '<ul>' +
+      '<li><b>Rohmilch</b> im Kupferkessi, kein Thermisieren – Salzbad ≥ 15 Tage, 12 Monate im AOP-Gebiet.</li>' +
+      '<li>Kulturen <b>thermophil + homofermentativ</b>; Fett 2,9–3,0 %; wenig Wasserzusatz → extraharter Teig.</li>' +
+      '<li>Brennen bei <b>55–56 °C</b> reduziert Fremdkeime, ohne die Säuerung zu stoppen.</li>' +
+      '<li>Langes Salzbad (20–22 °Bé, 12–15 °C) + hoher Salzgehalt hemmen die <b>Nachgärung</b>.</li>' +
+      '<li>Reifung <b>2–4 Jahre</b> stehend im Stotzgestell; Fehler: Nachgärung/Gläs, Borde.</li>' +
+    '</ul>' +
+    '<button class="btn btn-primary" onclick="restart()">Nochmals starten</button>';
+
+  showCard('finish');
+  document.getElementById('nextBtn').style.visibility = 'hidden';
+  document.getElementById('prevBtn').style.visibility = 'visible';
+  renderProgress();
+}
+
+function restart() {
+  current = 0;
+  for (var i = 0; i < N; i++) { solved[i] = false; earned[i] = 0; }
+  document.getElementById('nextBtn').style.visibility = 'visible';
+  buildAll();
+  showCard(0);
+  updateNav();
+}
+
+/* Init */
+buildAll();
+showCard(0);
+updateNav();
+</script>
+</body>
+</html>
