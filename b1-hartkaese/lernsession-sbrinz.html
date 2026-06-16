@@ -11,13 +11,25 @@
 
     .ls-wrap { max-width: 640px; margin: 0 auto; }
 
+    /* Gamification-HUD */
+    .hud { display:flex; align-items:center; gap:12px; background:var(--blue-dark); color:#fff; border-radius:var(--radius-md); padding:10px 14px; margin-bottom:14px; box-shadow:var(--shadow-sm); }
+    .hud-xp { display:flex; align-items:baseline; gap:5px; flex-shrink:0; }
+    .hud-label { font-size:0.6rem; font-weight:700; letter-spacing:0.1em; opacity:0.8; }
+    .hud-val { font-size:1.15rem; font-weight:800; display:inline-block; }
+    .hud-val.pop { animation:xppop 0.4s ease; }
+    @keyframes xppop { 0%{transform:scale(1);} 40%{transform:scale(1.45); color:#9ad1e8;} 100%{transform:scale(1);} }
+    .hud-bar { flex:1; height:8px; background:rgba(255,255,255,0.2); border-radius:4px; overflow:hidden; }
+    .hud-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#69A9C9,#9ad1e8); border-radius:4px; transition:width 0.4s ease; }
+    .hud-streak { font-size:0.84rem; font-weight:700; background:rgba(255,255,255,0.14); padding:3px 9px; border-radius:12px; white-space:nowrap; flex-shrink:0; transition:transform 0.15s; }
+    .hud-streak.pulse { transform:scale(1.25); }
+
     /* Fortschritt */
     .ls-meta { font-size:0.8rem; font-weight:600; color:var(--text-muted); text-align:center; margin-bottom:6px; }
-    .ls-dots { display:flex; gap:6px; justify-content:center; margin-bottom:20px; flex-wrap:wrap; }
+    .ls-dots { display:flex; gap:5px; justify-content:center; margin-bottom:20px; flex-wrap:wrap; }
     .ls-dot {
-      width:30px; height:30px; border-radius:50%;
+      width:28px; height:28px; border-radius:50%;
       display:flex; align-items:center; justify-content:center;
-      font-size:0.74rem; font-weight:700;
+      font-size:0.72rem; font-weight:700;
       background:#edf2f7; color:var(--text-subtle); border:2px solid transparent;
     }
     .ls-dot.active { border-color:var(--blue-dark); color:var(--blue-dark); }
@@ -33,6 +45,18 @@
     .station-title { font-size:1.15rem; font-weight:700; color:var(--blue-dark); margin-bottom:10px; }
     .station-lead { font-size:0.9rem; color:var(--text); line-height:1.6; margin-bottom:18px; }
     .station-lead b { color:var(--blue-dark); }
+    .station.boss { border:2px solid #f0c36d; box-shadow:0 0 0 4px #fff7e6; }
+    .station.boss .station-kicker { color:#d97706; }
+
+    /* Lese-/Info-Inhalte */
+    .read { font-size:0.9rem; line-height:1.65; color:var(--text); }
+    .read p { margin-bottom:12px; }
+    .read h4 { font-size:0.92rem; color:var(--blue-dark); margin:14px 0 6px; }
+    .read ul { margin:0 0 12px 1.15rem; }
+    .read li { margin-bottom:5px; }
+    .read b { color:var(--blue-dark); }
+    .read .factbox { background:var(--blue-tint); border-left:4px solid var(--blue-light); border-radius:var(--radius-sm); padding:10px 14px; margin:12px 0; font-size:0.86rem; line-height:1.55; }
+    .read-btn-row { margin-top:16px; }
 
     /* Medien (Bilder / Video / PDF) */
     .station-media { margin-bottom:18px; }
@@ -128,8 +152,13 @@
 
     /* Auswertung */
     .finish { text-align:center; }
-    .finish .big-score { font-size:2.4rem; font-weight:800; color:var(--blue-dark); margin:6px 0 4px; }
-    .finish .score-sub { font-size:0.86rem; color:var(--text-muted); margin-bottom:18px; }
+    .finish .rank { font-size:1.25rem; font-weight:800; color:var(--blue-dark); margin:4px 0 2px; }
+    .finish .big-score { font-size:2.4rem; font-weight:800; color:var(--blue-dark); margin:6px 0 2px; }
+    .finish .score-sub { font-size:0.86rem; color:var(--text-muted); margin-bottom:16px; }
+    .badges { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin:0 auto 18px; max-width:500px; }
+    .badge-chip { display:inline-flex; align-items:center; gap:5px; font-size:0.76rem; font-weight:600; padding:6px 12px; border-radius:20px; border:1.5px solid var(--border); background:#f8fafc; color:var(--text-subtle); }
+    .badge-chip.earned { background:#fff7e6; border-color:#f0c36d; color:#92400e; }
+    .badge-chip .lock { opacity:0.6; }
     .finish ul { text-align:left; max-width:480px; margin:0 auto 20px; font-size:0.86rem; color:var(--text); line-height:1.6; }
     .finish li { margin-bottom:6px; }
 
@@ -144,7 +173,7 @@
   <div class="header-text">
   <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologie EFZ · b.1</span>
   <h1>Lernsession: Sbrinz AOP</h1>
-  <p>Geführter Lernpfad in 6 Stationen – vom Pflichtenheft bis zur Fehlersuche</p>
+  <p>Geführter Lernpfad in 13 Stationen – mit Lesetexten, XP-Punkten und Abzeichen</p>
   </div>
   <div class="header-logos">
     <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
@@ -156,6 +185,12 @@
   <a class="back-link" href="../index.html">← Alle Lerntools</a>
 
   <div class="ls-wrap">
+    <div class="hud">
+      <div class="hud-xp"><span class="hud-label">XP</span><span class="hud-val" id="hudXp">0</span></div>
+      <div class="hud-bar"><div class="hud-bar-fill" id="hudBar"></div></div>
+      <div class="hud-streak" id="hudStreak">🔥 0</div>
+    </div>
+
     <div class="ls-meta" id="lsMeta"></div>
     <div class="ls-dots" id="lsDots"></div>
 
@@ -176,39 +211,64 @@
 <script>
 /* ============================================================
    Lernsession Sbrinz AOP – Inhalte aus b.1 Lehrmittel
+   13 Stationen mit Lesetexten + Gamification (XP, Streak, Abzeichen)
    ============================================================ */
 var STATIONS = [
-  {
-    kicker: 'Station 1', title: 'Steckbrief',
-    lead: 'Sbrinz AOP ist der älteste Schweizer <b>Extrahartkäse</b>, hergestellt in der Zentralschweiz (LU, SZ, OW, NW, ZG, AG). Der Name geht vermutlich auf den Handelsort <b>Brienz</b> zurück. Jahresproduktion rund 1500 Tonnen, Reifung 2–4 Jahre.',
-    media:
-      '<div class="media-grid">' +
-        '<figure class="media-figure">' +
-          '<img src="images/lernsession-sbrinz/herstellregion.png" alt="Sbrinz-Herstellregion in der Zentralschweiz" loading="lazy">' +
-          '<figcaption>Herstellregion: Zentralschweiz (LU, SZ, OW, NW, ZG, AG)</figcaption>' +
-        '</figure>' +
-        '<figure class="media-figure">' +
-          '<img src="images/lernsession-sbrinz/kaseinmarke.png" alt="Kaseinmarke des Sbrinz AOP" loading="lazy">' +
-          '<figcaption>Kaseinmarke – Herkunfts- und Echtheitsnachweis</figcaption>' +
-        '</figure>' +
-      '</div>',
+  /* 0 */ {
+    kicker: 'Info · Grundlagen', title: 'Was ist Sbrinz AOP?',
+    lead: 'Lies den Steckbrief – gleich danach prüfst du dein Wissen.',
+    type: 'info',
+    read:
+      '<p><b>Sbrinz AOP</b> ist der älteste Schweizer Käse und ein <b>Extrahartkäse</b> aus der Zentralschweiz. Er wird aus <b>roher Kuhmilch</b> hergestellt und reift <b>2–4 Jahre</b>.</p>' +
+      '<h4>Herkunft des Namens</h4>' +
+      '<p>Der Name geht vermutlich auf den Handelsort <b>Brienz</b> zurück – im Mittelalter Ausgangspunkt der Käsetransporte über die Alpenpässe nach Italien. Italienische Händler machten aus „Brienz“ vermutlich „Sbrinz“.</p>' +
+      '<h4>Zahlen &amp; Fakten</h4>' +
+      '<ul>' +
+        '<li>Herstellgebiet: <b>LU, SZ, OW, NW, ZG, AG</b> (Zentralschweiz)</li>' +
+        '<li>Rund 20 Dorfkäsereien + ca. 10 Alpbetriebe</li>' +
+        '<li>Jahresproduktion ca. <b>1500 Tonnen</b>, Exportanteil ca. 15 %</li>' +
+        '<li>Laib: <b>35–48 kg</b>, Durchmesser 50–62 cm</li>' +
+      '</ul>' +
+      '<div class="factbox">Typische Verwendung: fein <b>gehobelt</b> (Möckli) oder gerieben – dank des extraharten, gut reibfähigen Teigs.</div>'
+  },
+  /* 1 */ {
+    kicker: 'Quiz', title: 'Steckbrief',
+    lead: 'Drei Fragen zu den Grundlagen.',
     type: 'quiz',
     questions: [
       { q: 'Zu welcher Käsegruppe zählt Sbrinz AOP?',
         opts: ['Extrahartkäse', 'Halbhartkäse', 'Weichkäse'], correct: 0 },
-      { q: 'Wie lange reift Sbrinz mindestens?',
-        opts: ['Mindestens 18 Monate', 'Etwa 3 Monate', 'Etwa 6 Wochen'], correct: 0 }
+      { q: 'Wie lange reift Sbrinz typischerweise?',
+        opts: ['2–4 Jahre (mind. 18 Monate)', 'Etwa 3 Monate', 'Etwa 6 Wochen'], correct: 0 },
+      { q: 'Aus welcher Milch wird Sbrinz hergestellt?',
+        opts: ['Rohmilch', 'Pasteurisierter Milch', 'Thermisierter Milch'], correct: 0 }
     ]
   },
-  {
-    kicker: 'Station 2', title: 'AOP-Pflichtenheft',
-    lead: 'Das Pflichtenheft enthält verbindliche Vorgaben. Entscheide bei jeder Aussage: <b>wahr</b> oder <b>falsch</b>?',
+  /* 2 */ {
+    kicker: 'Info · AOP', title: 'AOP & das Pflichtenheft',
+    lead: 'Warum darf nicht jeder Hartkäse „Sbrinz“ heissen?',
+    type: 'info',
+    read:
+      '<p><b>AOP</b> steht für <i>Appellation d’Origine Protégée</i> – „geschützte Ursprungsbezeichnung“. Nur Käse, der ein verbindliches <b>Pflichtenheft</b> einhält, darf den Namen Sbrinz AOP tragen.</p>' +
+      '<h4>Wichtige Pflichtenheft-Vorgaben</h4>' +
+      '<ul>' +
+        '<li>Verarbeitung im <b>Kupferkessi / Kupferfertiger</b></li>' +
+        '<li><b>Rohmilch</b> – kein Thermisieren, Pasteurisieren, Baktofugieren, Filtrieren</li>' +
+        '<li>Nur <b>thermophile Kulturen, Lab und Speisesalz</b> – keine GVO</li>' +
+        '<li>Milch spätestens <b>24 h</b> nach dem ältesten Gemelk verarbeiten</li>' +
+        '<li>Salzbad <b>mind. 15 Tage</b>; erste <b>12 Monate</b> Reifung im AOP-Gebiet</li>' +
+      '</ul>' +
+      '<div class="factbox">Die <b>Kaseinmarke</b> im Laib weist Herkunft, Laib-Nummer, Jahr und Betrieb nach – der „Ausweis“ jedes Sbrinz.</div>',
     media:
       '<figure class="media-figure" style="margin-bottom:12px;">' +
         '<img src="images/lernsession-sbrinz/kupferfertiger.jpg" alt="Kupferfertiger zur Sbrinz-Herstellung" loading="lazy">' +
         '<figcaption>Verarbeitung im Kupferfertiger – Pflichtenheft-Vorgabe</figcaption>' +
       '</figure>' +
-      '<a class="pdf-link" href="images/lernsession-sbrinz/Pflichtenheft_Sbrinz.pdf" target="_blank" rel="noopener">📄 Pflichtenheft Sbrinz AOP öffnen (PDF, 5 Seiten)</a>',
+      '<a class="pdf-link" href="images/lernsession-sbrinz/Pflichtenheft_Sbrinz.pdf" target="_blank" rel="noopener">📄 Pflichtenheft Sbrinz AOP öffnen (PDF, 5 Seiten)</a>'
+  },
+  /* 3 */ {
+    kicker: 'Wahr oder Falsch', title: 'Pflichtenheft', id: 'pflichtenheft',
+    lead: 'Entscheide bei jeder Aussage: <b>wahr</b> oder <b>falsch</b>?',
     type: 'tf',
     items: [
       { s: 'Die Rohmilch wird im Kupferkessi oder Kupferfertiger verarbeitet.', a: true,  e: 'Pflichtenheft: Verarbeitung im Kupferkessi/Kupferfertiger.' },
@@ -219,8 +279,24 @@ var STATIONS = [
       { s: 'Die Milch darf bis 48 Stunden nach dem Melken verarbeitet werden.', a: false, e: 'Spätestens 24 Stunden nach Gewinnung des ältesten Gemelks.' }
     ]
   },
-  {
-    kicker: 'Station 3', title: 'Milch & Kulturen',
+  /* 4 */ {
+    kicker: 'Info · Rohstoff', title: 'Milch & Kulturen',
+    lead: 'Was macht die Sbrinz-Milch besonders?',
+    type: 'info',
+    read:
+      '<p>Die Sbrinz-Milch muss möglichst <b>wenige Propionsäure- und Buttersäurebakterien</b> enthalten. Diese Fremdkeime stammen aus dem Erdreich (Futter, schmutzige Euter, Staub) und können in der langen Reifung eine <b>Nachgärung</b> mit Löchern, Rissen und Fehlgeschmack verursachen.</p>' +
+      '<h4>Kein Wasserzusatz</h4>' +
+      '<p>Beim Sbrinz wird (ausser Spülwasser, max. 2 %) <b>kein Wasser zugesetzt</b>. So bleibt viel Milchzucker erhalten → viel Milchsäure → diese löst Kalzium aus dem Kaseingerüst → <b>fester, kerniger, brüchiger</b> Teig.</p>' +
+      '<h4>Anforderungen an die Kulturen</h4>' +
+      '<ul>' +
+        '<li><b>thermophil</b> – überleben die hohe Brenntemperatur (55–57 °C)</li>' +
+        '<li><b>homofermentativ</b> – keine Gasbildung, sonst Risse / „Gläs“</li>' +
+        '<li>Zusatz ca. 2–2,5 ‰, Vorreifung ca. 30 min</li>' +
+      '</ul>' +
+      '<div class="factbox">Fettgehalt der Verarbeitungsmilch: <b>2,9–3,0 %</b>. Zu viel Fett → weicher, schmieriger Teig, der beim Reiben verklebt.</div>'
+  },
+  /* 5 */ {
+    kicker: 'Lückentext', title: 'Milch & Kulturen',
     lead: 'Wähle in jeder Lücke den richtigen Begriff.',
     type: 'gaps',
     parts: [
@@ -237,22 +313,57 @@ var STATIONS = [
       ' (keine Gasbildung, sonst entstehen Risse / „Gläs“).'
     ]
   },
-  {
-    kicker: 'Station 4', title: 'Bruch brennen – die richtige Temperatur',
-    lead: 'Der Sbrinz-Bruch ist geschnitten und gerührt. Jetzt wird gebrannt (gewärmt). <b>Welche Brenntemperatur wählst du?</b>',
+  /* 6 */ {
+    kicker: 'Info · Herstellung', title: 'Vom Kessi zum Bruch',
+    lead: 'Einlaben, schneiden und brennen – Schritt für Schritt.',
+    type: 'info',
+    read:
+      '<p>Im <b>Kupferkessi</b> wird die Rohmilch mit Kultur und Lab dickgelegt.</p>' +
+      '<h4>Einlaben &amp; Schneiden</h4>' +
+      '<ul>' +
+        '<li>Gerinnungstemperatur ca. <b>31–32 °C</b>, Labungszeit ca. 35–40 min</li>' +
+        '<li>Ohne Wasserzusatz nimmt der Griff schnell zu → <b>früh schneiden</b>, sonst „Überschiessen“ (Hautbildung um die Bruchkörner)</li>' +
+        '<li><b>feine Bruchgrösse</b> → bessere Entsirtung (Trocknung)</li>' +
+      '</ul>' +
+      '<h4>Brennen in zwei Phasen</h4>' +
+      '<ul>' +
+        '<li>Erste 20 min: langsam auf max. <b>40 °C</b></li>' +
+        '<li>Nächste 20 min: auf die Maximaltemperatur <b>55–56 °C</b></li>' +
+      '</ul>' +
+      '<div class="factbox">Der langsame Start verhindert das Überschiessen der Bruchkörner. Die hohe Endtemperatur reduziert Fremdkeime und fördert die Synärese (Entsirten).</div>'
+  },
+  /* 7 */ {
+    kicker: 'Entscheidung', title: 'Bruch brennen – die richtige Temperatur',
+    lead: 'Der Sbrinz-Bruch ist geschnitten und gerührt. Jetzt wird gebrannt. <b>Welche Brenntemperatur wählst du?</b>',
     type: 'decide',
     options: [
       { t: 'unter 55 °C', correct: false,
         fb: 'Zu tief: Propionsäure- und salztolerante Fremdkeime (Staphylo-/Mikrokokken) werden ungenügend reduziert → erhöhtes Nachgärungs- und „Gläs“-Risiko.' },
       { t: '55–56 °C', correct: true,
-        fb: 'Richtig! Am Maximum der thermophilen Kulturen: Fremdkeime werden stark reduziert und die Synärese (Entsirten) gefördert – ohne die erwünschten Milchsäurebakterien zu stark zu schädigen.' },
+        fb: 'Richtig! Am Maximum der thermophilen Kulturen: Fremdkeime werden stark reduziert und die Synärese gefördert – ohne die erwünschten Milchsäurebakterien zu stark zu schädigen.' },
       { t: 'über 56 °C', correct: false,
         fb: 'Zu hoch: auch die erwünschten Milchsäurebakterien werden reduziert → verzögerte Anfangssäuerung; Sporenbildner (Buttersäure, Putrifikus) keimen eher aus.' }
     ]
   },
-  {
-    kicker: 'Station 5', title: 'Salzbad & Reifung',
-    lead: 'Trage die typischen Sbrinz-Werte ein.',
+  /* 8 */ {
+    kicker: 'Info · Reifung', title: 'Salzen & Reifung',
+    lead: 'Schau dir das Salzbad und die Reifung an – inkl. Video aus dem Sbrinz-Lager.',
+    type: 'info',
+    read:
+      '<p>Nach dem Pressen kommt der Sbrinz ins <b>Salzbad</b> – mit <b>mind. 15 Tagen</b> (heute 18–20) extrem lang.</p>' +
+      '<h4>Ideale Salzbad-Werte</h4>' +
+      '<ul>' +
+        '<li>Konzentration <b>20–22 °Bé</b> (zu tief und zu hoch verzögern die Aufnahme)</li>' +
+        '<li>Temperatur <b>12–15 °C</b></li>' +
+        '<li>Ziel-Salzgehalt im Käse: mind. <b>10–15 g/kg</b></li>' +
+      '</ul>' +
+      '<p>Der hohe Salzgehalt verfestigt Narben und Teig, hemmt die <b>Nachgärung</b> und unterstützt das Aroma. <b>Nachsalzen</b> wird nicht empfohlen – es führt zu Verfärbungen.</p>' +
+      '<h4>Reifung</h4>' +
+      '<ul>' +
+        '<li><b>Abschwitzen</b> im Gärkeller (12–18 °C): wöchentlich wenden und das geschwitzte Fett verreiben</li>' +
+        '<li>Danach Reifung bei 9–14 °C, <b>stehend im Stotzgestell</b></li>' +
+        '<li>Gesamtreifung <b>2–4 Jahre</b> – keine zweite Gärung, langsame, intensive Aromabildung</li>' +
+      '</ul>',
     media:
       '<div class="media-grid">' +
         '<figure class="media-figure">' +
@@ -269,7 +380,11 @@ var STATIONS = [
           '<iframe src="https://www.youtube.com/embed/EUITEmX9TJQ" title="Einlagern und Reifen des Sbrinz" loading="lazy" allowfullscreen></iframe>' +
         '</div>' +
         '<figcaption>Video: Einlagern und Reifen im Luzerner Sbrinz-Lager</figcaption>' +
-      '</figure>',
+      '</figure>'
+  },
+  /* 9 */ {
+    kicker: 'Lückentext', title: 'Salzbad & Reifung',
+    lead: 'Trage die typischen Sbrinz-Werte ein.',
     type: 'gaps',
     parts: [
       'Das Salzbad dauert mindestens ',
@@ -285,9 +400,19 @@ var STATIONS = [
       '.'
     ]
   },
-  {
-    kicker: 'Station 6', title: 'Fehlersuche – Herstellungsprotokoll',
-    lead: 'In diesem Protokoll haben sich Fehler eingeschlichen. <b>Klicke alle falschen Angaben an</b>, dann werte aus.',
+  /* 10 */ {
+    kicker: 'Info · Qualität', title: 'Qualität & typische Fehler',
+    lead: 'Woran erkennt man einen guten Sbrinz – und was geht schief?',
+    type: 'info',
+    read:
+      '<p>Der grösste Feind des Sbrinz ist die <b>Nachgärung durch Propionsäurebakterien</b>: Sie bilden in der langen Reifung Gas → <b>Löcher, Risse und „Gläs“</b> – plus atypischer Geschmack. Solcher Käse darf nicht als Sbrinz verkauft werden.</p>' +
+      '<h4>So soll ein guter Sbrinz sein</h4>' +
+      '<ul>' +
+        '<li>Teig <b>elfenbein- bis hellgelb</b>, leicht bis mittel brüchig, eher trocken</li>' +
+        '<li>Lochung: keine oder nur kleine, runde Löcher (bis ca. 6 mm), griessige Kristalle</li>' +
+        '<li>Geschmack: salzig, sauer, leicht süsslich, fruchtig-geröstete Note</li>' +
+      '</ul>' +
+      '<div class="factbox"><b>Klassierung:</b> Taxierung mit max. 20 Punkten. Als Sbrinz AOP zugelassen nur mit <b>mind. 18 Punkten</b> und keinem Kriterium unter 4 – sonst 2. Klasse → Reib-/Schmelzkäse.</div>',
     media:
       '<div class="media-grid">' +
         '<figure class="media-figure">' +
@@ -298,7 +423,11 @@ var STATIONS = [
           '<img src="images/lernsession-sbrinz/fehler_propionsaeurebakterien.png" alt="Fehlerbild: Nachgärung durch Propionsäurebakterien" loading="lazy">' +
           '<figcaption>Fehler: Nachgärung durch Propionsäurebakterien (Risse / „Gläs“)</figcaption>' +
         '</figure>' +
-      '</div>',
+      '</div>'
+  },
+  /* 11 */ {
+    kicker: 'Fehlersuche', title: 'Herstellungsprotokoll', id: 'fehler',
+    lead: 'In diesem Protokoll haben sich Fehler eingeschlichen. <b>Klicke alle falschen Angaben an</b>, dann werte aus.',
     type: 'errors',
     items: [
       { label: 'Milch: Rohmilch, verarbeitet im',  value: 'Chromstahlkessi', wrong: true,  corr: 'Kupferkessi (Pflichtenheft)' },
@@ -307,6 +436,23 @@ var STATIONS = [
       { label: 'Bruch gebrannt bei',                 value: '55–56 °C',       wrong: false },
       { label: 'Salzbad:',                           value: '5 Tage',         wrong: true,  corr: 'mindestens 15 Tage' },
       { label: 'Reifung:',                           value: '2–4 Jahre, stehend im Stotzgestell', wrong: false }
+    ]
+  },
+  /* 12 */ {
+    kicker: 'Meisterprüfung', title: 'Sbrinz-Meisterprüfung', id: 'boss', boss: true,
+    lead: 'Die Schlussrunde quer durch alle Stationen – jede richtige Antwort gibt extra XP!',
+    type: 'quiz',
+    questions: [
+      { q: 'Warum wird beim Sbrinz (fast) kein Wasser zugesetzt?',
+        opts: ['Damit viel Milchsäure entsteht → fester, extraharter Teig', 'Damit der Käse milder schmeckt', 'Damit er schneller reift'], correct: 0 },
+      { q: 'Welche Eigenschaften müssen die Kulturen haben?',
+        opts: ['thermophil & homofermentativ', 'mesophil & heterofermentativ', 'psychrotroph & proteolytisch'], correct: 0 },
+      { q: 'Welche Brenntemperatur ist richtig?',
+        opts: ['55–56 °C', 'unter 50 °C', 'über 60 °C'], correct: 0 },
+      { q: 'Welchen Fehler verursachen Propionsäurebakterien in der Reifung?',
+        opts: ['Nachgärung mit Löchern, Rissen und „Gläs“', 'Eine zu helle Rinde', 'Einen zu weichen Narben'], correct: 0 },
+      { q: 'Wie viele Taxierungspunkte braucht ein Sbrinz mindestens für die AOP-Klasse?',
+        opts: ['18 von 20', '15 von 20', '12 von 20'], correct: 0 }
     ]
   }
 ];
@@ -318,13 +464,48 @@ var earned  = [];
 var maxPts  = [];
 for (var i = 0; i < N; i++) { solved[i] = false; earned[i] = 0; maxPts[i] = 0; }
 
+/* Gamification-Status */
+var xp = 0, streak = 0, bestStreak = 0;
+
+function findIdx(id) {
+  for (var i = 0; i < N; i++) { if (STATIONS[i].id === id) return i; }
+  return -1;
+}
+
+/* ---------- HUD / XP / Streak ---------- */
+function renderHud() {
+  document.getElementById('hudXp').textContent = xp;
+  var sc = 0;
+  for (var i = 0; i < N; i++) { if (solved[i]) sc++; }
+  document.getElementById('hudBar').style.width = Math.round(sc / N * 100) + '%';
+  document.getElementById('hudStreak').textContent = '🔥 ' + streak;
+}
+function addXp(n) {
+  xp += n;
+  var el = document.getElementById('hudXp');
+  renderHud();
+  el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop');
+}
+function registerAnswer(ok) {
+  if (ok) {
+    streak++;
+    if (streak > bestStreak) bestStreak = streak;
+    addXp(10 + (streak >= 3 ? 5 : 0));
+    var s = document.getElementById('hudStreak');
+    s.classList.remove('pulse'); void s.offsetWidth; s.classList.add('pulse');
+  } else {
+    streak = 0;
+    renderHud();
+  }
+}
+
 /* ---------- Aufbau aller Stationen ---------- */
 function buildAll() {
   var stage = document.getElementById('stage');
   stage.innerHTML = '';
   STATIONS.forEach(function(st, idx) {
     var card = document.createElement('div');
-    card.className = 'station' + (idx === 0 ? '' : ' hidden');
+    card.className = 'station' + (st.boss ? ' boss' : '') + (idx === 0 ? '' : ' hidden');
     card.id = 'station-' + idx;
     card.innerHTML =
       '<div class="station-kicker">' + st.kicker + '</div>' +
@@ -336,7 +517,6 @@ function buildAll() {
     buildBody(idx, st);
   });
 
-  // Auswertungs-Screen
   var fin = document.createElement('div');
   fin.className = 'station hidden';
   fin.id = 'station-finish';
@@ -346,11 +526,28 @@ function buildAll() {
 
 function buildBody(idx, st) {
   var body = document.getElementById('body-' + idx);
+  if (st.type === 'info')   buildInfo(body, idx, st);
   if (st.type === 'quiz')   buildQuiz(body, idx, st);
   if (st.type === 'tf')     buildTF(body, idx, st);
   if (st.type === 'gaps')   buildGaps(body, idx, st);
   if (st.type === 'decide') buildDecide(body, idx, st);
   if (st.type === 'errors') buildErrors(body, idx, st);
+}
+
+/* ---------- Info / Lesetext ---------- */
+function buildInfo(body, idx, st) {
+  maxPts[idx] = 0;
+  body.innerHTML =
+    '<div class="read">' + st.read + '</div>' +
+    '<div class="read-btn-row"><button class="btn btn-primary" id="readbtn-' + idx + '">Gelesen ✓ (+5 XP)</button></div>';
+  document.getElementById('readbtn-' + idx).addEventListener('click', function() {
+    if (solved[idx]) return;
+    solved[idx] = true;
+    addXp(5);
+    this.disabled = true;
+    this.textContent = 'Gelesen ✓';
+    updateNav();
+  });
 }
 
 /* ---------- Quiz ---------- */
@@ -370,14 +567,13 @@ function buildQuiz(body, idx, st) {
     btn.addEventListener('click', function() {
       var qi = +btn.dataset.q, oi = +btn.dataset.o;
       var qq = st.questions[qi];
-      // Schon beantwortet? (eine Option dieser Frage disabled)
       if (body.querySelector('.opt[data-q="' + qi + '"]:disabled')) return;
       body.querySelectorAll('.opt[data-q="' + qi + '"]').forEach(function(b) {
         b.disabled = true;
         if (+b.dataset.o === qq.correct) b.classList.add('correct');
       });
-      if (oi !== qq.correct) btn.classList.add('wrong');
-      else earned[idx]++;
+      if (oi !== qq.correct) { btn.classList.add('wrong'); registerAnswer(false); }
+      else { earned[idx]++; registerAnswer(true); }
       evalQuiz(idx, st);
     });
   });
@@ -416,8 +612,8 @@ function buildTF(body, idx, st) {
         b.disabled = true;
         if ((b.dataset.v === 'true') === it.a) b.classList.add('reveal');
       });
-      if (pick === it.a) { btn.classList.add('sel-correct'); earned[idx]++; }
-      else btn.classList.add('sel-wrong');
+      if (pick === it.a) { btn.classList.add('sel-correct'); earned[idx]++; registerAnswer(true); }
+      else { btn.classList.add('sel-wrong'); registerAnswer(false); }
       document.getElementById('tfexp-' + idx + '-' + ii).classList.add('show');
       evalTF(idx, st);
     });
@@ -457,9 +653,11 @@ function buildGaps(body, idx, st) {
     var ok = 0;
     sels.forEach(function(sel) {
       sel.classList.remove('correct', 'wrong');
-      if (+sel.value === +sel.dataset.correct) { sel.classList.add('correct'); ok++; }
+      var good = (+sel.value === +sel.dataset.correct);
+      if (good) { sel.classList.add('correct'); ok++; }
       else sel.classList.add('wrong');
       sel.disabled = true;
+      registerAnswer(good);
     });
     earned[idx] = ok;
     solved[idx] = true;
@@ -494,11 +692,13 @@ function buildDecide(body, idx, st) {
         btn.classList.add('correct');
         body.querySelectorAll('.opt').forEach(function(b) { b.disabled = true; });
         if (!triedWrong) earned[idx] = 1;
+        registerAnswer(!triedWrong);
         solved[idx] = true;
         updateNav();
       } else {
         btn.classList.add('wrong');
         triedWrong = true;
+        registerAnswer(false);
       }
     });
   });
@@ -534,9 +734,11 @@ function buildErrors(body, idx, st) {
       var it = st.items[ii];
       var marked = chip.classList.contains('marked');
       chip.classList.add('locked');
+      var decisionOk = (it.wrong === marked);
+      registerAnswer(decisionOk);
       if (it.wrong && marked) { chip.classList.remove('marked'); chip.classList.add('is-correct-mark'); document.getElementById('errcorr-' + idx + '-' + ii).classList.add('show'); score++; }
       else if (it.wrong && !marked) { chip.classList.add('missed'); document.getElementById('errcorr-' + idx + '-' + ii).classList.add('show'); }
-      else if (!it.wrong && marked) { /* falsch markiert */ chip.classList.add('wrong'); chip.style.background = 'var(--red-light)'; chip.style.color = 'var(--red-dark)'; chip.style.borderColor = 'var(--red)'; score--; }
+      else if (!it.wrong && marked) { chip.classList.add('wrong'); chip.style.background = 'var(--red-light)'; chip.style.color = 'var(--red-dark)'; chip.style.borderColor = 'var(--red)'; score--; }
     });
     earned[idx] = Math.max(0, score);
     solved[idx] = true;
@@ -577,6 +779,7 @@ function showCard(which) {
   document.querySelectorAll('.station').forEach(function(c) { c.classList.add('hidden'); });
   if (which === 'finish') document.getElementById('station-finish').classList.remove('hidden');
   else document.getElementById('station-' + which).classList.remove('hidden');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function updateNav() {
@@ -588,6 +791,7 @@ function updateNav() {
     nextBtn.textContent = (current === N - 1) ? 'Zur Auswertung →' : 'Weiter →';
   }
   renderProgress();
+  renderHud();
 }
 
 function goNext() {
@@ -600,9 +804,10 @@ function goNext() {
 }
 function goPrev() {
   if (current === 0) return;
-  if (current >= N) current = N - 1;   // von Auswertung zurück
+  if (current >= N) current = N - 1;
   else current--;
   showCard(current);
+  document.getElementById('nextBtn').style.visibility = 'visible';
   document.getElementById('nextBtn').disabled = false;
   updateNav();
 }
@@ -610,23 +815,43 @@ function goPrev() {
 function showFinish() {
   var total = 0, max = 0;
   for (var i = 0; i < N; i++) { total += earned[i]; max += maxPts[i]; }
-  var pct = Math.round(total / max * 100);
-  var msg;
-  if (pct >= 85)      msg = 'Stark! Du beherrschst die Sbrinz-AOP-Grundlagen sicher.';
-  else if (pct >= 55) msg = 'Gut gemacht – schau dir die markierten Punkte nochmals an.';
-  else                msg = 'Wiederhole die Stationen, dann sitzt der Sbrinz-Stoff.';
+  var pct = max > 0 ? Math.round(total / max * 100) : 0;
+
+  var rank;
+  if (pct >= 90)      rank = 'Sbrinz-Meister 🧀';
+  else if (pct >= 75) rank = 'Sbrinz-Affineur';
+  else if (pct >= 50) rank = 'Sbrinz-Geselle';
+  else                rank = 'Sbrinz-Lehrling';
+
+  var pIdx = findIdx('pflichtenheft'), fIdx = findIdx('fehler'), bIdx = findIdx('boss');
+  var badges = [
+    { icon: '📖', name: 'Aufmerksamer Leser', got: true },
+    { icon: '📜', name: 'Pflichtenheft-Profi', got: pIdx >= 0 && earned[pIdx] === maxPts[pIdx] },
+    { icon: '🔍', name: 'Fehlerjäger',        got: fIdx >= 0 && earned[fIdx] === maxPts[fIdx] },
+    { icon: '🔥', name: 'Serienkäser (Streak 8+)', got: bestStreak >= 8 },
+    { icon: '🎓', name: 'Meisterprüfung',     got: bIdx >= 0 && maxPts[bIdx] > 0 && earned[bIdx] === maxPts[bIdx] },
+    { icon: '🧀', name: 'Sbrinz-Meister (90%)', got: pct >= 90 }
+  ];
+  var gotCount = 0;
+  var badgeHtml = '';
+  badges.forEach(function(b) {
+    if (b.got) gotCount++;
+    badgeHtml += '<span class="badge-chip' + (b.got ? ' earned' : '') + '">' +
+      (b.got ? b.icon : '<span class="lock">🔒</span>') + ' ' + b.name + '</span>';
+  });
 
   document.getElementById('finishBody').innerHTML =
     '<div class="station-kicker">Geschafft</div>' +
-    '<div class="station-title">Lernsession abgeschlossen</div>' +
-    '<div class="big-score">' + total + ' / ' + max + '</div>' +
-    '<div class="score-sub">' + pct + ' % · ' + msg + '</div>' +
+    '<div class="rank">' + rank + '</div>' +
+    '<div class="big-score">' + xp + ' XP</div>' +
+    '<div class="score-sub">' + total + ' / ' + max + ' Wissenspunkte (' + pct + ' %) · längste Serie 🔥 ' + bestStreak + ' · ' + gotCount + '/' + badges.length + ' Abzeichen</div>' +
+    '<div class="badges">' + badgeHtml + '</div>' +
     '<ul>' +
       '<li><b>Rohmilch</b> im Kupferkessi, kein Thermisieren – Salzbad ≥ 15 Tage, 12 Monate im AOP-Gebiet.</li>' +
-      '<li>Kulturen <b>thermophil + homofermentativ</b>; Fett 2,9–3,0 %; wenig Wasserzusatz → extraharter Teig.</li>' +
+      '<li>Kulturen <b>thermophil + homofermentativ</b>; Fett 2,9–3,0 %; kein Wasserzusatz → extraharter Teig.</li>' +
       '<li>Brennen bei <b>55–56 °C</b> reduziert Fremdkeime, ohne die Säuerung zu stoppen.</li>' +
       '<li>Langes Salzbad (20–22 °Bé, 12–15 °C) + hoher Salzgehalt hemmen die <b>Nachgärung</b>.</li>' +
-      '<li>Reifung <b>2–4 Jahre</b> stehend im Stotzgestell; Fehler: Nachgärung/Gläs, Borde.</li>' +
+      '<li>Reifung <b>2–4 Jahre</b> stehend im Stotzgestell; Hauptfehler: Nachgärung / „Gläs“ durch Propionsäurebakterien.</li>' +
     '</ul>' +
     '<button class="btn btn-primary" onclick="restart()">Nochmals starten</button>';
 
@@ -638,6 +863,7 @@ function showFinish() {
 
 function restart() {
   current = 0;
+  xp = 0; streak = 0; bestStreak = 0;
   for (var i = 0; i < N; i++) { solved[i] = false; earned[i] = 0; }
   document.getElementById('nextBtn').style.visibility = 'visible';
   buildAll();
