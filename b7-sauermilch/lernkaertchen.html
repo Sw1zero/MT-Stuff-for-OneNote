@@ -7,28 +7,10 @@
   <link rel="stylesheet" href="../style.css">
   <style>
     /* ---- Page layout (centred column) ---- */
-    body {
+    .page-main {
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 32px 16px 48px;
-    }
-
-    .page-header {
-      text-align: center;
-      margin-bottom: 28px;
-    }
-
-    .page-header h1 {
-      font-size: 1.15rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      margin-bottom: 4px;
-    }
-
-    .page-header p {
-      font-size: 0.82rem;
-      color: var(--text-subtle);
     }
 
     .back-link {
@@ -134,12 +116,20 @@
 </head>
 <body>
 
-  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
-
-  <div class="page-header">
-    <h1>b.7 – Sauermilchprodukte herstellen</h1>
-    <p>Klicken oder <kbd>Leertaste</kbd> zum Umdrehen</p>
+<header class="bzwu-header">
+  <div class="header-text">
+  <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologie EFZ · b.7</span>
+  <h1>Sauermilchprodukte herstellen</h1>
+  <p>Klicken oder <kbd>Leertaste</kbd> zum Umdrehen</p>
   </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+  <a class="back-link" href="../index.html">← Alle Lerntools</a>
 
   <div class="filter-wrap" id="filterWrap"></div>
 
@@ -176,6 +166,12 @@
     <kbd>Leertaste</kbd> umdrehen &nbsp;|&nbsp;
     <kbd>S</kbd> mischen
   </p>
+
+</main>
+
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologie EFZ · Philipp Neukomm
+</footer>
 
   <script>
     const ALL_CARDS = [

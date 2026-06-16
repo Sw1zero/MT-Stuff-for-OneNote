@@ -6,11 +6,10 @@
   <title>Hotspot – Bakterienzelle</title>
   <link rel="stylesheet" href="../style.css">
   <style>
-    body {
+    .page-main {
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 28px 16px 56px;
     }
 
     .back-link {
@@ -24,13 +23,6 @@
       align-self: flex-start;
     }
     .back-link:hover { color: var(--red); }
-
-    .page-header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .page-header h1 { font-size: 1.1rem; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; }
-    .page-header p  { font-size: 0.82rem; color: var(--text-subtle); }
 
     .game-wrap {
       width: 660px;
@@ -154,12 +146,20 @@
 </head>
 <body>
 
-<a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
-
-<div class="page-header">
+<header class="bzwu-header">
+  <div class="header-text">
+  <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologie EFZ · a.8</span>
   <h1>Bakterienzelle</h1>
   <p>Klick auf die richtige Struktur im Bild.</p>
-</div>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+  <a class="back-link" href="../index.html">← Alle Lerntools</a>
 
 <div class="game-wrap">
 
@@ -191,6 +191,12 @@
   </div>
 
 </div>
+
+</main>
+
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologie EFZ · Philipp Neukomm
+</footer>
 
 <script>
   var IMG_W = 656, IMG_H = 551;

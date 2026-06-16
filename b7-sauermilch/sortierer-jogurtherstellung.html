@@ -6,11 +6,10 @@
   <title>Sortierer b.7 – Jogurtherstellung</title>
   <link rel="stylesheet" href="../style.css">
   <style>
-    body {
+    .page-main {
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 32px 16px 56px;
     }
 
     .back-link {
@@ -24,18 +23,6 @@
       align-self: flex-start;
     }
     .back-link:hover { color: var(--red); }
-
-    .page-header {
-      text-align: center;
-      margin-bottom: 10px;
-    }
-    .page-header h1 {
-      font-size: 1.15rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      margin-bottom: 4px;
-    }
-    .page-header p { font-size: 0.82rem; color: var(--text-subtle); }
 
     .instruction {
       background: var(--blue-light);
@@ -220,14 +207,22 @@
 </head>
 <body>
 
-  <div id="dragClone"></div>
-
-  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
-
-  <div class="page-header">
-    <h1>b.7 – Jogurtherstellung</h1>
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologie EFZ · b.7</span>
+    <h1>Jogurtherstellung</h1>
     <p>Bringen Sie die Produktionsschritte in die richtige Reihenfolge.</p>
   </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+  <a class="back-link" href="../index.html">← Alle Lerntools</a>
+
+  <div id="dragClone"></div>
 
   <div class="instruction">
     <strong>Aufgabe:</strong> Ziehen Sie die Schritte in die richtige Reihenfolge (oben = zuerst).<br>
@@ -252,6 +247,11 @@
     <button class="btn btn-ghost" onclick="resetOrder()">&#8635; Neu mischen</button>
     <button class="btn btn-primary" onclick="checkOrder()">Überprüfen</button>
   </div>
+</main>
+
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologie EFZ · Philipp Neukomm
+</footer>
 
   <script>
     const STEPS = [
