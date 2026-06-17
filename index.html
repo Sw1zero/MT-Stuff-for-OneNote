@@ -751,20 +751,44 @@
 var activeModule = 'all';
 var activeType   = 'all';
 
+function setActiveBtn(filter, value) {
+  document.querySelectorAll('.filter-btn[data-filter="' + filter + '"]').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.value === value);
+  });
+}
+
+function saveFilter() {
+  try {
+    localStorage.setItem('ltModule', activeModule);
+    localStorage.setItem('ltType', activeType);
+  } catch (e) {}
+}
+
+function restoreFilter() {
+  try {
+    var m = localStorage.getItem('ltModule');
+    var t = localStorage.getItem('ltType');
+    if (m) activeModule = m;
+    if (t) activeType   = t;
+  } catch (e) {}
+  // Auf 'all' zurückfallen, falls ein gespeicherter Wert nicht (mehr) existiert
+  if (!document.querySelector('.filter-btn[data-filter="module"][data-value="' + activeModule + '"]')) activeModule = 'all';
+  if (!document.querySelector('.filter-btn[data-filter="type"][data-value="' + activeType + '"]'))   activeType   = 'all';
+  setActiveBtn('module', activeModule);
+  setActiveBtn('type', activeType);
+}
+
 document.querySelectorAll('.filter-btn').forEach(function(btn) {
   btn.addEventListener('click', function() {
     var filter = btn.dataset.filter;
     var value  = btn.dataset.value;
 
-    // Update active state for this filter row
-    document.querySelectorAll('.filter-btn[data-filter="' + filter + '"]').forEach(function(b) {
-      b.classList.remove('active');
-    });
-    btn.classList.add('active');
+    setActiveBtn(filter, value);
 
     if (filter === 'module') activeModule = value;
     if (filter === 'type')   activeType   = value;
 
+    saveFilter();
     applyFilter();
   });
 });
@@ -783,6 +807,10 @@ function applyFilter() {
     section.classList.toggle('hidden', visible === 0);
   });
 }
+
+// Beim Laden gespeicherten Filter wiederherstellen
+restoreFilter();
+applyFilter();
 </script>
 
 </body>
