@@ -145,7 +145,7 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 | `animation`        | Animation         | `animation-labgerinnung.html`           | Schrittweise SVG-Animation eines Prozesses mit Nav      |
 | `prozess-entscheid`| Prozess-Entscheid | `prozess-entscheid-jogurt.html`         | Entscheidung pro Prozessschritt mit Fehleranalyse       |
 | `fliessschema`     | Fliessschema      | `fliessschema-stichfest.html`           | Produktionsschritte frei in leere, verkettete Kästchen eintippen |
-| `lernsession`      | Lernsession       | `lernsession-sbrinz.html`               | Geführter Lernpfad: Info-/Lesestationen + Quiz/W-F/Lücken/Entscheid/Fehlersuche; Gamification (XP, Streak, Abzeichen, Rang) |
+| `lernsession`      | Challenge         | `lernsession-sbrinz.html`               | Gamifizierte Challenge: Info-/Lesestationen + Quiz/W-F/Lücken/Entscheid/Fehlersuche; Gamification (XP, Streak, Abzeichen, Rang) |
 
 ### Geplant / Ideen
 
