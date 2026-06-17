@@ -559,8 +559,8 @@ function buildQuiz(body, idx, st) {
     var block = document.createElement('div');
     block.className = 'q-block';
     var h = '<div class="q-text">' + (qi + 1) + '. ' + qq.q + '</div>';
-    qq.opts.forEach(function(opt, oi) {
-      h += '<button class="opt" data-q="' + qi + '" data-o="' + oi + '">' + opt + '</button>';
+    shuffleIdx(qq.opts.length).forEach(function(oi) {
+      h += '<button class="opt" data-q="' + qi + '" data-o="' + oi + '">' + qq.opts[oi] + '</button>';
     });
     block.innerHTML = h;
     body.appendChild(block);
