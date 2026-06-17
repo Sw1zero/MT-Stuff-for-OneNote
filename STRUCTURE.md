@@ -47,6 +47,10 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 │   ├── prozess-entscheid-jogurt.html
 │   ├── fliessschema-stichfest.html
 │   └── animation-sauergerinnung.html
+├── a1-rohstoffe/
+│   ├── images/
+│   │   └── milchsammelwagen/           ← 2 PNG (mit/ohne Nummern)
+│   └── milchsammelwagen-beschriften.html
 ├── a2-rohstoffe-trennen/
 │   ├── images/
 │   │   └── trommelbestandteile/        ← 11 PNG-Bilder
@@ -81,7 +85,7 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 
 | `data-module` | Badge | Sektions-Titel                             | Ordner                          | Status |
 |---------------|-------|--------------------------------------------|---------------------------------|--------|
-| `a1`          | a.1   | a.1 – Rohstoffe annehmen                   | `a1-rohstoffe-annehmen/`        | 🔲     |
+| `a1`          | a.1   | a.1 – Rohstoffe annehmen                   | `a1-rohstoffe/`                 | ✅     |
 | `a2`          | a.2   | a.2 – Rohstoffe trennen                    | `a2-rohstoffe-trennen/`         | ✅     |
 | `a3`          | a.3   | a.3 – Rohstoffe aufkonzentrieren           | `a3-aufkonzentrieren/`          | 🔲     |
 | `a4`          | a.4   | a.4 – Wärmebehandlung durchführen          | `a4-waermebehandlung/`          | 🔲     |
