@@ -447,27 +447,38 @@ function renderPrompt() {
     'Klicken Sie auf: <b>' + hsOrder[hsIndex].name + '</b>';
 }
 
+function zonesOf(p) { return p.zones || [{ cx:p.cx, cy:p.cy, r:p.r }]; }
+
 function onHotspotClick(e) {
   var hl = document.getElementById('hotspotLayer');
   var rect = hl.getBoundingClientRect();
-  var px = (e.clientX - rect.left) / rect.width * 100;
-  var py = (e.clientY - rect.top)  / rect.height * 100;
+  var W = rect.width, H = rect.height;
+  var clickX = e.clientX - rect.left;
+  var clickY = e.clientY - rect.top;
 
   if (DEBUG) {
-    document.getElementById('dbgReadout').textContent = 'Klick: cx:' + px.toFixed(1) + ', cy:' + py.toFixed(1);
+    document.getElementById('dbgReadout').textContent =
+      'Klick: cx:' + (clickX / W * 100).toFixed(1) + ', cy:' + (clickY / H * 100).toFixed(1);
   }
   if (hsIndex >= hsOrder.length) return;
-
   var target = hsOrder[hsIndex];
-  var dx = px - target.cx;
-  var dy = (py - target.cy) * ASPECT;
-  var dist = Math.sqrt(dx * dx + dy * dy);
 
-  if (dist <= target.r) {
+  // Welches Bauteil liegt dem Klick am nächsten? (robust gegen kleine/dichte Zonen)
+  var nearest = null, nearestZone = null, nd = Infinity;
+  PARTS.forEach(function(p) {
+    zonesOf(p).forEach(function(z) {
+      var dx = clickX - z.cx / 100 * W;
+      var dy = clickY - z.cy / 100 * H;
+      var d = Math.sqrt(dx * dx + dy * dy);
+      if (d < nd) { nd = d; nearest = p; nearestZone = z; }
+    });
+  });
+
+  if (nearest === target && nd <= 0.22 * W) {
     var m = document.createElement('div');
     m.className = 'hs-marker';
-    m.style.left = target.cx + '%';
-    m.style.top  = target.cy + '%';
+    m.style.left = nearestZone.cx + '%';
+    m.style.top  = nearestZone.cy + '%';
     m.textContent = target.n;
     m.title = target.name;
     hl.appendChild(m);
@@ -477,8 +488,8 @@ function onHotspotClick(e) {
     hsMiss++;
     var miss = document.createElement('div');
     miss.className = 'hs-miss';
-    miss.style.left = px + '%';
-    miss.style.top  = py + '%';
+    miss.style.left = (clickX / W * 100) + '%';
+    miss.style.top  = (clickY / H * 100) + '%';
     miss.textContent = '✗';
     hl.appendChild(miss);
     setTimeout(function() { if (miss.parentNode) miss.parentNode.removeChild(miss); }, 600);
