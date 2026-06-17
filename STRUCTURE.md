@@ -46,6 +46,7 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 │   ├── prozessvergleich-jogurt.html
 │   ├── prozess-entscheid-jogurt.html
 │   ├── fliessschema-stichfest.html
+│   ├── lernsession-pruefung-jogurt.html
 │   └── animation-sauergerinnung.html
 ├── a1-rohstoffe/
 │   ├── images/

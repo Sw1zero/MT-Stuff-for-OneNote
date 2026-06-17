@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Challenge: Prüfungsvorbereitung Joghurt – b.7</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .back-link { display:inline-block; font-size:0.82rem; color:var(--text-muted); text-decoration:none; margin-bottom:1rem; }
+    .back-link:hover { color:var(--red); }
+    .ls-wrap { max-width:640px; margin:0 auto; }
+
+    /* HUD */
+    .hud { display:flex; align-items:center; gap:12px; background:var(--blue-dark); color:#fff; border-radius:var(--radius-md); padding:10px 14px; margin-bottom:14px; box-shadow:var(--shadow-sm); }
+    .hud-xp { display:flex; align-items:baseline; gap:5px; flex-shrink:0; }
+    .hud-label { font-size:0.6rem; font-weight:700; letter-spacing:0.1em; opacity:0.8; }
+    .hud-val { font-size:1.15rem; font-weight:800; display:inline-block; }
+    .hud-val.pop { animation:xppop 0.4s ease; }
+    @keyframes xppop { 0%{transform:scale(1);} 40%{transform:scale(1.45); color:#9ad1e8;} 100%{transform:scale(1);} }
+    .hud-bar { flex:1; height:8px; background:rgba(255,255,255,0.2); border-radius:4px; overflow:hidden; }
+    .hud-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#69A9C9,#9ad1e8); border-radius:4px; transition:width 0.4s ease; }
+    .hud-streak { font-size:0.84rem; font-weight:700; background:rgba(255,255,255,0.14); padding:3px 9px; border-radius:12px; white-space:nowrap; flex-shrink:0; transition:transform 0.15s; }
+    .hud-streak.pulse { transform:scale(1.25); }
+
+    .ls-meta { font-size:0.8rem; font-weight:600; color:var(--text-muted); text-align:center; margin-bottom:6px; }
+    .ls-dots { display:flex; gap:5px; justify-content:center; margin-bottom:20px; flex-wrap:wrap; }
+    .ls-dot { width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:700; background:#edf2f7; color:var(--text-subtle); border:2px solid transparent; }
+    .ls-dot.active { border-color:var(--blue-dark); color:var(--blue-dark); }
+    .ls-dot.done { background:#38a169; color:#fff; }
+
+    .station { background:var(--surface); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); padding:24px; margin-bottom:18px; }
+    .station.hidden { display:none; }
+    .station-kicker { font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--blue-light); margin-bottom:4px; }
+    .station-title { font-size:1.15rem; font-weight:700; color:var(--blue-dark); margin-bottom:10px; }
+    .station-lead { font-size:0.9rem; color:var(--text); line-height:1.6; margin-bottom:18px; }
+    .station-lead b { color:var(--blue-dark); }
+    .station.boss { border:2px solid #f0c36d; box-shadow:0 0 0 4px #fff7e6; }
+    .station.boss .station-kicker { color:#d97706; }
+
+    .read { font-size:0.9rem; line-height:1.65; color:var(--text); }
+    .read p { margin-bottom:12px; }
+    .read h4 { font-size:0.92rem; color:var(--blue-dark); margin:14px 0 6px; }
+    .read ul { margin:0 0 12px 1.15rem; }
+    .read li { margin-bottom:5px; }
+    .read b { color:var(--blue-dark); }
+    .read .factbox { background:var(--blue-tint); border-left:4px solid var(--blue-light); border-radius:var(--radius-sm); padding:10px 14px; margin:12px 0; font-size:0.86rem; line-height:1.55; }
+    .read-btn-row { margin-top:16px; }
+
+    .station-media { margin-bottom:18px; }
+    .station-media img { width:100%; height:auto; display:block; border-radius:var(--radius-md); border:1px solid var(--border); box-shadow:var(--shadow-sm); }
+
+    /* Quiz / Optionen */
+    .q-block { margin-bottom:18px; }
+    .q-block:last-child { margin-bottom:0; }
+    .q-text { font-size:0.92rem; font-weight:600; margin-bottom:10px; }
+    .opt { display:block; width:100%; text-align:left; font-family:var(--font); font-size:0.88rem; color:var(--text); background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius-md); padding:11px 14px; margin-bottom:8px; cursor:pointer; transition:all 0.15s; line-height:1.4; }
+    .opt:hover:not(:disabled) { border-color:var(--blue-light); }
+    .opt:disabled { cursor:default; }
+    .opt.correct { border-color:#38a169; background:#f0fff4; }
+    .opt.wrong { border-color:var(--red); background:var(--red-light); }
+
+    /* Wahr/Falsch */
+    .tf-item { padding:12px 0; border-bottom:1px solid var(--border); }
+    .tf-item:last-child { border-bottom:none; }
+    .tf-statement { font-size:0.9rem; margin-bottom:8px; }
+    .tf-btns { display:flex; gap:8px; }
+    .tf-btn { font-family:var(--font); font-size:0.82rem; font-weight:600; padding:7px 18px; border-radius:20px; border:1.5px solid var(--border); background:var(--surface); color:var(--text-muted); cursor:pointer; transition:all 0.15s; }
+    .tf-btn:hover:not(:disabled) { border-color:var(--blue-light); }
+    .tf-btn:disabled { cursor:default; }
+    .tf-btn.sel-correct { background:#38a169; border-color:#38a169; color:#fff; }
+    .tf-btn.sel-wrong { background:var(--red); border-color:var(--red); color:#fff; }
+    .tf-btn.reveal { border-color:#38a169; color:#276749; }
+    .tf-exp { font-size:0.78rem; color:var(--text-muted); margin-top:8px; display:none; }
+    .tf-exp.show { display:block; }
+
+    /* Lücken */
+    .gap-text { font-size:0.95rem; line-height:2.1; }
+    .gap-text select { font-family:var(--font); font-size:0.85rem; font-weight:600; border:1.5px solid var(--blue-light); border-radius:var(--radius-sm); padding:3px 6px; background:var(--blue-tint); color:var(--blue-dark); }
+    .gap-text select.correct { border-color:#38a169; background:#f0fff4; color:#276749; }
+    .gap-text select.wrong { border-color:var(--red); background:var(--red-light); color:var(--red-dark); }
+
+    /* Reihenfolge (order) */
+    .ord-list { display:flex; flex-direction:column; gap:8px; }
+    .ord-row { display:flex; align-items:center; gap:10px; background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius-md); padding:9px 12px; }
+    .ord-row.ord-correct { border-color:#38a169; background:#f0fff4; }
+    .ord-row.ord-wrong { border-color:var(--red); background:var(--red-light); }
+    .ord-btns { display:flex; flex-direction:column; gap:2px; }
+    .ord-btn { font-family:var(--font); font-size:0.7rem; line-height:1; padding:3px 7px; border:1.5px solid var(--border); background:var(--surface); color:var(--blue-dark); border-radius:6px; cursor:pointer; }
+    .ord-btn:hover { border-color:var(--blue); }
+    .ord-text { flex:1; font-size:0.86rem; font-weight:500; }
+    .ord-tag { font-size:0.74rem; font-weight:700; color:var(--text-subtle); min-width:34px; text-align:right; }
+    .ord-row.ord-correct .ord-tag { color:#276749; }
+    .ord-row.ord-wrong .ord-tag { color:var(--red-dark); }
+
+    /* Beschriften (label) + Eingaben */
+    .slots-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.55rem; margin-bottom:0.5rem; }
+    @media (max-width:560px){ .slots-grid { grid-template-columns:1fr; } }
+    .slot-row { display:flex; align-items:flex-start; gap:0.5rem; }
+    .slot-num { width:28px; height:28px; flex-shrink:0; border-radius:50%; background:var(--blue-dark); color:#fff; font-size:0.76rem; font-weight:700; display:flex; align-items:center; justify-content:center; margin-top:3px; }
+    .type-cell { flex:1; }
+    .type-input { width:100%; font-family:var(--font); font-size:0.84rem; padding:0.45rem 0.65rem; border:1.5px solid var(--border); border-radius:var(--radius-sm); background:#f8fafc; color:var(--text); transition:border-color 0.15s; }
+    .type-input:focus { outline:none; border-color:var(--blue); background:#fff; }
+    .type-input.correct { border-color:#16a34a; background:#f0fdf4; }
+    .type-input.wrong { border-color:var(--red); background:var(--red-light); }
+    .type-sol { font-size:0.72rem; color:#15803d; margin-top:2px; }
+
+    .check-btn-row { margin-top:16px; }
+
+    .finish { text-align:center; }
+    .finish .rank { font-size:1.25rem; font-weight:800; color:var(--blue-dark); margin:4px 0 2px; }
+    .finish .big-score { font-size:2.4rem; font-weight:800; color:var(--blue-dark); margin:6px 0 2px; }
+    .finish .score-sub { font-size:0.86rem; color:var(--text-muted); margin-bottom:16px; }
+    .badges { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin:0 auto 18px; max-width:520px; }
+    .badge-chip { display:inline-flex; align-items:center; gap:5px; font-size:0.76rem; font-weight:600; padding:6px 12px; border-radius:20px; border:1.5px solid var(--border); background:#f8fafc; color:var(--text-subtle); }
+    .badge-chip.earned { background:#fff7e6; border-color:#f0c36d; color:#92400e; }
+    .badge-chip .lock { opacity:0.6; }
+    .finish ul { text-align:left; max-width:500px; margin:0 auto 20px; font-size:0.86rem; color:var(--text); line-height:1.6; }
+    .finish li { margin-bottom:6px; }
+
+    .ls-nav { display:flex; justify-content:space-between; gap:10px; }
+    .ls-nav .spacer { flex:1; }
+  </style>
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+  <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · b.7</span>
+  <h1>Challenge: Prüfungsvorbereitung Joghurt</h1>
+  <p>15 Posten quer durch die Sauermilchprodukte – mit XP, Streak und Abzeichen</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+  <a class="back-link" href="../index.html">← Alle Lerntools</a>
+
+  <div class="ls-wrap">
+    <div class="hud">
+      <div class="hud-xp"><span class="hud-label">XP</span><span class="hud-val" id="hudXp">0</span></div>
+      <div class="hud-bar"><div class="hud-bar-fill" id="hudBar"></div></div>
+      <div class="hud-streak" id="hudStreak">🔥 0</div>
+    </div>
+    <div class="ls-meta" id="lsMeta"></div>
+    <div class="ls-dots" id="lsDots"></div>
+    <div id="stage"></div>
+    <div class="ls-nav">
+      <button class="btn btn-ghost" id="prevBtn" onclick="goPrev()">← Zurück</button>
+      <span class="spacer"></span>
+      <button class="btn btn-primary" id="nextBtn" onclick="goNext()">Weiter →</button>
+    </div>
+  </div>
+</main>
+
+<footer class="bzwu-footer">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm</footer>
+
+<script>
+/* ============================================================
+   Challenge b.7 – Prüfungsvorbereitung Joghurt (15 Posten)
+   Inhalte aus dem Lehrmittel b.7. Gamification wie Sbrinz-Challenge.
+   ============================================================ */
+var STATIONS = [
+  /* 1 */ {
+    kicker:'Info · Ablauf', title:'Ablauf der Joghurtherstellung', type:'info',
+    lead:'Lesen Sie den Ablauf, danach bringen Sie die Schritte in die richtige Reihenfolge.',
+    read:
+      '<p>Joghurt entsteht in einer festen Schrittfolge. Im Überblick:</p>' +
+      '<ul>' +
+        '<li><b>Rohmilch vorbehandeln</b> (sieben/filtrieren, thermisieren)</li>' +
+        '<li><b>Fettgehalt standardisieren</b> auf den Rezepturwert</li>' +
+        '<li><b>Fettfreie Trockenmasse erhöhen</b> (1,5–3 % Magermilchpulver / Proteinpulver)</li>' +
+        '<li><b>Homogenisieren</b> (mind. 65 °C, 180–220 bar)</li>' +
+        '<li><b>Hitzebehandlung</b> (85–95 °C, mehrere Minuten)</li>' +
+        '<li><b>Auf Impftemperatur kühlen</b> (40–44 °C)</li>' +
+        '<li><b>Impfen</b> (Joghurtkultur zugeben)</li>' +
+        '<li><b>Bebrüten</b> (40–44 °C bis pH 4,5)</li>' +
+        '<li><b>Kühlen &amp; Abfüllen</b> (bzw. beim stichfesten Joghurt: abfüllen, dann bebrüten)</li>' +
+      '</ul>' +
+      '<div class="factbox">Merkhilfe: erst die Milch <b>aufbereiten</b> (standardisieren, Trockenmasse, homogenisieren, erhitzen), dann <b>säuern</b> (kühlen, impfen, bebrüten), dann <b>fertigstellen</b> (kühlen, abfüllen).</div>'
+  },
+  /* 2 */ {
+    kicker:'Reihenfolge', title:'Schritte der Joghurtherstellung ordnen', id:'ablauf', type:'order',
+    lead:'Bringen Sie die Schritte mit den Pfeilen ▲▼ in die richtige Reihenfolge (oben = zuerst).',
+    steps:[
+      'Rohmilch vorbehandeln',
+      'Fettgehalt standardisieren',
+      'Fettfreie Trockenmasse erhöhen',
+      'Homogenisieren',
+      'Hitzebehandlung',
+      'Auf Impftemperatur kühlen',
+      'Impfen',
+      'Bebrüten',
+      'Kühlen & Abfüllen'
+    ]
+  },
+  /* 3 */ {
+    kicker:'Info · Zutaten', title:'Zutaten der Joghurtherstellung', type:'info',
+    lead:'Welche Zutaten kommen ins Joghurt?',
+    read:
+      '<h4>Grundzutaten</h4>' +
+      '<ul>' +
+        '<li><b>Milch</b> (standardisiert auf den gewünschten Fettgehalt)</li>' +
+        '<li><b>Trockenmasse-Erhöher</b>: Magermilchpulver, Milchproteinpulver oder Molken-/Buttermilchkonzentrat</li>' +
+        '<li><b>Joghurtkultur</b> (Sc. thermophilus + Lb. delbrueckii ssp. bulgaricus)</li>' +
+      '</ul>' +
+      '<h4>Für Frucht- und Aromajoghurt</h4>' +
+      '<ul>' +
+        '<li><b>Zucker</b> (direkt oder im Fruchtgrundstoff)</li>' +
+        '<li><b>Fruchtgrundstoff</b> (etwa je zur Hälfte Zucker und Früchte, pasteurisiert)</li>' +
+        '<li><b>Aromen</b> und <b>Verdickungsmittel</b> (Zusatzstoffe, auf der Verpackung deklariert)</li>' +
+      '</ul>' +
+      '<div class="factbox"><b>Nicht</b> ins Joghurt gehören Käsereizutaten wie <b>Lab</b> oder <b>Salz</b>.</div>'
+  },
+  /* 4 */ {
+    kicker:'Wahr oder Falsch', title:'Zutaten erkennen', id:'zutaten', type:'tf',
+    lead:'Ist das eine Zutat der Joghurtherstellung?',
+    items:[
+      { s:'Milch', a:true,  e:'Grundrohstoff, vorher standardisiert.' },
+      { s:'Magermilchpulver', a:true,  e:'Erhöht die fettfreie Trockenmasse.' },
+      { s:'Joghurtkultur', a:true,  e:'Sc. thermophilus + Lb. bulgaricus.' },
+      { s:'Fruchtgrundstoff', a:true,  e:'Zucker-Frucht-Masse, pasteurisiert.' },
+      { s:'Zucker', a:true,  e:'Zum Süssen, direkt oder im Fruchtgrundstoff.' },
+      { s:'Lab', a:false, e:'Lab gehört zur Käseherstellung, nicht ins Joghurt.' },
+      { s:'Speisesalz', a:false, e:'Salz ist keine Joghurtzutat.' }
+    ]
+  },
+  /* 5 */ {
+    kicker:'Info · Anlage', title:'Stichfeste Joghurtlinie', type:'info',
+    lead:'Schauen Sie sich die Anlage an – danach beschriften Sie die Teile.',
+    read:
+      '<p>Beim <b>stichfesten</b> Joghurt wird <b>in der Endverpackung bebrütet</b>. Die Linie führt von der Milchaufbereitung über den Online-Mischer bis zur Brutzelle.</p>' +
+      '<ul>' +
+        '<li>1 Vorlaufgefäss · 2 Pulver-/Aromazugabe · 3 Homogenisator</li>' +
+        '<li>4 Plattenwärmetauscher · 5 Heisshalter · 6 Tanks für Betriebskultur</li>' +
+        '<li>7 Gebinde mit Fruchtpüree/Aromen · 8 Online-Mischer · 9 Puffertanks</li>' +
+        '<li>10 Anwärmer · 11 Abfülllinie · 12 Brutzelle</li>' +
+      '</ul>',
+    media:'<img src="images/b.7_Anlage_stichfest_Nummern.png" alt="Produktionslinie stichfester Joghurt mit nummerierten Anlagenteilen">'
+  },
+  /* 6 */ {
+    kicker:'Beschriften', title:'Anlagenteile stichfeste Linie', id:'anlage', type:'label',
+    lead:'Schreiben Sie zu jeder Nummer den passenden Anlagenteil. Kleine Tippfehler werden akzeptiert.',
+    media:'<img src="images/b.7_Anlage_stichfest_Nummern.png" alt="Produktionslinie stichfester Joghurt mit nummerierten Anlagenteilen">',
+    items:[
+      { n:1,  name:'Vorlaufgefäss',                 keys:['vorlaufgefaess','vorlauf'] },
+      { n:2,  name:'Pulver-/Aromazugabe',           keys:['pulver','aroma','pulverzugabe'] },
+      { n:3,  name:'Homogenisator',                 keys:['homogenisator','homogenisier'] },
+      { n:4,  name:'Plattenwärmetauscher',          keys:['plattenwaermetauscher','waermetauscher','plattenwaerme'] },
+      { n:5,  name:'Heisshalter',                   keys:['heisshalter','heisshaltung'] },
+      { n:6,  name:'Tanks für Betriebskultur',      keys:['betriebskultur','kulturtank','kultur'] },
+      { n:7,  name:'Gebinde mit Fruchtpüree/Aromen',keys:['fruchtpueree','frucht','gebinde','pueree'] },
+      { n:8,  name:'Online-Mischer',                keys:['online mischer','onlinemischer','mischer'] },
+      { n:9,  name:'Puffertanks',                   keys:['puffertank','puffer'] },
+      { n:10, name:'Anwärmer',                      keys:['anwaermer','anwaerm'] },
+      { n:11, name:'Abfülllinie',                   keys:['abfuelllinie','abfuell'] },
+      { n:12, name:'Brutzelle',                     keys:['brutzelle','brutraum','brut'] }
+    ]
+  },
+  /* 7 */ {
+    kicker:'Info · Kulturen', title:'Joghurtkulturen & Symbiose', type:'info',
+    lead:'Die zwei Joghurtbakterien und wie sie zusammenarbeiten.',
+    read:
+      '<p>Die VLtH verlangt im Joghurt <b>Streptococcus thermophilus</b> und <b>Lactobacillus delbrueckii ssp. bulgaricus</b>. Beide leben in <b>Symbiose</b>: gemeinsam säuern sie schneller und stärker als jeder Keim allein.</p>' +
+      '<h4>Symbiose</h4>' +
+      '<ul>' +
+        '<li><b>Laktobazillen</b> wirken <b>proteolytisch</b> und liefern den Streptokokken <b>Aminosäuren</b> aus dem Milcheiweiss.</li>' +
+        '<li><b>Streptokokken</b> senken den <b>pH-Wert</b> und ermöglichen den Laktobazillen schnelleres Wachstum.</li>' +
+      '</ul>' +
+      '<h4>Eigenschaften</h4>' +
+      '<ul>' +
+        '<li><i>Sc. thermophilus</i>: Temp.-Optimum 37–42 °C, bildet die <b>Anfangssäure</b>, wirkt <b>viskositätserhöhend</b>.</li>' +
+        '<li><i>Lb. bulgaricus</i>: Temp.-Optimum 40–45 °C, bildet die <b>Endsäure</b>, sorgt für die <b>Aromabildung</b>, neigt zum <b>Nachsäuern</b>.</li>' +
+      '</ul>' +
+      '<div class="factbox">Mild oder sauer steuern Sie über den Laktobazillen-Anteil: <b>weniger Laktobazillen → milder</b>, weniger Nachsäuern. Im Endprodukt mind. <b>10 Mio. Joghurtbakterien pro Gramm</b>.</div>'
+  },
+  /* 8 */ {
+    kicker:'Lückentext', title:'Kulturen & Parameter', id:'kulturen', type:'gaps',
+    lead:'Wählen Sie die richtigen Werte und Begriffe.',
+    parts:[
+      '<i>Sc. thermophilus</i> hat ein Temperatur-Optimum von ',
+      { opts:['37–42 °C','45–50 °C','20–25 °C'], correct:0 },
+      ' und bildet die ',
+      { opts:['Anfangssäure','Endsäure','Essigsäure'], correct:0 },
+      '. <i>Lb. bulgaricus</i> ist verantwortlich für die ',
+      { opts:['Aromabildung','Gasbildung','Entrahmung'], correct:0 },
+      ' und neigt zum ',
+      { opts:['Nachsäuern','Aufrahmen','Gerinnen mit Lab'], correct:0 },
+      '. Bebrütet wird bei ',
+      { opts:['40–44 °C','10–15 °C','55–60 °C'], correct:0 },
+      '.'
+    ]
+  },
+  /* 9 */ {
+    kicker:'Quiz', title:'Symbiose & Wirkung', id:'symbiose', type:'quiz',
+    lead:'Drei Fragen zur Zusammenarbeit der Kulturen.',
+    questions:[
+      { q:'Was leisten die Laktobazillen in der Symbiose?',
+        opts:['Sie wirken proteolytisch und liefern den Streptokokken Aminosäuren','Sie senken den pH-Wert für die Streptokokken','Sie binden Wasser und erhöhen die Viskosität'], correct:0 },
+      { q:'Was leisten die Streptokokken in der Symbiose?',
+        opts:['Sie senken den pH-Wert und fördern so das Wachstum der Laktobazillen','Sie liefern den Laktobazillen Aminosäuren','Sie bilden die Endsäure'], correct:0 },
+      { q:'Wie viele Joghurtbakterien müssen mind. pro Gramm enthalten sein?',
+        opts:['10 Millionen','10 000','100'], correct:0 }
+    ]
+  },
+  /* 10 */ {
+    kicker:'Info · Gerinnung', title:'Säuregerinnung', type:'info',
+    lead:'Warum wird die Milch durch die Säure fest?',
+    read:
+      '<p>Die Milchsäurebakterien vergären den <b>Milchzucker (Laktose)</b> zu <b>Milchsäure</b>. Dadurch <b>sinkt der pH-Wert</b>.</p>' +
+      '<p>Bei rund <b>pH 4,6</b> (isoelektrischer Punkt) verliert das <b>Kasein</b> seine negative Ladung, die Teilchen stossen sich nicht mehr ab und gerinnen zu einer <b>Gallerte</b>. Die <b>Molkenproteine</b> bleiben dabei gelöst.</p>' +
+      '<div class="factbox">Die <b>Synärese</b> (Molke wird abgepresst) ist bei der Säuregerinnung <b>schwächer</b> als bei der Labgerinnung – die Gallerte soll möglichst nicht erschüttert werden.</div>'
+  },
+  /* 11 */ {
+    kicker:'Lückentext', title:'Säuregerinnung erklären', id:'gerinnung', type:'gaps',
+    lead:'Füllen Sie die Lücken im Ablauf der Säuregerinnung.',
+    parts:[
+      'Die Bakterien vergären die Laktose zu ',
+      { opts:['Milchsäure','Propionsäure','Buttersäure'], correct:0 },
+      '. Der pH-Wert ',
+      { opts:['sinkt','steigt','bleibt gleich'], correct:0 },
+      '. Bei pH ',
+      { opts:['4,6','6,8','3,0'], correct:0 },
+      ' gerinnt das ',
+      { opts:['Kasein','Albumin','Laktose'], correct:0 },
+      ' zu einer Gallerte, während die ',
+      { opts:['Molkenproteine','Fettkügelchen','Mineralstoffe'], correct:0 },
+      ' gelöst bleiben.'
+    ]
+  },
+  /* 12 */ {
+    kicker:'Info · Technologie', title:'Technologische Aspekte', type:'info',
+    lead:'Homogenisieren und Erhitzen – Parameter und Wirkung.',
+    read:
+      '<h4>Homogenisieren</h4>' +
+      '<p>Werte: <b>mind. 65 °C, 180–220 bar</b>. Vorteile: es <b>verhindert das Aufrahmen</b> (keine Fettschicht beim Bebrüten, wichtig für stichfesten Joghurt), gibt ein <b>feineres Mundgefühl</b> und bindet mehr Wasser.</p>' +
+      '<h4>Hitzebehandlung (85–95 °C)</h4>' +
+      '<p>Die Joghurtmilch wird <b>höher als 72 °C</b> erhitzt, weil dabei die <b>Molkenproteine denaturieren</b>. Sie können dann mehr Wasser binden, dadurch scheidet stichfester Joghurt weniger Molke ab und gerührter wird dickflüssiger.</p>' +
+      '<div class="factbox">Joghurt darf <b>nicht nachträglich pasteurisiert</b> werden: im Endprodukt müssen mind. 10 Mio. <b>lebende</b> Joghurtbakterien pro Gramm sein.</div>'
+  },
+  /* 13 */ {
+    kicker:'Quiz', title:'Technologische Aspekte', id:'technologie', type:'quiz',
+    lead:'Parameter und Begründungen.',
+    questions:[
+      { q:'Warum wird die Joghurtmilch höher als 72 °C (auf 85–95 °C) erhitzt?',
+        opts:['Damit die Molkenproteine denaturieren und mehr Wasser binden','Damit die Joghurtkultur sofort abstirbt','Damit das Fett aufrahmt'], correct:0 },
+      { q:'Welchen Vorteil bringt das Homogenisieren?',
+        opts:['Es verhindert das Aufrahmen und gibt ein feineres Mundgefühl','Es tötet alle Bakterien ab','Es senkt den pH-Wert'], correct:0 },
+      { q:'Welche Werte sind beim Homogenisieren typisch?',
+        opts:['mind. 65 °C, 180–220 bar','5 °C, 10 bar','100 °C, 500 bar'], correct:0 },
+      { q:'Warum darf Joghurt nicht nachträglich pasteurisiert werden?',
+        opts:['Es müssen mind. 10 Mio. lebende Joghurtbakterien pro Gramm enthalten sein','Weil es sonst zu süss wird','Weil es sonst aufrahmt'], correct:0 }
+    ]
+  },
+  /* 14 */ {
+    kicker:'Info · Mischen & Lagern', title:'Mischverfahren & Nachsäuern', type:'info',
+    lead:'Frucht beimischen und das Joghurt mild halten.',
+    read:
+      '<h4>Kalt- und Warmmischverfahren</h4>' +
+      '<ul>' +
+        '<li><b>Warmmischverfahren</b> (Gallerte auf 20–30 °C vorgekühlt): Fruchtgrundstoff und Zucker beimischen und abfüllen. Vorteil: das Joghurt <b>dickt beim Kühlen in der Verpackung wieder nach</b> → gute Endviskosität.</li>' +
+        '<li><b>Kaltmischverfahren</b> (Gallerte auf &lt; 5 °C gekühlt): Mischen und Abfüllen meist erst am nächsten Tag. Vorteil: <b>zeitlich ungebunden</b> – Nature-Joghurt am 1. Tag, Fruchtjoghurt später.</li>' +
+      '</ul>' +
+      '<h4>Nachsäuern</h4>' +
+      '<p><b>Nachsäuern</b> = unerwünschte Säurezunahme <b>nach</b> dem Bebrüten. Die lebenden Bakterien bilden weiter (langsam) Säure, der pH sinkt.</p>' +
+      '<div class="factbox">Reduzieren durch: <b>schnell kühlen</b>, Lagertemperatur ständig <b>&lt; 5 °C</b>, pH vor dem Kühlen <b>nicht unter 4,3</b> (&lt; 42 °SH), <b>wenig Laktobazillen</b> in der Kultur, Kühlkette nicht unterbrechen.</div>'
+  },
+  /* 15 */ {
+    kicker:'Prüfungsrunde', title:'Mischverfahren & Nachsäuern', id:'boss', boss:true, type:'quiz',
+    lead:'Die Schlussrunde – jede richtige Antwort gibt extra XP!',
+    questions:[
+      { q:'Welchen Vorteil hat das Warmmischverfahren?',
+        opts:['Das Joghurt dickt beim Kühlen in der Verpackung nach (gute Endviskosität)','Man kann am nächsten Tag mischen','Die Gallerte wird nie mechanisch belastet'], correct:0 },
+      { q:'Welchen Vorteil hat das Kaltmischverfahren?',
+        opts:['Mischen und Abfüllen sind zeitlich ungebunden','Das Joghurt wird automatisch süsser','Es braucht keine Kühlung'], correct:0 },
+      { q:'Was versteht man unter Nachsäuern?',
+        opts:['Unerwünschte Säurezunahme nach dem Bebrüten','Das Zugeben von Säure vor dem Bebrüten','Das Erhitzen über 95 °C'], correct:0 },
+      { q:'Wie lässt sich das Nachsäuern am besten reduzieren?',
+        opts:['Schnell auf < 5 °C kühlen und die Kühlkette halten','Die Lagertemperatur erhöhen','Mehr Laktobazillen einsetzen'], correct:0 }
+    ]
+  }
+];
+
+var N = STATIONS.length;
+var current = 0;
+var solved = [], earned = [], maxPts = [];
+for (var i = 0; i < N; i++) { solved[i] = false; earned[i] = 0; maxPts[i] = 0; }
+var xp = 0, streak = 0, bestStreak = 0;
+
+function findIdx(id){ for(var i=0;i<N;i++){ if(STATIONS[i].id===id) return i; } return -1; }
+function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;} return a; }
+function shuffleIdx(n){ var a=[]; for(var i=0;i<n;i++) a.push(i); return shuffle(a); }
+function fold(s){ return String(s).toLowerCase().replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss').replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim(); }
+function matchKeys(input, it){ var f=fold(input); if(!f) return false; if(f===fold(it.name)) return true; for(var i=0;i<it.keys.length;i++){ if(f.indexOf(fold(it.keys[i]))!==-1) return true; } return false; }
+
+/* HUD */
+function renderHud(){
+  document.getElementById('hudXp').textContent = xp;
+  var sc=0; for(var i=0;i<N;i++){ if(solved[i]) sc++; }
+  document.getElementById('hudBar').style.width = Math.round(sc/N*100)+'%';
+  document.getElementById('hudStreak').textContent = '🔥 '+streak;
+}
+function addXp(n){ xp+=n; var el=document.getElementById('hudXp'); renderHud(); el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
+function registerAnswer(ok){
+  if(ok){ streak++; if(streak>bestStreak) bestStreak=streak; addXp(10+(streak>=3?5:0)); var s=document.getElementById('hudStreak'); s.classList.remove('pulse'); void s.offsetWidth; s.classList.add('pulse'); }
+  else { streak=0; renderHud(); }
+}
+
+/* Aufbau */
+function buildAll(){
+  var stage=document.getElementById('stage'); stage.innerHTML='';
+  STATIONS.forEach(function(st, idx){
+    var card=document.createElement('div');
+    card.className='station'+(st.boss?' boss':'')+(idx===0?'':' hidden'); card.id='station-'+idx;
+    card.innerHTML='<div class="station-kicker">'+st.kicker+'</div>'+
+      '<div class="station-title">'+st.title+'</div>'+
+      '<div class="station-lead">'+st.lead+'</div>'+
+      (st.media?'<div class="station-media">'+st.media+'</div>':'')+
+      '<div class="station-body" id="body-'+idx+'"></div>';
+    stage.appendChild(card);
+    buildBody(idx, st);
+  });
+  var fin=document.createElement('div'); fin.className='station hidden'; fin.id='station-finish';
+  fin.innerHTML='<div class="finish" id="finishBody"></div>'; stage.appendChild(fin);
+}
+function buildBody(idx, st){
+  if(st.type==='info')  buildInfo(idx, st);
+  if(st.type==='order') buildOrder(idx, st);
+  if(st.type==='tf')    buildTF(idx, st);
+  if(st.type==='label') buildLabel(idx, st);
+  if(st.type==='gaps')  buildGaps(idx, st);
+  if(st.type==='quiz')  buildQuiz(idx, st);
+}
+
+/* Info */
+function buildInfo(idx, st){
+  maxPts[idx]=0;
+  document.getElementById('body-'+idx).innerHTML='<div class="read">'+st.read+'</div>'+
+    '<div class="read-btn-row"><button class="btn btn-primary" id="readbtn-'+idx+'">Gelesen ✓ (+5 XP)</button></div>';
+  document.getElementById('readbtn-'+idx).addEventListener('click', function(){ if(solved[idx]) return; solved[idx]=true; addXp(5); this.disabled=true; this.textContent='Gelesen ✓'; updateNav(); });
+}
+
+/* Reihenfolge */
+function buildOrder(idx, st){
+  maxPts[idx]=st.steps.length;
+  var html='<div class="ord-list" id="ord-'+idx+'">';
+  shuffleIdx(st.steps.length).forEach(function(si){
+    html+='<div class="ord-row" data-step="'+si+'">'+
+      '<div class="ord-btns"><button type="button" class="ord-btn" data-dir="-1">▲</button><button type="button" class="ord-btn" data-dir="1">▼</button></div>'+
+      '<div class="ord-text">'+st.steps[si]+'</div><div class="ord-tag"></div></div>';
+  });
+  html+='</div><div class="check-btn-row"><button class="btn btn-primary" id="ordcheck-'+idx+'">Reihenfolge prüfen</button></div>';
+  document.getElementById('body-'+idx).innerHTML=html;
+  var list=document.getElementById('ord-'+idx);
+  list.querySelectorAll('.ord-btn').forEach(function(b){
+    b.addEventListener('click', function(){
+      if(solved[idx]) return;
+      var row=b.parentNode.parentNode; var dir=+b.dataset.dir;
+      if(dir<0 && row.previousElementSibling){ list.insertBefore(row, row.previousElementSibling); }
+      if(dir>0 && row.nextElementSibling){ list.insertBefore(row.nextElementSibling, row); }
+    });
+  });
+  document.getElementById('ordcheck-'+idx).addEventListener('click', function(){
+    if(solved[idx]) return;
+    var rows=list.querySelectorAll('.ord-row'); var correct=0;
+    rows.forEach(function(row, pos){
+      var ok=(+row.dataset.step===pos);
+      row.classList.add(ok?'ord-correct':'ord-wrong');
+      row.querySelector('.ord-tag').textContent = ok?'✓':('→ '+(+row.dataset.step+1));
+      registerAnswer(ok); if(ok) correct++;
+    });
+    earned[idx]=correct; solved[idx]=true; this.disabled=true; updateNav();
+  });
+}
+
+/* Wahr / Falsch */
+function buildTF(idx, st){
+  maxPts[idx]=st.items.length;
+  var body=document.getElementById('body-'+idx);
+  st.items.forEach(function(it, ii){
+    var item=document.createElement('div'); item.className='tf-item';
+    item.innerHTML='<div class="tf-statement">'+it.s+'</div>'+
+      '<div class="tf-btns"><button class="tf-btn" data-i="'+ii+'" data-v="true">Zutat</button>'+
+      '<button class="tf-btn" data-i="'+ii+'" data-v="false">Keine Zutat</button></div>'+
+      '<div class="tf-exp" id="tfexp-'+idx+'-'+ii+'">'+it.e+'</div>';
+    body.appendChild(item);
+  });
+  body.querySelectorAll('.tf-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var ii=+btn.dataset.i; var pick=btn.dataset.v==='true';
+      if(body.querySelector('.tf-btn[data-i="'+ii+'"]:disabled')) return;
+      var it=st.items[ii];
+      body.querySelectorAll('.tf-btn[data-i="'+ii+'"]').forEach(function(b){ b.disabled=true; if((b.dataset.v==='true')===it.a) b.classList.add('reveal'); });
+      if(pick===it.a){ btn.classList.add('sel-correct'); earned[idx]++; registerAnswer(true); } else { btn.classList.add('sel-wrong'); registerAnswer(false); }
+      document.getElementById('tfexp-'+idx+'-'+ii).classList.add('show');
+      var answered=0; for(var k=0;k<st.items.length;k++){ if(document.querySelector('#body-'+idx+' .tf-btn[data-i="'+k+'"]:disabled')) answered++; }
+      if(answered===st.items.length) solved[idx]=true;
+      updateNav();
+    });
+  });
+}
+
+/* Beschriften */
+function buildLabel(idx, st){
+  maxPts[idx]=st.items.length;
+  var html='<div class="slots-grid">';
+  st.items.forEach(function(it){
+    html+='<div class="slot-row"><div class="slot-num">'+it.n+'</div><div class="type-cell">'+
+      '<input class="type-input" id="lb-'+idx+'-'+it.n+'" type="text" autocomplete="off" placeholder="Nr. '+it.n+' …">'+
+      '<div class="type-sol" id="lbsol-'+idx+'-'+it.n+'" style="display:none;"></div></div></div>';
+  });
+  html+='</div><div class="check-btn-row"><button class="btn btn-primary" id="lbcheck-'+idx+'">Überprüfen</button></div>';
+  document.getElementById('body-'+idx).innerHTML=html;
+  st.items.forEach(function(it, i){
+    document.getElementById('lb-'+idx+'-'+it.n).addEventListener('keydown', function(e){
+      if(e.key==='Enter'){ e.preventDefault(); var nx=st.items[i+1]; if(nx) document.getElementById('lb-'+idx+'-'+nx.n).focus(); }
+    });
+  });
+  document.getElementById('lbcheck-'+idx).addEventListener('click', function(){
+    if(solved[idx]) return; var correct=0;
+    st.items.forEach(function(it){
+      var inp=document.getElementById('lb-'+idx+'-'+it.n); var sol=document.getElementById('lbsol-'+idx+'-'+it.n);
+      inp.classList.remove('correct','wrong');
+      var ok=matchKeys(inp.value, it);
+      if(ok){ inp.classList.add('correct'); sol.style.display='none'; correct++; } else { inp.classList.add('wrong'); sol.textContent='→ '+it.name; sol.style.display='block'; }
+      registerAnswer(ok);
+    });
+    earned[idx]=correct; solved[idx]=true; this.disabled=true; updateNav();
+  });
+}
+
+/* Lücken */
+function buildGaps(idx, st){
+  var gapCount=0; var html='<div class="gap-text">';
+  st.parts.forEach(function(part){
+    if(typeof part==='string'){ html+=part; }
+    else { var gi=gapCount++; var opts=shuffleIdx(part.opts.length);
+      html+='<select data-g="'+gi+'" data-correct="'+part.correct+'"><option value="-1">…</option>';
+      opts.forEach(function(oi){ html+='<option value="'+oi+'">'+part.opts[oi]+'</option>'; });
+      html+='</select>';
+    }
+  });
+  html+='</div><div class="check-btn-row"><button class="btn btn-primary" id="gapcheck-'+idx+'">Prüfen</button></div>';
+  document.getElementById('body-'+idx).innerHTML=html;
+  maxPts[idx]=gapCount;
+  document.getElementById('gapcheck-'+idx).addEventListener('click', function(){
+    if(solved[idx]) return;
+    var sels=document.querySelectorAll('#body-'+idx+' select'); var ok=0;
+    sels.forEach(function(sel){ sel.classList.remove('correct','wrong'); var good=(+sel.value===+sel.dataset.correct); if(good){sel.classList.add('correct'); ok++;} else sel.classList.add('wrong'); sel.disabled=true; registerAnswer(good); });
+    earned[idx]=ok; solved[idx]=true; this.disabled=true; updateNav();
+  });
+}
+
+/* Quiz */
+function buildQuiz(idx, st){
+  maxPts[idx]=st.questions.length;
+  var body=document.getElementById('body-'+idx);
+  st.questions.forEach(function(qq, qi){
+    var block=document.createElement('div'); block.className='q-block';
+    var h='<div class="q-text">'+(qi+1)+'. '+qq.q+'</div>';
+    shuffleIdx(qq.opts.length).forEach(function(oi){ h+='<button class="opt" data-q="'+qi+'" data-o="'+oi+'">'+qq.opts[oi]+'</button>'; });
+    block.innerHTML=h; body.appendChild(block);
+  });
+  body.querySelectorAll('.opt').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var qi=+btn.dataset.q, oi=+btn.dataset.o, qq=st.questions[qi];
+      if(body.querySelector('.opt[data-q="'+qi+'"]:disabled')) return;
+      body.querySelectorAll('.opt[data-q="'+qi+'"]').forEach(function(b){ b.disabled=true; if(+b.dataset.o===qq.correct) b.classList.add('correct'); });
+      if(oi!==qq.correct){ btn.classList.add('wrong'); registerAnswer(false); } else { earned[idx]++; registerAnswer(true); }
+      var answered=0; for(var k=0;k<st.questions.length;k++){ if(document.querySelector('#body-'+idx+' .opt[data-q="'+k+'"]:disabled')) answered++; }
+      if(answered===st.questions.length) solved[idx]=true;
+      updateNav();
+    });
+  });
+}
+
+/* Navigation */
+function renderProgress(){
+  var dots=document.getElementById('lsDots'); dots.innerHTML='';
+  for(var i=0;i<N;i++){ var d=document.createElement('div'); d.className='ls-dot'+(i===current?' active':'')+(solved[i]?' done':''); d.textContent=solved[i]?'✓':(i+1); dots.appendChild(d); }
+  document.getElementById('lsMeta').textContent = (current<N) ? ('Posten '+(current+1)+' von '+N) : 'Auswertung';
+}
+function showCard(which){
+  document.querySelectorAll('.station').forEach(function(c){ c.classList.add('hidden'); });
+  document.getElementById(which==='finish'?'station-finish':'station-'+which).classList.remove('hidden');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function updateNav(){
+  var nextBtn=document.getElementById('nextBtn'), prevBtn=document.getElementById('prevBtn');
+  prevBtn.style.visibility=(current===0)?'hidden':'visible';
+  if(current<N){ nextBtn.disabled=!solved[current]; nextBtn.textContent=(current===N-1)?'Zur Auswertung →':'Weiter →'; }
+  renderProgress(); renderHud();
+}
+function goNext(){ if(current<N){ if(!solved[current]) return; current++; if(current<N){ showCard(current); updateNav(); } else { showFinish(); } } }
+function goPrev(){ if(current===0) return; if(current>=N) current=N-1; else current--; showCard(current); document.getElementById('nextBtn').style.visibility='visible'; document.getElementById('nextBtn').disabled=false; updateNav(); }
+
+function showFinish(){
+  var total=0, max=0; for(var i=0;i<N;i++){ total+=earned[i]; max+=maxPts[i]; }
+  var pct=max>0?Math.round(total/max*100):0;
+  var rank = pct>=90?'Joghurt-Meister 🥇' : pct>=75?'Joghurt-Profi' : pct>=50?'Joghurt-Geselle' : 'Joghurt-Lehrling';
+  var aIdx=findIdx('anlage'), kIdx=findIdx('kulturen'), bIdx=findIdx('boss'), oIdx=findIdx('ablauf');
+  var badges=[
+    { icon:'📖', name:'Aufmerksamer Leser', got:true },
+    { icon:'🔢', name:'Ablauf-Profi', got: oIdx>=0 && earned[oIdx]===maxPts[oIdx] },
+    { icon:'🏭', name:'Anlagen-Kenner', got: aIdx>=0 && earned[aIdx]===maxPts[aIdx] },
+    { icon:'🦠', name:'Kultur-Kenner', got: kIdx>=0 && earned[kIdx]===maxPts[kIdx] },
+    { icon:'🔥', name:'Serien-Säurer (Streak 8+)', got: bestStreak>=8 },
+    { icon:'🥇', name:'Joghurt-Meister (90%)', got: pct>=90 }
+  ];
+  var got=0, bh=''; badges.forEach(function(b){ if(b.got) got++; bh+='<span class="badge-chip'+(b.got?' earned':'')+'">'+(b.got?b.icon:'<span class="lock">🔒</span>')+' '+b.name+'</span>'; });
+  document.getElementById('finishBody').innerHTML=
+    '<div class="station-kicker">Geschafft</div>'+
+    '<div class="rank">'+rank+'</div>'+
+    '<div class="big-score">'+xp+' XP</div>'+
+    '<div class="score-sub">'+total+' / '+max+' Punkte ('+pct+' %) · längste Serie 🔥 '+bestStreak+' · '+got+'/'+badges.length+' Abzeichen</div>'+
+    '<div class="badges">'+bh+'</div>'+
+    '<ul>'+
+      '<li>Ablauf: aufbereiten (standardisieren, Trockenmasse, homogenisieren, erhitzen) → säuern (kühlen, impfen, bebrüten) → fertigstellen.</li>'+
+      '<li>Kulturen <b>Sc. thermophilus</b> (Anfangssäure, Viskosität) + <b>Lb. bulgaricus</b> (Endsäure, Aroma) in <b>Symbiose</b>.</li>'+
+      '<li>Säuregerinnung: Laktose → Milchsäure → pH sinkt → bei pH 4,6 gerinnt das Kasein.</li>'+
+      '<li>Erhitzen > 72 °C denaturiert Molkenproteine (Wasserbindung); Homogenisieren verhindert Aufrahmen.</li>'+
+      '<li>Nachsäuern verhindern: schnell auf < 5 °C kühlen, Kühlkette halten, wenig Laktobazillen.</li>'+
+    '</ul>'+
+    '<button class="btn btn-primary" onclick="restart()">Nochmals starten</button>';
+  showCard('finish');
+  document.getElementById('nextBtn').style.visibility='hidden';
+  document.getElementById('prevBtn').style.visibility='visible';
+  renderProgress();
+}
+function restart(){
+  current=0; xp=0; streak=0; bestStreak=0;
+  for(var i=0;i<N;i++){ solved[i]=false; earned[i]=0; }
+  document.getElementById('nextBtn').style.visibility='visible';
+  buildAll(); showCard(0); updateNav();
+}
+
+buildAll(); showCard(0); updateNav();
+</script>
+</body>
+</html>
