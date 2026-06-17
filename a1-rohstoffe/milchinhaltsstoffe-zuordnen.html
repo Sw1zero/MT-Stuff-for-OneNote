@@ -144,13 +144,6 @@
 
   <div class="result-banner" id="resultBanner"></div>
 
-  <div class="legend-box">
-    <b>Zusammensetzung der Kuhmilch</b> (Schweizer Jahresdurchschnitt):
-    Wasser 87 % · Fett 4 % · Eiweiss 3.2 % (Kasein 2.5 % + Molkenproteine 0.7 %) ·
-    Milchzucker/Laktose 4.9 % · Mineralstoffe 0.7 % · Nebenbestandteile 0.2 %.
-    <br>Trockenmasse = 13 % · fettfreie Trockenmasse = 9 %.
-  </div>
-
 </main>
 
 <div id="touchClone"></div>
@@ -211,7 +204,6 @@ function drawStage(showNums) {
   s += '<line x1="96"    y1="' + (BAR1_Y + BAR_H) + '" x2="96" y2="' + BAR2_Y + '" stroke="#cbd5e1" stroke-width="0.5" stroke-dasharray="1.5,1"/>';
   // Titel
   s += '<text x="4" y="8" font-size="3.4" font-weight="700" fill="#134061">Vollmilch (100 %)</text>';
-  s += '<text x="4" y="36" font-size="3.4" font-weight="700" fill="#134061">Trockenmasse (13 %) – im Detail</text>';
 
   function drawBand(segs, bandY, labelY) {
     segs.forEach(function(seg) {
