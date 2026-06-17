@@ -52,7 +52,8 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 │   │   ├── milchsammelwagen/           ← 2 PNG (mit/ohne Nummern)
 │   │   └── MID/                        ← 2 PNG (mit/ohne Nummern)
 │   ├── milchsammelwagen-beschriften.html
-│   └── mid-beschriften.html
+│   ├── mid-beschriften.html
+│   └── milchinhaltsstoffe-zuordnen.html
 ├── a2-rohstoffe-trennen/
 │   ├── images/
 │   │   └── trommelbestandteile/        ← 11 PNG-Bilder
