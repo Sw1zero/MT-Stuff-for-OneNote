@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Challenge: Prüfungsvorbereitung Joghurt – b.7</title>
+  <title>Challenge: Prüfungsvorbereitung Joghurt (b.7)</title>
   <link rel="stylesheet" href="../style.css">
   <style>
     .back-link { display:inline-block; font-size:0.82rem; color:var(--text-muted); text-decoration:none; margin-bottom:1rem; }
@@ -81,7 +81,11 @@
 
     /* Reihenfolge (order) */
     .ord-list { display:flex; flex-direction:column; gap:8px; }
-    .ord-row { display:flex; align-items:center; gap:10px; background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius-md); padding:9px 12px; }
+    .ord-row { display:flex; align-items:center; gap:10px; background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius-md); padding:9px 12px; cursor:grab; touch-action:none; }
+    .ord-row:active { cursor:grabbing; }
+    .ord-row.dragging { opacity:0.4; }
+    .ord-row.drag-over { border-color:var(--blue); box-shadow:0 0 0 3px var(--blue-tint); }
+    .ord-grip { color:var(--text-subtle); font-size:0.95rem; line-height:1; user-select:none; flex-shrink:0; }
     .ord-row.ord-correct { border-color:#38a169; background:#f0fff4; }
     .ord-row.ord-wrong { border-color:var(--red); background:var(--red-light); }
     .ord-btns { display:flex; flex-direction:column; gap:2px; }
@@ -127,7 +131,7 @@
   <div class="header-text">
   <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · b.7</span>
   <h1>Challenge: Prüfungsvorbereitung Joghurt</h1>
-  <p>15 Posten quer durch die Sauermilchprodukte – mit XP, Streak und Abzeichen</p>
+  <p>15 Posten quer durch die Sauermilchprodukte, mit XP, Streak und Abzeichen</p>
   </div>
   <div class="header-logos">
     <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
@@ -159,7 +163,7 @@
 
 <script>
 /* ============================================================
-   Challenge b.7 – Prüfungsvorbereitung Joghurt (15 Posten)
+   Challenge b.7: Prüfungsvorbereitung Joghurt (15 Posten)
    Inhalte aus dem Lehrmittel b.7. Gamification wie Sbrinz-Challenge.
    ============================================================ */
 var STATIONS = [
@@ -229,7 +233,7 @@ var STATIONS = [
   },
   /* 5 */ {
     kicker:'Info · Anlage', title:'Stichfeste Joghurtlinie', type:'info',
-    lead:'Schauen Sie sich die Anlage an – danach beschriften Sie die Teile.',
+    lead:'Schauen Sie sich die Anlage an, danach beschriften Sie die Teile.',
     read:
       '<p>Beim <b>stichfesten</b> Joghurt wird <b>in der Endverpackung bebrütet</b>. Die Linie führt von der Milchaufbereitung über den Online-Mischer bis zur Brutzelle.</p>' +
       '<ul>' +
@@ -311,7 +315,7 @@ var STATIONS = [
     read:
       '<p>Die Milchsäurebakterien vergären den <b>Milchzucker (Laktose)</b> zu <b>Milchsäure</b>. Dadurch <b>sinkt der pH-Wert</b>.</p>' +
       '<p>Bei rund <b>pH 4,6</b> (isoelektrischer Punkt) verliert das <b>Kasein</b> seine negative Ladung, die Teilchen stossen sich nicht mehr ab und gerinnen zu einer <b>Gallerte</b>. Die <b>Molkenproteine</b> bleiben dabei gelöst.</p>' +
-      '<div class="factbox">Die <b>Synärese</b> (Molke wird abgepresst) ist bei der Säuregerinnung <b>schwächer</b> als bei der Labgerinnung – die Gallerte soll möglichst nicht erschüttert werden.</div>'
+      '<div class="factbox">Die <b>Synärese</b> (Molke wird abgepresst) ist bei der Säuregerinnung <b>schwächer</b> als bei der Labgerinnung, die Gallerte soll möglichst nicht erschüttert werden.</div>'
   },
   /* 11 */ {
     kicker:'Lückentext', title:'Säuregerinnung erklären', id:'gerinnung', type:'gaps',
@@ -332,7 +336,7 @@ var STATIONS = [
   },
   /* 12 */ {
     kicker:'Info · Technologie', title:'Technologische Aspekte', type:'info',
-    lead:'Homogenisieren und Erhitzen – Parameter und Wirkung.',
+    lead:'Homogenisieren und Erhitzen: Parameter und Wirkung.',
     read:
       '<h4>Homogenisieren</h4>' +
       '<p>Werte: <b>mind. 65 °C, 180–220 bar</b>. Vorteile: es <b>verhindert das Aufrahmen</b> (keine Fettschicht beim Bebrüten, wichtig für stichfesten Joghurt), gibt ein <b>feineres Mundgefühl</b> und bindet mehr Wasser.</p>' +
@@ -361,7 +365,7 @@ var STATIONS = [
       '<h4>Kalt- und Warmmischverfahren</h4>' +
       '<ul>' +
         '<li><b>Warmmischverfahren</b> (Gallerte auf 20–30 °C vorgekühlt): Fruchtgrundstoff und Zucker beimischen und abfüllen. Vorteil: das Joghurt <b>dickt beim Kühlen in der Verpackung wieder nach</b> → gute Endviskosität.</li>' +
-        '<li><b>Kaltmischverfahren</b> (Gallerte auf &lt; 5 °C gekühlt): Mischen und Abfüllen meist erst am nächsten Tag. Vorteil: <b>zeitlich ungebunden</b> – Nature-Joghurt am 1. Tag, Fruchtjoghurt später.</li>' +
+        '<li><b>Kaltmischverfahren</b> (Gallerte auf &lt; 5 °C gekühlt): Mischen und Abfüllen meist erst am nächsten Tag. Vorteil: <b>zeitlich ungebunden</b>: Nature-Joghurt am 1. Tag, Fruchtjoghurt später.</li>' +
       '</ul>' +
       '<h4>Nachsäuern</h4>' +
       '<p><b>Nachsäuern</b> = unerwünschte Säurezunahme <b>nach</b> dem Bebrüten. Die lebenden Bakterien bilden weiter (langsam) Säure, der pH sinkt.</p>' +
@@ -369,7 +373,7 @@ var STATIONS = [
   },
   /* 15 */ {
     kicker:'Prüfungsrunde', title:'Mischverfahren & Nachsäuern', id:'boss', boss:true, type:'quiz',
-    lead:'Die Schlussrunde – jede richtige Antwort gibt extra XP!',
+    lead:'Die Schlussrunde, jede richtige Antwort gibt extra XP!',
     questions:[
       { q:'Welchen Vorteil hat das Warmmischverfahren?',
         opts:['Das Joghurt dickt beim Kühlen in der Verpackung nach (gute Endviskosität)','Man kann am nächsten Tag mischen','Die Gallerte wird nie mechanisch belastet'], correct:0 },
@@ -442,18 +446,23 @@ function buildInfo(idx, st){
   document.getElementById('readbtn-'+idx).addEventListener('click', function(){ if(solved[idx]) return; solved[idx]=true; addXp(5); this.disabled=true; this.textContent='Gelesen ✓'; updateNav(); });
 }
 
-/* Reihenfolge */
+/* Reihenfolge: Klick (▲▼) + Drag & Drop + Touch */
+var ordDrag=null, ordTouchRow=null, ordTouchList=null, ordClone=null, ordOffY=0;
+
 function buildOrder(idx, st){
   maxPts[idx]=st.steps.length;
   var html='<div class="ord-list" id="ord-'+idx+'">';
   shuffleIdx(st.steps.length).forEach(function(si){
-    html+='<div class="ord-row" data-step="'+si+'">'+
+    html+='<div class="ord-row" draggable="true" data-step="'+si+'">'+
+      '<span class="ord-grip">⋮⋮</span>'+
       '<div class="ord-btns"><button type="button" class="ord-btn" data-dir="-1">▲</button><button type="button" class="ord-btn" data-dir="1">▼</button></div>'+
       '<div class="ord-text">'+st.steps[si]+'</div><div class="ord-tag"></div></div>';
   });
   html+='</div><div class="check-btn-row"><button class="btn btn-primary" id="ordcheck-'+idx+'">Reihenfolge prüfen</button></div>';
   document.getElementById('body-'+idx).innerHTML=html;
   var list=document.getElementById('ord-'+idx);
+
+  // Klick: ▲▼
   list.querySelectorAll('.ord-btn').forEach(function(b){
     b.addEventListener('click', function(){
       if(solved[idx]) return;
@@ -462,18 +471,62 @@ function buildOrder(idx, st){
       if(dir>0 && row.nextElementSibling){ list.insertBefore(row.nextElementSibling, row); }
     });
   });
+
+  // Drag & Drop (Desktop) + Touch (Mobil)
+  list.querySelectorAll('.ord-row').forEach(function(row){
+    row.addEventListener('dragstart', function(e){ if(solved[idx]){ e.preventDefault(); return; } ordDrag=row; row.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; });
+    row.addEventListener('dragend', function(){ row.classList.remove('dragging'); list.querySelectorAll('.ord-row').forEach(function(r){ r.classList.remove('drag-over'); }); });
+    row.addEventListener('dragover', function(e){
+      if(!ordDrag || ordDrag===row || solved[idx]) return;
+      e.preventDefault();
+      var r=row.getBoundingClientRect(); var after=(e.clientY-r.top) > r.height/2;
+      list.insertBefore(ordDrag, after ? row.nextElementSibling : row);
+    });
+    row.addEventListener('touchstart', function(e){
+      if(solved[idx] || e.target.closest('.ord-btn')) return;
+      e.preventDefault();
+      var t=e.touches[0], rect=row.getBoundingClientRect();
+      ordTouchRow=row; ordTouchList=list; ordOffY=t.clientY-rect.top;
+      ordClone=row.cloneNode(true); ordClone.id='ordClone';
+      ordClone.style.cssText='position:fixed;z-index:9999;pointer-events:none;opacity:0.9;margin:0;width:'+rect.width+'px;left:'+rect.left+'px;top:'+(t.clientY-ordOffY)+'px;box-shadow:0 8px 28px rgba(0,0,0,0.18);';
+      document.body.appendChild(ordClone);
+      row.style.opacity='0.3';
+    }, {passive:false});
+  });
+
   document.getElementById('ordcheck-'+idx).addEventListener('click', function(){
     if(solved[idx]) return;
     var rows=list.querySelectorAll('.ord-row'); var correct=0;
     rows.forEach(function(row, pos){
       var ok=(+row.dataset.step===pos);
-      row.classList.add(ok?'ord-correct':'ord-wrong');
+      row.classList.add(ok?'ord-correct':'ord-wrong'); row.setAttribute('draggable','false');
       row.querySelector('.ord-tag').textContent = ok?'✓':('→ '+(+row.dataset.step+1));
       registerAnswer(ok); if(ok) correct++;
     });
     earned[idx]=correct; solved[idx]=true; this.disabled=true; updateNav();
   });
 }
+
+document.addEventListener('touchmove', function(e){
+  if(!ordTouchRow) return;
+  e.preventDefault();
+  var t=e.touches[0];
+  ordClone.style.top=(t.clientY-ordOffY)+'px';
+  ordClone.style.display='none';
+  var el=document.elementFromPoint(t.clientX, t.clientY);
+  ordClone.style.display='';
+  var over=el ? el.closest('.ord-row') : null;
+  if(over && over!==ordTouchRow && over.parentNode===ordTouchList){
+    var r=over.getBoundingClientRect(); var after=(t.clientY-r.top) > r.height/2;
+    ordTouchList.insertBefore(ordTouchRow, after ? over.nextElementSibling : over);
+  }
+}, {passive:false});
+
+document.addEventListener('touchend', function(){
+  if(!ordTouchRow) return;
+  if(ordClone){ ordClone.remove(); ordClone=null; }
+  ordTouchRow.style.opacity=''; ordTouchRow=null; ordTouchList=null;
+});
 
 /* Wahr / Falsch */
 function buildTF(idx, st){
