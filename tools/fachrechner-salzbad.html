@@ -845,7 +845,7 @@ function genProz() {
   var gewicht = Math.round(vol * dichte / 10) * 10;
   var salz    = gewicht * konz / 100;
 
-  sbAnswer = { val1: salz, tol: Math.max(5, salz * 0.005) };
+  sbAnswer = { val1: salz, tol: 0.001, dec: 3 };
 
   renderSBQuestion(
     'Ein Salzbad hat ein Gesamtgewicht von <strong>' + fmt(gewicht,0) + ' kg</strong> und eine NaCl-Konzentration von <strong>' + konz + ' %</strong>.<br>Wie viel kg Salz sind darin enthalten?',
@@ -879,7 +879,7 @@ function genUmr() {
   var dichte  = getDensity(konz);
   var gewicht = vol * dichte;
 
-  sbAnswer = { val1: gewicht, tol: Math.max(5, gewicht * 0.005) };
+  sbAnswer = { val1: gewicht, tol: 0.001, dec: 3 };
 
   renderSBQuestion(
     'Ein Salzbad hat ein Volumen von <strong>' + fmt(vol,0) + ' Liter</strong> und eine NaCl-Konzentration von <strong>' + konz + ' %</strong>.<br>' +
@@ -911,7 +911,7 @@ function genMix() {
   var mengeB     = gewSalzbad / teileA * teileB;
 
   var zugabe = aufab === 'auf' ? 'Salz' : 'Wasser';
-  sbAnswer = { val1: mengeB, tol: Math.max(5, mengeB * 0.005) };
+  sbAnswer = { val1: mengeB, tol: 0.001, dec: 3 };
 
   renderSBQuestion(
     'Ein Salzbad hat ein Volumen von <strong>' + fmt(vol,0) + ' Liter</strong> und eine aktuelle NaCl-Konzentration von <strong>' + fq(ist,1) + ' %</strong>.<br>' +
@@ -928,7 +928,7 @@ function renderSBQuestion(questionHtml, ansLabel, ansUnit, ansId) {
     '<div class="quiz-question-sb">' + questionHtml + '</div>' +
     '<div class="quiz-ans-row">' +
     '<span class="quiz-ans-label">' + ansLabel + '</span>' +
-    '<input type="text" inputmode="decimal" class="quiz-ans-input" id="' + ansId + '" placeholder="0.0">' +
+    '<input type="text" inputmode="decimal" class="quiz-ans-input" id="' + ansId + '" placeholder="' + (ansUnit === 'kg' ? '0.000' : '0.0') + '">' +
     '<span class="quiz-ans-unit">' + ansUnit + '</span>' +
     '</div>' +
     '<button class="btn btn-primary" onclick="checkSBAnswer()" style="width:100%;margin-top:4px">Lösung prüfen</button>' +
@@ -953,10 +953,10 @@ function checkSBAnswer() {
 
   if (ok) {
     fb.className = 'quiz-feedback-sb visible correct-fb';
-    fb.innerHTML = '<strong>Richtig!</strong> Korrekte Lösung: ' + fmt(sbAnswer.val1, 1);
+    fb.innerHTML = '<strong>Richtig!</strong> Korrekte Lösung: ' + fmt(sbAnswer.val1, sbAnswer.dec || 1);
   } else {
     fb.className = 'quiz-feedback-sb visible wrong-fb';
-    fb.innerHTML = '<strong>Nicht ganz.</strong> Korrekte Lösung: <strong>' + fmt(sbAnswer.val1, 1) + '</strong>';
+    fb.innerHTML = '<strong>Nicht ganz.</strong> Korrekte Lösung: <strong>' + fmt(sbAnswer.val1, sbAnswer.dec || 1) + '</strong>';
   }
 }
 </script>
