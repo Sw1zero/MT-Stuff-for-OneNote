@@ -63,7 +63,8 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 │   ├── images/                         ← Ölbrenner, Dreizugdampfkessel, Warmwasseranlage (je mit/ohne Nummern)
 │   ├── tabellen-luecken-metalle.html
 │   ├── quiz-werkstoffe-schmierstoffe.html
-│   └── lernsession-waermeerzeugung.html  ← Challenge (15 Posten); ?only=A..H = Einzelaufgaben
+│   ├── beschriften.html                  ← 3-Stufen-Tool; ?set=oelbrenner|dampfkessel|warmwasser
+│   └── lernsession-waermeerzeugung.html  ← Challenge (15 Posten); ?only=A..H = Einzelaufgaben (ohne Info-Text)
 ├── a8-kulturen/
 │   ├── images/
 │   │   └── a.8_Bakterienzelle_leer.png

@@ -324,7 +324,10 @@ var ALL = [
 /* ?only=A,B  -> nur diese Aufgaben */
 var ONLY = (location.search.match(/[?&]only=([A-Za-z0-9,]+)/) || [])[1];
 var TASK_NAMES = { A:'Verbrennung & Brenner', B:'Ölbrenner beschriften', C:'Sicherheit & Wartung', D:'Dampfkessel', E:'Gefahren am Dampfkessel', F:'Warmwasseranlage', G:'Warmwasser vs. Dampf', H:'Wartung & Abschluss' };
-var STATIONS = ALL.filter(function(s){ return !ONLY || ONLY.split(',').indexOf(s.task) !== -1; });
+var STATIONS = ALL.filter(function(s){
+  if (ONLY) { return ONLY.split(',').indexOf(s.task) !== -1 && s.type !== 'info'; }  // Einzelaufgabe: ohne Info-Fliesstext
+  return true;
+});
 if (ONLY) {
   var names = ONLY.split(',').map(function(t){ return TASK_NAMES[t] || t; });
   document.getElementById('subtitle').textContent = 'Einzelaufgabe: ' + names.join(', ');
