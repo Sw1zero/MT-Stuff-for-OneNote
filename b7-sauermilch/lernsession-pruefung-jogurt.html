@@ -78,6 +78,9 @@
     .gap-text select { font-family:var(--font); font-size:0.85rem; font-weight:600; border:1.5px solid var(--blue-light); border-radius:var(--radius-sm); padding:3px 6px; background:var(--blue-tint); color:var(--blue-dark); }
     .gap-text select.correct { border-color:#38a169; background:#f0fff4; color:#276749; }
     .gap-text select.wrong { border-color:var(--red); background:var(--red-light); color:var(--red-dark); }
+    .lp-select { width:100%; font-family:var(--font); font-size:0.85rem; font-weight:600; border:1.5px solid var(--blue-light); border-radius:var(--radius-sm); padding:3px 6px; background:var(--blue-tint); color:var(--blue-dark); }
+    .lp-select.correct { border-color:#38a169; background:#f0fff4; color:#276749; }
+    .lp-select.wrong { border-color:var(--red); background:var(--red-light); color:var(--red-dark); }
 
     /* Reihenfolge (order) */
     .ord-list { display:flex; flex-direction:column; gap:8px; }
@@ -130,8 +133,8 @@
 <header class="bzwu-header">
   <div class="header-text">
   <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · b.7</span>
-  <h1>Challenge: Prüfungsvorbereitung Joghurt</h1>
-  <p>15 Posten quer durch die Sauermilchprodukte, mit XP, Streak und Abzeichen</p>
+  <h1 id="pageTitle">Joghurt herstellen</h1>
+  <p id="subtitle">15 Posten quer durch die Sauermilchprodukte</p>
   </div>
   <div class="header-logos">
     <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
@@ -166,7 +169,7 @@
    Challenge b.7: Prüfungsvorbereitung Joghurt (15 Posten)
    Inhalte aus dem Lehrmittel b.7. Gamification wie Sbrinz-Challenge.
    ============================================================ */
-var STATIONS = [
+var ALL = [
   /* 1 */ {
     kicker:'Info · Ablauf', title:'Ablauf der Joghurtherstellung', type:'info',
     lead:'Lesen Sie den Ablauf, danach bringen Sie die Schritte in die richtige Reihenfolge.',
@@ -387,6 +390,17 @@ var STATIONS = [
   }
 ];
 
+var MODE = /[?&]mode=challenge/.test(location.search) ? 'challenge' : 'lernpfad';
+var STATIONS = ALL.filter(function(s){ return MODE === 'challenge' ? s.type !== 'info' : true; });
+(function(){
+  var t = (MODE === 'challenge') ? 'Challenge' : 'Lernpfad';
+  document.getElementById('pageTitle').textContent = t + ': Joghurt herstellen';
+  document.getElementById('subtitle').textContent = (MODE === 'challenge')
+    ? 'Prüfungsmodus – ohne Hilfen, Anlagenteile eintippen'
+    : 'Wissensvermittlung – mit Lesetexten und Übungen';
+  document.title = t + ': Joghurt herstellen (b.7)';
+})();
+
 var N = STATIONS.length;
 var current = 0;
 var solved = [], earned = [], maxPts = [];
@@ -433,7 +447,7 @@ function buildBody(idx, st){
   if(st.type==='info')  buildInfo(idx, st);
   if(st.type==='order') buildOrder(idx, st);
   if(st.type==='tf')    buildTF(idx, st);
-  if(st.type==='label') buildLabel(idx, st);
+  if(st.type==='label') (MODE==='challenge'?buildLabelType:buildLabelChoose)(idx, st);
   if(st.type==='gaps')  buildGaps(idx, st);
   if(st.type==='quiz')  buildQuiz(idx, st);
 }
@@ -556,7 +570,8 @@ function buildTF(idx, st){
 }
 
 /* Beschriften */
-function buildLabel(idx, st){
+/* Beschriften – Challenge: eintippen */
+function buildLabelType(idx, st){
   maxPts[idx]=st.items.length;
   var html='<div class="slots-grid">';
   st.items.forEach(function(it){
@@ -579,6 +594,32 @@ function buildLabel(idx, st){
       var ok=matchKeys(inp.value, it);
       if(ok){ inp.classList.add('correct'); sol.style.display='none'; correct++; } else { inp.classList.add('wrong'); sol.textContent='→ '+it.name; sol.style.display='block'; }
       registerAnswer(ok);
+    });
+    earned[idx]=correct; solved[idx]=true; this.disabled=true; updateNav();
+  });
+}
+
+/* Beschriften – Lernpfad: zuordnen per Auswahl */
+function buildLabelChoose(idx, st){
+  maxPts[idx]=st.items.length;
+  var names=st.items.map(function(it){return it.name;}).filter(function(v,i,a){return a.indexOf(v)===i;});
+  var optHtml=shuffle(names).map(function(o){return '<option>'+o+'</option>';}).join('');
+  var html='<div class="slots-grid">';
+  st.items.forEach(function(it){
+    html+='<div class="slot-row"><div class="slot-num">'+it.n+'</div><div class="type-cell">'+
+      '<select class="lp-select" id="lb-'+idx+'-'+it.n+'"><option value="">…</option>'+optHtml+'</select>'+
+      '<div class="type-sol" id="lbsol-'+idx+'-'+it.n+'" style="display:none;"></div></div></div>';
+  });
+  html+='</div><div class="check-btn-row"><button class="btn btn-primary" id="lbcheck-'+idx+'">Überprüfen</button></div>';
+  document.getElementById('body-'+idx).innerHTML=html;
+  document.getElementById('lbcheck-'+idx).addEventListener('click', function(){
+    if(solved[idx]) return; var correct=0;
+    st.items.forEach(function(it){
+      var sel=document.getElementById('lb-'+idx+'-'+it.n); var sol=document.getElementById('lbsol-'+idx+'-'+it.n);
+      sel.classList.remove('correct','wrong');
+      var ok=(sel.value===it.name);
+      if(ok){ sel.classList.add('correct'); sol.style.display='none'; correct++; } else { sel.classList.add('wrong'); sol.textContent='→ '+it.name; sol.style.display='block'; }
+      sel.disabled=true; registerAnswer(ok);
     });
     earned[idx]=correct; solved[idx]=true; this.disabled=true; updateNav();
   });

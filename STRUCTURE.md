@@ -64,7 +64,7 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 │   ├── tabellen-luecken-metalle.html
 │   ├── quiz-werkstoffe-schmierstoffe.html
 │   ├── beschriften.html                  ← 3-Stufen-Tool; ?set=oelbrenner|dampfkessel|warmwasser
-│   └── lernsession-waermeerzeugung.html  ← Challenge (15 Posten); ?only=A..H = Einzelaufgaben (ohne Info-Text)
+│   └── lernsession-waermeerzeugung.html  ← Lernpfad (Standard) / Challenge (?mode=challenge)
 ├── a8-kulturen/
 │   ├── images/
 │   │   └── a.8_Bakterienzelle_leer.png
@@ -150,7 +150,7 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 | `animation`        | Animation         | `animation-labgerinnung.html`           | Schrittweise SVG-Animation eines Prozesses mit Nav      |
 | `prozess-entscheid`| Prozess-Entscheid | `prozess-entscheid-jogurt.html`         | Entscheidung pro Prozessschritt mit Fehleranalyse       |
 | `fliessschema`     | Fliessschema      | `fliessschema-stichfest.html`           | Produktionsschritte frei in leere, verkettete Kästchen eintippen |
-| `lernsession`      | Challenge         | `lernsession-sbrinz.html`               | Gamifizierte Challenge: Info-/Lesestationen + Quiz/W-F/Lücken/Entscheid/Fehlersuche; Gamification (XP, Streak, Abzeichen, Rang) |
+| `lernpfad` / `challenge` | Lernpfad / Challenge | `lernsession-sbrinz.html` | Eine Datei, zwei Modi: **Lernpfad** (Standard, mit Info-Lesetexten + Übungen einfach/mittel) und **Challenge** (`?mode=challenge`: ohne Info, schwerste Stufe, voll gamifiziert: XP/Streak/Abzeichen/Rang) |
 
 ### Geplant / Ideen
 

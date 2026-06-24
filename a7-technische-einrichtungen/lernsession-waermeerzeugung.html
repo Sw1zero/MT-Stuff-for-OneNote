@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Challenge: Wärmeerzeugung (a.7)</title>
+  <title>Wärmeerzeugung (a.7)</title>
   <link rel="stylesheet" href="../style.css">
   <style>
     .back-link { display:inline-block; font-size:0.82rem; color:var(--text-muted); text-decoration:none; margin-bottom:1rem; }
@@ -71,9 +71,10 @@
     .tf-exp.show { display:block; }
 
     .gap-text { font-size:0.95rem; line-height:2.1; }
-    .gap-text select { font-family:var(--font); font-size:0.85rem; font-weight:600; border:1.5px solid var(--blue-light); border-radius:var(--radius-sm); padding:3px 6px; background:var(--blue-tint); color:var(--blue-dark); }
-    .gap-text select.correct { border-color:#38a169; background:#f0fff4; color:#276749; }
-    .gap-text select.wrong { border-color:var(--red); background:var(--red-light); color:var(--red-dark); }
+    .gap-text select, .lp-select { font-family:var(--font); font-size:0.85rem; font-weight:600; border:1.5px solid var(--blue-light); border-radius:var(--radius-sm); padding:3px 6px; background:var(--blue-tint); color:var(--blue-dark); }
+    .gap-text select.correct, .lp-select.correct { border-color:#38a169; background:#f0fff4; color:#276749; }
+    .gap-text select.wrong, .lp-select.wrong { border-color:var(--red); background:var(--red-light); color:var(--red-dark); }
+    .lp-select { width:100%; }
 
     .slots-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.55rem; margin-bottom:0.5rem; }
     @media (max-width:560px){ .slots-grid { grid-template-columns:1fr; } }
@@ -108,7 +109,7 @@
 <header class="bzwu-header">
   <div class="header-text">
   <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · a.7</span>
-  <h1>Challenge: Wärmeerzeugung</h1>
+  <h1 id="pageTitle">Wärmeerzeugung</h1>
   <p id="subtitle">Brenner, Dampfkessel, Warmwasseranlage und Wartung</p>
   </div>
   <div class="header-logos">
@@ -141,12 +142,15 @@
 
 <script>
 /* ============================================================
-   Challenge a.7: Wärmeerzeugung (Brenner, Dampfkessel,
-   Warmwasseranlage, Wartung). Inhalte aus Lehrmittel a.7.
-   ?only=A,B,...  zeigt nur einzelne Aufgaben (Index-Deeplinks).
+   a.7 Wärmeerzeugung. Eine Datei, zwei Modi:
+   ?mode=lernpfad (Standard) = Wissensvermittlung: mit Info-Lesetexten,
+        Beschriften per Auswahl (zuordnen).
+   ?mode=challenge = Prüfung: ohne Info, Beschriften per Eintippen, voll gamifiziert.
    ============================================================ */
+var MODE = /[?&]mode=challenge/.test(location.search) ? 'challenge' : 'lernpfad';
+
 var ALL = [
-  /* A */ { task:'A', kicker:'Info · Verbrennung', title:'Verbrennung & Brenner', type:'info',
+  { kicker:'Info · Verbrennung', title:'Verbrennung & Brenner', type:'info',
     lead:'Lesen Sie die Grundlagen, danach prüfen Sie sie.',
     read:
       '<p>Bei der <b>Verbrennung</b> verbinden sich brennbare Stoffe unter Wärme- und Lichtentwicklung mit dem Sauerstoff der Luft (rasche Oxidation). Dafür braucht es drei Dinge: <b>Brennstoff</b>, <b>Sauerstoff</b> und <b>Wärme</b> (Zündung).</p>' +
@@ -156,7 +160,7 @@ var ALL = [
         '<li><b>Gasbrenner</b>: gleich, aber <b>ohne Brennstoffpumpe</b> (Gas steht schon unter Druck). Dafür Sicherheitseinrichtungen gegen Gasaustritt.</li>' +
       '</ul>' +
       '<div class="factbox">Die <b>Verbrennungsluft</b> soll so dosiert sein, dass der Brennstoff vollständig verbrennt. Zu viel oder zu wenig Luft erhöht den Verbrauch und belastet die Umwelt.</div>' },
-  /* A */ { task:'A', kicker:'Wahr oder Falsch', title:'Verbrennung & Brenner', id:'a_tf', type:'tf',
+  { kicker:'Wahr oder Falsch', title:'Verbrennung & Brenner', id:'a_tf', type:'tf',
     lead:'Stimmt die Aussage?',
     items:[
       { s:'Für eine Verbrennung braucht es Brennstoff, Sauerstoff und Wärme.', a:true, e:'Das Verbrennungsdreieck.' },
@@ -165,20 +169,20 @@ var ALL = [
       { s:'Zu viel Verbrennungsluft spart Brennstoff.', a:false, e:'Zu viel oder zu wenig Luft erhöht den Verbrauch.' },
       { s:'Bei Gasbrennern sind besondere Sicherheitseinrichtungen gegen Gasaustritt vorgeschrieben.', a:true, e:'Erdgas ist explosionsfähig.' }
     ] },
-  /* B */ { task:'B', kicker:'Info · Ölbrenner', title:'Ölbrenner: Funktionsweise', type:'info',
+  { kicker:'Info · Ölbrenner', title:'Ölbrenner: Funktionsweise', type:'info',
     lead:'Wie ein Ölbrenner arbeitet, danach beschriften Sie ihn.',
     read:
       '<p>Der <b>Elektromotor</b> treibt <b>Ventilatorrad</b> und <b>Ölpumpe</b> an. Die Pumpe fördert das Öl unter Druck über das <b>Magnetventil</b> zur <b>Düse</b>, wo es zu Nebel zerrissen wird. Die Verbrennungsluft gelangt über das Ventilatorrad in den <b>Flammkopf</b>.</p>' +
       '<p>Die <b>Zündelektroden</b> erhalten vom <b>Zündtrafo</b> Hochspannung, der Funke entzündet das Gemisch. Der <b>Brennerautomat</b> steuert den Ablauf, der <b>Fotowiderstand</b> überwacht die Flamme.</p>' +
       '<div class="factbox">Merken: <b>Brennerautomat</b> = steuert, <b>Fotowiderstand</b> = überwacht (Flammenwächter).</div>' },
-  /* B */ { task:'B', kicker:'Beschriften', title:'Ölbrenner beschriften', id:'b_label', type:'label',
-    lead:'Schreiben Sie zu jeder Nummer das Bauteil. Kleine Tippfehler werden akzeptiert.',
+  { kicker:'Beschriften', title:'Ölbrenner beschriften', id:'b_label', type:'label',
+    lead:'Ordnen Sie jeder Nummer das richtige Bauteil zu.',
     media:'<img src="images/a.7_Oelbrenner_mit_Nummern.png" alt="Aufbau eines Ölbrenners mit nummerierten Bauteilen">',
     items:[
       { n:1,  name:'Flammkopf',                  keys:['flammkopf','flammenkopf'] },
       { n:2,  name:'Fotowiderstand',             keys:['fotowiderstand','flammenwaechter'] },
       { n:3,  name:'Magnetventil',               keys:['magnetventil'] },
-      { n:4,  name:'Zündkabel',                  keys:['zuendkabel','zuendkabel','zuendleitung'] },
+      { n:4,  name:'Zündkabel',                  keys:['zuendkabel','zuendleitung'] },
       { n:5,  name:'Pumpe',                      keys:['pumpe','oelpumpe'] },
       { n:6,  name:'Ölschlauch-Anschluss',       keys:['oelschlauch','anschluss'] },
       { n:7,  name:'Elektromotor',               keys:['elektromotor','motor'] },
@@ -191,7 +195,7 @@ var ALL = [
       { n:14, name:'Drehschieber für Lufteinstellung', keys:['drehschieber'] },
       { n:15, name:'Brennerautomat',             keys:['brennerautomat','automat'] }
     ] },
-  /* C */ { task:'C', kicker:'Info · Sicherheit', title:'Brenner: Sicherheit & Wartung', type:'info',
+  { kicker:'Info · Sicherheit', title:'Brenner: Sicherheit & Wartung', type:'info',
     lead:'Worauf es bei Sicherheit, Umwelt und Wartung ankommt.',
     read:
       '<h4>Sicherheit</h4>' +
@@ -206,7 +210,7 @@ var ALL = [
         '<li>Der <b>Betreiber</b> darf den Fotowiderstand selbst kontrollieren/reinigen und auf Geruch/Lärm achten. Den Brenner revidiert und stellt ein <b>Fachmann</b> periodisch.</li>' +
         '<li>Die <b>Feuerungskontrolle</b> ist staatlich vorgeschrieben (Luftreinhalteverordnung).</li>' +
       '</ul>' },
-  /* C */ { task:'C', kicker:'Quiz', title:'Sicherheit & Wartung', id:'c_quiz', type:'quiz',
+  { kicker:'Quiz', title:'Sicherheit & Wartung', id:'c_quiz', type:'quiz',
     lead:'Vier Fragen.',
     questions:[
       { q:'Was passiert, wenn die Flamme während des Betriebs ausfällt?', opts:['Der Brennerautomat sperrt über das Magnetventil die Ölzufuhr','Der Brenner zündet sofort stärker nach','Die Ölpumpe erhöht den Druck'], correct:0 },
@@ -214,7 +218,7 @@ var ALL = [
       { q:'Was darf der Anlagenbetreiber selbst tun?', opts:['Den Fotowiderstand kontrollieren und reinigen','Den Brenner neu einstellen','Die Düse austauschen'], correct:0 },
       { q:'Wozu dient die Rauchgasrezirkulation?', opts:['Sie senkt den Ausstoss von Stickstoffoxiden (NOx)','Sie erhöht die Flammentemperatur','Sie spart Zündenergie'], correct:0 }
     ] },
-  /* D */ { task:'D', kicker:'Info · Dampfkessel', title:'Dampfkessel: Grundlagen', type:'info',
+  { kicker:'Info · Dampfkessel', title:'Dampfkessel: Grundlagen', type:'info',
     lead:'Wozu Dampf dient und welche Bauarten es gibt.',
     read:
       '<p>Der <b>Dampf</b> dient als Wärmeträger für Käsefertiger, Erhitzer, Desinfektion und Warmwasser. Er hat einen hohen Wärmeinhalt und strömt ohne Pumpe zu den Verbrauchern. Die grosse gespeicherte Energie ist zugleich eine <b>Gefahrenquelle</b> (Kesselexplosion), darum gelten strenge Vorschriften.</p>' +
@@ -225,8 +229,8 @@ var ALL = [
         '<li><b>Schnelldampferzeuger</b>: wenig Wasserinhalt, kurze Anfahrzeit, günstig.</li>' +
       '</ul>' +
       '<div class="factbox">Bei allen Bauarten geben die heissen <b>Rauchgase</b> in Röhren ihre Wärme ans Kesselwasser ab und verlassen den Kessel über das Rauchrohr in den Kamin.</div>' },
-  /* D */ { task:'D', kicker:'Beschriften', title:'Dreizugdampfkessel beschriften', id:'d_label', type:'label',
-    lead:'Schreiben Sie zu jeder Nummer den Begriff.',
+  { kicker:'Beschriften', title:'Dreizugdampfkessel beschriften', id:'d_label', type:'label',
+    lead:'Ordnen Sie jeder Nummer den richtigen Begriff zu.',
     media:'<img src="images/a.7_Dreizugdampfkessel_mit_Nummern.png" alt="Schema eines Dreizugdampfkessels mit Legende">',
     items:[
       { n:1, name:'Flammrohr',                  keys:['flammrohr'] },
@@ -236,7 +240,7 @@ var ALL = [
       { n:5, name:'Wasserumspülte Wendekammer', keys:['wendekammer','wasserumspuelte'] },
       { n:6, name:'Rauchrohr',                  keys:['rauchrohr'] }
     ] },
-  /* E */ { task:'E', kicker:'Info · Gefahren', title:'Gefahren am Dampfkessel', type:'info',
+  { kicker:'Info · Gefahren', title:'Gefahren am Dampfkessel', type:'info',
     lead:'Drei Hauptgefahren und das richtige Verhalten.',
     read:
       '<ul>' +
@@ -245,7 +249,7 @@ var ALL = [
         '<li><b>Kesselstein</b>: Kalk/Magnesium aus hartem Wasser lagert sich ab und isoliert die Heizfläche → Überhitzung. Verhindern durch <b>Wasseraufbereitung</b> (Enthärtung/Entsalzung) vor dem Kessel.</li>' +
       '</ul>' +
       '<div class="factbox">Alle drei Gefahren führen über Überhitzung oder Überdruck zur plötzlichen Energiefreigabe. Wartungs- und Bedienungsvorschriften unbedingt einhalten.</div>' },
-  /* E */ { task:'E', kicker:'Lückentext', title:'Gefahren am Dampfkessel', id:'e_gaps', type:'gaps',
+  { kicker:'Lückentext', title:'Gefahren am Dampfkessel', id:'e_gaps', type:'gaps',
     lead:'Füllen Sie die Lücken.',
     parts:[
       'Die drei Hauptgefahren sind zu grosser ',
@@ -262,7 +266,7 @@ var ALL = [
       { opts:['Wasseraufbereitung','höheren Druck','mehr Brennstoff'], correct:0 },
       ' vor dem Kessel.'
     ] },
-  /* F */ { task:'F', kicker:'Info · Warmwasser', title:'Warmwasseranlage', type:'info',
+  { kicker:'Info · Warmwasser', title:'Warmwasseranlage', type:'info',
     lead:'Aufbau und Regelung der Warmwasseranlage.',
     read:
       '<p>Die Warmwasseranlage ist ein <b>geschlossenes Rohrsystem</b> (ca. 3 bar). Das Wasser wird im Kessel auf <b>80–110 °C</b> erwärmt, von der <b>Umwälzpumpe</b> über den <b>Verteilerbalken</b> zu den Verbrauchern gepumpt und über den <b>Sammelbalken</b> zurückgeführt.</p>' +
@@ -271,26 +275,26 @@ var ALL = [
         '<li>Das <b>Ausdehnungs-/Expansionsgefäss</b> nimmt das Mehrvolumen auf, das beim Erwärmen entsteht.</li>' +
         '<li>Der Brenner wird über eine Temperaturregelung in Stufen gesteuert.</li>' +
       '</ul>' },
-  /* F */ { task:'F', kicker:'Beschriften', title:'Warmwasseranlage beschriften', id:'f_label', type:'label',
-    lead:'Schreiben Sie zu jeder Nummer den Begriff.',
+  { kicker:'Beschriften', title:'Warmwasseranlage beschriften', id:'f_label', type:'label',
+    lead:'Ordnen Sie jeder Nummer den richtigen Begriff zu.',
     media:'<img src="images/a.7_Warmwasseranlage_mit_Nummern.png" alt="Schema einer Warmwasseranlage mit Legende">',
     items:[
-      { n:1,  name:'Kessel mit Brenner',     keys:['kessel'] },
-      { n:2,  name:'Umwälzpumpe',            keys:['umwaelzpumpe','pumpe'] },
-      { n:3,  name:'Verteilerbalken/Vorlauf',keys:['verteilerbalken','vorlauf'] },
-      { n:4,  name:'Mischventil',            keys:['mischventil'] },
-      { n:5,  name:'Umwälzpumpe',            keys:['umwaelzpumpe','pumpe'] },
-      { n:6,  name:'Käsefertiger',           keys:['kaesefertiger','fertiger'] },
-      { n:7,  name:'Sammelbalken/Rücklauf',  keys:['sammelbalken','ruecklauf'] },
-      { n:8,  name:'Plattenhitzer',          keys:['plattenhitzer','plattenerhitzer'] },
-      { n:9,  name:'Gruppe Heizkeller',      keys:['heizkeller'] },
-      { n:10, name:'Gruppe Wohnungsheizung', keys:['wohnungsheizung'] },
-      { n:11, name:'Sicherheitsventil',      keys:['sicherheitsventil'] },
-      { n:12, name:'Expansionsgefäss',       keys:['expansionsgefaess','ausdehnungsgefaess'] },
+      { n:1,  name:'Kessel mit Brenner',      keys:['kessel'] },
+      { n:2,  name:'Umwälzpumpe (Kessel)',    keys:['umwaelzpumpe','pumpe'] },
+      { n:3,  name:'Verteilerbalken/Vorlauf', keys:['verteilerbalken','vorlauf'] },
+      { n:4,  name:'Mischventil',             keys:['mischventil'] },
+      { n:5,  name:'Umwälzpumpe (Gruppe)',    keys:['umwaelzpumpe','pumpe'] },
+      { n:6,  name:'Käsefertiger',            keys:['kaesefertiger','fertiger'] },
+      { n:7,  name:'Sammelbalken/Rücklauf',   keys:['sammelbalken','ruecklauf'] },
+      { n:8,  name:'Plattenhitzer',           keys:['plattenhitzer','plattenerhitzer'] },
+      { n:9,  name:'Gruppe Heizkeller',       keys:['heizkeller'] },
+      { n:10, name:'Gruppe Wohnungsheizung',  keys:['wohnungsheizung'] },
+      { n:11, name:'Sicherheitsventil',       keys:['sicherheitsventil'] },
+      { n:12, name:'Expansionsgefäss',        keys:['expansionsgefaess','ausdehnungsgefaess'] },
       { n:13, name:'Füll- und Entleerungsventil', keys:['fuell','entleerungsventil'] },
-      { n:14, name:'Druckanzeige',           keys:['druckanzeige','manometer'] }
+      { n:14, name:'Druckanzeige',            keys:['druckanzeige','manometer'] }
     ] },
-  /* G */ { task:'G', kicker:'Wahr oder Falsch', title:'Warmwasser vs. Dampf', id:'g_tf', type:'tf',
+  { kicker:'Wahr oder Falsch', title:'Warmwasser vs. Dampf', id:'g_tf', type:'tf',
     lead:'Vor- und Nachteile der Warmwasseranlage gegenüber der Dampfanlage.',
     items:[
       { s:'Die Warmwasseranlage hat tiefere Temperaturen und dadurch geringere Wärmeverluste.', a:true, e:'Besserer Wirkungsgrad.' },
@@ -300,7 +304,7 @@ var ALL = [
       { s:'Sehr hohe Temperaturen (z. B. für UHT) erreicht die Warmwasseranlage problemlos.', a:false, e:'Hohe Temperaturen sind nicht/weniger schnell erreichbar.' },
       { s:'Die Warmwasseranlage braucht Pumpen, um das Wasser zu fördern.', a:true, e:'Im Gegensatz zum Dampf, der von selbst strömt.' }
     ] },
-  /* H */ { task:'H', kicker:'Info · Wartung', title:'Wartung & Instandhaltung', type:'info',
+  { kicker:'Info · Wartung', title:'Wartung & Instandhaltung', type:'info',
     lead:'Wer macht was, und was ist vorgeschrieben?',
     read:
       '<ul>' +
@@ -310,8 +314,8 @@ var ALL = [
         '<li><b>Brenner</b>: Betreiber reinigt den Fotowiderstand, der Fachmann revidiert periodisch. Die <b>Feuerungskontrolle</b> ist staatlich (LRV).</li>' +
       '</ul>' +
       '<div class="factbox">Faustregel: einfache Kontrolle/Reinigung macht der <b>Betreiber</b>, Einstellen/Revision/Inspektion der <b>Fachmann/Inspektor</b>.</div>' },
-  /* H */ { task:'H', kicker:'Prüfungsrunde', title:'Quer durch die Wärmeerzeugung', id:'boss', boss:true, type:'quiz',
-    lead:'Die Schlussrunde, jede richtige Antwort gibt extra XP!',
+  { kicker:'Abschluss', title:'Quer durch die Wärmeerzeugung', id:'boss', boss:true, type:'quiz',
+    lead:'Gemischte Fragen zum Schluss.',
     questions:[
       { q:'Ab welchem Betriebsüberdruck unterliegt ein Dampfkessel der SVTI-Kontrollpflicht?', opts:['über 0,5 bar','über 6 bar','über 32 bar'], correct:0 },
       { q:'Wie oft reinigt der Kaminfeger den Kessel feuerseitig?', opts:['zweimal jährlich','wöchentlich','alle fünf Jahre'], correct:0 },
@@ -321,17 +325,17 @@ var ALL = [
     ] }
 ];
 
-/* ?only=A,B  -> nur diese Aufgaben */
-var ONLY = (location.search.match(/[?&]only=([A-Za-z0-9,]+)/) || [])[1];
-var TASK_NAMES = { A:'Verbrennung & Brenner', B:'Ölbrenner beschriften', C:'Sicherheit & Wartung', D:'Dampfkessel', E:'Gefahren am Dampfkessel', F:'Warmwasseranlage', G:'Warmwasser vs. Dampf', H:'Wartung & Abschluss' };
-var STATIONS = ALL.filter(function(s){
-  if (ONLY) { return ONLY.split(',').indexOf(s.task) !== -1 && s.type !== 'info'; }  // Einzelaufgabe: ohne Info-Fliesstext
-  return true;
-});
-if (ONLY) {
-  var names = ONLY.split(',').map(function(t){ return TASK_NAMES[t] || t; });
-  document.getElementById('subtitle').textContent = 'Einzelaufgabe: ' + names.join(', ');
-}
+/* Challenge = ohne Info-Lesetexte */
+var STATIONS = ALL.filter(function(s){ return MODE === 'challenge' ? s.type !== 'info' : true; });
+
+(function(){
+  var t = (MODE === 'challenge') ? 'Challenge' : 'Lernpfad';
+  document.getElementById('pageTitle').textContent = t + ': Wärmeerzeugung';
+  document.getElementById('subtitle').textContent = (MODE === 'challenge')
+    ? 'Prüfungsmodus – ohne Hilfen, Bauteile eintippen'
+    : 'Wissensvermittlung – mit Lesetexten und Übungen';
+  document.title = t + ': Wärmeerzeugung (a.7)';
+})();
 
 var N = STATIONS.length;
 var current = 0;
@@ -376,7 +380,7 @@ function buildAll(){
 function buildBody(idx, st){
   if(st.type==='info')  buildInfo(idx, st);
   if(st.type==='tf')    buildTF(idx, st);
-  if(st.type==='label') buildLabel(idx, st);
+  if(st.type==='label') (MODE==='challenge') ? buildLabelType(idx, st) : buildLabelChoose(idx, st);
   if(st.type==='gaps')  buildGaps(idx, st);
   if(st.type==='quiz')  buildQuiz(idx, st);
 }
@@ -414,7 +418,8 @@ function buildTF(idx, st){
   });
 }
 
-function buildLabel(idx, st){
+/* Beschriften – Challenge: eintippen */
+function buildLabelType(idx, st){
   maxPts[idx]=st.items.length;
   var html='<div class="slots-grid">';
   st.items.forEach(function(it){
@@ -437,6 +442,32 @@ function buildLabel(idx, st){
       var ok=matchKeys(inp.value, it);
       if(ok){ inp.classList.add('correct'); sol.style.display='none'; correct++; } else { inp.classList.add('wrong'); sol.textContent='→ '+it.name; sol.style.display='block'; }
       registerAnswer(ok);
+    });
+    earned[idx]=correct; solved[idx]=true; this.disabled=true; updateNav();
+  });
+}
+
+/* Beschriften – Lernpfad: zuordnen per Auswahl */
+function buildLabelChoose(idx, st){
+  maxPts[idx]=st.items.length;
+  var names=st.items.map(function(it){return it.name;}).filter(function(v,i,a){return a.indexOf(v)===i;});
+  var optHtml=shuffle(names).map(function(o){return '<option>'+o+'</option>';}).join('');
+  var html='<div class="slots-grid">';
+  st.items.forEach(function(it){
+    html+='<div class="slot-row"><div class="slot-num">'+it.n+'</div><div class="type-cell">'+
+      '<select class="lp-select" id="lb-'+idx+'-'+it.n+'"><option value="">…</option>'+optHtml+'</select>'+
+      '<div class="type-sol" id="lbsol-'+idx+'-'+it.n+'" style="display:none;"></div></div></div>';
+  });
+  html+='</div><div class="check-btn-row"><button class="btn btn-primary" id="lbcheck-'+idx+'">Überprüfen</button></div>';
+  document.getElementById('body-'+idx).innerHTML=html;
+  document.getElementById('lbcheck-'+idx).addEventListener('click', function(){
+    if(solved[idx]) return; var correct=0;
+    st.items.forEach(function(it){
+      var sel=document.getElementById('lb-'+idx+'-'+it.n); var sol=document.getElementById('lbsol-'+idx+'-'+it.n);
+      sel.classList.remove('correct','wrong');
+      var ok=(sel.value===it.name);
+      if(ok){ sel.classList.add('correct'); sol.style.display='none'; correct++; } else { sel.classList.add('wrong'); sol.textContent='→ '+it.name; sol.style.display='block'; }
+      sel.disabled=true; registerAnswer(ok);
     });
     earned[idx]=correct; solved[idx]=true; this.disabled=true; updateNav();
   });
@@ -508,26 +539,21 @@ function showFinish(){
   var total=0, max=0; for(var i=0;i<N;i++){ total+=earned[i]; max+=maxPts[i]; }
   var pct=max>0?Math.round(total/max*100):0;
   var rank = pct>=90?'Wärme-Meister 🥇' : pct>=75?'Wärme-Profi' : pct>=50?'Wärme-Geselle' : 'Wärme-Lehrling';
-  var badgeHtml='';
-  if(!ONLY){
-    var bIdx=findIdx('boss');
-    var badges=[
-      { icon:'📖', name:'Aufmerksamer Leser', got:true },
-      { icon:'🔥', name:'Brenner-Profi', got: findIdx('b_label')>=0 && earned[findIdx('b_label')]===maxPts[findIdx('b_label')] },
-      { icon:'♨️', name:'Kessel-Kenner', got: findIdx('d_label')>=0 && earned[findIdx('d_label')]===maxPts[findIdx('d_label')] },
-      { icon:'🚿', name:'Warmwasser-Profi', got: findIdx('f_label')>=0 && earned[findIdx('f_label')]===maxPts[findIdx('f_label')] },
-      { icon:'⚡', name:'Serie (Streak 8+)', got: bestStreak>=8 },
-      { icon:'🥇', name:'Wärme-Meister (90%)', got: pct>=90 }
-    ];
-    var got=0; badges.forEach(function(b){ if(b.got) got++; badgeHtml+='<span class="badge-chip'+(b.got?' earned':'')+'">'+(b.got?b.icon:'<span class="lock">🔒</span>')+' '+b.name+'</span>'; });
-    badgeHtml='<div class="badges">'+badgeHtml+'</div>';
-  }
+  var badges=[
+    { icon:'📖', name:'Aufmerksamer Leser', got: MODE!=='challenge' },
+    { icon:'🔥', name:'Brenner-Profi', got: findIdx('b_label')>=0 && earned[findIdx('b_label')]===maxPts[findIdx('b_label')] },
+    { icon:'♨️', name:'Kessel-Kenner', got: findIdx('d_label')>=0 && earned[findIdx('d_label')]===maxPts[findIdx('d_label')] },
+    { icon:'🚿', name:'Warmwasser-Profi', got: findIdx('f_label')>=0 && earned[findIdx('f_label')]===maxPts[findIdx('f_label')] },
+    { icon:'⚡', name:'Serie (Streak 8+)', got: bestStreak>=8 },
+    { icon:'🥇', name:'Wärme-Meister (90%)', got: pct>=90 }
+  ];
+  var got=0, bh=''; badges.forEach(function(b){ if(b.got) got++; bh+='<span class="badge-chip'+(b.got?' earned':'')+'">'+(b.got?b.icon:'<span class="lock">🔒</span>')+' '+b.name+'</span>'; });
   document.getElementById('finishBody').innerHTML=
-    '<div class="station-kicker">Geschafft</div>'+
-    '<div class="rank">'+(ONLY?'Aufgabe erledigt':rank)+'</div>'+
+    '<div class="station-kicker">'+(MODE==='challenge'?'Prüfung beendet':'Geschafft')+'</div>'+
+    '<div class="rank">'+rank+'</div>'+
     '<div class="big-score">'+xp+' XP</div>'+
-    '<div class="score-sub">'+total+' / '+max+' Punkte ('+pct+' %) · längste Serie 🔥 '+bestStreak+'</div>'+
-    badgeHtml+
+    '<div class="score-sub">'+total+' / '+max+' Punkte ('+pct+' %) · längste Serie 🔥 '+bestStreak+' · '+got+'/'+badges.length+' Abzeichen</div>'+
+    '<div class="badges">'+bh+'</div>'+
     '<button class="btn btn-primary" onclick="restart()">Nochmals starten</button>'+
     '<a class="back-link" href="../index.html" style="display:block;margin-top:14px;">← Alle Lerntools</a>';
   showCard('finish');
