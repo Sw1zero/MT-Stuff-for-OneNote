@@ -60,8 +60,10 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 │   │   └── trommelbestandteile/        ← 11 PNG-Bilder
 │   └── memory-trommelbestandteile.html
 ├── a7-technische-einrichtungen/
+│   ├── images/                         ← Ölbrenner, Dreizugdampfkessel, Warmwasseranlage (je mit/ohne Nummern)
 │   ├── tabellen-luecken-metalle.html
-│   └── quiz-werkstoffe-schmierstoffe.html
+│   ├── quiz-werkstoffe-schmierstoffe.html
+│   └── lernsession-waermeerzeugung.html  ← Challenge (15 Posten); ?only=A..H = Einzelaufgaben
 ├── a8-kulturen/
 │   ├── images/
 │   │   └── a.8_Bakterienzelle_leer.png

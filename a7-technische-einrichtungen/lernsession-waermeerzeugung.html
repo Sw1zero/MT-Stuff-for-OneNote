@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Challenge: Wärmeerzeugung (a.7)</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .back-link { display:inline-block; font-size:0.82rem; color:var(--text-muted); text-decoration:none; margin-bottom:1rem; }
+    .back-link:hover { color:var(--red); }
+    .ls-wrap { max-width:640px; margin:0 auto; }
+
+    .hud { display:flex; align-items:center; gap:12px; background:var(--blue-dark); color:#fff; border-radius:var(--radius-md); padding:10px 14px; margin-bottom:14px; box-shadow:var(--shadow-sm); }
+    .hud-xp { display:flex; align-items:baseline; gap:5px; flex-shrink:0; }
+    .hud-label { font-size:0.6rem; font-weight:700; letter-spacing:0.1em; opacity:0.8; }
+    .hud-val { font-size:1.15rem; font-weight:800; display:inline-block; }
+    .hud-val.pop { animation:xppop 0.4s ease; }
+    @keyframes xppop { 0%{transform:scale(1);} 40%{transform:scale(1.45); color:#9ad1e8;} 100%{transform:scale(1);} }
+    .hud-bar { flex:1; height:8px; background:rgba(255,255,255,0.2); border-radius:4px; overflow:hidden; }
+    .hud-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#69A9C9,#9ad1e8); border-radius:4px; transition:width 0.4s ease; }
+    .hud-streak { font-size:0.84rem; font-weight:700; background:rgba(255,255,255,0.14); padding:3px 9px; border-radius:12px; white-space:nowrap; flex-shrink:0; transition:transform 0.15s; }
+    .hud-streak.pulse { transform:scale(1.25); }
+
+    .ls-meta { font-size:0.8rem; font-weight:600; color:var(--text-muted); text-align:center; margin-bottom:6px; }
+    .ls-dots { display:flex; gap:5px; justify-content:center; margin-bottom:20px; flex-wrap:wrap; }
+    .ls-dot { width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:700; background:#edf2f7; color:var(--text-subtle); border:2px solid transparent; }
+    .ls-dot.active { border-color:var(--blue-dark); color:var(--blue-dark); }
+    .ls-dot.done { background:#38a169; color:#fff; }
+
+    .station { background:var(--surface); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); padding:24px; margin-bottom:18px; }
+    .station.hidden { display:none; }
+    .station-kicker { font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--blue-light); margin-bottom:4px; }
+    .station-title { font-size:1.15rem; font-weight:700; color:var(--blue-dark); margin-bottom:10px; }
+    .station-lead { font-size:0.9rem; color:var(--text); line-height:1.6; margin-bottom:18px; }
+    .station-lead b { color:var(--blue-dark); }
+    .station.boss { border:2px solid #f0c36d; box-shadow:0 0 0 4px #fff7e6; }
+    .station.boss .station-kicker { color:#d97706; }
+
+    .read { font-size:0.9rem; line-height:1.65; color:var(--text); }
+    .read p { margin-bottom:12px; }
+    .read h4 { font-size:0.92rem; color:var(--blue-dark); margin:14px 0 6px; }
+    .read ul { margin:0 0 12px 1.15rem; }
+    .read li { margin-bottom:5px; }
+    .read b { color:var(--blue-dark); }
+    .read .factbox { background:var(--blue-tint); border-left:4px solid var(--blue-light); border-radius:var(--radius-sm); padding:10px 14px; margin:12px 0; font-size:0.86rem; line-height:1.55; }
+    .read-btn-row { margin-top:16px; }
+
+    .station-media { margin-bottom:18px; }
+    .station-media img { width:100%; height:auto; display:block; border-radius:var(--radius-md); border:1px solid var(--border); box-shadow:var(--shadow-sm); }
+
+    .q-block { margin-bottom:18px; }
+    .q-block:last-child { margin-bottom:0; }
+    .q-text { font-size:0.92rem; font-weight:600; margin-bottom:10px; }
+    .opt { display:block; width:100%; text-align:left; font-family:var(--font); font-size:0.88rem; color:var(--text); background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius-md); padding:11px 14px; margin-bottom:8px; cursor:pointer; transition:all 0.15s; line-height:1.4; }
+    .opt:hover:not(:disabled) { border-color:var(--blue-light); }
+    .opt:disabled { cursor:default; }
+    .opt.correct { border-color:#38a169; background:#f0fff4; }
+    .opt.wrong { border-color:var(--red); background:var(--red-light); }
+
+    .tf-item { padding:12px 0; border-bottom:1px solid var(--border); }
+    .tf-item:last-child { border-bottom:none; }
+    .tf-statement { font-size:0.9rem; margin-bottom:8px; }
+    .tf-btns { display:flex; gap:8px; }
+    .tf-btn { font-family:var(--font); font-size:0.82rem; font-weight:600; padding:7px 18px; border-radius:20px; border:1.5px solid var(--border); background:var(--surface); color:var(--text-muted); cursor:pointer; transition:all 0.15s; }
+    .tf-btn:hover:not(:disabled) { border-color:var(--blue-light); }
+    .tf-btn:disabled { cursor:default; }
+    .tf-btn.sel-correct { background:#38a169; border-color:#38a169; color:#fff; }
+    .tf-btn.sel-wrong { background:var(--red); border-color:var(--red); color:#fff; }
+    .tf-btn.reveal { border-color:#38a169; color:#276749; }
+    .tf-exp { font-size:0.78rem; color:var(--text-muted); margin-top:8px; display:none; }
+    .tf-exp.show { display:block; }
+
+    .gap-text { font-size:0.95rem; line-height:2.1; }
+    .gap-text select { font-family:var(--font); font-size:0.85rem; font-weight:600; border:1.5px solid var(--blue-light); border-radius:var(--radius-sm); padding:3px 6px; background:var(--blue-tint); color:var(--blue-dark); }
+    .gap-text select.correct { border-color:#38a169; background:#f0fff4; color:#276749; }
+    .gap-text select.wrong { border-color:var(--red); background:var(--red-light); color:var(--red-dark); }
+
+    .slots-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.55rem; margin-bottom:0.5rem; }
+    @media (max-width:560px){ .slots-grid { grid-template-columns:1fr; } }
+    .slot-row { display:flex; align-items:flex-start; gap:0.5rem; }
+    .slot-num { width:28px; height:28px; flex-shrink:0; border-radius:50%; background:var(--blue-dark); color:#fff; font-size:0.76rem; font-weight:700; display:flex; align-items:center; justify-content:center; margin-top:3px; }
+    .type-cell { flex:1; }
+    .type-input { width:100%; font-family:var(--font); font-size:0.84rem; padding:0.45rem 0.65rem; border:1.5px solid var(--border); border-radius:var(--radius-sm); background:#f8fafc; color:var(--text); transition:border-color 0.15s; }
+    .type-input:focus { outline:none; border-color:var(--blue); background:#fff; }
+    .type-input.correct { border-color:#16a34a; background:#f0fdf4; }
+    .type-input.wrong { border-color:var(--red); background:var(--red-light); }
+    .type-sol { font-size:0.72rem; color:#15803d; margin-top:2px; }
+
+    .check-btn-row { margin-top:16px; }
+
+    .finish { text-align:center; }
+    .finish .rank { font-size:1.25rem; font-weight:800; color:var(--blue-dark); margin:4px 0 2px; }
+    .finish .big-score { font-size:2.4rem; font-weight:800; color:var(--blue-dark); margin:6px 0 2px; }
+    .finish .score-sub { font-size:0.86rem; color:var(--text-muted); margin-bottom:16px; }
+    .badges { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin:0 auto 18px; max-width:520px; }
+    .badge-chip { display:inline-flex; align-items:center; gap:5px; font-size:0.76rem; font-weight:600; padding:6px 12px; border-radius:20px; border:1.5px solid var(--border); background:#f8fafc; color:var(--text-subtle); }
+    .badge-chip.earned { background:#fff7e6; border-color:#f0c36d; color:#92400e; }
+    .badge-chip .lock { opacity:0.6; }
+    .finish ul { text-align:left; max-width:500px; margin:0 auto 20px; font-size:0.86rem; color:var(--text); line-height:1.6; }
+    .finish li { margin-bottom:6px; }
+
+    .ls-nav { display:flex; justify-content:space-between; gap:10px; }
+    .ls-nav .spacer { flex:1; }
+  </style>
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+  <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · a.7</span>
+  <h1>Challenge: Wärmeerzeugung</h1>
+  <p id="subtitle">Brenner, Dampfkessel, Warmwasseranlage und Wartung</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+  <a class="back-link" href="../index.html">← Alle Lerntools</a>
+
+  <div class="ls-wrap">
+    <div class="hud">
+      <div class="hud-xp"><span class="hud-label">XP</span><span class="hud-val" id="hudXp">0</span></div>
+      <div class="hud-bar"><div class="hud-bar-fill" id="hudBar"></div></div>
+      <div class="hud-streak" id="hudStreak">🔥 0</div>
+    </div>
+    <div class="ls-meta" id="lsMeta"></div>
+    <div class="ls-dots" id="lsDots"></div>
+    <div id="stage"></div>
+    <div class="ls-nav">
+      <button class="btn btn-ghost" id="prevBtn" onclick="goPrev()">← Zurück</button>
+      <span class="spacer"></span>
+      <button class="btn btn-primary" id="nextBtn" onclick="goNext()">Weiter →</button>
+    </div>
+  </div>
+</main>
+
+<footer class="bzwu-footer">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm</footer>
+
+<script>
+/* ============================================================
+   Challenge a.7: Wärmeerzeugung (Brenner, Dampfkessel,
+   Warmwasseranlage, Wartung). Inhalte aus Lehrmittel a.7.
+   ?only=A,B,...  zeigt nur einzelne Aufgaben (Index-Deeplinks).
+   ============================================================ */
+var ALL = [
+  /* A */ { task:'A', kicker:'Info · Verbrennung', title:'Verbrennung & Brenner', type:'info',
+    lead:'Lesen Sie die Grundlagen, danach prüfen Sie sie.',
+    read:
+      '<p>Bei der <b>Verbrennung</b> verbinden sich brennbare Stoffe unter Wärme- und Lichtentwicklung mit dem Sauerstoff der Luft (rasche Oxidation). Dafür braucht es drei Dinge: <b>Brennstoff</b>, <b>Sauerstoff</b> und <b>Wärme</b> (Zündung).</p>' +
+      '<h4>Öl- und Gasbrenner</h4>' +
+      '<ul>' +
+        '<li><b>Ölbrenner</b>: Druckzerstäubung. Öl unter Druck durch eine Düse zu Nebel zerstäubt, mit Luft gemischt, elektrisch gezündet.</li>' +
+        '<li><b>Gasbrenner</b>: gleich, aber <b>ohne Brennstoffpumpe</b> (Gas steht schon unter Druck). Dafür Sicherheitseinrichtungen gegen Gasaustritt.</li>' +
+      '</ul>' +
+      '<div class="factbox">Die <b>Verbrennungsluft</b> soll so dosiert sein, dass der Brennstoff vollständig verbrennt. Zu viel oder zu wenig Luft erhöht den Verbrauch und belastet die Umwelt.</div>' },
+  /* A */ { task:'A', kicker:'Wahr oder Falsch', title:'Verbrennung & Brenner', id:'a_tf', type:'tf',
+    lead:'Stimmt die Aussage?',
+    items:[
+      { s:'Für eine Verbrennung braucht es Brennstoff, Sauerstoff und Wärme.', a:true, e:'Das Verbrennungsdreieck.' },
+      { s:'Ölbrenner arbeiten meist nach dem Prinzip der Druckzerstäubung.', a:true, e:'Öl wird durch die Düse zu Nebel zerstäubt.' },
+      { s:'Gasbrenner brauchen eine Brennstoffpumpe.', a:false, e:'Das Gas steht bereits unter Druck.' },
+      { s:'Zu viel Verbrennungsluft spart Brennstoff.', a:false, e:'Zu viel oder zu wenig Luft erhöht den Verbrauch.' },
+      { s:'Bei Gasbrennern sind besondere Sicherheitseinrichtungen gegen Gasaustritt vorgeschrieben.', a:true, e:'Erdgas ist explosionsfähig.' }
+    ] },
+  /* B */ { task:'B', kicker:'Info · Ölbrenner', title:'Ölbrenner: Funktionsweise', type:'info',
+    lead:'Wie ein Ölbrenner arbeitet, danach beschriften Sie ihn.',
+    read:
+      '<p>Der <b>Elektromotor</b> treibt <b>Ventilatorrad</b> und <b>Ölpumpe</b> an. Die Pumpe fördert das Öl unter Druck über das <b>Magnetventil</b> zur <b>Düse</b>, wo es zu Nebel zerrissen wird. Die Verbrennungsluft gelangt über das Ventilatorrad in den <b>Flammkopf</b>.</p>' +
+      '<p>Die <b>Zündelektroden</b> erhalten vom <b>Zündtrafo</b> Hochspannung, der Funke entzündet das Gemisch. Der <b>Brennerautomat</b> steuert den Ablauf, der <b>Fotowiderstand</b> überwacht die Flamme.</p>' +
+      '<div class="factbox">Merken: <b>Brennerautomat</b> = steuert, <b>Fotowiderstand</b> = überwacht (Flammenwächter).</div>' },
+  /* B */ { task:'B', kicker:'Beschriften', title:'Ölbrenner beschriften', id:'b_label', type:'label',
+    lead:'Schreiben Sie zu jeder Nummer das Bauteil. Kleine Tippfehler werden akzeptiert.',
+    media:'<img src="images/a.7_Oelbrenner_mit_Nummern.png" alt="Aufbau eines Ölbrenners mit nummerierten Bauteilen">',
+    items:[
+      { n:1,  name:'Flammkopf',                  keys:['flammkopf','flammenkopf'] },
+      { n:2,  name:'Fotowiderstand',             keys:['fotowiderstand','flammenwaechter'] },
+      { n:3,  name:'Magnetventil',               keys:['magnetventil'] },
+      { n:4,  name:'Zündkabel',                  keys:['zuendkabel','zuendkabel','zuendleitung'] },
+      { n:5,  name:'Pumpe',                      keys:['pumpe','oelpumpe'] },
+      { n:6,  name:'Ölschlauch-Anschluss',       keys:['oelschlauch','anschluss'] },
+      { n:7,  name:'Elektromotor',               keys:['elektromotor','motor'] },
+      { n:8,  name:'Ventilatorrad',              keys:['ventilatorrad','ventilator','geblaese'] },
+      { n:9,  name:'Düsenschaft',                keys:['duesenschaft','duese'] },
+      { n:10, name:'Zündelektroden',             keys:['zuendelektroden','elektroden'] },
+      { n:11, name:'Zündtrafo',                  keys:['zuendtrafo','zuendtransformator','trafo'] },
+      { n:12, name:'Luftansaugkasten',           keys:['luftansaugkasten','ansaugkasten','luftansaug'] },
+      { n:13, name:'Skala für Lufteinstellung',  keys:['skala'] },
+      { n:14, name:'Drehschieber für Lufteinstellung', keys:['drehschieber'] },
+      { n:15, name:'Brennerautomat',             keys:['brennerautomat','automat'] }
+    ] },
+  /* C */ { task:'C', kicker:'Info · Sicherheit', title:'Brenner: Sicherheit & Wartung', type:'info',
+    lead:'Worauf es bei Sicherheit, Umwelt und Wartung ankommt.',
+    read:
+      '<h4>Sicherheit</h4>' +
+      '<p>Tritt bei erloschener Flamme Öl in den heissen Feuerraum, kann ein explosives Öldampf-Gemisch entstehen. Schutz:</p>' +
+      '<ul>' +
+        '<li><b>Flammenwächter (Fotowiderstand)</b>: Fällt die Flamme aus, sperrt der Brennerautomat über das Magnetventil sofort die Ölzufuhr. Den Fotowiderstand sauber halten, verrusst reagiert er nicht.</li>' +
+        '<li><b>Gasexplosionsklappen</b> am Feuerraum lassen einen Explosionsdruck ins Heizlokal entweichen.</li>' +
+      '</ul>' +
+      '<h4>Umwelt & Wartung</h4>' +
+      '<ul>' +
+        '<li><b>Rauchgasrezirkulation</b> senkt den Ausstoss von Stickstoffoxiden (<b>NOx</b>).</li>' +
+        '<li>Der <b>Betreiber</b> darf den Fotowiderstand selbst kontrollieren/reinigen und auf Geruch/Lärm achten. Den Brenner revidiert und stellt ein <b>Fachmann</b> periodisch.</li>' +
+        '<li>Die <b>Feuerungskontrolle</b> ist staatlich vorgeschrieben (Luftreinhalteverordnung).</li>' +
+      '</ul>' },
+  /* C */ { task:'C', kicker:'Quiz', title:'Sicherheit & Wartung', id:'c_quiz', type:'quiz',
+    lead:'Vier Fragen.',
+    questions:[
+      { q:'Was passiert, wenn die Flamme während des Betriebs ausfällt?', opts:['Der Brennerautomat sperrt über das Magnetventil die Ölzufuhr','Der Brenner zündet sofort stärker nach','Die Ölpumpe erhöht den Druck'], correct:0 },
+      { q:'Womit wird die Flamme überwacht?', opts:['Mit dem Fotowiderstand (Flammenwächter)','Mit dem Druckreduzierventil','Mit dem Ventilatorrad'], correct:0 },
+      { q:'Was darf der Anlagenbetreiber selbst tun?', opts:['Den Fotowiderstand kontrollieren und reinigen','Den Brenner neu einstellen','Die Düse austauschen'], correct:0 },
+      { q:'Wozu dient die Rauchgasrezirkulation?', opts:['Sie senkt den Ausstoss von Stickstoffoxiden (NOx)','Sie erhöht die Flammentemperatur','Sie spart Zündenergie'], correct:0 }
+    ] },
+  /* D */ { task:'D', kicker:'Info · Dampfkessel', title:'Dampfkessel: Grundlagen', type:'info',
+    lead:'Wozu Dampf dient und welche Bauarten es gibt.',
+    read:
+      '<p>Der <b>Dampf</b> dient als Wärmeträger für Käsefertiger, Erhitzer, Desinfektion und Warmwasser. Er hat einen hohen Wärmeinhalt und strömt ohne Pumpe zu den Verbrauchern. Die grosse gespeicherte Energie ist zugleich eine <b>Gefahrenquelle</b> (Kesselexplosion), darum gelten strenge Vorschriften.</p>' +
+      '<h4>Bauarten</h4>' +
+      '<ul>' +
+        '<li><b>Dreizugdampfkessel</b>: Rauchrohrkessel mit Rohren auf drei Höhen, guter Wirkungsgrad (häufig).</li>' +
+        '<li><b>Niederdruckdampfkessel</b>: max. <b>0,5 bar</b> Betriebsüberdruck, <b>keine</b> SVTI-Kontrollpflicht.</li>' +
+        '<li><b>Schnelldampferzeuger</b>: wenig Wasserinhalt, kurze Anfahrzeit, günstig.</li>' +
+      '</ul>' +
+      '<div class="factbox">Bei allen Bauarten geben die heissen <b>Rauchgase</b> in Röhren ihre Wärme ans Kesselwasser ab und verlassen den Kessel über das Rauchrohr in den Kamin.</div>' },
+  /* D */ { task:'D', kicker:'Beschriften', title:'Dreizugdampfkessel beschriften', id:'d_label', type:'label',
+    lead:'Schreiben Sie zu jeder Nummer den Begriff.',
+    media:'<img src="images/a.7_Dreizugdampfkessel_mit_Nummern.png" alt="Schema eines Dreizugdampfkessels mit Legende">',
+    items:[
+      { n:1, name:'Flammrohr',                  keys:['flammrohr'] },
+      { n:2, name:'Dampf',                      keys:['dampf'] },
+      { n:3, name:'Wasser',                     keys:['wasser','kesselwasser'] },
+      { n:4, name:'Feuerbüchse',                keys:['feuerbuechse','feuerbuchse'] },
+      { n:5, name:'Wasserumspülte Wendekammer', keys:['wendekammer','wasserumspuelte'] },
+      { n:6, name:'Rauchrohr',                  keys:['rauchrohr'] }
+    ] },
+  /* E */ { task:'E', kicker:'Info · Gefahren', title:'Gefahren am Dampfkessel', type:'info',
+    lead:'Drei Hauptgefahren und das richtige Verhalten.',
+    read:
+      '<ul>' +
+        '<li><b>Zu grosser Überdruck</b>: Das <b>Sicherheitsventil</b> lässt überschüssigen Druck ab. Ist es verklemmt oder überlastet, kann der Kessel explodieren.</li>' +
+        '<li><b>Wassermangel</b>: Wasserstand unter der Minimalmarke → Heizfläche überhitzt, Material reisst (Feuerbüchse beult). <b>Nie kaltes Wasser nachspeisen!</b> Stattdessen Feuerung ausschalten, Sturmleitung öffnen, abkalten lassen. Glühende Heizfläche → Kesselinspektor.</li>' +
+        '<li><b>Kesselstein</b>: Kalk/Magnesium aus hartem Wasser lagert sich ab und isoliert die Heizfläche → Überhitzung. Verhindern durch <b>Wasseraufbereitung</b> (Enthärtung/Entsalzung) vor dem Kessel.</li>' +
+      '</ul>' +
+      '<div class="factbox">Alle drei Gefahren führen über Überhitzung oder Überdruck zur plötzlichen Energiefreigabe. Wartungs- und Bedienungsvorschriften unbedingt einhalten.</div>' },
+  /* E */ { task:'E', kicker:'Lückentext', title:'Gefahren am Dampfkessel', id:'e_gaps', type:'gaps',
+    lead:'Füllen Sie die Lücken.',
+    parts:[
+      'Die drei Hauptgefahren sind zu grosser ',
+      { opts:['Überdruck','Unterdruck','Luftmangel'], correct:0 },
+      ', ',
+      { opts:['Wassermangel','Ölmangel','Dampfüberschuss'], correct:0 },
+      ' und ',
+      { opts:['Kesselstein','Rost','Schaum'], correct:0 },
+      '. Den Überdruck lässt das ',
+      { opts:['Sicherheitsventil','Magnetventil','Mischventil'], correct:0 },
+      ' ab. Bei Wassermangel darf man nie ',
+      { opts:['kaltes Wasser nachspeisen','die Feuerung erhöhen','den Druck steigern'], correct:0 },
+      '. Kesselstein verhindert man durch ',
+      { opts:['Wasseraufbereitung','höheren Druck','mehr Brennstoff'], correct:0 },
+      ' vor dem Kessel.'
+    ] },
+  /* F */ { task:'F', kicker:'Info · Warmwasser', title:'Warmwasseranlage', type:'info',
+    lead:'Aufbau und Regelung der Warmwasseranlage.',
+    read:
+      '<p>Die Warmwasseranlage ist ein <b>geschlossenes Rohrsystem</b> (ca. 3 bar). Das Wasser wird im Kessel auf <b>80–110 °C</b> erwärmt, von der <b>Umwälzpumpe</b> über den <b>Verteilerbalken</b> zu den Verbrauchern gepumpt und über den <b>Sammelbalken</b> zurückgeführt.</p>' +
+      '<ul>' +
+        '<li>Das <b>Mischventil</b> stellt die Vorlauftemperatur ein (kühleres Rücklaufwasser beimischen): Abendmilch ca. 30–40 °C, Käsebruch höher.</li>' +
+        '<li>Das <b>Ausdehnungs-/Expansionsgefäss</b> nimmt das Mehrvolumen auf, das beim Erwärmen entsteht.</li>' +
+        '<li>Der Brenner wird über eine Temperaturregelung in Stufen gesteuert.</li>' +
+      '</ul>' },
+  /* F */ { task:'F', kicker:'Beschriften', title:'Warmwasseranlage beschriften', id:'f_label', type:'label',
+    lead:'Schreiben Sie zu jeder Nummer den Begriff.',
+    media:'<img src="images/a.7_Warmwasseranlage_mit_Nummern.png" alt="Schema einer Warmwasseranlage mit Legende">',
+    items:[
+      { n:1,  name:'Kessel mit Brenner',     keys:['kessel'] },
+      { n:2,  name:'Umwälzpumpe',            keys:['umwaelzpumpe','pumpe'] },
+      { n:3,  name:'Verteilerbalken/Vorlauf',keys:['verteilerbalken','vorlauf'] },
+      { n:4,  name:'Mischventil',            keys:['mischventil'] },
+      { n:5,  name:'Umwälzpumpe',            keys:['umwaelzpumpe','pumpe'] },
+      { n:6,  name:'Käsefertiger',           keys:['kaesefertiger','fertiger'] },
+      { n:7,  name:'Sammelbalken/Rücklauf',  keys:['sammelbalken','ruecklauf'] },
+      { n:8,  name:'Plattenhitzer',          keys:['plattenhitzer','plattenerhitzer'] },
+      { n:9,  name:'Gruppe Heizkeller',      keys:['heizkeller'] },
+      { n:10, name:'Gruppe Wohnungsheizung', keys:['wohnungsheizung'] },
+      { n:11, name:'Sicherheitsventil',      keys:['sicherheitsventil'] },
+      { n:12, name:'Expansionsgefäss',       keys:['expansionsgefaess','ausdehnungsgefaess'] },
+      { n:13, name:'Füll- und Entleerungsventil', keys:['fuell','entleerungsventil'] },
+      { n:14, name:'Druckanzeige',           keys:['druckanzeige','manometer'] }
+    ] },
+  /* G */ { task:'G', kicker:'Wahr oder Falsch', title:'Warmwasser vs. Dampf', id:'g_tf', type:'tf',
+    lead:'Vor- und Nachteile der Warmwasseranlage gegenüber der Dampfanlage.',
+    items:[
+      { s:'Die Warmwasseranlage hat tiefere Temperaturen und dadurch geringere Wärmeverluste.', a:true, e:'Besserer Wirkungsgrad.' },
+      { s:'Die Warmwasseranlage unterliegt keiner Kontrollpflicht.', a:true, e:'Grössere Sicherheit als Dampf.' },
+      { s:'Mit der Warmwasseranlage kann man Geräte mit Dampf entkeimen.', a:false, e:'Dampf als Entkeimungsmedium entfällt.' },
+      { s:'Die Warmwasseranlage braucht keine Wasseraufbereitung, weil das System geschlossen ist.', a:true, e:'Geschlossener Kreislauf.' },
+      { s:'Sehr hohe Temperaturen (z. B. für UHT) erreicht die Warmwasseranlage problemlos.', a:false, e:'Hohe Temperaturen sind nicht/weniger schnell erreichbar.' },
+      { s:'Die Warmwasseranlage braucht Pumpen, um das Wasser zu fördern.', a:true, e:'Im Gegensatz zum Dampf, der von selbst strömt.' }
+    ] },
+  /* H */ { task:'H', kicker:'Info · Wartung', title:'Wartung & Instandhaltung', type:'info',
+    lead:'Wer macht was, und was ist vorgeschrieben?',
+    read:
+      '<ul>' +
+        '<li>Druckgeräte wie der <b>Dampfkessel</b> werden nach Herstellerangaben fachgerecht instand gehalten, nach einem <b>Plan</b> und <b>dokumentiert</b>.</li>' +
+        '<li>Der <b>Kaminfeger</b> reinigt feuerseitig <b>zweimal jährlich</b>.</li>' +
+        '<li>Dampfkessel über <b>0,5 bar</b> unterstehen der <b>SVTI-Kontrollpflicht</b>; Niederdruckdampfkessel (≤ 0,5 bar) nicht.</li>' +
+        '<li><b>Brenner</b>: Betreiber reinigt den Fotowiderstand, der Fachmann revidiert periodisch. Die <b>Feuerungskontrolle</b> ist staatlich (LRV).</li>' +
+      '</ul>' +
+      '<div class="factbox">Faustregel: einfache Kontrolle/Reinigung macht der <b>Betreiber</b>, Einstellen/Revision/Inspektion der <b>Fachmann/Inspektor</b>.</div>' },
+  /* H */ { task:'H', kicker:'Prüfungsrunde', title:'Quer durch die Wärmeerzeugung', id:'boss', boss:true, type:'quiz',
+    lead:'Die Schlussrunde, jede richtige Antwort gibt extra XP!',
+    questions:[
+      { q:'Ab welchem Betriebsüberdruck unterliegt ein Dampfkessel der SVTI-Kontrollpflicht?', opts:['über 0,5 bar','über 6 bar','über 32 bar'], correct:0 },
+      { q:'Wie oft reinigt der Kaminfeger den Kessel feuerseitig?', opts:['zweimal jährlich','wöchentlich','alle fünf Jahre'], correct:0 },
+      { q:'Was tun bei Wassermangel im Dampfkessel?', opts:['Feuerung ausschalten, nie kaltes Wasser nachspeisen','Sofort kaltes Wasser nachfüllen','Den Druck erhöhen'], correct:0 },
+      { q:'Welche Anlage erreicht keine sehr hohen Temperaturen?', opts:['Die Warmwasseranlage','Der Dampfkessel','Der Schnelldampferzeuger'], correct:0 },
+      { q:'Was überwacht beim Ölbrenner die Flamme?', opts:['Der Fotowiderstand','Der Brennerautomat','Das Magnetventil'], correct:0 }
+    ] }
+];
+
+/* ?only=A,B  -> nur diese Aufgaben */
+var ONLY = (location.search.match(/[?&]only=([A-Za-z0-9,]+)/) || [])[1];
+var TASK_NAMES = { A:'Verbrennung & Brenner', B:'Ölbrenner beschriften', C:'Sicherheit & Wartung', D:'Dampfkessel', E:'Gefahren am Dampfkessel', F:'Warmwasseranlage', G:'Warmwasser vs. Dampf', H:'Wartung & Abschluss' };
+var STATIONS = ALL.filter(function(s){ return !ONLY || ONLY.split(',').indexOf(s.task) !== -1; });
+if (ONLY) {
+  var names = ONLY.split(',').map(function(t){ return TASK_NAMES[t] || t; });
+  document.getElementById('subtitle').textContent = 'Einzelaufgabe: ' + names.join(', ');
+}
+
+var N = STATIONS.length;
+var current = 0;
+var solved = [], earned = [], maxPts = [];
+for (var i = 0; i < N; i++) { solved[i] = false; earned[i] = 0; maxPts[i] = 0; }
+var xp = 0, streak = 0, bestStreak = 0;
+
+function findIdx(id){ for(var i=0;i<N;i++){ if(STATIONS[i].id===id) return i; } return -1; }
+function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;} return a; }
+function shuffleIdx(n){ var a=[]; for(var i=0;i<n;i++) a.push(i); return shuffle(a); }
+function fold(s){ return String(s).toLowerCase().replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss').replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim(); }
+function matchKeys(input, it){ var f=fold(input); if(!f) return false; if(f===fold(it.name)) return true; for(var i=0;i<it.keys.length;i++){ if(f.indexOf(fold(it.keys[i]))!==-1) return true; } return false; }
+
+function renderHud(){
+  document.getElementById('hudXp').textContent = xp;
+  var sc=0; for(var i=0;i<N;i++){ if(solved[i]) sc++; }
+  document.getElementById('hudBar').style.width = Math.round(sc/N*100)+'%';
+  document.getElementById('hudStreak').textContent = '🔥 '+streak;
+}
+function addXp(n){ xp+=n; var el=document.getElementById('hudXp'); renderHud(); el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
+function registerAnswer(ok){
+  if(ok){ streak++; if(streak>bestStreak) bestStreak=streak; addXp(10+(streak>=3?5:0)); var s=document.getElementById('hudStreak'); s.classList.remove('pulse'); void s.offsetWidth; s.classList.add('pulse'); }
+  else { streak=0; renderHud(); }
+}
+
+function buildAll(){
+  var stage=document.getElementById('stage'); stage.innerHTML='';
+  STATIONS.forEach(function(st, idx){
+    var card=document.createElement('div');
+    card.className='station'+(st.boss?' boss':'')+(idx===0?'':' hidden'); card.id='station-'+idx;
+    card.innerHTML='<div class="station-kicker">'+st.kicker+'</div>'+
+      '<div class="station-title">'+st.title+'</div>'+
+      '<div class="station-lead">'+st.lead+'</div>'+
+      (st.media?'<div class="station-media">'+st.media+'</div>':'')+
+      '<div class="station-body" id="body-'+idx+'"></div>';
+    stage.appendChild(card);
+    buildBody(idx, st);
+  });
+  var fin=document.createElement('div'); fin.className='station hidden'; fin.id='station-finish';
+  fin.innerHTML='<div class="finish" id="finishBody"></div>'; stage.appendChild(fin);
+}
+function buildBody(idx, st){
+  if(st.type==='info')  buildInfo(idx, st);
+  if(st.type==='tf')    buildTF(idx, st);
+  if(st.type==='label') buildLabel(idx, st);
+  if(st.type==='gaps')  buildGaps(idx, st);
+  if(st.type==='quiz')  buildQuiz(idx, st);
+}
+
+function buildInfo(idx, st){
+  maxPts[idx]=0;
+  document.getElementById('body-'+idx).innerHTML='<div class="read">'+st.read+'</div>'+
+    '<div class="read-btn-row"><button class="btn btn-primary" id="readbtn-'+idx+'">Gelesen ✓ (+5 XP)</button></div>';
+  document.getElementById('readbtn-'+idx).addEventListener('click', function(){ if(solved[idx]) return; solved[idx]=true; addXp(5); this.disabled=true; this.textContent='Gelesen ✓'; updateNav(); });
+}
+
+function buildTF(idx, st){
+  maxPts[idx]=st.items.length;
+  var body=document.getElementById('body-'+idx);
+  st.items.forEach(function(it, ii){
+    var item=document.createElement('div'); item.className='tf-item';
+    item.innerHTML='<div class="tf-statement">'+it.s+'</div>'+
+      '<div class="tf-btns"><button class="tf-btn" data-i="'+ii+'" data-v="true">Wahr</button>'+
+      '<button class="tf-btn" data-i="'+ii+'" data-v="false">Falsch</button></div>'+
+      '<div class="tf-exp" id="tfexp-'+idx+'-'+ii+'">'+it.e+'</div>';
+    body.appendChild(item);
+  });
+  body.querySelectorAll('.tf-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var ii=+btn.dataset.i; var pick=btn.dataset.v==='true';
+      if(body.querySelector('.tf-btn[data-i="'+ii+'"]:disabled')) return;
+      var it=st.items[ii];
+      body.querySelectorAll('.tf-btn[data-i="'+ii+'"]').forEach(function(b){ b.disabled=true; if((b.dataset.v==='true')===it.a) b.classList.add('reveal'); });
+      if(pick===it.a){ btn.classList.add('sel-correct'); earned[idx]++; registerAnswer(true); } else { btn.classList.add('sel-wrong'); registerAnswer(false); }
+      document.getElementById('tfexp-'+idx+'-'+ii).classList.add('show');
+      var answered=0; for(var k=0;k<st.items.length;k++){ if(document.querySelector('#body-'+idx+' .tf-btn[data-i="'+k+'"]:disabled')) answered++; }
+      if(answered===st.items.length) solved[idx]=true;
+      updateNav();
+    });
+  });
+}
+
+function buildLabel(idx, st){
+  maxPts[idx]=st.items.length;
+  var html='<div class="slots-grid">';
+  st.items.forEach(function(it){
+    html+='<div class="slot-row"><div class="slot-num">'+it.n+'</div><div class="type-cell">'+
+      '<input class="type-input" id="lb-'+idx+'-'+it.n+'" type="text" autocomplete="off" placeholder="Nr. '+it.n+' …">'+
+      '<div class="type-sol" id="lbsol-'+idx+'-'+it.n+'" style="display:none;"></div></div></div>';
+  });
+  html+='</div><div class="check-btn-row"><button class="btn btn-primary" id="lbcheck-'+idx+'">Überprüfen</button></div>';
+  document.getElementById('body-'+idx).innerHTML=html;
+  st.items.forEach(function(it, i){
+    document.getElementById('lb-'+idx+'-'+it.n).addEventListener('keydown', function(e){
+      if(e.key==='Enter'){ e.preventDefault(); var nx=st.items[i+1]; if(nx) document.getElementById('lb-'+idx+'-'+nx.n).focus(); }
+    });
+  });
+  document.getElementById('lbcheck-'+idx).addEventListener('click', function(){
+    if(solved[idx]) return; var correct=0;
+    st.items.forEach(function(it){
+      var inp=document.getElementById('lb-'+idx+'-'+it.n); var sol=document.getElementById('lbsol-'+idx+'-'+it.n);
+      inp.classList.remove('correct','wrong');
+      var ok=matchKeys(inp.value, it);
+      if(ok){ inp.classList.add('correct'); sol.style.display='none'; correct++; } else { inp.classList.add('wrong'); sol.textContent='→ '+it.name; sol.style.display='block'; }
+      registerAnswer(ok);
+    });
+    earned[idx]=correct; solved[idx]=true; this.disabled=true; updateNav();
+  });
+}
+
+function buildGaps(idx, st){
+  var gapCount=0; var html='<div class="gap-text">';
+  st.parts.forEach(function(part){
+    if(typeof part==='string'){ html+=part; }
+    else { var gi=gapCount++; var opts=shuffleIdx(part.opts.length);
+      html+='<select data-g="'+gi+'" data-correct="'+part.correct+'"><option value="-1">…</option>';
+      opts.forEach(function(oi){ html+='<option value="'+oi+'">'+part.opts[oi]+'</option>'; });
+      html+='</select>';
+    }
+  });
+  html+='</div><div class="check-btn-row"><button class="btn btn-primary" id="gapcheck-'+idx+'">Prüfen</button></div>';
+  document.getElementById('body-'+idx).innerHTML=html;
+  maxPts[idx]=gapCount;
+  document.getElementById('gapcheck-'+idx).addEventListener('click', function(){
+    if(solved[idx]) return;
+    var sels=document.querySelectorAll('#body-'+idx+' select'); var ok=0;
+    sels.forEach(function(sel){ sel.classList.remove('correct','wrong'); var good=(+sel.value===+sel.dataset.correct); if(good){sel.classList.add('correct'); ok++;} else sel.classList.add('wrong'); sel.disabled=true; registerAnswer(good); });
+    earned[idx]=ok; solved[idx]=true; this.disabled=true; updateNav();
+  });
+}
+
+function buildQuiz(idx, st){
+  maxPts[idx]=st.questions.length;
+  var body=document.getElementById('body-'+idx);
+  st.questions.forEach(function(qq, qi){
+    var block=document.createElement('div'); block.className='q-block';
+    var h='<div class="q-text">'+(qi+1)+'. '+qq.q+'</div>';
+    shuffleIdx(qq.opts.length).forEach(function(oi){ h+='<button class="opt" data-q="'+qi+'" data-o="'+oi+'">'+qq.opts[oi]+'</button>'; });
+    block.innerHTML=h; body.appendChild(block);
+  });
+  body.querySelectorAll('.opt').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var qi=+btn.dataset.q, oi=+btn.dataset.o, qq=st.questions[qi];
+      if(body.querySelector('.opt[data-q="'+qi+'"]:disabled')) return;
+      body.querySelectorAll('.opt[data-q="'+qi+'"]').forEach(function(b){ b.disabled=true; if(+b.dataset.o===qq.correct) b.classList.add('correct'); });
+      if(oi!==qq.correct){ btn.classList.add('wrong'); registerAnswer(false); } else { earned[idx]++; registerAnswer(true); }
+      var answered=0; for(var k=0;k<st.questions.length;k++){ if(document.querySelector('#body-'+idx+' .opt[data-q="'+k+'"]:disabled')) answered++; }
+      if(answered===st.questions.length) solved[idx]=true;
+      updateNav();
+    });
+  });
+}
+
+function renderProgress(){
+  var dots=document.getElementById('lsDots'); dots.innerHTML='';
+  for(var i=0;i<N;i++){ var d=document.createElement('div'); d.className='ls-dot'+(i===current?' active':'')+(solved[i]?' done':''); d.textContent=solved[i]?'✓':(i+1); dots.appendChild(d); }
+  document.getElementById('lsMeta').textContent = (current<N) ? ('Posten '+(current+1)+' von '+N) : 'Auswertung';
+}
+function showCard(which){
+  document.querySelectorAll('.station').forEach(function(c){ c.classList.add('hidden'); });
+  document.getElementById(which==='finish'?'station-finish':'station-'+which).classList.remove('hidden');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function updateNav(){
+  var nextBtn=document.getElementById('nextBtn'), prevBtn=document.getElementById('prevBtn');
+  prevBtn.style.visibility=(current===0)?'hidden':'visible';
+  if(current<N){ nextBtn.disabled=!solved[current]; nextBtn.textContent=(current===N-1)?'Zur Auswertung →':'Weiter →'; }
+  renderProgress(); renderHud();
+}
+function goNext(){ if(current<N){ if(!solved[current]) return; current++; if(current<N){ showCard(current); updateNav(); } else { showFinish(); } } }
+function goPrev(){ if(current===0) return; if(current>=N) current=N-1; else current--; showCard(current); document.getElementById('nextBtn').style.visibility='visible'; document.getElementById('nextBtn').disabled=false; updateNav(); }
+
+function showFinish(){
+  var total=0, max=0; for(var i=0;i<N;i++){ total+=earned[i]; max+=maxPts[i]; }
+  var pct=max>0?Math.round(total/max*100):0;
+  var rank = pct>=90?'Wärme-Meister 🥇' : pct>=75?'Wärme-Profi' : pct>=50?'Wärme-Geselle' : 'Wärme-Lehrling';
+  var badgeHtml='';
+  if(!ONLY){
+    var bIdx=findIdx('boss');
+    var badges=[
+      { icon:'📖', name:'Aufmerksamer Leser', got:true },
+      { icon:'🔥', name:'Brenner-Profi', got: findIdx('b_label')>=0 && earned[findIdx('b_label')]===maxPts[findIdx('b_label')] },
+      { icon:'♨️', name:'Kessel-Kenner', got: findIdx('d_label')>=0 && earned[findIdx('d_label')]===maxPts[findIdx('d_label')] },
+      { icon:'🚿', name:'Warmwasser-Profi', got: findIdx('f_label')>=0 && earned[findIdx('f_label')]===maxPts[findIdx('f_label')] },
+      { icon:'⚡', name:'Serie (Streak 8+)', got: bestStreak>=8 },
+      { icon:'🥇', name:'Wärme-Meister (90%)', got: pct>=90 }
+    ];
+    var got=0; badges.forEach(function(b){ if(b.got) got++; badgeHtml+='<span class="badge-chip'+(b.got?' earned':'')+'">'+(b.got?b.icon:'<span class="lock">🔒</span>')+' '+b.name+'</span>'; });
+    badgeHtml='<div class="badges">'+badgeHtml+'</div>';
+  }
+  document.getElementById('finishBody').innerHTML=
+    '<div class="station-kicker">Geschafft</div>'+
+    '<div class="rank">'+(ONLY?'Aufgabe erledigt':rank)+'</div>'+
+    '<div class="big-score">'+xp+' XP</div>'+
+    '<div class="score-sub">'+total+' / '+max+' Punkte ('+pct+' %) · längste Serie 🔥 '+bestStreak+'</div>'+
+    badgeHtml+
+    '<button class="btn btn-primary" onclick="restart()">Nochmals starten</button>'+
+    '<a class="back-link" href="../index.html" style="display:block;margin-top:14px;">← Alle Lerntools</a>';
+  showCard('finish');
+  document.getElementById('nextBtn').style.visibility='hidden';
+  document.getElementById('prevBtn').style.visibility='visible';
+  renderProgress();
+}
+function restart(){
+  current=0; xp=0; streak=0; bestStreak=0;
+  for(var i=0;i<N;i++){ solved[i]=false; earned[i]=0; }
+  document.getElementById('nextBtn').style.visibility='visible';
+  buildAll(); showCard(0); updateNav();
+}
+
+buildAll(); showCard(0); updateNav();
+</script>
+</body>
+</html>
