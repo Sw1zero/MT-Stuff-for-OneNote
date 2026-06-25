@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kulturenformen – Vor- und Nachteile zuordnen</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .back-link {
+      display: inline-block;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      margin-bottom: 1.5rem;
+      transition: color 0.15s;
+    }
+    .back-link:hover { color: var(--red); }
+
+    .instruction {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      margin-bottom: 1.25rem;
+      text-align: center;
+    }
+
+    /* Card pool */
+    .card-pool {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      background: var(--blue-light);
+      border-radius: var(--radius-md);
+      padding: 0.9rem 1rem;
+      margin-bottom: 1.75rem;
+      min-height: 60px;
+    }
+
+    .karte {
+      font-family: var(--font);
+      font-size: 0.80rem;
+      font-weight: 500;
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.38rem 0.75rem;
+      cursor: grab;
+      color: var(--text);
+      line-height: 1.45;
+      user-select: none;
+      touch-action: none;
+      max-width: 280px;
+      transition: border-color 0.15s, box-shadow 0.15s, opacity 0.15s;
+    }
+    .karte:hover { border-color: var(--blue); }
+    .karte.dragging { opacity: 0.3; }
+    .karte.used { opacity: 0.18; pointer-events: none; }
+    .karte.selected {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: #fff;
+    }
+
+    /* Three-column layout */
+    .spalten-wrap {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 700px) {
+      .spalten-wrap { grid-template-columns: 1fr; }
+    }
+
+    .spalte {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    .spalte-header {
+      background: var(--blue-dark);
+      color: #fff;
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 0.6rem 0.5rem;
+      letter-spacing: 0.01em;
+    }
+
+    .vn-bereich {
+      padding: 0.6rem 0.6rem 0.7rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .vn-bereich:last-child { border-bottom: none; }
+
+    .vn-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.4rem;
+      padding-left: 0.2rem;
+    }
+    .vn-label.vorteil { color: #15803d; }
+    .vn-label.nachteil { color: var(--red); }
+
+    .drop-zone {
+      min-height: 52px;
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.35rem 0.4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      background: #fafbfc;
+      transition: all 0.15s;
+    }
+    .drop-zone.over {
+      border-color: var(--blue);
+      border-style: solid;
+      background: #e8f4ff;
+    }
+    .drop-zone.ready {
+      border-color: var(--blue);
+      border-style: solid;
+      background: #f0f7ff;
+    }
+
+    /* Placed cards inside drop zones */
+    .placed-karte {
+      font-family: var(--font);
+      font-size: 0.79rem;
+      font-weight: 500;
+      background: var(--surface);
+      border: 2px solid var(--blue);
+      border-radius: var(--radius-sm);
+      padding: 0.32rem 0.6rem;
+      color: var(--text);
+      cursor: grab;
+      user-select: none;
+      touch-action: none;
+      line-height: 1.4;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .placed-karte:hover { border-color: var(--blue-dark); }
+    .placed-karte.dragging { opacity: 0.3; }
+    .placed-karte.correct {
+      border-color: #16a34a !important;
+      background: #f0fdf4 !important;
+      color: #15803d !important;
+      cursor: default;
+      pointer-events: none;
+    }
+    .placed-karte.wrong {
+      border-color: var(--red) !important;
+      background: var(--red-light, #fff0f0) !important;
+      color: var(--red) !important;
+      cursor: default;
+      pointer-events: none;
+    }
+
+    /* Touch drag clone */
+    #touchClone {
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.88;
+      transform: scale(1.04);
+      border-radius: var(--radius-sm);
+      padding: 0.38rem 0.75rem;
+      background: var(--blue);
+      color: #fff;
+      font-family: var(--font);
+      font-size: 0.80rem;
+      font-weight: 500;
+      box-shadow: 0 4px 16px rgba(0,102,204,0.35);
+      max-width: 260px;
+      line-height: 1.45;
+      display: none;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.5rem;
+    }
+
+    .result-banner {
+      margin-top: 1.25rem;
+      padding: 0.9rem 1rem;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.92rem;
+      text-align: center;
+      display: none;
+    }
+    .result-banner.show   { display: block; }
+    .result-banner.perfect { background: #f0fdf4; color: #15803d; border: 1.5px solid #bbf7d0; }
+    .result-banner.partial { background: #fff7ed; color: #c2410c; border: 1.5px solid #fed7aa; }
+  </style>
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · a.8</span>
+    <h1>Kulturenformen</h1>
+    <p>Ordnen Sie die Vor- und Nachteile den drei Kulturenformen zu.</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+
+  <a class="back-link" href="../index.html">← Alle Lerntools</a>
+
+  <p class="instruction">Ziehen Sie jede Karte in die richtige Spalte und den richtigen Bereich (Vorteil / Nachteil).</p>
+
+  <div class="card-pool" id="cardPool"></div>
+
+  <div class="spalten-wrap" id="spaltenWrap">
+    <!-- Flüssigkultur -->
+    <div class="spalte">
+      <div class="spalte-header">Flüssigkultur</div>
+      <div class="vn-bereich">
+        <div class="vn-label vorteil">Vorteile</div>
+        <div class="drop-zone" data-form="fluessig" data-typ="vorteil" id="zone-fluessig-vorteil"></div>
+      </div>
+      <div class="vn-bereich">
+        <div class="vn-label nachteil">Nachteile</div>
+        <div class="drop-zone" data-form="fluessig" data-typ="nachteil" id="zone-fluessig-nachteil"></div>
+      </div>
+    </div>
+    <!-- Gefriergetrocknete Kultur -->
+    <div class="spalte">
+      <div class="spalte-header">Gefriergetrocknet (lyophilisiert)</div>
+      <div class="vn-bereich">
+        <div class="vn-label vorteil">Vorteile</div>
+        <div class="drop-zone" data-form="lyophilisiert" data-typ="vorteil" id="zone-lyophilisiert-vorteil"></div>
+      </div>
+      <div class="vn-bereich">
+        <div class="vn-label nachteil">Nachteile</div>
+        <div class="drop-zone" data-form="lyophilisiert" data-typ="nachteil" id="zone-lyophilisiert-nachteil"></div>
+      </div>
+    </div>
+    <!-- Gefrorene Kultur -->
+    <div class="spalte">
+      <div class="spalte-header">Gefrorene Kultur</div>
+      <div class="vn-bereich">
+        <div class="vn-label vorteil">Vorteile</div>
+        <div class="drop-zone" data-form="gefroren" data-typ="vorteil" id="zone-gefroren-vorteil"></div>
+      </div>
+      <div class="vn-bereich">
+        <div class="vn-label nachteil">Nachteile</div>
+        <div class="drop-zone" data-form="gefroren" data-typ="nachteil" id="zone-gefroren-nachteil"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button type="button" class="btn btn-primary" onclick="checkAll()">Überprüfen</button>
+    <button type="button" class="btn btn-ghost" onclick="resetAll()">Neu mischen</button>
+  </div>
+
+  <div class="result-banner" id="resultBanner"></div>
+
+</main>
+
+<div id="touchClone"></div>
+
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+
+<script>
+var KARTEN = [
+  { id:  1, text: "Sehr gute Aktivitätsbereitschaft", form: "fluessig", typ: "vorteil" },
+  { id:  2, text: "Keine Artenverarmung durch Gefriertrocknung", form: "fluessig", typ: "vorteil" },
+  { id:  3, text: "Empfindlich gegenüber Temperaturschwankungen", form: "fluessig", typ: "nachteil" },
+  { id:  4, text: "Kurze Vorratshaltung (max. 7–10 Tage bei < 5 °C)", form: "fluessig", typ: "nachteil" },
+  { id:  5, text: "Weniger empfindlich bei Temperaturschwankungen", form: "lyophilisiert", typ: "vorteil" },
+  { id:  6, text: "Vorratshaltung unter −18 °C mindestens 3 Monate möglich", form: "lyophilisiert", typ: "vorteil" },
+  { id:  7, text: "Jederzeit verfügbar, unabhängig von der Kulturenherstellung", form: "lyophilisiert", typ: "vorteil" },
+  { id:  8, text: "Hohe Flexibilität in der Anwendung", form: "lyophilisiert", typ: "vorteil" },
+  { id:  9, text: "Verzögerte Anfangsaktivität durch verlangsamte Startphase", form: "lyophilisiert", typ: "nachteil" },
+  { id: 10, text: "Selektion: Artenverarmung durch Gefriertrocknung (Laktobazillen reduziert)", form: "lyophilisiert", typ: "nachteil" },
+  { id: 11, text: "Ohne eigene Nachzucht keine ständige Aktivitätskontrolle", form: "lyophilisiert", typ: "nachteil" },
+  { id: 12, text: "Verlangt Sicherheitsmassnahmen bei Stromausfall / Kühlgerätedefekt", form: "lyophilisiert", typ: "nachteil" },
+  { id: 13, text: "Normale Aktivität durch vorhandene Restflüssigkeit", form: "gefroren", typ: "vorteil" },
+  { id: 14, text: "Haltbarkeit bis zu 1 Jahr bei −196 °C (Flüssigstickstoff)", form: "gefroren", typ: "vorteil" },
+  { id: 15, text: "Ununterbrochene Kühlhaltung während der Lagerung nötig", form: "gefroren", typ: "nachteil" },
+  { id: 16, text: "Nur in grösseren Verbrauchseinheiten lieferbar", form: "gefroren", typ: "nachteil" }
+];
+
+// Lookup map: id -> karte
+var karteById = {};
+for (var ki = 0; ki < KARTEN.length; ki++) {
+  karteById[KARTEN[ki].id] = KARTEN[ki];
+}
+
+// --- Drag state ---
+var dragId     = null;  // card id being dragged
+var dragSource = null;  // DOM element (pool chip or placed-karte)
+var dragFromPool = false;
+
+// --- Click-to-place state ---
+var selectedId = null;  // card id selected by click
+
+// --- Touch state ---
+var touchId     = null;
+var touchSource = null;
+var touchFromPool = false;
+var touchCloneEl = document.getElementById('touchClone');
+var touchOffX = 0, touchOffY = 0;
+
+function shuffle(arr) {
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+
+// ---- Init ----
+function init() {
+  dragId = dragSource = null;
+  touchId = touchSource = null;
+  selectedId = null;
+  buildPool();
+  clearAllZones();
+  document.getElementById('resultBanner').className = 'result-banner';
+}
+
+// ---- Card pool ----
+function buildPool() {
+  var pool = document.getElementById('cardPool');
+  pool.innerHTML = '';
+  var shuffled = shuffle(KARTEN.slice());
+  for (var i = 0; i < shuffled.length; i++) {
+    (function(k) {
+      var chip = makePoolChip(k);
+      pool.appendChild(chip);
+    })(shuffled[i]);
+  }
+}
+
+function makePoolChip(k) {
+  var chip = document.createElement('span');
+  chip.className = 'karte';
+  chip.textContent = k.text;
+  chip.dataset.id = k.id;
+  chip.setAttribute('draggable', 'true');
+
+  chip.addEventListener('dragstart', function(e) {
+    dragId = k.id;
+    dragSource = chip;
+    dragFromPool = true;
+    chip.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+  });
+  chip.addEventListener('dragend', function() {
+    chip.classList.remove('dragging');
+  });
+
+  chip.addEventListener('touchstart', function(e) {
+    onTouchStart(e, chip, k.id, true);
+  }, {passive: false});
+
+  chip.addEventListener('click', function() {
+    selectPoolChip(chip, k.id);
+  });
+
+  return chip;
+}
+
+// ---- Click-to-place ----
+function selectPoolChip(chip, id) {
+  if (chip.classList.contains('used')) return;
+  if (selectedId === id) {
+    // Deselect
+    chip.classList.remove('selected');
+    selectedId = null;
+    clearReadyZones();
+    return;
+  }
+  // Deselect all
+  document.querySelectorAll('.karte.selected').forEach(function(c) { c.classList.remove('selected'); });
+  chip.classList.add('selected');
+  selectedId = id;
+  // Highlight empty zones
+  document.querySelectorAll('.drop-zone').forEach(function(z) {
+    z.classList.remove('ready');
+    if (!z.classList.contains('checked')) z.classList.add('ready');
+  });
+}
+
+function clickZone(zone) {
+  if (zone.classList.contains('checked')) return;
+  if (selectedId === null) return;
+  placeCardInZone(zone, selectedId);
+  markPoolChipUsed(selectedId);
+  selectedId = null;
+  document.querySelectorAll('.karte.selected').forEach(function(c) { c.classList.remove('selected'); });
+  clearReadyZones();
+}
+
+function clickPlacedKarte(el, id, zone) {
+  if (el.classList.contains('correct') || el.classList.contains('wrong')) return;
+  if (selectedId !== null) {
+    // Swap: return this card to pool, place selected card
+    var k = karteById[id];
+    returnToPool(id);
+    removeFromZone(zone, id);
+    placeCardInZone(zone, selectedId);
+    markPoolChipUsed(selectedId);
+    selectedId = null;
+    document.querySelectorAll('.karte.selected').forEach(function(c) { c.classList.remove('selected'); });
+    clearReadyZones();
+  } else {
+    // Return to pool
+    returnToPool(id);
+    removeFromZone(zone, id);
+  }
+}
+
+function clearReadyZones() {
+  document.querySelectorAll('.drop-zone').forEach(function(z) { z.classList.remove('ready'); });
+}
+
+// ---- Zone management ----
+function clearAllZones() {
+  document.querySelectorAll('.drop-zone').forEach(function(z) {
+    z.innerHTML = '';
+    z.classList.remove('checked', 'over', 'ready');
+  });
+}
+
+function placeCardInZone(zone, id) {
+  var k = karteById[id];
+  var el = document.createElement('div');
+  el.className = 'placed-karte';
+  el.textContent = k.text;
+  el.dataset.id = id;
+  el.setAttribute('draggable', 'true');
+
+  // Drag from placed position
+  el.addEventListener('dragstart', function(e) {
+    if (el.classList.contains('correct') || el.classList.contains('wrong')) { e.preventDefault(); return; }
+    dragId = id;
+    dragSource = el;
+    dragFromPool = false;
+    el.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+  });
+  el.addEventListener('dragend', function() {
+    el.classList.remove('dragging');
+  });
+
+  // Touch drag from placed position
+  el.addEventListener('touchstart', function(e) {
+    if (el.classList.contains('correct') || el.classList.contains('wrong')) return;
+    onTouchStart(e, el, id, false);
+  }, {passive: false});
+
+  // Click to return to pool (or swap)
+  el.addEventListener('click', function(e) {
+    e.stopPropagation();
+    clickPlacedKarte(el, id, zone);
+  });
+
+  zone.appendChild(el);
+}
+
+function removeFromZone(zone, id) {
+  var children = zone.querySelectorAll('.placed-karte');
+  for (var i = 0; i < children.length; i++) {
+    if (parseInt(children[i].dataset.id) === parseInt(id)) {
+      zone.removeChild(children[i]);
+      return;
+    }
+  }
+}
+
+function findZoneForPlacedEl(el) {
+  return el.closest('.drop-zone');
+}
+
+function markPoolChipUsed(id) {
+  document.querySelectorAll('.karte').forEach(function(c) {
+    if (parseInt(c.dataset.id) === parseInt(id)) c.classList.add('used');
+  });
+}
+
+function returnToPool(id) {
+  document.querySelectorAll('.karte').forEach(function(c) {
+    if (parseInt(c.dataset.id) === parseInt(id)) c.classList.remove('used');
+  });
+}
+
+// ---- Drop logic (drag & drop) ----
+function dropOnZone(zone) {
+  if (!dragId) return;
+  if (zone.classList.contains('checked')) return;
+
+  var displacedEls = zone.querySelectorAll('.placed-karte');
+  // If dragging from another zone, remove from there
+  if (!dragFromPool && dragSource) {
+    var srcZone = findZoneForPlacedEl(dragSource);
+    if (srcZone) {
+      srcZone.removeChild(dragSource);
+    }
+    // No pool change needed
+  } else if (dragFromPool) {
+    markPoolChipUsed(dragId);
+  }
+
+  // Displace existing cards if dragging from pool (send each back to pool)
+  // Actually: allow multiple cards in a zone, so just add
+  // But if dragging from pool: remove displaced only if zone allows only one card per slot
+  // Design choice: zones accept multiple cards (all 16 need to be placed)
+  // Just add the card to the zone
+  placeCardInZone(zone, dragId);
+  dragId = dragSource = null;
+  dragFromPool = false;
+}
+
+// ---- Set up zone event listeners ----
+function setupZones() {
+  document.querySelectorAll('.drop-zone').forEach(function(zone) {
+    zone.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      if (!zone.classList.contains('checked')) zone.classList.add('over');
+    });
+    zone.addEventListener('dragleave', function() {
+      zone.classList.remove('over');
+    });
+    zone.addEventListener('drop', function(e) {
+      e.preventDefault();
+      zone.classList.remove('over');
+      dropOnZone(zone);
+    });
+    zone.addEventListener('click', function() {
+      clickZone(zone);
+    });
+  });
+}
+
+// ---- Touch drag ----
+function onTouchStart(e, el, id, fromPool) {
+  if (e.touches.length !== 1) return;
+  e.preventDefault();
+  var touch = e.touches[0];
+  var rect = el.getBoundingClientRect();
+
+  touchId = id;
+  touchSource = {el: el, fromPool: fromPool};
+  touchOffX = touch.clientX - rect.left;
+  touchOffY = touch.clientY - rect.top;
+
+  touchCloneEl.textContent = karteById[id].text;
+  touchCloneEl.style.left  = (touch.clientX - touchOffX) + 'px';
+  touchCloneEl.style.top   = (touch.clientY - touchOffY) + 'px';
+  touchCloneEl.style.display = 'block';
+  el.style.opacity = '0.25';
+}
+
+document.addEventListener('touchmove', function(e) {
+  if (!touchId) return;
+  e.preventDefault();
+  var touch = e.touches[0];
+  touchCloneEl.style.left = (touch.clientX - touchOffX) + 'px';
+  touchCloneEl.style.top  = (touch.clientY - touchOffY) + 'px';
+}, {passive: false});
+
+document.addEventListener('touchend', function(e) {
+  if (touchId === null) return;
+  var touch = e.changedTouches[0];
+
+  touchCloneEl.style.display = 'none';
+  touchSource.el.style.opacity = '';
+
+  var underEl = document.elementFromPoint(touch.clientX, touch.clientY);
+  var targetZone = underEl ? underEl.closest('.drop-zone') : null;
+
+  if (targetZone && !targetZone.classList.contains('checked')) {
+    if (touchSource.fromPool) {
+      markPoolChipUsed(touchId);
+    } else {
+      // Remove from current zone
+      var srcZone = findZoneForPlacedEl(touchSource.el);
+      if (srcZone) srcZone.removeChild(touchSource.el);
+    }
+    placeCardInZone(targetZone, touchId);
+  }
+
+  touchId = null;
+  touchSource = null;
+});
+
+// ---- Check & Reset ----
+function checkAll() {
+  var correct = 0, total = 0;
+
+  document.querySelectorAll('.drop-zone').forEach(function(zone) {
+    var correctForm = zone.dataset.form;
+    var correctTyp  = zone.dataset.typ;
+    zone.classList.add('checked');
+
+    zone.querySelectorAll('.placed-karte').forEach(function(el) {
+      var id = parseInt(el.dataset.id);
+      var k = karteById[id];
+      total++;
+      el.classList.remove('placed-karte');
+      if (k.form === correctForm && k.typ === correctTyp) {
+        el.classList.add('placed-karte', 'correct');
+        correct++;
+      } else {
+        el.classList.add('placed-karte', 'wrong');
+      }
+      el.setAttribute('draggable', 'false');
+    });
+  });
+
+  var banner = document.getElementById('resultBanner');
+  if (correct === 16 && total === 16) {
+    banner.textContent = 'Perfekt! Alle 16 Karten richtig zugeordnet.';
+    banner.className = 'result-banner show perfect';
+  } else {
+    banner.textContent = correct + ' von ' + total + ' Karten korrekt platziert. Rot markierte Karten nochmals überprüfen.';
+    banner.className = 'result-banner show partial';
+  }
+}
+
+function resetAll() {
+  init();
+}
+
+setupZones();
+init();
+</script>
+</body>
+</html>
