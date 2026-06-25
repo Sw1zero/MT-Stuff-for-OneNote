@@ -200,6 +200,9 @@ body {
 
 .badge-module { background: var(--blue-tint); color: var(--blue-dark); }
 .badge-type   { background: #f1f5f9;           color: var(--text-muted); }
+/* Pastell-Akzente (gleiche Helligkeit wie --blue-tint) */
+.badge-lernpfad  { background: #dcf0e4; color: #1c7a4d; }  /* grün = Lernpfad */
+.badge-challenge { background: #f7dee0; color: #b32a2a; }  /* rot = Challenge */
 .badge-soon   {
   position: absolute; top: 14px; right: 14px;
   background: #f1f5f9; color: var(--text-subtle);
