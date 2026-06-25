@@ -149,7 +149,8 @@ body {
   transition: box-shadow 0.18s, transform 0.15s, border-color 0.18s;
   position: relative;
   min-width: 0;                  /* verhindert Überlauf im Grid */
-  overflow-wrap: anywhere;       /* lange Wörter brechen statt überlaufen */
+  -webkit-hyphens: auto;
+  hyphens: auto;                 /* lange Wörter nur mit Bindestrich trennen, nicht mitten im Wort */
   height: 100%;
 }
 
