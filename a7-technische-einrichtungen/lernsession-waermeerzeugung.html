@@ -397,9 +397,9 @@ function buildPdf(idx, st){
     '<iframe src="'+st.src+'" class="pdf-frame"></iframe>'+
     '<p style="font-size:0.78rem;color:var(--text-muted);margin:6px 0 14px;">'+
       'PDF wird nicht angezeigt? <a href="'+st.src+'" target="_blank">Folien herunterladen</a></p>'+
-    '<div class="read-btn-row"><button class="btn btn-primary" id="pdfbtn-'+idx+'">Weiter →</button></div>';
+    '<div class="read-btn-row"><button class="btn btn-primary" id="pdfbtn-'+idx+'">Gelesen ✓ (+5 XP)</button></div>';
   document.getElementById('pdfbtn-'+idx).addEventListener('click', function(){
-    if(solved[idx]) return; solved[idx]=true; addXp(5); this.disabled=true; this.textContent='Angeschaut ✓'; updateNav();
+    if(solved[idx]) return; solved[idx]=true; addXp(5); this.disabled=true; this.textContent='Gelesen ✓'; updateNav();
   });
 }
 
