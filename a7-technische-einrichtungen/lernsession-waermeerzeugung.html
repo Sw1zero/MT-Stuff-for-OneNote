@@ -20,8 +20,15 @@
     .hud-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#69A9C9,#9ad1e8); border-radius:4px; transition:width 0.4s ease; }
     .hud-bar-fill.on-fire { animation:barpulse 0.9s ease-in-out infinite; }
     @keyframes barpulse { 0%,100%{box-shadow:0 0 4px 1px rgba(154,209,232,0.4);} 50%{box-shadow:0 0 10px 3px rgba(154,209,232,0.85);} }
-    .hud-streak { font-size:0.84rem; font-weight:700; background:rgba(255,255,255,0.14); padding:3px 9px; border-radius:12px; white-space:nowrap; flex-shrink:0; transition:transform 0.15s; }
+    .hud-streak { font-size:0.84rem; font-weight:700; background:rgba(255,255,255,0.14); padding:3px 9px; border-radius:12px; white-space:nowrap; flex-shrink:0; transition:transform 0.15s, background 0.3s; }
     .hud-streak.pulse { transform:scale(1.25); }
+    .hud-streak.on-fire { animation:fireflicker 0.28s ease-in-out infinite alternate; color:#ffe0a0; }
+    @keyframes fireflicker {
+      0%   { background:rgba(220,80,0,0.55);  box-shadow:0 0 5px 1px rgba(255,120,0,0.5), 0 0 10px 2px rgba(255,60,0,0.25); transform:scale(1.02); }
+      33%  { background:rgba(255,130,0,0.65); box-shadow:0 0 8px 3px rgba(255,180,0,0.7), 0 0 14px 4px rgba(255,80,0,0.4); transform:scale(1.05) rotate(-0.8deg); }
+      66%  { background:rgba(200,60,0,0.6);   box-shadow:0 0 6px 2px rgba(255,100,0,0.55),0 0 12px 3px rgba(255,40,0,0.3); transform:scale(1.03) rotate(0.5deg); }
+      100% { background:rgba(255,160,0,0.55); box-shadow:0 0 10px 4px rgba(255,200,0,0.6),0 0 18px 6px rgba(255,80,0,0.3); transform:scale(1.06); }
+    }
 
     .ls-meta { font-size:0.8rem; font-weight:600; color:var(--text-muted); text-align:center; margin-bottom:6px; }
     .ls-dots { display:flex; gap:5px; justify-content:center; margin-bottom:20px; flex-wrap:wrap; }
@@ -371,7 +378,9 @@ function renderHud(){
   document.getElementById('hudBar').style.width = Math.round(sc/N*100)+'%';
   document.getElementById('hudStreak').textContent = '🔥 '+streak;
   var bar=document.getElementById('hudBar');
-  if(streak>=3){ bar.classList.add('on-fire'); } else { bar.classList.remove('on-fire'); }
+  var str=document.getElementById('hudStreak');
+  if(streak>=3){ bar.classList.add('on-fire'); str.classList.add('on-fire'); }
+  else { bar.classList.remove('on-fire'); str.classList.remove('on-fire'); }
 }
 function addXp(n){ xp+=n; var el=document.getElementById('hudXp'); renderHud(); el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
 function registerAnswer(ok){
