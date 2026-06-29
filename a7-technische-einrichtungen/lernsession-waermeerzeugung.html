@@ -20,7 +20,8 @@
     .hud-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#69A9C9,#9ad1e8); border-radius:4px; transition:width 0.4s ease; }
     .hud-bar-fill.on-fire { animation:barpulse 0.9s ease-in-out infinite; }
     @keyframes barpulse { 0%,100%{box-shadow:0 0 4px 1px rgba(154,209,232,0.4);} 50%{box-shadow:0 0 10px 3px rgba(154,209,232,0.85);} }
-    .hud-streak { position:relative; font-size:0.84rem; font-weight:700; background:rgba(255,255,255,0.14); padding:3px 9px; border-radius:12px; white-space:nowrap; flex-shrink:0; transition:transform 0.15s, background 0.3s; }
+    .hud-streak { position:relative; display:flex; align-items:center; gap:8px; font-size:0.84rem; font-weight:700; background:rgba(255,255,255,0.14); padding:3px 9px; border-radius:12px; white-space:nowrap; flex-shrink:0; transition:transform 0.15s, background 0.3s; }
+    .streak-num-fire { color:#ff8c00; text-shadow:0 0 6px rgba(255,100,0,0.8); }
     .hud-streak.pulse { transform:scale(1.25); }
     .streak-pop { position:absolute; top:-4px; right:-4px; font-size:0.72rem; font-weight:800; color:#ffa040; pointer-events:none; white-space:nowrap; animation:streakPopAnim 0.9s ease-out forwards; }
     @keyframes streakPopAnim { 0%{opacity:1;transform:translateY(0) scale(1);} 70%{opacity:1;} 100%{opacity:0;transform:translateY(-20px) scale(0.75);} }
@@ -403,6 +404,7 @@ function renderHud(){
   document.getElementById('hudBar').classList.toggle('on-fire', onFire);
   document.getElementById('hudStreakEmoji').style.display = onFire ? 'none' : '';
   document.getElementById('hudFireWrap').style.display = onFire ? 'inline-block' : 'none';
+  document.getElementById('hudStreakNum').className = onFire ? 'streak-num-fire' : '';
 }
 function addXp(n){ xp+=n; var el=document.getElementById('hudXp'); renderHud(); el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
 function showStreakPop(){ var el=document.createElement('span'); el.className='streak-pop'; el.textContent='+1 🔥'; document.getElementById('hudStreak').appendChild(el); setTimeout(function(){ el.remove(); }, 900); }
