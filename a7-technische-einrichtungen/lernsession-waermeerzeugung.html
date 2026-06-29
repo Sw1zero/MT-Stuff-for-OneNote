@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Wärmeerzeugung (a.7)</title>
   <link rel="stylesheet" href="../style.css">
+  <script src="../assets/dnd.js"></script>
   <style>
     .back-link { display:inline-block; font-size:0.82rem; color:var(--text-muted); text-decoration:none; margin-bottom:1rem; }
     .back-link:hover { color:var(--red); }
@@ -120,7 +121,6 @@
     .lb-slot.lb-filled { border-style:solid; border-color:var(--blue-light); color:var(--text); font-weight:500; cursor:grab; touch-action:none; user-select:none; }
     .lb-slot.correct { border-color:#16a34a !important; background:#f0fdf4 !important; color:#15803d !important; cursor:default; }
     .lb-slot.wrong   { border-color:var(--red) !important; background:var(--red-light) !important; color:var(--red) !important; cursor:default; }
-    .lp-tc { position:fixed; pointer-events:none; z-index:9999; opacity:0.88; transform:scale(1.06); border-radius:20px; padding:0.3rem 0.8rem; background:var(--blue-dark); color:#fff; font-family:var(--font); font-size:0.82rem; font-weight:500; box-shadow:0 4px 16px rgba(0,0,0,0.25); white-space:nowrap; display:none; }
     .slot-row { display:flex; align-items:flex-start; gap:0.5rem; }
     .slot-num { width:28px; height:28px; flex-shrink:0; border-radius:50%; background:var(--blue-dark); color:#fff; font-size:0.76rem; font-weight:700; display:flex; align-items:center; justify-content:center; margin-top:3px; }
     .type-cell { flex:1; }
@@ -538,22 +538,14 @@ function buildLabelType(idx, st){
 }
 
 /* Beschriften – Lernpfad: Drag & Drop (wie beschriften.html buildEinfach) */
-var _lbD={word:null,src:null,bank:null,sel:null,selChip:null,tw:null,ts:null,ox:0,oy:0};
-var _lbTC=null;
-function _lbClone(){ if(!_lbTC){_lbTC=document.createElement('div');_lbTC.className='lp-tc';document.body.appendChild(_lbTC);} return _lbTC; }
-document.addEventListener('touchmove',function(e){ if(!_lbD.tw) return; e.preventDefault(); var t=e.touches[0],cl=_lbClone(); cl.style.left=(t.clientX-_lbD.ox)+'px'; cl.style.top=(t.clientY-_lbD.oy)+'px'; },{passive:false});
-document.addEventListener('touchend',function(e){
-  if(!_lbD.tw) return;
-  var t=e.changedTouches[0]; _lbClone().style.display='none'; _lbD.ts.el.style.opacity='';
-  var el=document.elementFromPoint(t.clientX,t.clientY); var box=el?el.closest('.lb-slot'):null;
-  if(box&&!box.classList.contains('correct')&&!box.classList.contains('wrong')){
-    var disp=box.dataset.filled||null;
-    if(_lbD.ts.isSlot){ _lbClear(_lbD.ts.el); if(disp) _lbFill(_lbD.ts.el,disp); }
-    else { _lbUse(_lbD.tw,_lbD.bank); if(disp) _lbRet(disp,_lbD.bank); }
-    _lbFill(box,_lbD.tw);
-  }
-  _lbD.tw=_lbD.ts=null;
-});
+var _lbD={word:null,src:null,bank:null,sel:null,selChip:null};
+function _lbOnDrop(box, word, source){
+  if(box.classList.contains('correct')||box.classList.contains('wrong')) return;
+  var disp=box.dataset.filled||null;
+  if(source.isSlot){ _lbClear(source.el); if(disp) _lbFill(source.el,disp); }
+  else { _lbUse(word,_lbD.bank); if(disp) _lbRet(disp,_lbD.bank); }
+  _lbFill(box,word);
+}
 function _lbFill(box,word){ box.dataset.filled=word; box.textContent=word; box.className='lb-slot lb-filled'; box.setAttribute('draggable','true'); }
 function _lbClear(box){ delete box.dataset.filled; box.textContent='—'; box.className='lb-slot'; box.setAttribute('draggable','false'); }
 function _lbUse(word,bank){ var ok=false; bank.querySelectorAll('.lb-chip').forEach(function(c){ if(!ok&&c.dataset.word===word&&!c.classList.contains('used')){c.classList.add('used');ok=true;} }); }
@@ -564,12 +556,6 @@ function _lbDrop(box){
   if(_lbD.src&&_lbD.src.classList.contains('lb-slot')){ _lbClear(_lbD.src); if(disp) _lbFill(_lbD.src,disp); }
   else { _lbUse(_lbD.word,_lbD.bank); if(disp) _lbRet(disp,_lbD.bank); }
   _lbFill(box,_lbD.word); _lbD.word=_lbD.src=null;
-}
-function _lbTouch(e,el,word,isSlot,bank){
-  if(e.touches.length!==1) return; e.preventDefault();
-  var t=e.touches[0],rect=el.getBoundingClientRect();
-  _lbD.tw=word; _lbD.ts={el:el,isSlot:isSlot}; _lbD.ox=t.clientX-rect.left; _lbD.oy=t.clientY-rect.top; _lbD.bank=bank;
-  var cl=_lbClone(); cl.textContent=word; cl.style.left=(t.clientX-_lbD.ox)+'px'; cl.style.top=(t.clientY-_lbD.oy)+'px'; cl.style.display='block'; el.style.opacity='0.25';
 }
 function _lbSelChip(chip,word,bank){
   if(chip.classList.contains('selected')){ chip.classList.remove('selected'); _lbD.sel=null; _lbD.selChip=null; document.querySelectorAll('.lb-slot.lb-ready').forEach(function(b){b.classList.remove('lb-ready');}); return; }
@@ -593,7 +579,7 @@ function buildLabelChoose(idx,st){
   shuffle(names).forEach(function(word){
     var chip=document.createElement('span'); chip.className='lb-chip'; chip.textContent=word; chip.dataset.word=word; chip.setAttribute('draggable','true');
     chip.addEventListener('dragstart',function(e){_lbD.word=word;_lbD.src=chip;_lbD.bank=bank;e.dataTransfer.effectAllowed='move';});
-    chip.addEventListener('touchstart',function(e){_lbTouch(e,chip,word,false,bank);},{passive:false});
+    chip.addEventListener('touchstart',function(e){_lbD.bank=bank;MTDnD.touchStart(e,chip,word,false,'.lb-slot',_lbOnDrop);},{passive:false});
     chip.addEventListener('click',function(){_lbSelChip(chip,word,bank);});
     bank.appendChild(chip);
   });
@@ -607,7 +593,7 @@ function buildLabelChoose(idx,st){
     box.addEventListener('dragleave',function(){box.classList.remove('lb-over');});
     box.addEventListener('drop',function(e){e.preventDefault();box.classList.remove('lb-over');_lbDrop(box);});
     box.addEventListener('dragstart',function(e){if(!box.dataset.filled){e.preventDefault();return;}_lbD.word=box.dataset.filled;_lbD.src=box;_lbD.bank=bank;e.dataTransfer.effectAllowed='move';});
-    box.addEventListener('touchstart',function(e){if(!box.dataset.filled)return;_lbTouch(e,box,box.dataset.filled,true,bank);},{passive:false});
+    box.addEventListener('touchstart',function(e){if(!box.dataset.filled)return;_lbD.bank=bank;MTDnD.touchStart(e,box,box.dataset.filled,true,'.lb-slot',_lbOnDrop);},{passive:false});
     box.addEventListener('click',function(){_lbClickBox(box,bank);});
     row.appendChild(badge);row.appendChild(box);grid.appendChild(row);
   });

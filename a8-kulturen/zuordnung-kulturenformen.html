@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kulturenformen – Vor- und Nachteile zuordnen</title>
   <link rel="stylesheet" href="../style.css">
+  <script src="../assets/dnd.js"></script>
   <style>
     .back-link {
       display: inline-block;
@@ -160,26 +161,6 @@
       pointer-events: none;
     }
 
-    /* Touch drag clone */
-    #touchClone {
-      position: fixed;
-      pointer-events: none;
-      z-index: 9999;
-      opacity: 0.88;
-      transform: scale(1.04);
-      border-radius: var(--radius-sm);
-      padding: 0.38rem 0.75rem;
-      background: var(--blue);
-      color: #fff;
-      font-family: var(--font);
-      font-size: 0.80rem;
-      font-weight: 500;
-      box-shadow: 0 4px 16px rgba(0,102,204,0.35);
-      max-width: 260px;
-      line-height: 1.45;
-      display: none;
-    }
-
     .btn-row {
       display: flex;
       gap: 0.75rem;
@@ -271,8 +252,6 @@
 
 </main>
 
-<div id="touchClone"></div>
-
 <footer class="bzwu-footer">
   BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
 </footer>
@@ -311,26 +290,10 @@ var dragFromPool = false;
 // --- Click-to-place state ---
 var selectedId = null;  // card id selected by click
 
-// --- Touch state ---
-var touchId     = null;
-var touchSource = null;
-var touchFromPool = false;
-var touchCloneEl = document.getElementById('touchClone');
-var touchOffX = 0, touchOffY = 0;
-
-function shuffle(arr) {
-  var a = arr.slice();
-  for (var i = a.length - 1; i > 0; i--) {
-    var j = Math.floor(Math.random() * (i + 1));
-    var t = a[i]; a[i] = a[j]; a[j] = t;
-  }
-  return a;
-}
 
 // ---- Init ----
 function init() {
   dragId = dragSource = null;
-  touchId = touchSource = null;
   selectedId = null;
   buildPool();
   clearAllZones();
@@ -341,7 +304,7 @@ function init() {
 function buildPool() {
   var pool = document.getElementById('cardPool');
   pool.innerHTML = '';
-  var shuffled = shuffle(KARTEN.slice());
+  var shuffled = MTDnD.shuffle(KARTEN.slice());
   for (var i = 0; i < shuffled.length; i++) {
     (function(k) {
       var chip = makePoolChip(k);
@@ -369,7 +332,7 @@ function makePoolChip(k) {
   });
 
   chip.addEventListener('touchstart', function(e) {
-    onTouchStart(e, chip, k.id, true);
+    MTDnD.touchStart(e, chip, k.id, false, '.drop-zone', onDrop);
   }, {passive: false});
 
   chip.addEventListener('click', function() {
@@ -465,7 +428,7 @@ function placeCardInZone(zone, id) {
   // Touch drag from placed position
   el.addEventListener('touchstart', function(e) {
     if (el.classList.contains('correct') || el.classList.contains('wrong')) return;
-    onTouchStart(e, el, id, false);
+    MTDnD.touchStart(e, el, id, true, '.drop-zone', onDrop);
   }, {passive: false});
 
   // Click to return to pool (or swap)
@@ -551,57 +514,18 @@ function setupZones() {
   });
 }
 
-// ---- Touch drag ----
-function onTouchStart(e, el, id, fromPool) {
-  if (e.touches.length !== 1) return;
-  e.preventDefault();
-  var touch = e.touches[0];
-  var rect = el.getBoundingClientRect();
-
-  touchId = id;
-  touchSource = {el: el, fromPool: fromPool};
-  touchOffX = touch.clientX - rect.left;
-  touchOffY = touch.clientY - rect.top;
-
-  touchCloneEl.textContent = karteById[id].text;
-  touchCloneEl.style.left  = (touch.clientX - touchOffX) + 'px';
-  touchCloneEl.style.top   = (touch.clientY - touchOffY) + 'px';
-  touchCloneEl.style.display = 'block';
-  el.style.opacity = '0.25';
-}
-
-document.addEventListener('touchmove', function(e) {
-  if (!touchId) return;
-  e.preventDefault();
-  var touch = e.touches[0];
-  touchCloneEl.style.left = (touch.clientX - touchOffX) + 'px';
-  touchCloneEl.style.top  = (touch.clientY - touchOffY) + 'px';
-}, {passive: false});
-
-document.addEventListener('touchend', function(e) {
-  if (touchId === null) return;
-  var touch = e.changedTouches[0];
-
-  touchCloneEl.style.display = 'none';
-  touchSource.el.style.opacity = '';
-
-  var underEl = document.elementFromPoint(touch.clientX, touch.clientY);
-  var targetZone = underEl ? underEl.closest('.drop-zone') : null;
-
-  if (targetZone && !targetZone.classList.contains('checked')) {
-    if (touchSource.fromPool) {
-      markPoolChipUsed(touchId);
-    } else {
-      // Remove from current zone
-      var srcZone = findZoneForPlacedEl(touchSource.el);
-      if (srcZone) srcZone.removeChild(touchSource.el);
-    }
-    placeCardInZone(targetZone, touchId);
+// ---- onDrop (called by MTDnD) ----
+function onDrop(targetZone, id, source) {
+  if (targetZone.classList.contains('checked')) return;
+  if (source.isSlot) {
+    // Dragged from a placed position — remove from current zone
+    var srcZone = findZoneForPlacedEl(source.el);
+    if (srcZone) srcZone.removeChild(source.el);
+  } else {
+    markPoolChipUsed(id);
   }
-
-  touchId = null;
-  touchSource = null;
-});
+  placeCardInZone(targetZone, id);
+}
 
 // ---- Check & Reset ----
 function checkAll() {

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tabellen-Lücken – Kühlung & Mikroorganismen</title>
   <link rel="stylesheet" href="../style.css">
+  <script src="../assets/dnd.js"></script>
   <style>
     .back-link { display:inline-block; font-size:0.82rem; color:var(--text-muted); text-decoration:none; margin-bottom:1.5rem; transition:color 0.15s; }
     .back-link:hover { color:var(--red); }
@@ -27,7 +28,6 @@
     .blank-cell.correct { border-color:#16a34a !important; background:#f0fdf4 !important; color:#15803d !important; }
     .blank-cell.wrong { border-color:var(--red) !important; background:var(--red-light) !important; color:var(--red) !important; }
     .blank-cell.over { border-color:var(--blue); border-style:solid; background:#e0f2fe; }
-    #touchClone { position:fixed; z-index:1000; display:none; pointer-events:none; background:var(--blue); color:#fff; border-radius:20px; padding:0.3rem 0.85rem; font-size:0.82rem; font-weight:600; box-shadow:var(--shadow-md); }
     .info-box { background:#f0f7ff; border-left:3px solid var(--blue); border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:0.75rem 1rem; font-size:0.82rem; color:var(--text-muted); margin-bottom:1.5rem; line-height:1.5; }
     .info-box strong { color:var(--text); }
     .btn-row { display:flex; gap:0.75rem; flex-wrap:wrap; }
@@ -83,8 +83,6 @@
   <div class="result-banner" id="resultBanner"></div>
 </main>
 
-<div id="touchClone"></div>
-
 <footer class="bzwu-footer">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm</footer>
 
 <script>
@@ -93,22 +91,18 @@ var ANSWERS = [
   'Aktivität stark vermindert','Wachstum aller MO gestoppt','Enzyme vollständig blockiert'
 ];
 
-var selected = null, dragWord = null, touchWord = null, touchSrc = null;
-var touchClone = document.getElementById('touchClone');
-var touchOffX = 0, touchOffY = 0;
-
-function shuffle(arr){ var a=arr.slice(); for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;} return a; }
+var selected = null, dragWord = null;
 function isLocked(cell){ return cell.classList.contains('correct')||cell.classList.contains('wrong'); }
 
 function init(){
   var bank=document.getElementById('wordBank'); bank.innerHTML='';
-  shuffle(ANSWERS).forEach(function(word){
+  MTDnD.shuffle(ANSWERS).forEach(function(word){
     var chip=document.createElement('button'); chip.type='button'; chip.className='word-chip'; chip.textContent=word; chip.dataset.word=word;
     chip.setAttribute('draggable','true');
     chip.onclick=function(){ selectChip(this); };
     chip.addEventListener('dragstart',function(e){ dragWord=word; e.dataTransfer.effectAllowed='move'; chip.classList.add('dragging'); });
     chip.addEventListener('dragend',function(){ chip.classList.remove('dragging'); });
-    chip.addEventListener('touchstart',function(e){ onChipTouchStart(e,chip,word); },{passive:false});
+    chip.addEventListener('touchstart',function(e){ MTDnD.touchStart(e,chip,word,false,'.blank-cell',onDrop); },{passive:false});
     bank.appendChild(chip);
   });
   document.querySelectorAll('.blank-cell').forEach(function(cell){
@@ -143,17 +137,10 @@ function returnWord(word){ document.querySelectorAll('.word-chip').forEach(funct
 function markUsed(word){ document.querySelectorAll('.word-chip').forEach(function(c){ if(c.dataset.word===word){ c.classList.remove('selected'); c.classList.add('used'); } }); }
 function clearReady(){ document.querySelectorAll('.blank-cell').forEach(function(c){ c.classList.remove('ready'); }); }
 
-function onChipTouchStart(e,chip,word){
-  if(chip.classList.contains('used')) return; if(e.touches.length!==1) return; e.preventDefault();
-  var t=e.touches[0], r=chip.getBoundingClientRect(); touchWord=word; touchSrc=chip; touchOffX=t.clientX-r.left; touchOffY=t.clientY-r.top;
-  touchClone.textContent=word; touchClone.style.left=(t.clientX-touchOffX)+'px'; touchClone.style.top=(t.clientY-touchOffY)+'px'; touchClone.style.display='block'; chip.style.opacity='0.25';
+function onDrop(box, word, source) {
+  if (isLocked(box)) return;
+  placeInCell(box, word);
 }
-document.addEventListener('touchmove',function(e){ if(!touchWord) return; e.preventDefault(); var t=e.touches[0]; touchClone.style.left=(t.clientX-touchOffX)+'px'; touchClone.style.top=(t.clientY-touchOffY)+'px'; },{passive:false});
-document.addEventListener('touchend',function(e){
-  if(!touchWord) return; var t=e.changedTouches[0]; touchClone.style.display='none'; if(touchSrc) touchSrc.style.opacity='';
-  var under=document.elementFromPoint(t.clientX,t.clientY); var cell=under?under.closest('.blank-cell'):null;
-  if(cell&&!isLocked(cell)) placeInCell(cell,touchWord); touchWord=null; touchSrc=null;
-});
 
 function checkAll(){
   var correct=0, filled=0;

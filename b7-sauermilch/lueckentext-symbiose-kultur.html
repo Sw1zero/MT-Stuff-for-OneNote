@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lückentext b.7 – Symbiose & Kultursteuerung</title>
   <link rel="stylesheet" href="../style.css">
+  <script src="../assets/dnd.js"></script>
   <style>
     .back-link {
       font-size: 0.82rem;
@@ -156,13 +157,6 @@
 
     .blank-slot.drop-over { border-bottom-color: var(--blue); background: var(--blue-light); border-radius: 4px 4px 0 0; }
 
-    #touchClone {
-      position: fixed; z-index: 1000; display: none; pointer-events: none;
-      background: var(--blue); color: #fff; border-radius: 20px;
-      padding: 0.3rem 0.85rem; font-size: 0.84rem; font-weight: 600;
-      box-shadow: var(--shadow-md);
-    }
-
     .result-box {
       width: 560px;
       max-width: 92vw;
@@ -229,7 +223,6 @@
     </div>
   </div>
 
-  <div id="touchClone"></div>
 </main>
 
 <footer class="bzwu-footer">
@@ -289,9 +282,6 @@
     var selectedSlot  = null;
     var filledWords   = [];
     var dragWord      = null;   // Maus-Drag
-    var touchWord     = null, touchSrc = null;
-    var touchOffX     = 0, touchOffY = 0;
-    var touchClone    = document.getElementById('touchClone');
 
     function setDifficulty(mode) {
       difficulty   = mode;
@@ -371,10 +361,17 @@
           dragWord = word; e.dataTransfer.effectAllowed = 'move'; chip.classList.add('dragging');
         });
         chip.addEventListener('dragend', function() { chip.classList.remove('dragging'); });
-        chip.addEventListener('touchstart', function(e) { onChipTouchStart(e, chip, word); }, {passive: false});
+        chip.addEventListener('touchstart', function(e) {
+          if (chip.classList.contains('used')) return;
+          MTDnD.touchStart(e, chip, word, false, '.blank-slot', onDrop);
+        }, {passive: false});
         wrap.appendChild(chip);
       });
       updateChips();
+    }
+
+    function onDrop(box, word, source) {
+      placeWordInSlot(parseInt(box.dataset.id), word);
     }
 
     // Wort in eine bestimmte Lücke setzen (Klick-Zuordnung, Drag, Touch)
@@ -384,40 +381,6 @@
       refreshAllSlots();
       updateChips();
     }
-
-    // ---- Touch-Drag ----
-    function onChipTouchStart(e, chip, word) {
-      if (chip.classList.contains('used')) return;
-      if (e.touches.length !== 1) return;
-      e.preventDefault();
-      var t = e.touches[0], r = chip.getBoundingClientRect();
-      touchWord = word; touchSrc = chip;
-      touchOffX = t.clientX - r.left; touchOffY = t.clientY - r.top;
-      touchClone.textContent = word;
-      touchClone.style.left = (t.clientX - touchOffX) + 'px';
-      touchClone.style.top  = (t.clientY - touchOffY) + 'px';
-      touchClone.style.display = 'block';
-      chip.style.opacity = '0.25';
-    }
-
-    document.addEventListener('touchmove', function(e) {
-      if (!touchWord) return;
-      e.preventDefault();
-      var t = e.touches[0];
-      touchClone.style.left = (t.clientX - touchOffX) + 'px';
-      touchClone.style.top  = (t.clientY - touchOffY) + 'px';
-    }, {passive: false});
-
-    document.addEventListener('touchend', function(e) {
-      if (!touchWord) return;
-      var t = e.changedTouches[0];
-      touchClone.style.display = 'none';
-      if (touchSrc) touchSrc.style.opacity = '';
-      var under = document.elementFromPoint(t.clientX, t.clientY);
-      var slot  = under ? under.closest('.blank-slot') : null;
-      if (slot) placeWordInSlot(parseInt(slot.dataset.id), touchWord);
-      touchWord = null; touchSrc = null;
-    });
 
     function updateChips() {
       var used = filledWords.filter(function(w) { return w !== null; });

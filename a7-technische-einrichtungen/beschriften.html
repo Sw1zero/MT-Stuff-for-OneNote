@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Anlagenteile beschriften – a.7</title>
   <link rel="stylesheet" href="../style.css">
+  <script src="../assets/dnd.js"></script>
   <style>
     .back-link { display:inline-block; font-size:0.82rem; color:var(--text-muted); text-decoration:none; margin-bottom:1rem; }
     .back-link:hover { color:var(--red); }
@@ -50,7 +51,6 @@
     .type-input.wrong { border-color:var(--red); background:var(--red-light); }
     .type-sol { font-size:0.72rem; color:#15803d; margin-top:2px; }
     .type-cell { flex:1; }
-    #touchClone { position:fixed; pointer-events:none; z-index:9999; opacity:0.88; transform:scale(1.06); border-radius:20px; padding:0.32rem 0.85rem; background:var(--blue); color:#fff; font-family:var(--font); font-size:0.82rem; font-weight:500; box-shadow:0 4px 16px rgba(0,102,204,0.35); white-space:nowrap; display:none; }
     .btn-row { display:flex; gap:0.75rem; flex-wrap:wrap; }
     .result-banner { margin-top:1.25rem; padding:0.9rem 1rem; border-radius:var(--radius-md); font-weight:600; font-size:0.92rem; text-align:center; display:none; }
     .result-banner.show { display:block; }
@@ -100,7 +100,6 @@
   <div class="result-banner" id="resultBanner"></div>
 </main>
 
-<div id="touchClone"></div>
 <footer class="bzwu-footer">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm</footer>
 
 <script>
@@ -175,7 +174,6 @@ document.title = DS.title + ' – a.7';
 var DEBUG = /[?&]debug/.test(location.search);
 var level = 'einfach';
 
-function shuffle(arr){ var a=arr.slice(); for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;} return a; }
 function fold(s){ return String(s).toLowerCase().replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss').replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim(); }
 function matchPart(input, part){ var f=fold(input); if(!f) return false; if(f===fold(part.name)) return true; for(var i=0;i<part.keys.length;i++){ if(f.indexOf(fold(part.keys[i]))!==-1) return true; } return false; }
 function zonesOf(p){ return p.zones; }
@@ -198,16 +196,22 @@ function resetLevel(){
 }
 
 /* EINFACH */
-var dragWord=null, dragSource=null, selectedWord=null, touchWord=null, touchSource=null;
-var touchCloneEl=document.getElementById('touchClone'), touchOffX=0, touchOffY=0;
+var dragWord=null, dragSource=null, selectedWord=null;
+function onDrop(box, word, source) {
+  if (box.classList.contains('correct') || box.classList.contains('wrong')) return;
+  var displaced = box.dataset.filled || null;
+  if (source.isSlot) { clearSlot(source.el); if (displaced) fillSlot(source.el, displaced); }
+  else { markUsed(word); if (displaced) returnWord(displaced); }
+  fillSlot(box, word);
+}
 function buildEinfach(body){
   body.innerHTML='<div class="word-bank" id="wordBank"></div><div class="slots-grid" id="slotsGrid"></div>';
-  dragWord=dragSource=selectedWord=touchWord=touchSource=null;
+  dragWord=dragSource=selectedWord=null;
   var bank=document.getElementById('wordBank');
-  shuffle(PARTS.map(function(p){return p.name;})).forEach(function(word){
+  MTDnD.shuffle(PARTS.map(function(p){return p.name;})).forEach(function(word){
     var chip=document.createElement('span'); chip.className='word-chip'; chip.textContent=word; chip.dataset.word=word; chip.setAttribute('draggable','true');
     chip.addEventListener('dragstart', function(e){ dragWord=word; dragSource=chip; e.dataTransfer.effectAllowed='move'; });
-    chip.addEventListener('touchstart', function(e){ onTouchStart(e, chip, word, false); }, {passive:false});
+    chip.addEventListener('touchstart', function(e){ MTDnD.touchStart(e, chip, word, false, '.slot-box', onDrop); }, {passive:false});
     chip.addEventListener('click', function(){ selectChip(chip, word); });
     bank.appendChild(chip);
   });
@@ -220,7 +224,7 @@ function buildEinfach(body){
     box.addEventListener('dragleave', function(){ box.classList.remove('over'); });
     box.addEventListener('drop', function(e){ e.preventDefault(); box.classList.remove('over'); dropOnSlot(box); });
     box.addEventListener('dragstart', function(e){ if(!box.dataset.filled){e.preventDefault();return;} dragWord=box.dataset.filled; dragSource=box; e.dataTransfer.effectAllowed='move'; });
-    box.addEventListener('touchstart', function(e){ if(!box.dataset.filled) return; onTouchStart(e, box, box.dataset.filled, true); }, {passive:false});
+    box.addEventListener('touchstart', function(e){ if(!box.dataset.filled) return; MTDnD.touchStart(e, box, box.dataset.filled, true, '.slot-box', onDrop); }, {passive:false});
     box.addEventListener('click', function(){ clickBox(box); });
     row.appendChild(badge); row.appendChild(box); grid.appendChild(row);
   });
@@ -250,25 +254,6 @@ function fillSlot(box, word){ box.dataset.filled=word; box.textContent=word; box
 function clearSlot(box){ delete box.dataset.filled; box.textContent='—'; box.className='slot-box'; box.setAttribute('draggable','false'); }
 function markUsed(word){ var done=false; document.querySelectorAll('.word-chip').forEach(function(c){ if(!done && c.dataset.word===word && !c.classList.contains('used')){ c.classList.add('used'); done=true; } }); }
 function returnWord(word){ var done=false; document.querySelectorAll('.word-chip').forEach(function(c){ if(!done && c.dataset.word===word && c.classList.contains('used')){ c.classList.remove('used'); done=true; } }); }
-function onTouchStart(e, el, word, isSlot){
-  if(e.touches.length!==1) return; e.preventDefault();
-  var t=e.touches[0], rect=el.getBoundingClientRect();
-  touchWord=word; touchSource={el:el,isSlot:isSlot}; touchOffX=t.clientX-rect.left; touchOffY=t.clientY-rect.top;
-  touchCloneEl.textContent=word; touchCloneEl.style.left=(t.clientX-touchOffX)+'px'; touchCloneEl.style.top=(t.clientY-touchOffY)+'px'; touchCloneEl.style.display='block'; el.style.opacity='0.25';
-}
-document.addEventListener('touchmove', function(e){ if(!touchWord) return; e.preventDefault(); var t=e.touches[0]; touchCloneEl.style.left=(t.clientX-touchOffX)+'px'; touchCloneEl.style.top=(t.clientY-touchOffY)+'px'; }, {passive:false});
-document.addEventListener('touchend', function(e){
-  if(!touchWord) return; var t=e.changedTouches[0];
-  touchCloneEl.style.display='none'; touchSource.el.style.opacity='';
-  var under=document.elementFromPoint(t.clientX, t.clientY); var box=under?under.closest('.slot-box'):null;
-  if(box&&!box.classList.contains('correct')&&!box.classList.contains('wrong')){
-    var displaced=box.dataset.filled||null;
-    if(touchSource.isSlot){ clearSlot(touchSource.el); if(displaced) fillSlot(touchSource.el, displaced); }
-    else { markUsed(touchWord); if(displaced) returnWord(displaced); }
-    fillSlot(box, touchWord);
-  }
-  touchWord=touchSource=null;
-});
 function checkEinfach(){
   var correct=0, filled=0;
   document.querySelectorAll('.slot-box').forEach(function(box){
@@ -307,7 +292,7 @@ function checkSchwer(){
 /* MITTEL (Hotspot, nächstgelegenes Bauteil) */
 var hsOrder=[], hsIndex=0, hsMiss=0;
 function buildMittel(body){
-  hsOrder=shuffle(PARTS.slice()); hsIndex=0; hsMiss=0;
+  hsOrder=MTDnD.shuffle(PARTS.slice()); hsIndex=0; hsMiss=0;
   body.innerHTML='<div class="hs-prompt" id="hsPrompt"></div>';
   var hl=document.getElementById('hotspotLayer'); hl.classList.add('active'); hl.onclick=onHotspotClick;
   if(DEBUG) drawDebugZones();
