@@ -150,6 +150,33 @@
 
     .check-btn-row { margin-top:16px; }
 
+    /* Slides */
+    .slideshow { border-radius:10px; overflow:hidden; box-shadow:0 6px 28px rgba(0,0,0,0.13),0 1px 4px rgba(0,0,0,0.07); border:1px solid rgba(0,0,0,0.08); }
+    .slide-panel { display:none; }
+    .slide-panel.active { display:block; }
+    .slide-panel.slide-in-right { animation:slideInRight 0.3s cubic-bezier(0.22,0.61,0.36,1) both; }
+    .slide-panel.slide-in-left  { animation:slideInLeft  0.3s cubic-bezier(0.22,0.61,0.36,1) both; }
+    @keyframes slideInRight { from{transform:translateX(44px);opacity:0} to{transform:translateX(0);opacity:1} }
+    @keyframes slideInLeft  { from{transform:translateX(-44px);opacity:0} to{transform:translateX(0);opacity:1} }
+    .slide-header { padding:20px 22px 16px; display:flex; align-items:center; gap:16px; border-bottom:1px solid rgba(0,0,0,0.09); }
+    .slide-icon { font-size:2.5rem; line-height:1; flex-shrink:0; width:56px; height:56px; display:flex; align-items:center; justify-content:center; border-radius:10px; background:rgba(255,255,255,0.52); box-shadow:0 1px 5px rgba(0,0,0,0.12); }
+    .slide-htitle { font-size:1.05rem; font-weight:700; line-height:1.3; }
+    .slide-body { padding:16px 22px 14px; font-size:0.9rem; line-height:1.65; color:var(--text); background:var(--surface); }
+    .slide-body p { margin-bottom:10px; }
+    .slide-body ul,.slide-body ol { margin:0 0 10px 1.2rem; }
+    .slide-body li { margin-bottom:6px; }
+    .slide-body b { color:var(--blue-dark); }
+    .slide-body .factbox { background:var(--blue-tint); border-left:4px solid var(--blue-light); border-radius:var(--radius-sm); padding:9px 13px; margin:10px 0 2px; font-size:0.84rem; line-height:1.55; }
+    .slide-nav-row { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:16px; }
+    .slide-dots { display:flex; gap:6px; align-items:center; }
+    .slide-dot { width:8px; height:8px; border-radius:50%; background:var(--border); transition:background 0.2s,transform 0.2s; cursor:pointer; }
+    .slide-dot.active { background:var(--blue-dark); transform:scale(1.35); }
+    .slide-dot.done { background:var(--blue-light); }
+    .slide-nav-btn { font-family:var(--font); font-size:0.82rem; font-weight:600; padding:7px 14px; border-radius:20px; border:1.5px solid var(--border); background:var(--surface); color:var(--text-muted); cursor:pointer; transition:all 0.15s; }
+    .slide-nav-btn:hover:not(:disabled) { border-color:var(--blue-light); color:var(--blue-dark); }
+    .slide-nav-btn:disabled { opacity:0.32; cursor:default; }
+    .slide-counter { font-size:0.76rem; color:var(--text-subtle); font-weight:600; white-space:nowrap; }
+
     /* Auswertung */
     .finish { text-align:center; }
     .finish .rank { font-size:1.25rem; font-weight:800; color:var(--blue-dark); margin:4px 0 2px; }
@@ -215,23 +242,23 @@
    ============================================================ */
 var ALL = [
   /* 0 */ {
-    kicker: 'Info · Grundlagen', title: 'Was ist Sbrinz AOP?',
-    lead: 'Lesen Sie den Steckbrief. Gleich danach prüfen Sie Ihr Wissen.',
-    type: 'info',
-    read:
-      '<p><b>Sbrinz AOP</b> ist der älteste Schweizer Käse und ein <b>Extrahartkäse</b> aus der Zentralschweiz. Er wird aus <b>roher Kuhmilch</b> hergestellt und reift <b>mindestens 18 Monate</b>, typischerweise <b>2–4 Jahre</b>.</p>' +
-      '<h4>Warum ein Extrahartkäse?</h4>' +
-      '<p>Die Einteilung in Käsegruppen richtet sich nach dem <b>Wassergehalt</b>: je weniger Wasser, desto härter der Käse. Weil der Wassergehalt des Sbrinz mit <b>maximal 330 g/kg</b> (rund 33 %) sehr tief liegt, stuft man ihn als <b>Extrahartkäse</b> ein. Der tiefe Wassergehalt macht ihn auch sehr lange haltbar.</p>' +
-      '<h4>Herkunft des Namens</h4>' +
-      '<p>Der Name geht vermutlich auf den Handelsort <b>Brienz</b> zurück: im Mittelalter Ausgangspunkt der Käsetransporte über die Alpenpässe nach Italien. Italienische Händler machten aus „Brienz“ vermutlich „Sbrinz“.</p>' +
-      '<h4>Zahlen &amp; Fakten</h4>' +
-      '<ul>' +
-        '<li>Herstellgebiet: <b>LU, SZ, OW, NW, ZG, AG</b> (Zentralschweiz)</li>' +
-        '<li>Rund 20 Dorfkäsereien + ca. 10 Alpbetriebe</li>' +
-        '<li>Jahresproduktion ca. <b>1500 Tonnen</b>, Exportanteil ca. 15 %</li>' +
-        '<li>Laib: <b>35–48 kg</b>, Durchmesser 50–62 cm</li>' +
-      '</ul>' +
-      '<div class="factbox">Typische Verwendung: fein <b>gehobelt</b> (Möckli) oder gerieben, dank des extraharten, gut reibfähigen Teigs.</div>'
+    kicker: 'Folien · Grundlagen', title: 'Was ist Sbrinz AOP?',
+    lead: 'Lesen Sie alle Folien, danach prüfen Sie sich.',
+    type: 'slides',
+    slides: [
+      { icon: '🧀', color: '#78350f', bg: '#fffbeb',
+        title: 'Steckbrief: Sbrinz AOP',
+        body: '<p><b>Sbrinz AOP</b> ist der älteste Schweizer Käse und ein <b>Extrahartkäse</b> aus der Zentralschweiz.</p>' +
+              '<ul><li>Milch: <b>rohe Kuhmilch</b></li><li>Reifung: <b>mindestens 18 Monate</b>, typischerweise 2 bis 4 Jahre</li><li>Einteilung: Extrahartkäse dank maximal <b>330 g/kg Wassergehalt</b></li></ul>' +
+              '<div class=”factbox”>Der tiefe Wassergehalt macht Sbrinz sehr lange haltbar und erklärt die extraharte, gut reibfähige Textur.</div>'
+      },
+      { icon: '📊', color: '#1e40af', bg: '#eff6ff',
+        title: 'Zahlen & Fakten',
+        body: '<ul><li>Herstellgebiet: <b>LU, SZ, OW, NW, ZG, AG</b></li><li>Rund 20 Dorfkäsereien + ca. 10 Alpbetriebe</li><li>Jahresproduktion ca. <b>1500 Tonnen</b>, Exportanteil ca. 15 %</li><li>Laib: <b>35 bis 48 kg</b>, Durchmesser 50 bis 62 cm</li></ul>' +
+              '<p><b>Herkunft des Namens:</b> Vermutlich vom Handelsort <b>Brienz</b> – im Mittelalter Ausgangspunkt der Käsetransporte über die Alpenpässe nach Italien.</p>' +
+              '<div class=”factbox”>Typische Verwendung: fein <b>gehobelt</b> (Möckli) oder gerieben.</div>'
+      }
+    ]
   },
   /* 1 */ {
     kicker: 'Quiz', title: 'Steckbrief',
@@ -247,26 +274,27 @@ var ALL = [
     ]
   },
   /* 2 */ {
-    kicker: 'Info · AOP', title: 'AOP & das Pflichtenheft',
-    lead: 'Warum darf nicht jeder Hartkäse „Sbrinz“ heissen?',
-    type: 'info',
-    read:
-      '<p><b>AOP</b> steht für <i>Appellation d’Origine Protégée</i>, „geschützte Ursprungsbezeichnung“. Nur Käse, der ein verbindliches <b>Pflichtenheft</b> einhält, darf den Namen Sbrinz AOP tragen.</p>' +
-      '<h4>Wichtige Pflichtenheft-Vorgaben</h4>' +
-      '<ul>' +
-        '<li>Verarbeitung im <b>Kupferkessi / Kupferfertiger</b></li>' +
-        '<li><b>Rohmilch</b> (kein Thermisieren, Pasteurisieren, Baktofugieren, Filtrieren)</li>' +
-        '<li>Nur <b>thermophile Kulturen, Lab und Speisesalz</b> (keine GVO)</li>' +
-        '<li>Milch spätestens <b>24 h</b> nach dem ältesten Gemelk verarbeiten</li>' +
-        '<li>Salzbad <b>mind. 15 Tage</b>; erste <b>12 Monate</b> Reifung im AOP-Gebiet</li>' +
-      '</ul>' +
-      '<div class="factbox">Die <b>Kaseinmarke</b> im Laib weist Herkunft, Laib-Nummer, Jahr und Betrieb nach: der „Ausweis“ jedes Sbrinz.</div>',
+    kicker: ‘Folien · AOP’, title: ‘AOP & das Pflichtenheft’,
+    lead: ‘Lesen Sie alle Folien, danach prüfen Sie sich.’,
+    type: ‘slides’,
     media:
-      '<figure class="media-figure" style="margin-bottom:12px;">' +
-        '<img src="images/lernsession-sbrinz/kupferfertiger.jpg" alt="Kupferfertiger zur Sbrinz-Herstellung" loading="lazy">' +
-        '<figcaption>Verarbeitung im Kupferfertiger (Pflichtenheft-Vorgabe)</figcaption>' +
-      '</figure>' +
-      '<a class="pdf-link" href="images/lernsession-sbrinz/Pflichtenheft_Sbrinz.pdf" target="_blank" rel="noopener">📄 Pflichtenheft Sbrinz AOP öffnen (PDF, 5 Seiten)</a>'
+      ‘<figure class=”media-figure” style=”margin-bottom:12px;”>’ +
+        ‘<img src=”images/lernsession-sbrinz/kupferfertiger.jpg” alt=”Kupferfertiger zur Sbrinz-Herstellung” loading=”lazy”>’ +
+        ‘<figcaption>Verarbeitung im Kupferfertiger (Pflichtenheft-Vorgabe)</figcaption>’ +
+      ‘</figure>’ +
+      ‘<a class=”pdf-link” href=”images/lernsession-sbrinz/Pflichtenheft_Sbrinz.pdf” target=”_blank” rel=”noopener”>📄 Pflichtenheft Sbrinz AOP öffnen (PDF, 5 Seiten)</a>’,
+    slides: [
+      { icon: ‘🔏’, color: ‘#166534’, bg: ‘#f0fdf4’,
+        title: ‘Was bedeutet AOP?’,
+        body: ‘<p><b>AOP</b> steht für <i>Appellation d\’Origine Protégée</i> – geschützte Ursprungsbezeichnung. Nur Käse, der ein verbindliches <b>Pflichtenheft</b> einhält, darf den Namen Sbrinz AOP tragen.</p>’ +
+              ‘<p>Die <b>Kaseinmarke</b> im Laib weist Herkunft, Laib-Nummer, Jahr und Betrieb nach – der Ausweis jedes Sbrinz.</p>’ +
+              ‘<div class=”factbox”>Das Pflichtenheft schützt sowohl Konsumenten als auch Produzenten: Qualität und Herkunft sind garantiert.</div>’
+      },
+      { icon: ‘📋’, color: ‘#7c3aed’, bg: ‘#f5f3ff’,
+        title: ‘Wichtige Pflichtenheft-Vorgaben’,
+        body: ‘<ul><li>Verarbeitung im <b>Kupferkessi oder Kupferfertiger</b></li><li><b>Rohmilch:</b> kein Thermisieren, Pasteurisieren, Baktofugieren oder Filtrieren</li><li>Nur <b>thermophile Kulturen, Lab und Speisesalz</b> – keine GVO</li><li>Milch spätestens <b>24 Stunden</b> nach dem ältesten Gemelk verarbeiten</li><li>Salzbad <b>mindestens 15 Tage</b></li><li>Erste <b>12 Monate</b> Reifung im AOP-Gebiet</li></ul>’
+      }
+    ]
   },
   /* 3 */ {
     kicker: 'Wahr oder Falsch', title: 'Pflichtenheft', id: 'pflichtenheft',
@@ -282,20 +310,21 @@ var ALL = [
     ]
   },
   /* 4 */ {
-    kicker: 'Info · Rohstoff', title: 'Milch & Kulturen',
-    lead: 'Was macht die Sbrinz-Milch besonders?',
-    type: 'info',
-    read:
-      '<p>Die Sbrinz-Milch muss möglichst <b>wenige Propionsäure- und Buttersäurebakterien</b> enthalten. Diese Fremdkeime stammen aus dem Erdreich (Futter, schmutzige Euter, Staub) und können in der langen Reifung eine <b>Nachgärung</b> mit Löchern, Rissen und Fehlgeschmack verursachen.</p>' +
-      '<h4>Kein Wasserzusatz</h4>' +
-      '<p>Beim Sbrinz wird (ausser Spülwasser, max. 2 %) <b>kein Wasser zugesetzt</b>. So bleibt viel Milchzucker erhalten → viel Milchsäure → diese löst Kalzium aus dem Kaseingerüst → <b>fester, kerniger, brüchiger</b> Teig.</p>' +
-      '<h4>Anforderungen an die Kulturen</h4>' +
-      '<ul>' +
-        '<li><b>thermophil</b>: überleben die hohe Brenntemperatur (55–57 °C)</li>' +
-        '<li><b>homofermentativ</b>: keine Gasbildung, sonst Risse / „Gläs“</li>' +
-        '<li>Zusatz ca. 2–2,5 ‰, Vorreifung ca. 30 min</li>' +
-      '</ul>' +
-      '<div class="factbox">Fettgehalt der Verarbeitungsmilch: <b>2,9–3,0 %</b>. Zu viel Fett → weicher, schmieriger Teig, der beim Reiben verklebt.</div>'
+    kicker: 'Folien · Rohstoff', title: 'Milch & Kulturen',
+    lead: 'Lesen Sie alle Folien, danach prüfen Sie sich.',
+    type: 'slides',
+    slides: [
+      { icon: '🥛', color: '#0f766e', bg: '#f0fdfa',
+        title: 'Anforderungen an die Sbrinz-Milch',
+        body: '<p>Die Sbrinz-Milch soll möglichst <b>wenige Propionsäure- und Buttersäurebakterien</b> enthalten. Diese Fremdkeime stammen aus dem Erdreich und können in der langen Reifung eine <b>Nachgärung</b> mit Löchern, Rissen und Fehlgeschmack verursachen.</p>' +
+              '<p><b>Kein Wasserzusatz</b> (ausser Spülwasser, max. 2 %): So bleibt viel Milchzucker erhalten – daraus entsteht viel Milchsäure – diese löst Kalzium aus dem Kaseingerüst – Ergebnis: <b>fester, kerniger, brüchiger</b> Teig.</p>'
+      },
+      { icon: '🦠', color: '#b45309', bg: '#fffbeb',
+        title: 'Anforderungen an die Kulturen',
+        body: '<ul><li><b>Thermophil:</b> Überleben die hohe Brenntemperatur von 55 bis 57 °C</li><li><b>Homofermentativ:</b> Keine Gasbildung, sonst Risse und «Gläs»</li><li>Zugabemenge: ca. <b>2 bis 2,5 ‰</b></li><li>Vorreifung: ca. <b>30 Minuten</b></li></ul>' +
+              '<div class=”factbox”>Fettgehalt der Verarbeitungsmilch: <b>2,9 bis 3,0 %</b>. Zu viel Fett ergibt einen weichen, schmierigen Teig, der beim Reiben verklebt.</div>'
+      }
+    ]
   },
   /* 5 */ {
     kicker: 'Lückentext', title: 'Milch & Kulturen',
@@ -316,23 +345,22 @@ var ALL = [
     ]
   },
   /* 6 */ {
-    kicker: 'Info · Herstellung', title: 'Vom Kessi zum Bruch',
-    lead: 'Einlaben, schneiden und brennen, Schritt für Schritt.',
-    type: 'info',
-    read:
-      '<p>Im <b>Kupferkessi</b> wird die Rohmilch mit Kultur und Lab dickgelegt.</p>' +
-      '<h4>Einlaben &amp; Schneiden</h4>' +
-      '<ul>' +
-        '<li>Gerinnungstemperatur ca. <b>31–32 °C</b>, Labungszeit ca. 35–40 min</li>' +
-        '<li>Ohne Wasserzusatz nimmt der Griff schnell zu → <b>früh schneiden</b>, sonst „Überschiessen“ (Hautbildung um die Bruchkörner)</li>' +
-        '<li><b>feine Bruchgrösse</b> → bessere Entsirtung (Trocknung)</li>' +
-      '</ul>' +
-      '<h4>Brennen in zwei Phasen</h4>' +
-      '<ul>' +
-        '<li>Erste 20 min: langsam auf max. <b>40 °C</b></li>' +
-        '<li>Nächste 20 min: auf die Maximaltemperatur <b>55–56 °C</b></li>' +
-      '</ul>' +
-      '<div class="factbox">Der langsame Start verhindert das Überschiessen der Bruchkörner. Die hohe Endtemperatur reduziert Fremdkeime und fördert die Synärese (Entsirten).</div>'
+    kicker: 'Folien · Herstellung', title: 'Vom Kessi zum Bruch',
+    lead: 'Lesen Sie alle Folien, danach prüfen Sie sich.',
+    type: 'slides',
+    slides: [
+      { icon: '⚗️', color: '#1d4ed8', bg: '#eff6ff',
+        title: 'Einlaben & Schneiden',
+        body: '<ul><li>Gerinnungstemperatur: ca. <b>31 bis 32 °C</b>, Labungszeit ca. 35 bis 40 Minuten</li><li>Ohne Wasserzusatz nimmt der Griff schnell zu – deshalb: <b>früh schneiden</b>, sonst «Überschiessen» mit Hautbildung um die Bruchkörner</li><li><b>Feine Bruchgrösse</b> sorgt für bessere Entsirtung (Trocknung)</li></ul>' +
+              '<div class=”factbox”>«Überschiessen»: Zu schnelle Entsirtung an der Kornoberfläche bildet eine Haut, die die weitere Entsirtung behindert.</div>'
+      },
+      { icon: '🔥', color: '#c2410c', bg: '#fff7ed',
+        title: 'Brennen in zwei Phasen',
+        body: '<p><b>Phase 1:</b> Erste 20 Minuten langsam auf maximal <b>40 °C</b>.</p>' +
+              '<p><b>Phase 2:</b> Nächste 20 Minuten auf die Maximaltemperatur <b>55 bis 56 °C</b>.</p>' +
+              '<div class=”factbox”>Der langsame Start verhindert das Überschiessen der Bruchkörner. Die hohe Endtemperatur reduziert Fremdkeime stark und fördert die Synärese (Entsirten).</div>'
+      }
+    ]
   },
   /* 7 */ {
     kicker: 'Entscheidung', title: 'Bruch brennen: die richtige Temperatur',
@@ -348,24 +376,22 @@ var ALL = [
     ]
   },
   /* 8 */ {
-    kicker: 'Info · Reifung', title: 'Salzen & Reifung',
-    lead: 'Schauen Sie sich das Salzbad und die Reifung an, inkl. Video aus dem Sbrinz-Lager.',
-    type: 'info',
-    read:
-      '<p>Nach dem Pressen kommt der Sbrinz ins <b>Salzbad</b>, das mit <b>mind. 15 Tagen</b> (heute 18–20) extrem lang.</p>' +
-      '<h4>Ideale Salzbad-Werte</h4>' +
-      '<ul>' +
-        '<li>Konzentration <b>20–22 °Bé</b> (zu tief und zu hoch verzögern die Aufnahme)</li>' +
-        '<li>Temperatur <b>12–15 °C</b></li>' +
-        '<li>Ziel-Salzgehalt im Käse: mind. <b>10–15 g/kg</b></li>' +
-      '</ul>' +
-      '<p>Der hohe Salzgehalt verfestigt Narben und Teig, hemmt die <b>Nachgärung</b> und unterstützt das Aroma. <b>Nachsalzen</b> wird nicht empfohlen, es führt zu Verfärbungen.</p>' +
-      '<h4>Reifung</h4>' +
-      '<ul>' +
-        '<li><b>Abschwitzen</b> im Gärkeller (12–18 °C): wöchentlich wenden und das geschwitzte Fett verreiben</li>' +
-        '<li>Danach Reifung bei 9–14 °C, <b>stehend im Stotzgestell</b></li>' +
-        '<li>Gesamtreifung <b>2–4 Jahre</b>: keine zweite Gärung, langsame, intensive Aromabildung</li>' +
-      '</ul>',
+    kicker: 'Folien · Reifung', title: 'Salzen & Reifung',
+    lead: 'Lesen Sie alle Folien, danach prüfen Sie sich.',
+    type: 'slides',
+    slides: [
+      { icon: '🧂', color: '#1e3a5f', bg: '#f0f8ff',
+        title: 'Das Salzbad',
+        body: '<p>Das Salzbad dauert <b>mindestens 15 Tage</b> (heute üblich 18 bis 20 Tage) – extrem lang im Vergleich zu anderen Käsesorten.</p>' +
+              '<ul><li>Konzentration: <b>20 bis 22 °Bé</b></li><li>Temperatur: <b>12 bis 15 °C</b></li><li>Ziel-Salzgehalt im Käse: mind. <b>10 bis 15 g/kg</b></li></ul>' +
+              '<div class="factbox"><b>Kein Nachsalzen</b> empfohlen: Es führt zu unschönen Verfärbungen an der Rinde.</div>'
+      },
+      { icon: '🏠', color: '#166534', bg: '#f0fdf4',
+        title: 'Reifung',
+        body: '<ul><li><b>Abschwitzen</b> im Gärkeller (12 bis 18 °C): wöchentlich wenden und das geschwitzte Fett verreiben</li><li>Danach Reifung bei <b>9 bis 14 °C</b>, stehend im <b>Stotzgestell</b></li><li>Gesamtreifung <b>2 bis 4 Jahre</b>: keine zweite Gärung, langsame, intensive Aromabildung</li></ul>' +
+              '<div class="factbox">Der hohe Salzgehalt verfestigt Narben und Teig, hemmt die Nachgärung und unterstützt die Aromaentwicklung.</div>'
+      }
+    ],
     media:
       '<div class="media-grid">' +
         '<figure class="media-figure">' +
@@ -403,18 +429,21 @@ var ALL = [
     ]
   },
   /* 10 */ {
-    kicker: 'Info · Qualität', title: 'Qualität & typische Fehler',
-    lead: 'Woran erkennt man einen guten Sbrinz, und was geht schief?',
-    type: 'info',
-    read:
-      '<p>Der grösste Feind des Sbrinz ist die <b>Nachgärung durch Propionsäurebakterien</b>: Sie bilden in der langen Reifung Gas → <b>Löcher, Risse und „Gläs“</b>, plus atypischer Geschmack. Solcher Käse darf nicht als Sbrinz verkauft werden.</p>' +
-      '<h4>So soll ein guter Sbrinz sein</h4>' +
-      '<ul>' +
-        '<li>Teig <b>elfenbein- bis hellgelb</b>, leicht bis mittel brüchig, eher trocken</li>' +
-        '<li>Lochung: keine oder nur kleine, runde Löcher (bis ca. 6 mm), griessige Kristalle</li>' +
-        '<li>Geschmack: salzig, sauer, leicht süsslich, fruchtig-geröstete Note</li>' +
-      '</ul>' +
-      '<div class="factbox"><b>Klassierung:</b> Taxierung mit max. 20 Punkten. Als Sbrinz AOP zugelassen nur mit <b>mind. 18 Punkten</b> und keinem Kriterium unter 4, sonst 2. Klasse → Reib-/Schmelzkäse.</div>',
+    kicker: 'Folien · Qualität', title: 'Qualität & typische Fehler',
+    lead: 'Lesen Sie alle Folien, danach prüfen Sie sich.',
+    type: 'slides',
+    slides: [
+      { icon: '✅', color: '#166534', bg: '#f0fdf4',
+        title: 'So soll ein guter Sbrinz sein',
+        body: '<ul><li>Teig: <b>elfenbein- bis hellgelb</b>, leicht bis mittel brüchig, eher trocken</li><li>Lochung: keine oder nur kleine, runde Löcher (bis ca. 6 mm), griessige Kristalle</li><li>Geschmack: salzig, sauer, leicht süsslich, fruchtig-geröstete Note</li></ul>' +
+              '<div class=”factbox”><b>Klassierung:</b> Taxierung mit max. 20 Punkten. Als Sbrinz AOP zugelassen nur mit mind. <b>18 Punkten</b> und keinem Kriterium unter 4 – sonst 2. Klasse für Reib- und Schmelzkäse.</div>'
+      },
+      { icon: '⚠️', color: '#92400e', bg: '#fff7ed',
+        title: 'Typische Fehler',
+        body: '<p>Der grösste Feind des Sbrinz ist die <b>Nachgärung durch Propionsäurebakterien</b>: Sie bilden in der langen Reifung Gas – Folge: <b>Löcher, Risse und «Gläs»</b> sowie atypischer Geschmack. Solcher Käse darf <b>nicht</b> als Sbrinz AOP verkauft werden.</p>' +
+              '<div class=”factbox”>Vorbeugung: tiefe Fremdkeimbelastung in der Rohmilch, korrekte Brenntemperatur (55 bis 56 °C) und ausreichend langes Salzbad (mind. 15 Tage).</div>'
+      }
+    ],
     media:
       '<div class="media-grid">' +
         '<figure class="media-figure">' +
@@ -460,7 +489,7 @@ var ALL = [
 ];
 
 var MODE = /[?&]mode=challenge/.test(location.search) ? 'challenge' : 'lernpfad';
-var STATIONS = ALL.filter(function(s){ return MODE === 'challenge' ? s.type !== 'info' : true; });
+var STATIONS = ALL.filter(function(s){ return MODE === 'challenge' ? (s.type !== 'info' && s.type !== 'slides') : true; });
 (function(){
   var t = (MODE === 'challenge') ? 'Challenge' : 'Lernpfad';
   document.getElementById('pageTitle').textContent = t + ': Sbrinz AOP';
@@ -540,6 +569,7 @@ function buildAll() {
 function buildBody(idx, st) {
   var body = document.getElementById('body-' + idx);
   if (st.type === 'info')   buildInfo(body, idx, st);
+  if (st.type === 'slides') buildSlides(body, idx, st);
   if (st.type === 'quiz')   buildQuiz(body, idx, st);
   if (st.type === 'tf')     buildTF(body, idx, st);
   if (st.type === 'gaps')   buildGaps(body, idx, st);
@@ -553,6 +583,76 @@ function buildInfo(body, idx, st) {
   body.innerHTML =
     '<div class="read">' + st.read + '</div>' +
     '<div class="read-btn-row"><button class="btn btn-primary" id="readbtn-' + idx + '">Gelesen ✓ (+5 XP)</button></div>';
+  document.getElementById('readbtn-' + idx).addEventListener('click', function() {
+    if (solved[idx]) return;
+    solved[idx] = true;
+    addXp(5);
+    this.disabled = true;
+    this.textContent = 'Gelesen ✓';
+    updateNav();
+  });
+}
+
+/* ---------- Slides ---------- */
+function buildSlides(body, idx, st) {
+  maxPts[idx] = 0;
+  var cur = 0;
+  var slides = st.slides;
+
+  var html = '<div class="slideshow" id="ssw-' + idx + '">';
+  slides.forEach(function(sl, si) {
+    html += '<div class="slide-panel' + (si === 0 ? ' active' : '') + '" id="ssp-' + idx + '-' + si + '">';
+    html += '<div class="slide-header" style="background:' + sl.bg + ';">';
+    html += '<span class="slide-icon">' + sl.icon + '</span>';
+    html += '<span class="slide-htitle" style="color:' + sl.color + ';">' + sl.title + '</span>';
+    html += '</div><div class="slide-body">' + sl.body + '</div></div>';
+  });
+  html += '</div>';
+  html += '<div class="slide-nav-row">';
+  html += '<button class="slide-nav-btn" id="sprev-' + idx + '" disabled>← Zurück</button>';
+  html += '<div style="display:flex;align-items:center;gap:8px;"><div class="slide-dots" id="sdots-' + idx + '"></div>';
+  html += '<span class="slide-counter" id="sctr-' + idx + '"></span></div>';
+  html += '<button class="slide-nav-btn" id="snext-' + idx + '">Weiter →</button>';
+  html += '</div>';
+  html += '<div class="read-btn-row" id="sbtnrow-' + idx + '" style="display:' + (slides.length <= 1 ? '' : 'none') + '">';
+  html += '<button class="btn btn-primary" id="readbtn-' + idx + '">Gelesen ✓ (+5 XP)</button></div>';
+  body.innerHTML = html;
+
+  function renderDots() {
+    var el = document.getElementById('sdots-' + idx); el.innerHTML = '';
+    slides.forEach(function(sl, si) {
+      var d = document.createElement('span');
+      d.className = 'slide-dot' + (si === cur ? ' active' : si < cur ? ' done' : '');
+      d.addEventListener('click', function() { if (si !== cur) go(si); });
+      el.appendChild(d);
+    });
+    var ctr = document.getElementById('sctr-' + idx);
+    if (ctr) ctr.textContent = (cur + 1) + ' / ' + slides.length;
+  }
+  function renderNav() {
+    document.getElementById('sprev-' + idx).disabled = (cur === 0);
+    document.getElementById('snext-' + idx).disabled = (cur === slides.length - 1);
+    var btnRow = document.getElementById('sbtnrow-' + idx);
+    if (btnRow) btnRow.style.display = (cur === slides.length - 1) ? '' : 'none';
+  }
+  function go(newIdx) {
+    var dir = newIdx > cur ? 'right' : 'left';
+    slides.forEach(function(sl, si) { document.getElementById('ssp-' + idx + '-' + si).classList.remove('active', 'slide-in-right', 'slide-in-left'); });
+    var panel = document.getElementById('ssp-' + idx + '-' + newIdx);
+    panel.classList.add('active', dir === 'right' ? 'slide-in-right' : 'slide-in-left');
+    cur = newIdx; renderDots(); renderNav();
+  }
+  renderDots(); renderNav();
+  document.getElementById('sprev-' + idx).addEventListener('click', function() { if (cur > 0) go(cur - 1); });
+  document.getElementById('snext-' + idx).addEventListener('click', function() { if (cur < slides.length - 1) go(cur + 1); });
+
+  var tsX = 0;
+  document.getElementById('ssw-' + idx).addEventListener('touchstart', function(e) { tsX = e.touches[0].clientX; }, {passive: true});
+  document.getElementById('ssw-' + idx).addEventListener('touchend', function(e) {
+    var dx = e.changedTouches[0].clientX - tsX;
+    if (Math.abs(dx) > 42) { if (dx < 0 && cur < slides.length - 1) go(cur + 1); else if (dx > 0 && cur > 0) go(cur - 1); }
+  }, {passive: true});
+
   document.getElementById('readbtn-' + idx).addEventListener('click', function() {
     if (solved[idx]) return;
     solved[idx] = true;
