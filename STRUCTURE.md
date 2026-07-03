@@ -321,6 +321,56 @@ Referenz: `a8-kulturen/hotspot-bakterienzelle.html`
 
 ---
 
+### Slides-Station in Lernsession (Canonical Pattern)
+
+Referenz: `a7-technische-einrichtungen/lernsession-waermeerzeugung.html`
+
+Eine `type:'slides'`-Station zeigt 2–3 Folien als animierte Diashow (swipebar). Im **Challenge-Modus** wird dieser Stationstyp wie `info` und `pdf` herausgefiltert.
+
+**Stations-Datenstruktur:**
+```javascript
+{ kicker:'Folien · [Thema]', title:'[Stationstitel]', type:'slides',
+  lead:'Lesen Sie alle Folien, danach prüfen Sie sich.',
+  slides:[
+    { icon:'🔥',            // Emoji (gross, in abgerundetem Box)
+      color:'#92400e',      // Textfarbe Header
+      bg:'#fff7ed',         // Hintergrundfarbe Header
+      title:'[Folientitel]',
+      body:'<p>...</p>'     // HTML: <p>, <ul>, <ol>, <b>, <div class="factbox">
+    },
+    // 1–2 weitere Folien
+  ]
+}
+```
+
+**CSS-Klassen:**
+```css
+.slideshow          /* äusserer Container: border-radius, box-shadow, border */
+.slide-panel        /* einzelne Folie (display:none by default) */
+.slide-panel.active /* sichtbare Folie */
+.slide-in-right / .slide-in-left  /* Eintrittsanimation (cubic-bezier, 0.3 s) */
+.slide-header       /* farbige Kopfzeile: icon-box + Titel */
+.slide-icon         /* Emoji in abgerundetem Box (56×56 px, shadow) */
+.slide-htitle       /* Folientitel (1.05 rem, bold) */
+.slide-body         /* weisser Inhaltsbereich, 22 px horizontaler Abstand */
+.slide-body .factbox /* blauer Infokasten (var(--blue-tint), linker Balken) */
+```
+
+**Inhaltsregeln:**
+- Direkte Sie-Form: «Sie», «Ihre Aufgabe», «Sie als Milchtechnologe/in» – nie «Betreiber»
+- Keine Gedankenstrich-Separatoren (`–`). Satzende mit Punkt, danach neuer Satz.
+- Zahlenbereiche: «80 bis 110 °C» – nicht «80–110 °C»
+- 2–3 Folien pro Station; Lesemenge pro Folie: 4–8 kurze Sätze oder 4–6 Listenpunkte
+- `.factbox` für Merksätze, Grenzwerte, Formeln
+
+**Lese-Button:** Nur auf der letzten Folie sichtbar, Text `'Gelesen ✓ (+5 XP)'`.
+
+**Touch-Swipe:** Threshold 42 px horizontal (`touchstart`/`touchend` δx).
+
+**Navigation:** Dot-Indikatoren + Pfeil-Buttons links/rechts; Pfeilbuttons auf letzter Folie rechts ausgeblendet.
+
+---
+
 ## Checkliste – Neues Tool
 
 1. HTML-Datei im richtigen Modulordner erstellen
