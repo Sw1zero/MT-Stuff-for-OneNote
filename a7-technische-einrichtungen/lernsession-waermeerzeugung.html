@@ -78,6 +78,28 @@
     .read-btn:disabled { cursor:default; }
     .read-btn.done .read-btn-icon { background:linear-gradient(to bottom,#48bb78,#38a169); }
 
+    /* ---- Slideshow ---- */
+    .slideshow { border-radius:var(--radius-md); overflow:hidden; }
+    .slide-panel { display:none; }
+    .slide-panel.active { display:block; }
+    .slide-panel.slide-in-right { animation:slideInRight 0.3s cubic-bezier(0.22,0.61,0.36,1) both; }
+    .slide-panel.slide-in-left  { animation:slideInLeft  0.3s cubic-bezier(0.22,0.61,0.36,1) both; }
+    @keyframes slideInRight { from{transform:translateX(44px);opacity:0} to{transform:translateX(0);opacity:1} }
+    @keyframes slideInLeft  { from{transform:translateX(-44px);opacity:0} to{transform:translateX(0);opacity:1} }
+    .slide-header { padding:18px 20px 14px; display:flex; align-items:center; gap:14px; border-radius:var(--radius-md) var(--radius-md) 0 0; }
+    .slide-icon { font-size:2rem; line-height:1; flex-shrink:0; }
+    .slide-htitle { font-size:1.02rem; font-weight:700; }
+    .slide-body { padding:14px 2px 6px; }
+    .slide-nav-row { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:14px; }
+    .slide-dots { display:flex; gap:6px; align-items:center; }
+    .slide-dot { width:8px; height:8px; border-radius:50%; background:var(--border); transition:background 0.2s,transform 0.2s; cursor:pointer; }
+    .slide-dot.active { background:var(--blue-dark); transform:scale(1.35); }
+    .slide-dot.done { background:var(--blue-light); }
+    .slide-nav-btn { font-family:var(--font); font-size:0.82rem; font-weight:600; padding:7px 14px; border-radius:20px; border:1.5px solid var(--border); background:var(--surface); color:var(--text-muted); cursor:pointer; transition:all 0.15s; }
+    .slide-nav-btn:hover:not(:disabled) { border-color:var(--blue-light); color:var(--blue-dark); }
+    .slide-nav-btn:disabled { opacity:0.32; cursor:default; }
+    .slide-counter { font-size:0.76rem; color:var(--text-subtle); font-weight:600; white-space:nowrap; }
+
     .station-media { margin-bottom:18px; }
     .station-media img { width:100%; height:auto; display:block; border-radius:var(--radius-md); border:1px solid var(--border); box-shadow:var(--shadow-sm); }
 
@@ -207,16 +229,22 @@ var ALL = [
   { kicker:'Einstieg · Folien', title:'Präsentation zur Wärmeerzeugung', type:'pdf',
     lead:'Schauen Sie sich die Folien an, bevor Sie mit den Übungen beginnen.',
     src:'presentations/02_Waermeerzeugung.pdf' },
-  { kicker:'Info · Verbrennung', title:'Verbrennung & Brenner', type:'info',
-    lead:'Lesen Sie die Grundlagen, danach prüfen Sie sie.',
-    read:
-      '<p>Bei der <b>Verbrennung</b> verbinden sich brennbare Stoffe unter Wärme- und Lichtentwicklung mit dem Sauerstoff der Luft (rasche Oxidation). Dafür braucht es drei Dinge: <b>Brennstoff</b>, <b>Sauerstoff</b> und <b>Wärme</b> (Zündung).</p>' +
-      '<h4>Öl- und Gasbrenner</h4>' +
-      '<ul>' +
-        '<li><b>Ölbrenner</b>: Druckzerstäubung. Öl unter Druck durch eine Düse zu Nebel zerstäubt, mit Luft gemischt, elektrisch gezündet.</li>' +
-        '<li><b>Gasbrenner</b>: gleich, aber <b>ohne Brennstoffpumpe</b> (Gas steht schon unter Druck). Dafür Sicherheitseinrichtungen gegen Gasaustritt.</li>' +
-      '</ul>' +
-      '<div class="factbox">Die <b>Verbrennungsluft</b> soll so dosiert sein, dass der Brennstoff vollständig verbrennt. Zu viel oder zu wenig Luft erhöht den Verbrauch und belastet die Umwelt.</div>' },
+  { kicker:'Folien · Verbrennung', title:'Verbrennung & Brenner', type:'slides',
+    lead:'Lesen Sie alle Folien, danach prüfen Sie sich.',
+    slides:[
+      { icon:'🔥', color:'#92400e', bg:'#fff7ed',
+        title:'Das Verbrennungsdreieck',
+        body:'<p>Bei der <b>Verbrennung</b> verbinden sich brennbare Stoffe mit dem Sauerstoff der Luft (rasche Oxidation). Drei Dinge müssen gleichzeitig vorhanden sein:</p><ul><li><b>Brennstoff</b> (Heizöl oder Erdgas)</li><li><b>Sauerstoff</b> (Verbrennungsluft)</li><li><b>Wärme</b> (Zündtemperatur)</li></ul><div class="factbox">Fehlt eine dieser Bedingungen, erlischt die Flamme sofort.</div>'
+      },
+      { icon:'🛢️', color:'#1e4e8c', bg:'#dbeeff',
+        title:'Ölbrenner: Druckzerstäubung',
+        body:'<p>Beim Ölbrenner wird Heizöl durch eine <b>Düse</b> unter Druck zu feinem Nebel zerstäubt. Der Nebel wird mit Verbrennungsluft gemischt und elektrisch gezündet.</p><ul><li><b>Elektromotor</b> treibt Pumpe und Ventilatorrad an</li><li><b>Magnetventil</b> steuert die Ölzufuhr</li><li><b>Zündelektroden</b> erzeugen den Funken</li></ul>'
+      },
+      { icon:'💨', color:'#15803d', bg:'#dcfce7',
+        title:'Gasbrenner: Unterschiede',
+        body:'<p>Der Gasbrenner funktioniert ähnlich, aber <b>ohne Brennstoffpumpe</b> — das Gas steht bereits unter Druck.</p><ul><li>Keine Ölpumpe nötig</li><li>Dafür: <b>Sicherheitseinrichtungen</b> gegen Gasaustritt (Erdgas ist explosionsfähig)</li></ul><div class="factbox">Verbrennungsluft muss genau dosiert sein – zu viel oder zu wenig erhöht den Verbrauch und belastet die Umwelt.</div>'
+      }
+    ] },
   { kicker:'Wahr oder Falsch', title:'Verbrennung & Brenner', id:'a_tf', type:'tf',
     lead:'Stimmt die Aussage?',
     items:[
@@ -226,12 +254,22 @@ var ALL = [
       { s:'Zu viel Verbrennungsluft spart Brennstoff.', a:false, e:'Zu viel oder zu wenig Luft erhöht den Verbrauch.' },
       { s:'Bei Gasbrennern sind besondere Sicherheitseinrichtungen gegen Gasaustritt vorgeschrieben.', a:true, e:'Erdgas ist explosionsfähig.' }
     ] },
-  { kicker:'Info · Ölbrenner', title:'Ölbrenner: Funktionsweise', type:'info',
+  { kicker:'Folien · Ölbrenner', title:'Ölbrenner: Funktionsweise', type:'slides',
     lead:'Wie ein Ölbrenner arbeitet, danach beschriften Sie ihn.',
-    read:
-      '<p>Der <b>Elektromotor</b> treibt <b>Ventilatorrad</b> und <b>Ölpumpe</b> an. Die Pumpe fördert das Öl unter Druck über das <b>Magnetventil</b> zur <b>Düse</b>, wo es zu Nebel zerrissen wird. Die Verbrennungsluft gelangt über das Ventilatorrad in den <b>Flammkopf</b>.</p>' +
-      '<p>Die <b>Zündelektroden</b> erhalten vom <b>Zündtrafo</b> Hochspannung, der Funke entzündet das Gemisch. Der <b>Brennerautomat</b> steuert den Ablauf, der <b>Fotowiderstand</b> überwacht die Flamme.</p>' +
-      '<div class="factbox">Merken: <b>Brennerautomat</b> = steuert, <b>Fotowiderstand</b> = überwacht (Flammenwächter).</div>' },
+    slides:[
+      { icon:'⚙️', color:'#1e4e8c', bg:'#dbeeff',
+        title:'Motor, Pumpe & Gebläse',
+        body:'<p>Der <b>Elektromotor</b> treibt zwei Komponenten gleichzeitig an:</p><ul><li><b>Ölpumpe</b>: saugt Heizöl an und fördert es unter Druck</li><li><b>Ventilatorrad</b>: erzeugt den Luftstrom für die Verbrennung</li></ul><p>Das Öl gelangt über den <b>Ölschlauch-Anschluss</b> und das <b>Magnetventil</b> zur Düse.</p>'
+      },
+      { icon:'✨', color:'#92400e', bg:'#fff7ed',
+        title:'Düse & Zündung',
+        body:'<p>Am Brennerkopf passiert die eigentliche Verbrennung:</p><ul><li><b>Düsenschaft</b>: zerstäubt das Öl zu feinem Nebel</li><li><b>Zündtrafo</b>: erzeugt Hochspannung</li><li><b>Zündelektroden</b>: erzeugen den Funken → Gemisch entzündet sich</li><li><b>Flammkopf</b>: hält Flamme stabil</li></ul>'
+      },
+      { icon:'🛡️', color:'#6b21a8', bg:'#f3e8ff',
+        title:'Steuerung & Überwachung',
+        body:'<ul><li><b>Brennerautomat</b>: steuert den gesamten Ablauf (Zünden, Betrieb, Abschalten)</li><li><b>Fotowiderstand</b>: überwacht die Flamme kontinuierlich (Flammenwächter)</li><li><b>Luftansaugkasten</b> + <b>Drehschieber</b>: regeln die Verbrennungsluft</li></ul><div class="factbox">Merkhilfe: <b>Brennerautomat = steuert</b> · <b>Fotowiderstand = überwacht</b></div>'
+      }
+    ] },
   { kicker:'Beschriften', title:'Ölbrenner beschriften', id:'b_label', type:'label',
     lead:'Ordnen Sie jeder Nummer das richtige Bauteil zu.',
     media:'<img src="images/a.7_Oelbrenner_mit_Nummern.png" alt="Aufbau eines Ölbrenners mit nummerierten Bauteilen">',
@@ -252,21 +290,18 @@ var ALL = [
       { n:14, name:'Drehschieber für Lufteinstellung', keys:['drehschieber'] },
       { n:15, name:'Brennerautomat',             keys:['brennerautomat','automat'] }
     ] },
-  { kicker:'Info · Sicherheit', title:'Brenner: Sicherheit & Wartung', type:'info',
+  { kicker:'Folien · Sicherheit', title:'Brenner: Sicherheit & Wartung', type:'slides',
     lead:'Worauf es bei Sicherheit, Umwelt und Wartung ankommt.',
-    read:
-      '<h4>Sicherheit</h4>' +
-      '<p>Tritt bei erloschener Flamme Öl in den heissen Feuerraum, kann ein explosives Öldampf-Gemisch entstehen. Schutz:</p>' +
-      '<ul>' +
-        '<li><b>Flammenwächter (Fotowiderstand)</b>: Fällt die Flamme aus, sperrt der Brennerautomat über das Magnetventil sofort die Ölzufuhr. Den Fotowiderstand sauber halten, verrusst reagiert er nicht.</li>' +
-        '<li><b>Gasexplosionsklappen</b> am Feuerraum lassen einen Explosionsdruck ins Heizlokal entweichen.</li>' +
-      '</ul>' +
-      '<h4>Umwelt & Wartung</h4>' +
-      '<ul>' +
-        '<li><b>Rauchgasrezirkulation</b> senkt den Ausstoss von Stickstoffoxiden (<b>NOx</b>).</li>' +
-        '<li>Der <b>Betreiber</b> darf den Fotowiderstand selbst kontrollieren/reinigen und auf Geruch/Lärm achten. Den Brenner revidiert und stellt ein <b>Fachmann</b> periodisch.</li>' +
-        '<li>Die <b>Feuerungskontrolle</b> ist staatlich vorgeschrieben (Luftreinhalteverordnung).</li>' +
-      '</ul>' },
+    slides:[
+      { icon:'⚠️', color:'#c40027', bg:'#fde8ed',
+        title:'Sicherheit: Flammenwächter',
+        body:'<p>Erlischt die Flamme bei laufendem Brenner, kann Öl in den heissen Feuerraum strömen → <b>explosives Öldampfgemisch</b>. Schutz:</p><ul><li><b>Fotowiderstand</b>: erkennt Flammenausfall sofort → Brennerautomat sperrt Magnetventil</li><li><b>Gasexplosionsklappen</b>: lassen Überdruck ins Heizlokal entweichen</li></ul><div class="factbox">Fotowiderstand sauber halten – Russ hemmt seine Funktion!</div>'
+      },
+      { icon:'🔧', color:'#15803d', bg:'#dcfce7',
+        title:'Umwelt & Wartung',
+        body:'<ul><li><b>Rauchgasrezirkulation</b>: senkt NOx-Ausstoss</li><li><b>Betreiber</b> darf: Fotowiderstand reinigen, auf Geruch/Lärm achten</li><li><b>Fachmann</b> macht: Revision und Einstellung des Brenners</li><li><b>Kaminfeger</b>: reinigt feuerseitig zweimal jährlich</li></ul><div class="factbox"><b>Feuerungskontrolle</b> ist staatlich vorgeschrieben (Luftreinhalteverordnung).</div>'
+      }
+    ] },
   { kicker:'Quiz', title:'Sicherheit & Wartung', id:'c_quiz', type:'quiz',
     lead:'Vier Fragen.',
     questions:[
@@ -275,17 +310,22 @@ var ALL = [
       { q:'Was darf der Anlagenbetreiber selbst tun?', opts:['Den Fotowiderstand kontrollieren und reinigen','Den Brenner neu einstellen','Die Düse austauschen'], correct:0 },
       { q:'Wozu dient die Rauchgasrezirkulation?', opts:['Sie senkt den Ausstoss von Stickstoffoxiden (NOx)','Sie erhöht die Flammentemperatur','Sie spart Zündenergie'], correct:0 }
     ] },
-  { kicker:'Info · Dampfkessel', title:'Dampfkessel: Grundlagen', type:'info',
+  { kicker:'Folien · Dampfkessel', title:'Dampfkessel: Grundlagen', type:'slides',
     lead:'Wozu Dampf dient und welche Bauarten es gibt.',
-    read:
-      '<p>Der <b>Dampf</b> dient als Wärmeträger für Käsefertiger, Erhitzer, Desinfektion und Warmwasser. Er hat einen hohen Wärmeinhalt und strömt ohne Pumpe zu den Verbrauchern. Die grosse gespeicherte Energie ist zugleich eine <b>Gefahrenquelle</b> (Kesselexplosion), darum gelten strenge Vorschriften.</p>' +
-      '<h4>Bauarten</h4>' +
-      '<ul>' +
-        '<li><b>Dreizugdampfkessel</b>: Rauchrohrkessel mit Rohren auf drei Höhen, guter Wirkungsgrad (häufig).</li>' +
-        '<li><b>Niederdruckdampfkessel</b>: max. <b>0,5 bar</b> Betriebsüberdruck, <b>keine</b> SVTI-Kontrollpflicht.</li>' +
-        '<li><b>Schnelldampferzeuger</b>: wenig Wasserinhalt, kurze Anfahrzeit, günstig.</li>' +
-      '</ul>' +
-      '<div class="factbox">Bei allen Bauarten geben die heissen <b>Rauchgase</b> in Röhren ihre Wärme ans Kesselwasser ab und verlassen den Kessel über das Rauchrohr in den Kamin.</div>' },
+    slides:[
+      { icon:'♨️', color:'#1e4e8c', bg:'#dbeeff',
+        title:'Dampf als Wärmeträger',
+        body:'<p>Dampf dient in der Molkerei als <b>universeller Wärmeträger</b>: Käsefertiger beheizen, Erhitzer betreiben, Desinfektion, Warmwasserbereitung.</p><p>Vorteile: <b>hoher Wärmeinhalt</b>, strömt ohne Pumpe selbstständig zu den Verbrauchern.</p><div class="factbox">Die grosse gespeicherte Energie ist zugleich eine <b>Gefahrenquelle</b> – strenge Vorschriften!</div>'
+      },
+      { icon:'🏭', color:'#92400e', bg:'#fff7ed',
+        title:'Bauarten im Vergleich',
+        body:'<ul><li><b>Dreizugdampfkessel</b> (häufigste): Rauchrohrkessel mit Rohren auf 3 Höhen, guter Wirkungsgrad</li><li><b>Niederdruckdampfkessel</b>: max. 0,5 bar – <b>keine</b> SVTI-Kontrollpflicht</li><li><b>Schnelldampferzeuger</b>: wenig Wasserinhalt, kurze Anfahrzeit, kostengünstig</li></ul>'
+      },
+      { icon:'🌡️', color:'#15803d', bg:'#dcfce7',
+        title:'Funktionsprinzip',
+        body:'<p>Bei allen Bauarten: heisse <b>Rauchgase</b> strömen durch Röhren und geben Wärme ans <b>Kesselwasser</b> ab → Wasser verdampft → Dampf strömt zu den Verbrauchern → Rauchgase verlassen den Kessel über den <b>Kamin</b>.</p><div class="factbox">Rauchgase → Wärme → Dampf → Verbraucher → Kondensat zurück zum Kessel</div>'
+      }
+    ] },
   { kicker:'Beschriften', title:'Dreizugdampfkessel beschriften', id:'d_label', type:'label',
     lead:'Ordnen Sie jeder Nummer den richtigen Begriff zu.',
     media:'<img src="images/a.7_Dreizugdampfkessel_mit_Nummern.png" alt="Schema eines Dreizugdampfkessels mit Legende">',
@@ -297,15 +337,22 @@ var ALL = [
       { n:5, name:'Wasserumspülte Wendekammer', keys:['wendekammer','wasserumspuelte'] },
       { n:6, name:'Rauchrohr',                  keys:['rauchrohr'] }
     ] },
-  { kicker:'Info · Gefahren', title:'Gefahren am Dampfkessel', type:'info',
+  { kicker:'Folien · Gefahren', title:'Gefahren am Dampfkessel', type:'slides',
     lead:'Drei Hauptgefahren und das richtige Verhalten.',
-    read:
-      '<ul>' +
-        '<li><b>Zu grosser Überdruck</b>: Das <b>Sicherheitsventil</b> lässt überschüssigen Druck ab. Ist es verklemmt oder überlastet, kann der Kessel explodieren.</li>' +
-        '<li><b>Wassermangel</b>: Wasserstand unter der Minimalmarke → Heizfläche überhitzt, Material reisst (Feuerbüchse beult). <b>Nie kaltes Wasser nachspeisen!</b> Stattdessen Feuerung ausschalten, Sturmleitung öffnen, abkalten lassen. Glühende Heizfläche → Kesselinspektor.</li>' +
-        '<li><b>Kesselstein</b>: Kalk/Magnesium aus hartem Wasser lagert sich ab und isoliert die Heizfläche → Überhitzung. Verhindern durch <b>Wasseraufbereitung</b> (Enthärtung/Entsalzung) vor dem Kessel.</li>' +
-      '</ul>' +
-      '<div class="factbox">Alle drei Gefahren führen über Überhitzung oder Überdruck zur plötzlichen Energiefreigabe. Wartungs- und Bedienungsvorschriften unbedingt einhalten.</div>' },
+    slides:[
+      { icon:'💥', color:'#c40027', bg:'#fde8ed',
+        title:'Gefahr 1: Überdruck',
+        body:'<p>Steigt der Druck zu stark an, lässt das <b>Sicherheitsventil</b> überschüssigen Druck ab. Ist es verklemmt → <b>Kesselexplosion</b>.</p><div class="factbox">Sicherheitsventil regelmässig auf Funktion prüfen.</div>'
+      },
+      { icon:'💧', color:'#1e4e8c', bg:'#dbeeff',
+        title:'Gefahr 2: Wassermangel',
+        body:'<p>Wasserstand unter Minimalmarke → Heizfläche überhitzt → Material reisst.</p><p><b>Nie sofort kaltes Wasser nachspeisen!</b> Stattdessen:</p><ol><li>Feuerung ausschalten</li><li>Sturmleitung öffnen</li><li>Abkalten lassen</li><li>Bei Schäden: Kesselinspektor rufen</li></ol>'
+      },
+      { icon:'🪨', color:'#6b21a8', bg:'#f3e8ff',
+        title:'Gefahr 3: Kesselstein',
+        body:'<p>Kalk aus hartem Wasser lagert sich auf Heizflächen ab → isoliert → Überhitzung.</p><p><b>Vorbeugung</b>: Wasseraufbereitung (Enthärtung/Entsalzung) vor dem Kessel.</p><div class="factbox">Alle 3 Gefahren führen über Überhitzung oder Überdruck zur plötzlichen Energiefreigabe.</div>'
+      }
+    ] },
   { kicker:'Lückentext', title:'Gefahren am Dampfkessel', id:'e_gaps', type:'gaps',
     lead:'Füllen Sie die Lücken.',
     parts:[
@@ -323,15 +370,18 @@ var ALL = [
       { opts:['Wasseraufbereitung','höheren Druck','mehr Brennstoff'], correct:0 },
       ' vor dem Kessel.'
     ] },
-  { kicker:'Info · Warmwasser', title:'Warmwasseranlage', type:'info',
+  { kicker:'Folien · Warmwasser', title:'Warmwasseranlage', type:'slides',
     lead:'Aufbau und Regelung der Warmwasseranlage.',
-    read:
-      '<p>Die Warmwasseranlage ist ein <b>geschlossenes Rohrsystem</b> (ca. 3 bar). Das Wasser wird im Kessel auf <b>80–110 °C</b> erwärmt, von der <b>Umwälzpumpe</b> über den <b>Verteilerbalken</b> zu den Verbrauchern gepumpt und über den <b>Sammelbalken</b> zurückgeführt.</p>' +
-      '<ul>' +
-        '<li>Das <b>Mischventil</b> stellt die Vorlauftemperatur ein (kühleres Rücklaufwasser beimischen): Abendmilch ca. 30–40 °C, Käsebruch höher.</li>' +
-        '<li>Das <b>Ausdehnungs-/Expansionsgefäss</b> nimmt das Mehrvolumen auf, das beim Erwärmen entsteht.</li>' +
-        '<li>Der Brenner wird über eine Temperaturregelung in Stufen gesteuert.</li>' +
-      '</ul>' },
+    slides:[
+      { icon:'🔄', color:'#1e4e8c', bg:'#dbeeff',
+        title:'Aufbau & Kreislauf',
+        body:'<p>Geschlossenes Rohrsystem (~3 bar). Wasser wird auf <b>80–110 °C</b> erwärmt und kreist:</p><p style="text-align:center;font-weight:600;margin:10px 0;">Kessel → Umwälzpumpe → Verteilerbalken → Verbraucher → Sammelbalken → Kessel</p><p>Verbraucher: Käsefertiger, Plattenhitzer, Heizgruppen.</p>'
+      },
+      { icon:'🎛️', color:'#92400e', bg:'#fff7ed',
+        title:'Regelung & Sicherheit',
+        body:'<ul><li><b>Mischventil</b>: stellt Vorlauftemperatur ein (kühles Rücklaufwasser beimischen)</li><li><b>Expansionsgefäss</b>: nimmt Mehrvolumen beim Erwärmen auf</li><li><b>Brenner</b>: stufenweise Temperaturregelung</li></ul><div class="factbox">Geschlossenes System → keine Wasseraufbereitung nötig, kein Kesselstein-Problem.</div>'
+      }
+    ] },
   { kicker:'Beschriften', title:'Warmwasseranlage beschriften', id:'f_label', type:'label',
     lead:'Ordnen Sie jeder Nummer den richtigen Begriff zu.',
     media:'<img src="images/a.7_Warmwasseranlage_mit_Nummern.png" alt="Schema einer Warmwasseranlage mit Legende">',
@@ -361,16 +411,18 @@ var ALL = [
       { s:'Sehr hohe Temperaturen (z. B. für UHT) erreicht die Warmwasseranlage problemlos.', a:false, e:'Hohe Temperaturen sind nicht/weniger schnell erreichbar.' },
       { s:'Die Warmwasseranlage braucht Pumpen, um das Wasser zu fördern.', a:true, e:'Im Gegensatz zum Dampf, der von selbst strömt.' }
     ] },
-  { kicker:'Info · Wartung', title:'Wartung & Instandhaltung', type:'info',
+  { kicker:'Folien · Wartung', title:'Wartung & Instandhaltung', type:'slides',
     lead:'Wer macht was, und was ist vorgeschrieben?',
-    read:
-      '<ul>' +
-        '<li>Druckgeräte wie der <b>Dampfkessel</b> werden nach Herstellerangaben fachgerecht instand gehalten, nach einem <b>Plan</b> und <b>dokumentiert</b>.</li>' +
-        '<li>Der <b>Kaminfeger</b> reinigt feuerseitig <b>zweimal jährlich</b>.</li>' +
-        '<li>Dampfkessel über <b>0,5 bar</b> unterstehen der <b>SVTI-Kontrollpflicht</b>; Niederdruckdampfkessel (≤ 0,5 bar) nicht.</li>' +
-        '<li><b>Brenner</b>: Betreiber reinigt den Fotowiderstand, der Fachmann revidiert periodisch. Die <b>Feuerungskontrolle</b> ist staatlich (LRV).</li>' +
-      '</ul>' +
-      '<div class="factbox">Faustregel: einfache Kontrolle/Reinigung macht der <b>Betreiber</b>, Einstellen/Revision/Inspektion der <b>Fachmann/Inspektor</b>.</div>' },
+    slides:[
+      { icon:'👷', color:'#1e4e8c', bg:'#dbeeff',
+        title:'Wer macht was?',
+        body:'<ul><li><b>Betreiber</b>: Fotowiderstand reinigen, auf Geruch und Lärm achten</li><li><b>Fachmann</b>: Brenner revidieren und einstellen</li><li><b>Kaminfeger</b>: feuerseitig reinigen, <b>zweimal jährlich</b></li><li><b>SVTI-Inspektor</b>: Dampfkessel über 0,5 bar kontrollieren</li></ul>'
+      },
+      { icon:'📋', color:'#15803d', bg:'#dcfce7',
+        title:'Vorschriften & Dokumentation',
+        body:'<ul><li>Wartung nach <b>Plan</b>, schriftlich <b>dokumentiert</b></li><li>Dampfkessel über <b>0,5 bar</b>: <b>SVTI-Kontrollpflicht</b></li><li><b>Feuerungskontrolle</b>: staatlich vorgeschrieben (LRV)</li></ul><div class="factbox">Faustregel: einfache Reinigung = <b>Betreiber</b> · Einstellung/Revision/Inspektion = <b>Fachmann/Inspektor</b></div>'
+      }
+    ] },
   { kicker:'Abschluss', title:'Quer durch die Wärmeerzeugung', id:'boss', boss:true, type:'quiz',
     lead:'Gemischte Fragen zum Schluss.',
     questions:[
@@ -383,7 +435,7 @@ var ALL = [
 ];
 
 /* Challenge = ohne Info-Lesetexte und ohne PDF-Einstieg */
-var STATIONS = ALL.filter(function(s){ return MODE === 'challenge' ? (s.type !== 'info' && s.type !== 'pdf') : true; });
+var STATIONS = ALL.filter(function(s){ return MODE === 'challenge' ? (s.type !== 'info' && s.type !== 'pdf' && s.type !== 'slides') : true; });
 
 (function(){
   var t = (MODE === 'challenge') ? 'Challenge' : 'Lernpfad';
@@ -443,6 +495,7 @@ function buildAll(){
 function buildBody(idx, st){
   if(st.type==='pdf')   buildPdf(idx, st);
   if(st.type==='info')  buildInfo(idx, st);
+  if(st.type==='slides') buildSlides(idx, st);
   if(st.type==='tf')    buildTF(idx, st);
   if(st.type==='label') (MODE==='challenge') ? buildLabelType(idx, st) : buildLabelChoose(idx, st);
   if(st.type==='gaps')  buildGaps(idx, st);
@@ -475,6 +528,75 @@ function buildInfo(idx, st){
     '<div class="read-btn-icon">'+CHECK_SVG+'</div>'+
     '<span class="read-btn-text">Gelesen ✓ (+5 XP)</span></button></div>';
   document.getElementById('readbtn-'+idx).addEventListener('click', function(){
+    if(solved[idx]) return; solved[idx]=true; addXp(5);
+    this.disabled=true; this.classList.add('done');
+    this.querySelector('.read-btn-text').textContent='Gelesen ✓';
+    updateNav();
+  });
+}
+
+function buildSlides(idx, st){
+  maxPts[idx]=0;
+  var cur=0;
+  var slides=st.slides;
+  var body=document.getElementById('body-'+idx);
+
+  var html='<div class="slideshow" id="ssw-'+idx+'">';
+  slides.forEach(function(sl,si){
+    html+='<div class="slide-panel'+(si===0?' active':'')+'" id="ssp-'+idx+'-'+si+'">';
+    html+='<div class="slide-header" style="background:'+sl.bg+';">';
+    html+='<span class="slide-icon">'+sl.icon+'</span>';
+    html+='<span class="slide-htitle" style="color:'+sl.color+';">'+sl.title+'</span>';
+    html+='</div><div class="slide-body read">'+sl.body+'</div></div>';
+  });
+  html+='</div>';
+  html+='<div class="slide-nav-row">';
+  html+='<button class="slide-nav-btn" id="sprev-'+idx+'" disabled>← Zurück</button>';
+  html+='<div style="display:flex;align-items:center;gap:8px;"><div class="slide-dots" id="sdots-'+idx+'"></div>';
+  html+='<span class="slide-counter" id="sctr-'+idx+'"></span></div>';
+  html+='<button class="slide-nav-btn" id="snext-'+idx+'">Weiter →</button>';
+  html+='</div>';
+  html+='<div class="read-btn-row" id="sbtnrow-'+idx+'" style="display:'+(slides.length<=1?'':'none')+'">';
+  html+='<button class="read-btn" id="readbtn-'+idx+'">';
+  html+='<div class="read-btn-icon">'+CHECK_SVG+'</div>';
+  html+='<span class="read-btn-text">Alle Folien gelesen ✓ (+5 XP)</span></button></div>';
+  body.innerHTML=html;
+
+  function renderDots(){
+    var el=document.getElementById('sdots-'+idx); el.innerHTML='';
+    slides.forEach(function(sl,si){
+      var d=document.createElement('span'); d.className='slide-dot'+(si===cur?' active':si<cur?' done':'');
+      d.addEventListener('click',function(){ if(si!==cur) go(si); });
+      el.appendChild(d);
+    });
+    var ctr=document.getElementById('sctr-'+idx);
+    if(ctr) ctr.textContent=(cur+1)+' / '+slides.length;
+  }
+  function renderNav(){
+    document.getElementById('sprev-'+idx).disabled=(cur===0);
+    document.getElementById('snext-'+idx).disabled=(cur===slides.length-1);
+    var btnRow=document.getElementById('sbtnrow-'+idx);
+    if(btnRow) btnRow.style.display=(cur===slides.length-1)?'':'none';
+  }
+  function go(newIdx){
+    var dir=newIdx>cur?'right':'left';
+    var panel=document.getElementById('ssp-'+idx+'-'+newIdx);
+    slides.forEach(function(sl,si){ document.getElementById('ssp-'+idx+'-'+si).classList.remove('active','slide-in-right','slide-in-left'); });
+    panel.classList.add('active',dir==='right'?'slide-in-right':'slide-in-left');
+    cur=newIdx; renderDots(); renderNav();
+  }
+  renderDots(); renderNav();
+  document.getElementById('sprev-'+idx).addEventListener('click',function(){ if(cur>0) go(cur-1); });
+  document.getElementById('snext-'+idx).addEventListener('click',function(){ if(cur<slides.length-1) go(cur+1); });
+
+  var tsX=0;
+  document.getElementById('ssw-'+idx).addEventListener('touchstart',function(e){ tsX=e.touches[0].clientX; },{passive:true});
+  document.getElementById('ssw-'+idx).addEventListener('touchend',function(e){
+    var dx=e.changedTouches[0].clientX-tsX;
+    if(Math.abs(dx)>42){ if(dx<0&&cur<slides.length-1) go(cur+1); else if(dx>0&&cur>0) go(cur-1); }
+  },{passive:true});
+
+  document.getElementById('readbtn-'+idx).addEventListener('click',function(){
     if(solved[idx]) return; solved[idx]=true; addXp(5);
     this.disabled=true; this.classList.add('done');
     this.querySelector('.read-btn-text').textContent='Gelesen ✓';
