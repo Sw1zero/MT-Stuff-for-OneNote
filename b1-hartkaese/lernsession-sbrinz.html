@@ -57,6 +57,14 @@
     .read b { color:var(--blue-dark); }
     .read .factbox { background:var(--blue-tint); border-left:4px solid var(--blue-light); border-radius:var(--radius-sm); padding:10px 14px; margin:12px 0; font-size:0.86rem; line-height:1.55; }
     .read-btn-row { margin-top:16px; }
+    .read-btn { width:210px; height:42px; border-radius:40px; border:1px solid rgba(255,255,255,0.25); background-color:var(--blue-dark); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:transform 0.3s; overflow:hidden; font-family:var(--font); padding:0 6px; }
+    .read-btn-icon { width:32px; height:32px; background:linear-gradient(to bottom,var(--blue-light),#2a6fa8); border-radius:50px; display:flex; align-items:center; justify-content:center; overflow:hidden; z-index:2; transition:width 0.3s; flex-shrink:0; }
+    .read-btn-text { flex:1; display:flex; align-items:center; justify-content:center; color:#fff; font-size:0.88rem; font-weight:600; white-space:nowrap; overflow:hidden; transition:all 0.3s; }
+    .read-btn:hover:not(:disabled) .read-btn-icon { width:190px; }
+    .read-btn:hover:not(:disabled) .read-btn-text { width:0; font-size:0; opacity:0; }
+    .read-btn:active:not(:disabled) { transform:scale(0.95); }
+    .read-btn:disabled { cursor:default; }
+    .read-btn.done .read-btn-icon { background:linear-gradient(to bottom,#48bb78,#38a169); }
 
     /* Medien (Bilder / Video / PDF) */
     .station-media { margin-bottom:18px; }
@@ -236,6 +244,8 @@
 </footer>
 
 <script>
+var CHECK_SVG = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+
 /* ============================================================
    Lernsession Sbrinz AOP, Inhalte aus b.1 Lehrmittel
    13 Stationen mit Lesetexten + Gamification (XP, Streak, Abzeichen)
@@ -582,13 +592,16 @@ function buildInfo(body, idx, st) {
   maxPts[idx] = 0;
   body.innerHTML =
     '<div class="read">' + st.read + '</div>' +
-    '<div class="read-btn-row"><button class="btn btn-primary" id="readbtn-' + idx + '">Gelesen ✓ (+5 XP)</button></div>';
+    '<div class="read-btn-row"><button class="read-btn" id="readbtn-' + idx + '">' +
+    '<div class="read-btn-icon">' + CHECK_SVG + '</div>' +
+    '<span class="read-btn-text">Gelesen ✓ (+5 XP)</span></button></div>';
   document.getElementById('readbtn-' + idx).addEventListener('click', function() {
     if (solved[idx]) return;
     solved[idx] = true;
     addXp(5);
     this.disabled = true;
-    this.textContent = 'Gelesen ✓';
+    this.classList.add('done');
+    this.querySelector('.read-btn-text').textContent = 'Gelesen ✓';
     updateNav();
   });
 }
@@ -615,7 +628,9 @@ function buildSlides(body, idx, st) {
   html += '<button class="slide-nav-btn" id="snext-' + idx + '">Weiter →</button>';
   html += '</div>';
   html += '<div class="read-btn-row" id="sbtnrow-' + idx + '" style="display:' + (slides.length <= 1 ? '' : 'none') + '">';
-  html += '<button class="btn btn-primary" id="readbtn-' + idx + '">Gelesen ✓ (+5 XP)</button></div>';
+  html += '<button class="read-btn" id="readbtn-' + idx + '">' +
+          '<div class="read-btn-icon">' + CHECK_SVG + '</div>' +
+          '<span class="read-btn-text">Gelesen ✓ (+5 XP)</span></button></div>';
   body.innerHTML = html;
 
   function renderDots() {
@@ -658,7 +673,8 @@ function buildSlides(body, idx, st) {
     solved[idx] = true;
     addXp(5);
     this.disabled = true;
-    this.textContent = 'Gelesen ✓';
+    this.classList.add('done');
+    this.querySelector('.read-btn-text').textContent = 'Gelesen ✓';
     updateNav();
   });
 }
