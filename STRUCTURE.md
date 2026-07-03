@@ -150,7 +150,107 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 | `animation`        | Animation         | `animation-labgerinnung.html`           | Schrittweise SVG-Animation eines Prozesses mit Nav      |
 | `prozess-entscheid`| Prozess-Entscheid | `prozess-entscheid-jogurt.html`         | Entscheidung pro Prozessschritt mit Fehleranalyse       |
 | `fliessschema`     | Fliessschema      | `fliessschema-stichfest.html`           | Produktionsschritte frei in leere, verkettete Kästchen eintippen |
-| `lernpfad` / `challenge` | Lernpfad / Challenge | `lernsession-sbrinz.html` | Eine Datei, zwei Modi: **Lernpfad** (Standard, mit Info-Lesetexten + Übungen einfach/mittel) und **Challenge** (`?mode=challenge`: ohne Info, schwerste Stufe, voll gamifiziert: XP/Streak/Abzeichen/Rang) |
+| `lernpfad` / `challenge` | Lernpfad / Challenge | `lernsession-sbrinz.html` | Eine Datei, zwei Modi: **Lernpfad** (Standard, mit Slides + Übungen einfach/mittel) und **Challenge** (`?mode=challenge`: ohne Slides/Info/PDF, schwerste Stufe, voll gamifiziert: XP/Streak/Abzeichen/Rang) |
+
+---
+
+### Lernsession / Lernpfad (Canonical Pattern)
+
+Referenz: `a7-technische-einrichtungen/lernsession-waermeerzeugung.html` ← **immer von hier kopieren**
+
+#### Pflicht-CSS (vollständig, nichts weglassen)
+
+```css
+/* HUD */
+.hud { display:flex; align-items:center; gap:12px; background:var(--blue-dark); color:#fff; border-radius:var(--radius-md); padding:10px 14px; margin-bottom:14px; box-shadow:var(--shadow-sm); }
+.hud-xp { display:flex; align-items:baseline; gap:5px; flex-shrink:0; }
+.hud-label { font-size:0.6rem; font-weight:700; letter-spacing:0.1em; opacity:0.8; }
+.hud-val { font-size:1.15rem; font-weight:800; display:inline-block; }
+.hud-val.pop { animation:xppop 0.4s ease; }
+@keyframes xppop { 0%{transform:scale(1);} 40%{transform:scale(1.45); color:#9ad1e8;} 100%{transform:scale(1);} }
+.hud-bar { flex:1; height:8px; background:rgba(255,255,255,0.2); border-radius:4px; overflow:hidden; }
+.hud-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#69A9C9,#9ad1e8); border-radius:4px; transition:width 0.4s ease; }
+/* Streak + animierte Flamme */
+.hud-streak { position:relative; display:flex; align-items:center; gap:8px; font-size:0.84rem; font-weight:700; background:rgba(255,255,255,0.14); padding:3px 9px; border-radius:12px; white-space:nowrap; flex-shrink:0; transition:transform 0.15s, background 0.3s; }
+.streak-num-fire { color:#ff8c00; text-shadow:0 0 6px rgba(255,100,0,0.8); }
+.hud-streak.pulse { transform:scale(1.25); }
+.streak-pop { position:absolute; top:-4px; right:-4px; font-size:0.72rem; font-weight:800; color:#ffa040; pointer-events:none; white-space:nowrap; animation:streakPopAnim 0.9s ease-out forwards; }
+@keyframes streakPopAnim { 0%{opacity:1;transform:translateY(0) scale(1);} 70%{opacity:1;} 100%{opacity:0;transform:translateY(-20px) scale(0.75);} }
+/* Feuer-Animation (ab Streak ≥ 3) */
+.hud-fire-wrap { display:inline-block; position:relative; width:22px; height:22px; vertical-align:middle; overflow:visible; flex-shrink:0; }
+/* ... (vollständiger Block: aus lernsession-waermeerzeugung.html Zeilen 29–44 kopieren) */
+
+/* Read-Button */
+.read-btn-row { margin-top:16px; }
+.read-btn { width:210px; height:42px; border-radius:40px; border:1px solid rgba(255,255,255,0.25); background-color:var(--blue-dark); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:transform 0.3s; overflow:hidden; font-family:var(--font); padding:0 6px; }
+.read-btn-icon { width:32px; height:32px; background:linear-gradient(to bottom,var(--blue-light),#2a6fa8); border-radius:50px; display:flex; align-items:center; justify-content:center; overflow:hidden; z-index:2; transition:width 0.3s; flex-shrink:0; }
+.read-btn-text { flex:1; display:flex; align-items:center; justify-content:center; color:#fff; font-size:0.88rem; font-weight:600; white-space:nowrap; overflow:hidden; transition:all 0.3s; }
+.read-btn:hover:not(:disabled) .read-btn-icon { width:190px; }
+.read-btn:hover:not(:disabled) .read-btn-text { width:0; font-size:0; opacity:0; }
+.read-btn:active:not(:disabled) { transform:scale(0.95); }
+.read-btn:disabled { cursor:default; }
+.read-btn.done .read-btn-icon { background:linear-gradient(to bottom,#48bb78,#38a169); }
+```
+
+#### Pflicht-HTML (HUD)
+
+```html
+<div class="hud">
+  <div class="hud-xp"><span class="hud-label">XP</span><span class="hud-val" id="hudXp">0</span></div>
+  <div class="hud-bar"><div class="hud-bar-fill" id="hudBar"></div></div>
+  <div class="hud-streak" id="hudStreak">
+    <span id="hudStreakEmoji">🔥</span>
+    <div class="hud-fire-wrap" id="hudFireWrap" style="display:none">
+      <div class="fire">
+        <div class="fire-bottom"><div class="main-fire"></div></div>
+        <div class="fire-center"><div class="main-fire"></div><div class="particle-fire"></div></div>
+        <div class="fire-right"><div class="main-fire"></div><div class="particle-fire"></div></div>
+        <div class="fire-left"><div class="main-fire"></div><div class="particle-fire"></div></div>
+      </div>
+    </div>
+    <span id="hudStreakNum">0</span>
+  </div>
+</div>
+```
+
+#### Pflicht-JS (Gamification-Kern)
+
+```javascript
+var CHECK_SVG = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+
+var xp = 0, streak = 0, bestStreak = 0;
+
+function renderHud() {
+  document.getElementById('hudXp').textContent = xp;
+  var sc = 0; for (var i = 0; i < N; i++) { if (solved[i]) sc++; }
+  document.getElementById('hudBar').style.width = Math.round(sc / N * 100) + '%';
+  document.getElementById('hudStreakNum').textContent = streak;
+  var onFire = streak >= 3;
+  document.getElementById('hudStreakEmoji').style.display = onFire ? 'none' : '';
+  document.getElementById('hudFireWrap').style.display = onFire ? 'inline-block' : 'none';
+  document.getElementById('hudStreakNum').className = onFire ? 'streak-num-fire' : '';
+}
+function addXp(n) { xp += n; var el = document.getElementById('hudXp'); renderHud(); el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
+function showStreakPop() { var el = document.createElement('span'); el.className = 'streak-pop'; el.textContent = '+1 🔥'; document.getElementById('hudStreak').appendChild(el); setTimeout(function() { el.remove(); }, 900); }
+function registerAnswer(ok) {
+  if (ok) { streak++; if (streak > bestStreak) bestStreak = streak; addXp(10 + (streak >= 3 ? 5 : 0)); showStreakPop(); var s = document.getElementById('hudStreak'); s.classList.remove('pulse'); void s.offsetWidth; s.classList.add('pulse'); }
+  else { streak = 0; renderHud(); }
+}
+```
+
+#### STATIONS-Filter (Challenge-Modus)
+
+```javascript
+var STATIONS = ALL.filter(function(s) {
+  return MODE === 'challenge' ? (s.type !== 'info' && s.type !== 'pdf' && s.type !== 'slides') : true;
+});
+```
+
+#### Inhaltsregeln für Slides-Stationen
+
+Siehe [Slides-Station Canonical Pattern](#slides-station-in-lernsession-canonical-pattern) weiter unten.
+
+---
 
 ### Geplant / Ideen
 
