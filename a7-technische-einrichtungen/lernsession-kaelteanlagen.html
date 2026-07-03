@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kälteanlagen (a.7)</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="../assets/dnd.js"></script>
+  <style>
+    .back-link { display:inline-block; font-size:0.82rem; color:var(--text-muted); text-decoration:none; margin-bottom:1rem; }
+    .back-link:hover { color:var(--red); }
+    .ls-wrap { max-width:640px; margin:0 auto; }
+
+    .hud { display:flex; align-items:center; gap:12px; background:var(--blue-dark); color:#fff; border-radius:var(--radius-md); padding:10px 14px; margin-bottom:14px; box-shadow:var(--shadow-sm); }
+    .hud-xp { display:flex; align-items:baseline; gap:5px; flex-shrink:0; }
+    .hud-label { font-size:0.6rem; font-weight:700; letter-spacing:0.1em; opacity:0.8; }
+    .hud-val { font-size:1.15rem; font-weight:800; display:inline-block; }
+    .hud-val.pop { animation:xppop 0.4s ease; }
+    @keyframes xppop { 0%{transform:scale(1);} 40%{transform:scale(1.45); color:#9ad1e8;} 100%{transform:scale(1);} }
+    .hud-bar { flex:1; height:8px; background:rgba(255,255,255,0.2); border-radius:4px; overflow:hidden; }
+    .hud-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#69A9C9,#9ad1e8); border-radius:4px; transition:width 0.4s ease; }
+    .hud-bar-fill.on-fire { animation:barpulse 0.9s ease-in-out infinite; }
+    @keyframes barpulse { 0%,100%{box-shadow:0 0 4px 1px rgba(154,209,232,0.4);} 50%{box-shadow:0 0 10px 3px rgba(154,209,232,0.85);} }
+    .hud-streak { position:relative; display:flex; align-items:center; gap:8px; font-size:0.84rem; font-weight:700; background:rgba(255,255,255,0.14); padding:3px 9px; border-radius:12px; white-space:nowrap; flex-shrink:0; transition:transform 0.15s, background 0.3s; }
+    .streak-num-fire { color:#ff8c00; text-shadow:0 0 6px rgba(255,100,0,0.8); }
+    .hud-streak.pulse { transform:scale(1.25); }
+    .streak-pop { position:absolute; top:-4px; right:-4px; font-size:0.72rem; font-weight:800; color:#ffa040; pointer-events:none; white-space:nowrap; animation:streakPopAnim 0.9s ease-out forwards; }
+    @keyframes streakPopAnim { 0%{opacity:1;transform:translateY(0) scale(1);} 70%{opacity:1;} 100%{opacity:0;transform:translateY(-20px) scale(0.75);} }
+    .hud-fire-wrap { display:inline-block; position:relative; width:22px; height:22px; vertical-align:middle; overflow:visible; flex-shrink:0; }
+    .hud-fire-wrap .fire { position:absolute; width:100px; height:100px; top:50%; left:50%; transform:translate(-50%,-50%) scale(0.22); transform-origin:center center; background:transparent; }
+    @keyframes scaleUpDown { 0%,100%{transform:scaleY(1) scaleX(1);} 50%,90%{transform:scaleY(1.1);} 75%{transform:scaleY(0.95);} 80%{transform:scaleX(0.95);} }
+    @keyframes shake { 0%,100%{transform:skewX(0) scale(1);} 50%{transform:skewX(5deg) scale(0.9);} }
+    @keyframes particleUp { 0%{opacity:0;} 20%{opacity:1;} 80%{opacity:1;} 100%{opacity:0;top:-100%;transform:scale(0.5);} }
+    @keyframes glow { 0%,100%{background-color:#ef5a00;} 50%{background-color:#ff7800;} }
+    .hud-fire-wrap .fire-center { position:absolute; height:100%; width:100%; animation:scaleUpDown 3s ease-out infinite both; }
+    .hud-fire-wrap .fire-center .main-fire { position:absolute; width:100%; height:100%; background-image:radial-gradient(farthest-corner at 10px 0,#d43300 0%,#ef5a00 95%); transform:scaleX(0.8) rotate(45deg); border-radius:0 40% 60% 40%; filter:drop-shadow(0 0 10px #d43322); }
+    .hud-fire-wrap .fire-center .particle-fire { position:absolute; top:60%; left:45%; width:10px; height:10px; background:#ef5a00; border-radius:50%; filter:drop-shadow(0 0 10px #d43322); animation:particleUp 2s ease-out infinite both; }
+    .hud-fire-wrap .fire-right { height:100%; width:100%; position:absolute; animation:shake 2s ease-out infinite both; }
+    .hud-fire-wrap .fire-right .main-fire { position:absolute; top:15%; right:-25%; width:80%; height:80%; background:#ef5a00; transform:scaleX(0.8) rotate(45deg); border-radius:0 40% 60% 40%; filter:drop-shadow(0 0 10px #d43322); }
+    .hud-fire-wrap .fire-right .particle-fire { position:absolute; top:45%; left:50%; width:15px; height:15px; background:#ef5a00; transform:scaleX(0.8) rotate(45deg); border-radius:50%; filter:drop-shadow(0 0 10px #d43322); animation:particleUp 2s ease-out infinite both; }
+    .hud-fire-wrap .fire-left { position:absolute; height:100%; width:100%; animation:shake 3s ease-out infinite both; }
+    .hud-fire-wrap .fire-left .main-fire { position:absolute; top:15%; left:-20%; width:80%; height:80%; background:#ef5a00; transform:scaleX(0.8) rotate(45deg); border-radius:0 40% 60% 40%; filter:drop-shadow(0 0 10px #d43322); }
+    .hud-fire-wrap .fire-left .particle-fire { position:absolute; top:10%; left:20%; width:10%; height:10%; background:#ef5a00; border-radius:50%; filter:drop-shadow(0 0 10px #d43322); animation:particleUp 3s ease-out infinite both; }
+    .hud-fire-wrap .fire-bottom .main-fire { position:absolute; top:30%; left:20%; width:75%; height:75%; background:#ff7800; transform:scaleX(0.8) rotate(45deg); border-radius:0 40% 100% 40%; filter:blur(10px); animation:glow 2s ease-out infinite both; }
+
+    .ls-meta { font-size:0.8rem; font-weight:600; color:var(--text-muted); text-align:center; margin-bottom:6px; }
+    .ls-dots { display:flex; gap:5px; justify-content:center; margin-bottom:20px; flex-wrap:wrap; }
+    .ls-dot { width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:700; background:#edf2f7; color:var(--text-subtle); border:2px solid transparent; }
+    .ls-dot.active { border-color:var(--blue-dark); color:var(--blue-dark); }
+    .ls-dot.done { background:#38a169; color:#fff; }
+
+    .station { background:var(--surface); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); padding:24px; margin-bottom:18px; }
+    .station.hidden { display:none; }
+    .station-kicker { font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--blue-light); margin-bottom:4px; }
+    .station-title { font-size:1.15rem; font-weight:700; color:var(--blue-dark); margin-bottom:10px; }
+    .station-lead { font-size:0.9rem; color:var(--text); line-height:1.6; margin-bottom:18px; }
+    .station-lead b { color:var(--blue-dark); }
+    .station.boss { border:2px solid #f0c36d; box-shadow:0 0 0 4px #fff7e6; }
+    .station.boss .station-kicker { color:#d97706; }
+
+    .read { font-size:0.9rem; line-height:1.65; color:var(--text); }
+    .read p { margin-bottom:12px; }
+    .read h4 { font-size:0.92rem; color:var(--blue-dark); margin:14px 0 6px; }
+    .read ul { margin:0 0 12px 1.15rem; }
+    .read li { margin-bottom:5px; }
+    .read b { color:var(--blue-dark); }
+    .read .factbox { background:var(--blue-tint); border-left:4px solid var(--blue-light); border-radius:var(--radius-sm); padding:10px 14px; margin:12px 0; font-size:0.86rem; line-height:1.55; }
+    .read-btn-row { margin-top:16px; }
+    .pdf-frame { width:100%; height:520px; border:1px solid var(--border); border-radius:var(--radius-md); display:block; }
+    @media(max-width:560px){ .pdf-frame { height:360px; } }
+
+    .read-btn { width:210px; height:42px; border-radius:40px; border:1px solid rgba(255,255,255,0.25); background-color:var(--blue-dark); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:transform 0.3s; overflow:hidden; font-family:var(--font); padding:0 6px; }
+    .read-btn-icon { width:32px; height:32px; background:linear-gradient(to bottom,var(--blue-light),#2a6fa8); border-radius:50px; display:flex; align-items:center; justify-content:center; overflow:hidden; z-index:2; transition:width 0.3s; flex-shrink:0; }
+    .read-btn-text { flex:1; display:flex; align-items:center; justify-content:center; color:#fff; font-size:0.88rem; font-weight:600; white-space:nowrap; overflow:hidden; transition:all 0.3s; }
+    .read-btn:hover:not(:disabled) .read-btn-icon { width:190px; }
+    .read-btn:hover:not(:disabled) .read-btn-text { width:0; font-size:0; opacity:0; }
+    .read-btn:active:not(:disabled) { transform:scale(0.95); }
+    .read-btn:disabled { cursor:default; }
+    .read-btn.done .read-btn-icon { background:linear-gradient(to bottom,#48bb78,#38a169); }
+
+    /* ---- Slideshow ---- */
+    .slideshow { border-radius:10px; overflow:hidden; box-shadow:0 6px 28px rgba(0,0,0,0.13),0 1px 4px rgba(0,0,0,0.07); border:1px solid rgba(0,0,0,0.08); }
+    .slide-panel { display:none; }
+    .slide-panel.active { display:block; }
+    .slide-panel.slide-in-right { animation:slideInRight 0.3s cubic-bezier(0.22,0.61,0.36,1) both; }
+    .slide-panel.slide-in-left  { animation:slideInLeft  0.3s cubic-bezier(0.22,0.61,0.36,1) both; }
+    @keyframes slideInRight { from{transform:translateX(44px);opacity:0} to{transform:translateX(0);opacity:1} }
+    @keyframes slideInLeft  { from{transform:translateX(-44px);opacity:0} to{transform:translateX(0);opacity:1} }
+    .slide-header { padding:20px 22px 16px; display:flex; align-items:center; gap:16px; border-bottom:1px solid rgba(0,0,0,0.09); }
+    .slide-icon { font-size:2.5rem; line-height:1; flex-shrink:0; width:56px; height:56px; display:flex; align-items:center; justify-content:center; border-radius:10px; background:rgba(255,255,255,0.52); box-shadow:0 1px 5px rgba(0,0,0,0.12); }
+    .slide-htitle { font-size:1.05rem; font-weight:700; line-height:1.3; }
+    .slide-body { padding:16px 22px 14px; font-size:0.9rem; line-height:1.65; color:var(--text); background:var(--surface); }
+    .slide-body p { margin-bottom:10px; }
+    .slide-body ul,.slide-body ol { margin:0 0 10px 1.2rem; }
+    .slide-body li { margin-bottom:6px; }
+    .slide-body b { color:var(--blue-dark); }
+    .slide-body img { width:100%; border-radius:8px; margin:8px 0; display:block; }
+    .slide-body .factbox { background:var(--blue-tint); border-left:4px solid var(--blue-light); border-radius:var(--radius-sm); padding:9px 13px; margin:10px 0 2px; font-size:0.84rem; line-height:1.55; }
+    .slide-nav-row { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:16px; }
+    .slide-dots { display:flex; gap:6px; align-items:center; }
+    .slide-dot { width:8px; height:8px; border-radius:50%; background:var(--border); transition:background 0.2s,transform 0.2s; cursor:pointer; }
+    .slide-dot.active { background:var(--blue-dark); transform:scale(1.35); }
+    .slide-dot.done { background:var(--blue-light); }
+    .slide-nav-btn { font-family:var(--font); font-size:0.82rem; font-weight:600; padding:7px 14px; border-radius:20px; border:1.5px solid var(--border); background:var(--surface); color:var(--text-muted); cursor:pointer; transition:all 0.15s; }
+    .slide-nav-btn:hover:not(:disabled) { border-color:var(--blue-light); color:var(--blue-dark); }
+    .slide-nav-btn:disabled { opacity:0.32; cursor:default; }
+    .slide-counter { font-size:0.76rem; color:var(--text-subtle); font-weight:600; white-space:nowrap; }
+
+    .station-media { margin-bottom:18px; }
+    .station-media img { width:100%; height:auto; display:block; border-radius:var(--radius-md); border:1px solid var(--border); box-shadow:var(--shadow-sm); }
+
+    .q-block { margin-bottom:18px; }
+    .q-block:last-child { margin-bottom:0; }
+    .q-text { font-size:0.92rem; font-weight:600; margin-bottom:10px; }
+    .opt { display:block; width:100%; text-align:left; font-family:var(--font); font-size:0.88rem; color:var(--text); background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius-md); padding:11px 14px; margin-bottom:8px; cursor:pointer; transition:all 0.15s; line-height:1.4; }
+    .opt:hover:not(:disabled) { border-color:var(--blue-light); }
+    .opt:disabled { cursor:default; }
+    .opt.correct { border-color:#38a169; background:#f0fff4; }
+    .opt.wrong { border-color:var(--red); background:var(--red-light); }
+
+    .tf-item { padding:12px 0; border-bottom:1px solid var(--border); }
+    .tf-item:last-child { border-bottom:none; }
+    .tf-statement { font-size:0.9rem; margin-bottom:8px; }
+    .tf-btns { display:flex; gap:8px; }
+    .tf-btn { font-family:var(--font); font-size:0.82rem; font-weight:600; padding:7px 18px; border-radius:20px; border:1.5px solid var(--border); background:var(--surface); color:var(--text-muted); cursor:pointer; transition:all 0.15s; }
+    .tf-btn:hover:not(:disabled) { border-color:var(--blue-light); }
+    .tf-btn:disabled { cursor:default; }
+    .tf-btn.sel-correct { background:#38a169; border-color:#38a169; color:#fff; }
+    .tf-btn.sel-wrong { background:var(--red); border-color:var(--red); color:#fff; }
+    .tf-btn.reveal { border-color:#38a169; color:#276749; }
+    .tf-exp { font-size:0.78rem; color:var(--text-muted); margin-top:8px; display:none; }
+    .tf-exp.show { display:block; }
+
+    .gap-text { font-size:0.95rem; line-height:2.1; }
+    .gap-text select, .lp-select { font-family:var(--font); font-size:0.85rem; font-weight:600; border:1.5px solid var(--blue-light); border-radius:var(--radius-sm); padding:3px 6px; background:var(--blue-tint); color:var(--blue-dark); }
+    .gap-text select.correct, .lp-select.correct { border-color:#38a169; background:#f0fff4; color:#276749; }
+    .gap-text select.wrong, .lp-select.wrong { border-color:var(--red); background:var(--red-light); color:var(--red-dark); }
+    .lp-select { width:100%; }
+
+    .slots-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.55rem; margin-bottom:0.5rem; }
+    @media (max-width:560px){ .slots-grid { grid-template-columns:1fr; } }
+    .lb-bank { display:flex; flex-wrap:wrap; gap:0.5rem; background:var(--blue-light); border-radius:var(--radius-md); padding:0.9rem 1rem; margin-bottom:1rem; min-height:52px; }
+    .lb-chip { font-family:var(--font); font-size:0.82rem; font-weight:500; background:var(--surface); border:2px solid var(--border); border-radius:20px; padding:0.3rem 0.8rem; cursor:grab; color:var(--text); user-select:none; touch-action:none; transition:border-color 0.15s,opacity 0.15s; }
+    .lb-chip:hover { border-color:var(--blue-light); }
+    .lb-chip.used { opacity:0.2; pointer-events:none; }
+    .lb-chip.selected { background:var(--blue-dark); border-color:var(--blue-dark); color:#fff; }
+    .lb-slot { flex:1; min-height:36px; border:2px dashed var(--border); border-radius:var(--radius-sm); padding:0.3rem 0.65rem; font-size:0.82rem; font-family:var(--font); color:var(--text-subtle); display:flex; align-items:center; transition:all 0.15s; background:var(--surface); }
+    .lb-slot.lb-over,.lb-slot.lb-ready { border-color:var(--blue-light); border-style:solid; background:#f0f7ff; }
+    .lb-slot.lb-filled { border-style:solid; border-color:var(--blue-light); color:var(--text); font-weight:500; cursor:grab; touch-action:none; user-select:none; }
+    .lb-slot.correct { border-color:#16a34a !important; background:#f0fdf4 !important; color:#15803d !important; cursor:default; }
+    .lb-slot.wrong   { border-color:var(--red) !important; background:var(--red-light) !important; color:var(--red) !important; cursor:default; }
+    .slot-row { display:flex; align-items:flex-start; gap:0.5rem; }
+    .slot-num { width:28px; height:28px; flex-shrink:0; border-radius:50%; background:var(--blue-dark); color:#fff; font-size:0.76rem; font-weight:700; display:flex; align-items:center; justify-content:center; margin-top:3px; }
+    .type-cell { flex:1; }
+    .type-input { width:100%; font-family:var(--font); font-size:0.84rem; padding:0.45rem 0.65rem; border:1.5px solid var(--border); border-radius:var(--radius-sm); background:#f8fafc; color:var(--text); transition:border-color 0.15s; }
+    .type-input:focus { outline:none; border-color:var(--blue); background:#fff; }
+    .type-input.correct { border-color:#16a34a; background:#f0fdf4; }
+    .type-input.wrong { border-color:var(--red); background:var(--red-light); }
+    .type-sol { font-size:0.72rem; color:#15803d; margin-top:2px; }
+
+    .check-btn-row { margin-top:16px; }
+
+    .finish { text-align:center; }
+    .finish .rank { font-size:1.25rem; font-weight:800; color:var(--blue-dark); margin:4px 0 2px; }
+    .finish .big-score { font-size:2.4rem; font-weight:800; color:var(--blue-dark); margin:6px 0 2px; }
+    .finish .score-sub { font-size:0.86rem; color:var(--text-muted); margin-bottom:16px; }
+    .badges { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin:0 auto 18px; max-width:520px; }
+    .badge-chip { display:inline-flex; align-items:center; gap:5px; font-size:0.76rem; font-weight:600; padding:6px 12px; border-radius:20px; border:1.5px solid var(--border); background:#f8fafc; color:var(--text-subtle); }
+    .badge-chip.earned { background:#fff7e6; border-color:#f0c36d; color:#92400e; }
+    .badge-chip .lock { opacity:0.6; }
+    .finish ul { text-align:left; max-width:500px; margin:0 auto 20px; font-size:0.86rem; color:var(--text); line-height:1.6; }
+    .finish li { margin-bottom:6px; }
+
+    .ls-nav { display:flex; justify-content:space-between; gap:10px; }
+    .ls-nav .spacer { flex:1; }
+  </style>
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+  <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · a.7</span>
+  <h1 id="pageTitle">Kälteanlagen</h1>
+  <p id="subtitle">Kompressionsprinzip, Regulierung, Wartung und WRG</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+  <a class="back-link" href="../index.html">← Alle Lerntools</a>
+
+  <div class="ls-wrap">
+    <div class="hud">
+      <div class="hud-xp"><span class="hud-label">XP</span><span class="hud-val" id="hudXp">0</span></div>
+      <div class="hud-bar"><div class="hud-bar-fill" id="hudBar"></div></div>
+      <div class="hud-streak" id="hudStreak">
+        <span id="hudStreakEmoji">🔥</span>
+        <div class="hud-fire-wrap" id="hudFireWrap" style="display:none">
+          <div class="fire">
+            <div class="fire-bottom"><div class="main-fire"></div></div>
+            <div class="fire-center"><div class="main-fire"></div><div class="particle-fire"></div></div>
+            <div class="fire-right"><div class="main-fire"></div><div class="particle-fire"></div></div>
+            <div class="fire-left"><div class="main-fire"></div><div class="particle-fire"></div></div>
+          </div>
+        </div>
+        <span id="hudStreakNum">0</span>
+      </div>
+    </div>
+    <div class="ls-meta" id="lsMeta"></div>
+    <div class="ls-dots" id="lsDots"></div>
+    <div id="stage"></div>
+    <div class="ls-nav">
+      <button class="btn btn-ghost" id="prevBtn" onclick="goPrev()">&#8592; Zurück</button>
+      <span class="spacer"></span>
+      <button class="btn btn-primary" id="nextBtn" onclick="goNext()">Weiter &#8594;</button>
+    </div>
+  </div>
+</main>
+
+<footer class="bzwu-footer">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm</footer>
+
+<script>
+var MODE = /[?&]mode=challenge/.test(location.search) ? 'challenge' : 'lernpfad';
+
+var ALL = [
+  { kicker:'Folien · Kompressionsprinzip', title:'Aufbau und Funktion der Kälteanlage', type:'slides',
+    lead:'Lesen Sie alle Folien, danach prüfen Sie sich.',
+    slides:[
+      { icon:'🔄', color:'#1e4e8c', bg:'#dbeeff',
+        title:'Kältemaschine = Wärmetransportmaschine',
+        body:'<p>In Kühlräumen und Eiswasserbassins werden tiefe Temperaturen künstlich erzeugt. Das Kältemittel wird am gewünschten Ort zum <b>Verdampfen</b> gebracht und entzieht dabei die Verdampfungswärme der Umgebung.</p><p>Die aufgenommene Wärme wird an einem anderen Ort durch <b>Kondensation</b> des Kältemittels wieder abgegeben.</p><div class="factbox">Eine Kältemaschine erzeugt keine Kälte. Sie transportiert Wärme vom Kühlraum nach aussen.</div>'
+      },
+      { icon:'❄️', color:'#6b21a8', bg:'#f3e8ff',
+        title:'Die 4 Hauptbauteile',
+        body:'<p>Gewerbliche Kälteanlagen arbeiten nach dem <b>Kompressionsprinzip</b>. Die vier Bauteile im Kreislauf:</p><img src="images/a.7_Kaelteanlage_ohne_Nummern.png" alt="Schema einer Kälteanlage"><ul><li><b>Verdampfer</b>: flüssiges Kältemittel verdampft, entzieht dem Kühlraum Wärme</li><li><b>Kompressor</b>: saugt gasförmiges Kältemittel ab und komprimiert es</li><li><b>Kondensator</b>: kühlt und verflüssigt das Kältemittel, gibt Wärme ab</li><li><b>Expansionsventil</b>: bringt das flüssige Kältemittel auf Druck und Temperatur für den Verdampfer</li></ul>'
+      },
+      { icon:'🧪', color:'#15803d', bg:'#dcfce7',
+        title:'Kältemittel',
+        body:'<p>Heute werden <b>chlorfreie Sicherheitskältemittel</b> R134a oder R404a verwendet.</p><ul><li>R134a bei -10 °C Verdampfungstemperatur: <b>2 bar</b></li><li>R134a bei 50 °C Kondensationstemperatur: <b>13,2 bar</b></li><li>Grossanlagen: <b>Ammoniak (NH3)</b> als natürliches Kältemittel. Es ist giftig und erfordert regelmässige Fachkontrolle.</li></ul><div class="factbox">Frühere FCKW-Kältemittel zerstören die Ozonschicht und sind verboten. Bei einer Leckage dürfen R134a und R404a nicht mehr nachgefüllt werden.</div>'
+      }
+    ] },
+
+  { kicker:'Beschriften', title:'Kälteanlage beschriften', id:'a_label', type:'label',
+    lead:'Ordnen Sie jeder Nummer das richtige Bauteil zu.',
+    media:'<img src="images/a.7_Kaelteanlage_Nummern.png" alt="Schema einer Kälteanlage mit nummerierten Bauteilen">',
+    items:[
+      { n:1, name:'Verdampfer',       keys:['verdampfer'] },
+      { n:2, name:'Kompressor',       keys:['kompressor','verdichter'] },
+      { n:3, name:'Kondensator',      keys:['kondensator'] },
+      { n:4, name:'Expansionsventil', keys:['expansionsventil','expventil'] }
+    ] },
+
+  { kicker:'Wahr oder Falsch', title:'Kälteanlage und Kältemittel', id:'b_tf', type:'tf',
+    lead:'Stimmt die Aussage?',
+    items:[
+      { s:'Eine Kälteanlage erzeugt Kälte.', a:false, e:'Sie transportiert Wärme. Kälte entsteht als Nebeneffekt der Verdampfung.' },
+      { s:'Im Verdampfer entzieht das Kältemittel der Umgebung Wärme durch Verdampfen.', a:true, e:'Die Verdampfungswärme wird dem Kühlraum entzogen.' },
+      { s:'Ammoniak (NH3) ist das Standardkältemittel für kleine Betriebe.', a:false, e:'NH3 ist für Grossanlagen vorgesehen. Es ist giftig und braucht Fachkontrolle.' },
+      { s:'FCKW-Kältemittel dürfen bei einer Leckage nicht mehr nachgefüllt werden.', a:true, e:'FCKW zerstören die Ozonschicht und sind für Neuanlagen verboten.' },
+      { s:'R134a hat bei einer Verdampfungstemperatur von -10 °C einen Druck von 2 bar.', a:true, e:'Druckbereich R134a: 2 bar bei -10 °C, 13,2 bar bei 50 °C.' }
+    ] },
+
+  { kicker:'Folien · Kälteregulierung', title:'Regulierung der Kälteanlage', type:'slides',
+    lead:'Drei Regelungselemente im Detail.',
+    slides:[
+      { icon:'⚙️', color:'#1e4e8c', bg:'#dbeeff',
+        title:'Überblick: Kleine und grosse Anlagen',
+        body:'<p>Bei kleinen Anlagen (z.B. Kühlschrank) reguliert ein <b>Thermostat</b> die Temperatur direkt: er schaltet den Kompressor ein und aus.</p><p>Bei grösseren Anlagen sind verschiedene Elemente nötig:</p><img src="images/a.7_Kaelteregulierung_ohne_Nummern.png" alt="Schema einer Kälteregulierung"><ul><li>Thermostatisches Expansionsventil</li><li>Magnetventil</li><li>Pressostat (Nieder- und Hochdruck)</li></ul>'
+      },
+      { icon:'🌡️', color:'#15803d', bg:'#dcfce7',
+        title:'Expansionsventil und Magnetventil',
+        body:'<p>Das <b>thermostatische Expansionsventil</b> regelt die Menge Kältemittel durch den Verdampfer. Es verhindert, dass flüssiges Kältemittel in den Kompressor gelangt (Schäden).</p><ul><li>Zu warm am Ende des Verdampfers: mehr Kältemittel durchlassen</li><li>Zu kalt: weniger Kältemittel durchlassen</li></ul><p>Das <b>Magnetventil</b> öffnet und schliesst die Kältemittelzufuhr zum Verdampfer und regelt damit die Kühlraumtemperatur.</p>'
+      },
+      { icon:'🔧', color:'#92400e', bg:'#fff7ed',
+        title:'Druckregelung mit Pressostat',
+        body:'<p>Der <b>Pressostat</b> misst den Leitungsdruck vor dem Kompressor:</p><ul><li>Druck überschreitet Sollwert: Kompressor einschalten</li><li>Druck auf Sollwert gesunken: Kompressor ausschalten</li></ul><p>Auf der <b>Hochdruckseite</b> nach dem Kompressor ist oft ein zweiter Pressostat eingebaut. Er schaltet den Kompressor bei zu grossem Überdruck ab.</p><div class="factbox">Niederdruckpressostat: vor dem Kompressor. Hochdruckpressostat: nach dem Kompressor.</div>'
+      }
+    ] },
+
+  { kicker:'Beschriften', title:'Kälteregulierung beschriften', id:'c_label', type:'label',
+    lead:'Ordnen Sie jeder Nummer das richtige Element zu.',
+    media:'<img src="images/a.7_Kaelteregulierung_mit_Nummern.png" alt="Schema einer Kälteregulierung mit Legende">',
+    items:[
+      { n:1, name:'Niederdruckpressostat',              keys:['niederdruckpressostat','niederdruck','pressostat'] },
+      { n:2, name:'Hochdruckpressostat',               keys:['hochdruckpressostat','hochdruck'] },
+      { n:3, name:'Magnetventil',                      keys:['magnetventil'] },
+      { n:4, name:'Thermostat',                        keys:['thermostat'] },
+      { n:5, name:'Thermostatisches Expansionsventil', keys:['thermostatisches expansionsventil','expansionsventil','expventil'] },
+      { n:6, name:'Temperaturfühler',                  keys:['temperaturfuehler','temperatursensor','fuehler'] }
+    ] },
+
+  { kicker:'Lückentext', title:'Kälteregulierung', id:'d_gaps', type:'gaps',
+    lead:'Füllen Sie die Lücken aus.',
+    parts:[
+      'Das thermostatische ',
+      { opts:['Expansionsventil','Magnetventil','Pressostat'], correct:0 },
+      ' regelt die Menge Kältemittel, die durch den ',
+      { opts:['Verdampfer','Kondensator','Kompressor'], correct:0 },
+      ' strömt. Es verhindert, dass flüssiges Kältemittel in den ',
+      { opts:['Kompressor','Verdampfer','Kondensator'], correct:0 },
+      ' gelangt. Die Kühlraumtemperatur steuert das ',
+      { opts:['Magnetventil','Pressostat','Expansionsventil'], correct:0 },
+      '. Den Leitungsdruck vor dem Kompressor misst der ',
+      { opts:['Pressostat','Thermostat','Temperaturfühler'], correct:0 },
+      '.'
+    ] },
+
+  { kicker:'Folien · Wartung & WRG', title:'Wartung und Wärmerückgewinnung', type:'slides',
+    lead:'Was bei Wartung und WRG zu beachten ist.',
+    slides:[
+      { icon:'🔧', color:'#15803d', bg:'#dcfce7',
+        title:'Wartung: Was Sie selbst kontrollieren',
+        body:'<ul><li><b>Verdampfer vereisen</b>: Eisbelag hemmt Wärmedurchgang, Stromverbrauch steigt. Wenn kein automatisches Abtauen: täglich ausschalten, bis Eis weg</li><li><b>Kondensatorlamellen</b> (luftgekühlt): Luftgekühlte Kondensatoren nie in geschlossenen Räumen. Lamellen regelmässig mit <b>Pressluft</b> reinigen</li><li><b>Keilriemen</b> (ältere Anlagen): auf richtige Spannung achten</li></ul><div class="factbox">Einstellungen an Regulierungseinrichtungen dürfen nur kompetente Personen vornehmen.</div>'
+      },
+      { icon:'♻️', color:'#1e4e8c', bg:'#dbeeff',
+        title:'Wärmerückgewinnung (WRG)',
+        body:'<p>Ohne WRG gibt der Kondensator die Wärme einfach an die Umwelt ab. Mit einem <b>WRG-Boiler</b> wird diese Wärme genutzt:</p><img src="images/a.7_Waermerueckgewinnung_ohne_Nummern.png" alt="Schema Boiler mit Wärmerückgewinnung"><ul><li>Kondensator ist im Boiler eingebaut</li><li>Gasförmiges Kältemittel kühlt ab und erwärmt das Wasser im Boiler</li><li>Typische Nutzung: <b>Brauchwarmwasser vorwärmen</b></li><li>Im oberen Teil: Nacherhitzung mit Heizkessel oder Elektrizität</li></ul>'
+      },
+      { icon:'⚠️', color:'#c40027', bg:'#fde8ed',
+        title:'Grenzen der WRG',
+        body:'<p>Es wäre unwirtschaftlich, das Wasser im Boiler nur mit der WRG auf z.B. 70 °C zu erwärmen. Mit steigender Boilertemperatur steigt der Stromverbrauch des Kompressors stark an.</p><ul><li>WRG für <b>Fabrikationsprozesse</b> (Erhitzer, Pasteurisierung) lohnt sich nur in wenigen Betrieben</li><li>Kälteanlagen mit WRG brauchen einen <b>zusätzlichen Kondensator</b>: wenn das Boilerwasser zu heiss ist, muss Wärme anderweitig abgeführt werden</li></ul><div class="factbox">WRG lohnt sich fürs Vorwärmen von Brauchwasser, nicht für hohe Prozesstemperaturen.</div>'
+      }
+    ] },
+
+  { kicker:'Beschriften', title:'WRG-Boiler beschriften', id:'e_label', type:'label',
+    lead:'Ordnen Sie jeder Nummer den richtigen Begriff zu.',
+    media:'<img src="images/a.7_Waermerueckgewinnung_mit_Nummern.png" alt="Schema Boiler mit Wärmerückgewinnung und Legende">',
+    items:[
+      { n:1, name:'Zufuhr Kaltwasser',       keys:['kaltwasser','zufuhr'] },
+      { n:2, name:'Entnahme Warmwasser',     keys:['warmwasser','entnahme'] },
+      { n:3, name:'Vom Kompressor',          keys:['kompressor','vom kompressor'] },
+      { n:4, name:'Kondensator',             keys:['kondensator'] },
+      { n:5, name:'Zum Druckreduzierventil', keys:['druckreduzierventil','druckreduzierventi','druckreduzier'] },
+      { n:6, name:'Nacherhitzung',           keys:['nacherhitzung','nacherhitzer'] }
+    ] },
+
+  { kicker:'Folien · Klimatisierung', title:'Klimatisierung im Käsekeller', type:'slides',
+    lead:'Aufgaben der Klimaanlage im Käsekeller.',
+    slides:[
+      { icon:'🌬️', color:'#1e4e8c', bg:'#dbeeff',
+        title:'Klimaanlage im Käsekeller',
+        body:'<img src="images/a.7_Klimatisierung_Kaesekeller.png" alt="Klimatisierung Käsekeller"><p>Die Klimaanlage hat im Käsekeller vielfältige Aufgaben:</p><ul><li><b>Kühlen</b>: Raumtemperatur auf Sollwert halten</li><li><b>Lüften</b>: Frischluft zuführen und CO2 abführen</li><li><b>Feuchtigkeitsregulierung</b>: Luftfeuchte für die Käsereifung einstellen</li><li><b>Luftverteilung</b>: gleichmässige Temperatur und Feuchte im ganzen Keller sicherstellen</li></ul>'
+      }
+    ] },
+
+  { kicker:'Abschluss', title:'Quer durch die Kälteanlagen', id:'boss', boss:true, type:'quiz',
+    lead:'Gemischte Fragen zum Schluss.',
+    questions:[
+      { q:'Was ist der Hauptzweck einer Kältemaschine?', opts:['Wärme vom Kühlraum nach aussen transportieren','Kälte erzeugen und in den Kühlraum pumpen','Elektrische Energie in Kälteenergie umwandeln'], correct:0 },
+      { q:'Welches Kältemittel wird bevorzugt in Grossanlagen eingesetzt?', opts:['Ammoniak (NH3)','R134a','R404a'], correct:0 },
+      { q:'Was verhindert das thermostatische Expansionsventil?', opts:['Dass flüssiges Kältemittel in den Kompressor gelangt','Dass der Kondensator überhitzt','Dass der Kühlraum zu kalt wird'], correct:0 },
+      { q:'Wie reinigt man die Lamellen eines luftgekühlten Kondensators?', opts:['Mit Pressluft','Mit Wasser und Bürste','Mit chemischem Reinigungsmittel'], correct:0 },
+      { q:'Wozu dient der WRG-Boiler?', opts:['Brauchwarmwasser mit der Abwärme der Kälteanlage vorwärmen','Den Kompressor zu kühlen','Den Kondensationsdruck zu regulieren'], correct:0 }
+    ] }
+];
+
+/* Challenge = ohne Info-Lesetexte und Slides */
+var STATIONS = ALL.filter(function(s){ return MODE === 'challenge' ? (s.type !== 'info' && s.type !== 'pdf' && s.type !== 'slides') : true; });
+
+(function(){
+  var t = (MODE === 'challenge') ? 'Challenge' : 'Lernpfad';
+  document.getElementById('pageTitle').textContent = t + ': Kälteanlagen';
+  document.getElementById('subtitle').textContent = (MODE === 'challenge')
+    ? 'Prüfungsmodus: ohne Hilfen, Bauteile eintippen'
+    : 'Wissensvermittlung: mit Lesetexten und Übungen';
+  document.title = t + ': Kälteanlagen (a.7)';
+})();
+
+var N = STATIONS.length;
+var current = 0;
+var solved = [], earned = [], maxPts = [];
+for (var i = 0; i < N; i++) { solved[i] = false; earned[i] = 0; maxPts[i] = 0; }
+var xp = 0, streak = 0, bestStreak = 0;
+
+function findIdx(id){ for(var i=0;i<N;i++){ if(STATIONS[i].id===id) return i; } return -1; }
+function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;} return a; }
+function shuffleIdx(n){ var a=[]; for(var i=0;i<n;i++) a.push(i); return shuffle(a); }
+function fold(s){ return String(s).toLowerCase().replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss').replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim(); }
+function matchKeys(input, it){ var f=fold(input); if(!f) return false; if(f===fold(it.name)) return true; for(var i=0;i<it.keys.length;i++){ if(f.indexOf(fold(it.keys[i]))!==-1) return true; } return false; }
+
+function renderHud(){
+  document.getElementById('hudXp').textContent = xp;
+  var sc=0; for(var i=0;i<N;i++){ if(solved[i]) sc++; }
+  document.getElementById('hudBar').style.width = Math.round(sc/N*100)+'%';
+  document.getElementById('hudStreakNum').textContent = streak;
+  var onFire = streak >= 3;
+  document.getElementById('hudBar').classList.toggle('on-fire', onFire);
+  document.getElementById('hudStreakEmoji').style.display = onFire ? 'none' : '';
+  document.getElementById('hudFireWrap').style.display = onFire ? 'inline-block' : 'none';
+  document.getElementById('hudStreakNum').className = onFire ? 'streak-num-fire' : '';
+}
+function addXp(n){ xp+=n; var el=document.getElementById('hudXp'); renderHud(); el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
+function showStreakPop(){ var el=document.createElement('span'); el.className='streak-pop'; el.textContent='+1 🔥'; document.getElementById('hudStreak').appendChild(el); setTimeout(function(){ el.remove(); }, 900); }
+function registerAnswer(ok){
+  if(ok){ streak++; if(streak>bestStreak) bestStreak=streak; addXp(10+(streak>=3?5:0)); showStreakPop(); var s=document.getElementById('hudStreak'); s.classList.remove('pulse'); void s.offsetWidth; s.classList.add('pulse'); }
+  else { streak=0; renderHud(); }
+}
+
+function buildAll(){
+  var stage=document.getElementById('stage'); stage.innerHTML='';
+  STATIONS.forEach(function(st, idx){
+    var card=document.createElement('div');
+    card.className='station'+(st.boss?' boss':'')+(idx===0?'':' hidden'); card.id='station-'+idx;
+    card.innerHTML='<div class="station-kicker">'+st.kicker+'</div>'+
+      '<div class="station-title">'+st.title+'</div>'+
+      '<div class="station-lead">'+st.lead+'</div>'+
+      (st.media?'<div class="station-media">'+st.media+'</div>':'')+
+      '<div class="station-body" id="body-'+idx+'"></div>';
+    stage.appendChild(card);
+    buildBody(idx, st);
+  });
+  var fin=document.createElement('div'); fin.className='station hidden'; fin.id='station-finish';
+  fin.innerHTML='<div class="finish" id="finishBody"></div>'; stage.appendChild(fin);
+}
+function buildBody(idx, st){
+  if(st.type==='pdf')    buildPdf(idx, st);
+  if(st.type==='info')   buildInfo(idx, st);
+  if(st.type==='slides') buildSlides(idx, st);
+  if(st.type==='tf')     buildTF(idx, st);
+  if(st.type==='label')  (MODE==='challenge') ? buildLabelType(idx, st) : buildLabelChoose(idx, st);
+  if(st.type==='gaps')   buildGaps(idx, st);
+  if(st.type==='quiz')   buildQuiz(idx, st);
+}
+
+var CHECK_SVG = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+
+function buildPdf(idx, st){
+  maxPts[idx]=0;
+  document.getElementById('body-'+idx).innerHTML=
+    '<iframe src="'+st.src+'" class="pdf-frame"></iframe>'+
+    '<p style="font-size:0.78rem;color:var(--text-muted);margin:6px 0 14px;">'+
+      'PDF wird nicht angezeigt? <a href="'+st.src+'" target="_blank">Folien herunterladen</a></p>'+
+    '<div class="read-btn-row"><button class="read-btn" id="pdfbtn-'+idx+'">'+
+    '<div class="read-btn-icon">'+CHECK_SVG+'</div>'+
+    '<span class="read-btn-text">Gelesen &#10003; (+5 XP)</span></button></div>';
+  document.getElementById('pdfbtn-'+idx).addEventListener('click', function(){
+    if(solved[idx]) return; solved[idx]=true; addXp(5);
+    this.disabled=true; this.classList.add('done');
+    this.querySelector('.read-btn-text').textContent='Gelesen ✓';
+    updateNav();
+  });
+}
+
+function buildInfo(idx, st){
+  maxPts[idx]=0;
+  document.getElementById('body-'+idx).innerHTML='<div class="read">'+st.read+'</div>'+
+    '<div class="read-btn-row"><button class="read-btn" id="readbtn-'+idx+'">'+
+    '<div class="read-btn-icon">'+CHECK_SVG+'</div>'+
+    '<span class="read-btn-text">Gelesen &#10003; (+5 XP)</span></button></div>';
+  document.getElementById('readbtn-'+idx).addEventListener('click', function(){
+    if(solved[idx]) return; solved[idx]=true; addXp(5);
+    this.disabled=true; this.classList.add('done');
+    this.querySelector('.read-btn-text').textContent='Gelesen ✓';
+    updateNav();
+  });
+}
+
+function buildSlides(idx, st){
+  maxPts[idx]=0;
+  var cur=0;
+  var slides=st.slides;
+  var body=document.getElementById('body-'+idx);
+
+  var html='<div class="slideshow" id="ssw-'+idx+'">';
+  slides.forEach(function(sl,si){
+    html+='<div class="slide-panel'+(si===0?' active':'')+'" id="ssp-'+idx+'-'+si+'">';
+    html+='<div class="slide-header" style="background:'+sl.bg+';">';
+    html+='<span class="slide-icon">'+sl.icon+'</span>';
+    html+='<span class="slide-htitle" style="color:'+sl.color+';">'+sl.title+'</span>';
+    html+='</div><div class="slide-body read">'+sl.body+'</div></div>';
+  });
+  html+='</div>';
+  html+='<div class="slide-nav-row">';
+  html+='<button class="slide-nav-btn" id="sprev-'+idx+'" disabled>&#8592; Zurück</button>';
+  html+='<div style="display:flex;align-items:center;gap:8px;"><div class="slide-dots" id="sdots-'+idx+'"></div>';
+  html+='<span class="slide-counter" id="sctr-'+idx+'"></span></div>';
+  html+='<button class="slide-nav-btn" id="snext-'+idx+'">Weiter &#8594;</button>';
+  html+='</div>';
+  html+='<div class="read-btn-row" id="sbtnrow-'+idx+'" style="display:'+(slides.length<=1?'':'none')+'">';
+  html+='<button class="read-btn" id="readbtn-'+idx+'">';
+  html+='<div class="read-btn-icon">'+CHECK_SVG+'</div>';
+  html+='<span class="read-btn-text">Gelesen &#10003; (+5 XP)</span></button></div>';
+  body.innerHTML=html;
+
+  function renderDots(){
+    var el=document.getElementById('sdots-'+idx); el.innerHTML='';
+    slides.forEach(function(sl,si){
+      var d=document.createElement('span'); d.className='slide-dot'+(si===cur?' active':si<cur?' done':'');
+      d.addEventListener('click',function(){ if(si!==cur) go(si); });
+      el.appendChild(d);
+    });
+    var ctr=document.getElementById('sctr-'+idx);
+    if(ctr) ctr.textContent=(cur+1)+' / '+slides.length;
+  }
+  function renderNav(){
+    document.getElementById('sprev-'+idx).disabled=(cur===0);
+    document.getElementById('snext-'+idx).disabled=(cur===slides.length-1);
+    var btnRow=document.getElementById('sbtnrow-'+idx);
+    if(btnRow) btnRow.style.display=(cur===slides.length-1)?'':'none';
+  }
+  function go(newIdx){
+    var dir=newIdx>cur?'right':'left';
+    var panel=document.getElementById('ssp-'+idx+'-'+newIdx);
+    slides.forEach(function(sl,si){ document.getElementById('ssp-'+idx+'-'+si).classList.remove('active','slide-in-right','slide-in-left'); });
+    panel.classList.add('active',dir==='right'?'slide-in-right':'slide-in-left');
+    cur=newIdx; renderDots(); renderNav();
+  }
+  renderDots(); renderNav();
+  document.getElementById('sprev-'+idx).addEventListener('click',function(){ if(cur>0) go(cur-1); });
+  document.getElementById('snext-'+idx).addEventListener('click',function(){ if(cur<slides.length-1) go(cur+1); });
+
+  var tsX=0;
+  document.getElementById('ssw-'+idx).addEventListener('touchstart',function(e){ tsX=e.touches[0].clientX; },{passive:true});
+  document.getElementById('ssw-'+idx).addEventListener('touchend',function(e){
+    var dx=e.changedTouches[0].clientX-tsX;
+    if(Math.abs(dx)>42){ if(dx<0&&cur<slides.length-1) go(cur+1); else if(dx>0&&cur>0) go(cur-1); }
+  },{passive:true});
+
+  document.getElementById('readbtn-'+idx).addEventListener('click',function(){
+    if(solved[idx]) return; solved[idx]=true; addXp(5);
+    this.disabled=true; this.classList.add('done');
+    this.querySelector('.read-btn-text').textContent='Gelesen ✓';
+    updateNav();
+  });
+}
+
+function buildTF(idx, st){
+  maxPts[idx]=st.items.length;
+  var body=document.getElementById('body-'+idx);
+  st.items.forEach(function(it, ii){
+    var item=document.createElement('div'); item.className='tf-item';
+    item.innerHTML='<div class="tf-statement">'+it.s+'</div>'+
+      '<div class="tf-btns"><button class="tf-btn" data-i="'+ii+'" data-v="true">Wahr</button>'+
+      '<button class="tf-btn" data-i="'+ii+'" data-v="false">Falsch</button></div>'+
+      '<div class="tf-exp" id="tfexp-'+idx+'-'+ii+'">'+it.e+'</div>';
+    body.appendChild(item);
+  });
+  body.querySelectorAll('.tf-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var ii=+btn.dataset.i; var pick=btn.dataset.v==='true';
+      if(body.querySelector('.tf-btn[data-i="'+ii+'"]:disabled')) return;
+      var it=st.items[ii];
+      body.querySelectorAll('.tf-btn[data-i="'+ii+'"]').forEach(function(b){ b.disabled=true; if((b.dataset.v==='true')===it.a) b.classList.add('reveal'); });
+      if(pick===it.a){ btn.classList.add('sel-correct'); earned[idx]++; registerAnswer(true); } else { btn.classList.add('sel-wrong'); registerAnswer(false); }
+      document.getElementById('tfexp-'+idx+'-'+ii).classList.add('show');
+      var answered=0; for(var k=0;k<st.items.length;k++){ if(document.querySelector('#body-'+idx+' .tf-btn[data-i="'+k+'"]:disabled')) answered++; }
+      if(answered===st.items.length) solved[idx]=true;
+      updateNav();
+    });
+  });
+}
+
+/* Beschriften – Challenge: eintippen */
+function buildLabelType(idx, st){
+  maxPts[idx]=st.items.length;
+  var html='<div class="slots-grid">';
+  st.items.forEach(function(it){
+    html+='<div class="slot-row"><div class="slot-num">'+it.n+'</div><div class="type-cell">'+
+      '<input class="type-input" id="lb-'+idx+'-'+it.n+'" type="text" autocomplete="off" placeholder="Nr. '+it.n+' …">'+
+      '<div class="type-sol" id="lbsol-'+idx+'-'+it.n+'" style="display:none;"></div></div></div>';
+  });
+  html+='</div><div class="check-btn-row"><button class="btn btn-primary" id="lbcheck-'+idx+'">Überprüfen</button></div>';
+  document.getElementById('body-'+idx).innerHTML=html;
+  st.items.forEach(function(it, i){
+    document.getElementById('lb-'+idx+'-'+it.n).addEventListener('keydown', function(e){
+      if(e.key==='Enter'){ e.preventDefault(); var nx=st.items[i+1]; if(nx) document.getElementById('lb-'+idx+'-'+nx.n).focus(); }
+    });
+  });
+  document.getElementById('lbcheck-'+idx).addEventListener('click', function(){
+    if(solved[idx]) return; var correct=0;
+    st.items.forEach(function(it){
+      var inp=document.getElementById('lb-'+idx+'-'+it.n); var sol=document.getElementById('lbsol-'+idx+'-'+it.n);
+      inp.classList.remove('correct','wrong');
+      var ok=matchKeys(inp.value, it);
+      if(ok){ inp.classList.add('correct'); sol.style.display='none'; correct++; } else { inp.classList.add('wrong'); sol.textContent='→ '+it.name; sol.style.display='block'; }
+      registerAnswer(ok);
+    });
+    earned[idx]=correct; solved[idx]=true; this.disabled=true; updateNav();
+  });
+}
+
+/* Beschriften – Lernpfad: Drag & Drop */
+var _lbD={word:null,src:null,bank:null,sel:null,selChip:null};
+function _lbOnDrop(box, word, source){
+  if(box.classList.contains('correct')||box.classList.contains('wrong')) return;
+  var disp=box.dataset.filled||null;
+  if(source.isSlot){ _lbClear(source.el); if(disp) _lbFill(source.el,disp); }
+  else { _lbUse(word,_lbD.bank); if(disp) _lbRet(disp,_lbD.bank); }
+  _lbFill(box,word);
+}
+function _lbFill(box,word){ box.dataset.filled=word; box.textContent=word; box.className='lb-slot lb-filled'; box.setAttribute('draggable','true'); }
+function _lbClear(box){ delete box.dataset.filled; box.textContent='—'; box.className='lb-slot'; box.setAttribute('draggable','false'); }
+function _lbUse(word,bank){ var ok=false; bank.querySelectorAll('.lb-chip').forEach(function(c){ if(!ok&&c.dataset.word===word&&!c.classList.contains('used')){c.classList.add('used');ok=true;} }); }
+function _lbRet(word,bank){ var ok=false; bank.querySelectorAll('.lb-chip').forEach(function(c){ if(!ok&&c.dataset.word===word&&c.classList.contains('used')){c.classList.remove('used');ok=true;} }); }
+function _lbDrop(box){
+  if(!_lbD.word||box.classList.contains('correct')||box.classList.contains('wrong')) return;
+  var disp=box.dataset.filled||null;
+  if(_lbD.src&&_lbD.src.classList.contains('lb-slot')){ _lbClear(_lbD.src); if(disp) _lbFill(_lbD.src,disp); }
+  else { _lbUse(_lbD.word,_lbD.bank); if(disp) _lbRet(disp,_lbD.bank); }
+  _lbFill(box,_lbD.word); _lbD.word=_lbD.src=null;
+}
+function _lbSelChip(chip,word,bank){
+  if(chip.classList.contains('selected')){ chip.classList.remove('selected'); _lbD.sel=null; _lbD.selChip=null; document.querySelectorAll('.lb-slot.lb-ready').forEach(function(b){b.classList.remove('lb-ready');}); return; }
+  document.querySelectorAll('.lb-chip.selected').forEach(function(c){c.classList.remove('selected');});
+  chip.classList.add('selected'); _lbD.sel=word; _lbD.selChip=chip; _lbD.bank=bank;
+  document.querySelectorAll('.lb-slot').forEach(function(b){ b.classList.remove('lb-ready'); if(!b.dataset.filled&&!b.classList.contains('correct')&&!b.classList.contains('wrong')) b.classList.add('lb-ready'); });
+}
+function _lbClickBox(box,bank){
+  if(box.classList.contains('correct')||box.classList.contains('wrong')) return;
+  if(box.dataset.filled){ _lbRet(box.dataset.filled,bank); _lbClear(box); if(_lbD.sel) box.classList.add('lb-ready'); return; }
+  if(!_lbD.sel) return;
+  _lbFill(box,_lbD.sel); _lbUse(_lbD.sel,bank); _lbD.sel=null;
+  if(_lbD.selChip){_lbD.selChip.classList.remove('selected');_lbD.selChip=null;}
+  document.querySelectorAll('.lb-slot.lb-ready').forEach(function(b){b.classList.remove('lb-ready');});
+}
+function buildLabelChoose(idx,st){
+  maxPts[idx]=st.items.length;
+  var names=st.items.map(function(it){return it.name;}).filter(function(v,i,a){return a.indexOf(v)===i;});
+  var body=document.getElementById('body-'+idx);
+  var bank=document.createElement('div'); bank.className='lb-bank';
+  shuffle(names).forEach(function(word){
+    var chip=document.createElement('span'); chip.className='lb-chip'; chip.textContent=word; chip.dataset.word=word; chip.setAttribute('draggable','true');
+    chip.addEventListener('dragstart',function(e){_lbD.word=word;_lbD.src=chip;_lbD.bank=bank;e.dataTransfer.effectAllowed='move';});
+    chip.addEventListener('touchstart',function(e){_lbD.bank=bank;MTDnD.touchStart(e,chip,word,false,'.lb-slot',_lbOnDrop);},{passive:false});
+    chip.addEventListener('click',function(){_lbSelChip(chip,word,bank);});
+    bank.appendChild(chip);
+  });
+  body.appendChild(bank);
+  var grid=document.createElement('div'); grid.className='slots-grid';
+  st.items.forEach(function(p){
+    var row=document.createElement('div'); row.className='slot-row';
+    var badge=document.createElement('div'); badge.className='slot-num'; badge.textContent=p.n;
+    var box=document.createElement('div'); box.className='lb-slot'; box.dataset.slot=p.n; box.textContent='—';
+    box.addEventListener('dragover',function(e){e.preventDefault();if(!box.classList.contains('correct')&&!box.classList.contains('wrong'))box.classList.add('lb-over');});
+    box.addEventListener('dragleave',function(){box.classList.remove('lb-over');});
+    box.addEventListener('drop',function(e){e.preventDefault();box.classList.remove('lb-over');_lbDrop(box);});
+    box.addEventListener('dragstart',function(e){if(!box.dataset.filled){e.preventDefault();return;}_lbD.word=box.dataset.filled;_lbD.src=box;_lbD.bank=bank;e.dataTransfer.effectAllowed='move';});
+    box.addEventListener('touchstart',function(e){if(!box.dataset.filled)return;_lbD.bank=bank;MTDnD.touchStart(e,box,box.dataset.filled,true,'.lb-slot',_lbOnDrop);},{passive:false});
+    box.addEventListener('click',function(){_lbClickBox(box,bank);});
+    row.appendChild(badge);row.appendChild(box);grid.appendChild(row);
+  });
+  body.appendChild(grid);
+  var checkBtn=document.createElement('button'); checkBtn.className='btn btn-primary'; checkBtn.style.marginTop='12px';
+  checkBtn.textContent='Überprüfen';
+  checkBtn.addEventListener('click',function(){
+    if(solved[idx]) return; var correct=0;
+    st.items.forEach(function(p){
+      var box=grid.querySelector('[data-slot="'+p.n+'"]');
+      box.classList.remove('lb-filled','lb-over','lb-ready');
+      if(box.dataset.filled===p.name){box.classList.add('correct');correct++;}else{box.classList.add('wrong');}
+    });
+    earned[idx]=correct; solved[idx]=true; checkBtn.disabled=true; updateNav();
+  });
+  body.appendChild(checkBtn);
+}
+
+function buildGaps(idx, st){
+  var gapCount=0; var html='<div class="gap-text">';
+  st.parts.forEach(function(part){
+    if(typeof part==='string'){ html+=part; }
+    else { var gi=gapCount++; var opts=shuffleIdx(part.opts.length);
+      html+='<select data-g="'+gi+'" data-correct="'+part.correct+'"><option value="-1">…</option>';
+      opts.forEach(function(oi){ html+='<option value="'+oi+'">'+part.opts[oi]+'</option>'; });
+      html+='</select>';
+    }
+  });
+  html+='</div><div class="check-btn-row"><button class="btn btn-primary" id="gapcheck-'+idx+'">Prüfen</button></div>';
+  document.getElementById('body-'+idx).innerHTML=html;
+  maxPts[idx]=gapCount;
+  document.getElementById('gapcheck-'+idx).addEventListener('click', function(){
+    if(solved[idx]) return;
+    var sels=document.querySelectorAll('#body-'+idx+' select'); var ok=0;
+    sels.forEach(function(sel){ sel.classList.remove('correct','wrong'); var good=(+sel.value===+sel.dataset.correct); if(good){sel.classList.add('correct'); ok++;} else sel.classList.add('wrong'); sel.disabled=true; registerAnswer(good); });
+    earned[idx]=ok; solved[idx]=true; this.disabled=true; updateNav();
+  });
+}
+
+function buildQuiz(idx, st){
+  maxPts[idx]=st.questions.length;
+  var body=document.getElementById('body-'+idx);
+  st.questions.forEach(function(qq, qi){
+    var block=document.createElement('div'); block.className='q-block';
+    var h='<div class="q-text">'+(qi+1)+'. '+qq.q+'</div>';
+    shuffleIdx(qq.opts.length).forEach(function(oi){ h+='<button class="opt" data-q="'+qi+'" data-o="'+oi+'">'+qq.opts[oi]+'</button>'; });
+    block.innerHTML=h; body.appendChild(block);
+  });
+  body.querySelectorAll('.opt').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var qi=+btn.dataset.q, oi=+btn.dataset.o, qq=st.questions[qi];
+      if(body.querySelector('.opt[data-q="'+qi+'"]:disabled')) return;
+      body.querySelectorAll('.opt[data-q="'+qi+'"]').forEach(function(b){ b.disabled=true; if(+b.dataset.o===qq.correct) b.classList.add('correct'); });
+      if(oi!==qq.correct){ btn.classList.add('wrong'); registerAnswer(false); } else { earned[idx]++; registerAnswer(true); }
+      var answered=0; for(var k=0;k<st.questions.length;k++){ if(document.querySelector('#body-'+idx+' .opt[data-q="'+k+'"]:disabled')) answered++; }
+      if(answered===st.questions.length) solved[idx]=true;
+      updateNav();
+    });
+  });
+}
+
+function renderProgress(){
+  var dots=document.getElementById('lsDots'); dots.innerHTML='';
+  for(var i=0;i<N;i++){ var d=document.createElement('div'); d.className='ls-dot'+(i===current?' active':'')+(solved[i]?' done':''); d.textContent=solved[i]?'✓':(i+1); dots.appendChild(d); }
+  document.getElementById('lsMeta').textContent = (current<N) ? ('Posten '+(current+1)+' von '+N) : 'Auswertung';
+}
+function showCard(which){
+  document.querySelectorAll('.station').forEach(function(c){ c.classList.add('hidden'); });
+  document.getElementById(which==='finish'?'station-finish':'station-'+which).classList.remove('hidden');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function updateNav(){
+  var nextBtn=document.getElementById('nextBtn'), prevBtn=document.getElementById('prevBtn');
+  prevBtn.style.visibility=(current===0)?'hidden':'visible';
+  if(current<N){ nextBtn.disabled=!solved[current]; nextBtn.textContent=(current===N-1)?'Zur Auswertung →':'Weiter →'; }
+  renderProgress(); renderHud();
+}
+function goNext(){ if(current<N){ if(!solved[current]) return; current++; if(current<N){ showCard(current); updateNav(); } else { showFinish(); } } }
+function goPrev(){ if(current===0) return; if(current>=N) current=N-1; else current--; showCard(current); document.getElementById('nextBtn').style.visibility='visible'; document.getElementById('nextBtn').disabled=false; updateNav(); }
+
+function showFinish(){
+  var total=0, max=0; for(var i=0;i<N;i++){ total+=earned[i]; max+=maxPts[i]; }
+  var pct=max>0?Math.round(total/max*100):0;
+  var rank = pct>=90?'Kälte-Meister 🥇' : pct>=75?'Kälte-Profi' : pct>=50?'Kälte-Geselle' : 'Kälte-Lehrling';
+  var badges=[
+    { icon:'📖', name:'Aufmerksamer Leser', got: MODE!=='challenge' },
+    { icon:'❄️', name:'Anlage-Kenner', got: findIdx('a_label')>=0 && earned[findIdx('a_label')]===maxPts[findIdx('a_label')] },
+    { icon:'⚙️', name:'Regulierungs-Profi', got: findIdx('c_label')>=0 && earned[findIdx('c_label')]===maxPts[findIdx('c_label')] },
+    { icon:'♻️', name:'WRG-Spezialist', got: findIdx('e_label')>=0 && earned[findIdx('e_label')]===maxPts[findIdx('e_label')] },
+    { icon:'⚡', name:'Serie (Streak 8+)', got: bestStreak>=8 },
+    { icon:'🥇', name:'Kälte-Meister (90 %)', got: pct>=90 }
+  ];
+  var got=0, bh=''; badges.forEach(function(b){ if(b.got) got++; bh+='<span class="badge-chip'+(b.got?' earned':'')+'">'+(b.got?b.icon:'<span class="lock">🔒</span>')+' '+b.name+'</span>'; });
+  document.getElementById('finishBody').innerHTML=
+    '<div class="station-kicker">'+(MODE==='challenge'?'Prüfung beendet':'Geschafft')+'</div>'+
+    '<div class="rank">'+rank+'</div>'+
+    '<div class="big-score">'+xp+' XP</div>'+
+    '<div class="score-sub">'+total+' / '+max+' Punkte ('+pct+' %) · längste Serie 🔥 '+bestStreak+' · '+got+'/'+badges.length+' Abzeichen</div>'+
+    '<div class="badges">'+bh+'</div>'+
+    '<button class="btn btn-primary" onclick="restart()">Nochmals starten</button>'+
+    '<a class="back-link" href="../index.html" style="display:block;margin-top:14px;">← Alle Lerntools</a>';
+  showCard('finish');
+  document.getElementById('nextBtn').style.visibility='hidden';
+  document.getElementById('prevBtn').style.visibility='visible';
+  renderProgress();
+}
+function restart(){
+  current=0; xp=0; streak=0; bestStreak=0;
+  for(var i=0;i<N;i++){ solved[i]=false; earned[i]=0; }
+  document.getElementById('nextBtn').style.visibility='visible';
+  buildAll(); showCard(0); updateNav();
+}
+
+buildAll(); showCard(0); updateNav();
+</script>
+</body>
+</html>
