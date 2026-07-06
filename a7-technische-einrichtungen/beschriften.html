@@ -160,6 +160,40 @@ var DATASETS = {
       { n:13, name:'Füll- und Entleerungsventil', keys:['fuell','entleerungsventil'], cx:95, cy:90 },
       { n:14, name:'Druckanzeige',            keys:['druckanzeige','manometer'], cx:85, cy:75 }
     ], r:5
+  },
+  kaelteanlage: {
+    title:'Kälteanlage beschriften', sub:'Kompressionsprinzip – 4 Hauptbauteile',
+    img:'images/a.7_Kaelteanlage_Nummern.png', blank:'images/a.7_Kaelteanlage_ohne_Nummern.png',
+    parts:[
+      { n:1, name:'Verdampfer',       keys:['verdampfer'], cx:18, cy:55 },
+      { n:2, name:'Kompressor',       keys:['kompressor','verdichter'], cx:45, cy:85 },
+      { n:3, name:'Kondensator',      keys:['kondensator'], cx:80, cy:40 },
+      { n:4, name:'Expansionsventil', keys:['expansionsventil','expventil'], cx:45, cy:15 }
+    ], r:8
+  },
+  kaelteregulierung: {
+    title:'Kälteregulierung beschriften', sub:'Regelungselemente einer Kälteanlage',
+    img:'images/a.7_Kaelteregulierung_mit_Nummern.png', blank:'images/a.7_Kaelteregulierung_ohne_Nummern.png',
+    parts:[
+      { n:1, name:'Niederdruckpressostat',              keys:['niederdruckpressostat','niederdruck','pressostat'], cx:15, cy:70 },
+      { n:2, name:'Hochdruckpressostat',               keys:['hochdruckpressostat','hochdruck'], cx:80, cy:25 },
+      { n:3, name:'Magnetventil',                      keys:['magnetventil'], cx:50, cy:75 },
+      { n:4, name:'Thermostat',                        keys:['thermostat'], cx:25, cy:45 },
+      { n:5, name:'Thermostatisches Expansionsventil', keys:['thermostatisches expansionsventil','expansionsventil','expventil'], cx:35, cy:78 },
+      { n:6, name:'Temperaturfühler',                  keys:['temperaturfuehler','temperatursensor','fuehler'], cx:35, cy:55 }
+    ], r:7
+  },
+  wrgboiler: {
+    title:'WRG-Boiler beschriften', sub:'Wärmerückgewinnung – Boiler-Schema',
+    img:'images/a.7_Waermerueckgewinnung_mit_Nummern.png', blank:'images/a.7_Waermerueckgewinnung_ohne_Nummern.png',
+    parts:[
+      { n:1, name:'Zufuhr Kaltwasser',       keys:['kaltwasser','zufuhr'], cx:15, cy:85 },
+      { n:2, name:'Entnahme Warmwasser',     keys:['warmwasser','entnahme'], cx:15, cy:20 },
+      { n:3, name:'Vom Kompressor',          keys:['kompressor','vom kompressor'], cx:80, cy:30 },
+      { n:4, name:'Kondensator',             keys:['kondensator'], cx:50, cy:55 },
+      { n:5, name:'Zum Druckreduzierventil', keys:['druckreduzierventil','druckreduzier'], cx:80, cy:75 },
+      { n:6, name:'Nacherhitzung',           keys:['nacherhitzung','nacherhitzer'], cx:50, cy:15 }
+    ], r:7
   }
 };
 
