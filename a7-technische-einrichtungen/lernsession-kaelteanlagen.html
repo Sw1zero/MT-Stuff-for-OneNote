@@ -57,6 +57,11 @@
     .station-lead b { color:var(--blue-dark); }
     .station.boss { border:2px solid #f0c36d; box-shadow:0 0 0 4px #fff7e6; }
     .station.boss .station-kicker { color:#d97706; }
+    .station-kicker-row { display:flex; align-items:center; gap:8px; margin-bottom:4px; }
+    .diff-badge { font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; padding:2px 8px; border-radius:20px; white-space:nowrap; }
+    .diff-badge.einfach { background:#dcfce7; color:#15803d; }
+    .diff-badge.mittel  { background:#fef9c3; color:#854d0e; }
+    .diff-badge.schwer  { background:#fde8ed; color:#c40027; }
 
     .read { font-size:0.9rem; line-height:1.65; color:var(--text); }
     .read p { margin-bottom:12px; }
@@ -247,7 +252,7 @@ var ALL = [
     lead:'Schauen Sie das Video von <b>0:15 bis 5:38</b>. Es erklärt das Kompressionsprinzip und die Hauptbauteile.',
     src:'https://www.youtube.com/embed/MiWi4uQ9xOI?start=15&end=338&rel=0' },
 
-  { kicker:'Beschriften', title:'Kälteanlage beschriften', id:'a_label', type:'label',
+  { kicker:'Beschriften', title:'Kälteanlage beschriften', id:'a_label', type:'label', diff:'einfach',
     lead:'Ordnen Sie jeder Nummer das richtige Bauteil zu.',
     media:'<img src="images/a.7_Kaelteanlage_Nummern.png" alt="Schema einer Kälteanlage mit nummerierten Bauteilen">',
     items:[
@@ -257,7 +262,7 @@ var ALL = [
       { n:4, name:'Expansionsventil', keys:['expansionsventil','expventil'] }
     ] },
 
-  { kicker:'Wahr oder Falsch', title:'Kälteanlage und Kältemittel', id:'b_tf', type:'tf',
+  { kicker:'Wahr oder Falsch', title:'Kälteanlage und Kältemittel', id:'b_tf', type:'tf', diff:'einfach',
     lead:'Stimmt die Aussage?',
     items:[
       { s:'Eine Kälteanlage erzeugt Kälte.', a:false, e:'Sie transportiert Wärme. Kälte entsteht als Nebeneffekt der Verdampfung.' },
@@ -288,7 +293,7 @@ var ALL = [
     lead:'Schauen Sie das Video von <b>5:38 bis 7:09</b>. Es zeigt die Steuerung und Regulierung der Kälteanlage.',
     src:'https://www.youtube.com/embed/MiWi4uQ9xOI?start=338&end=429&rel=0' },
 
-  { kicker:'Beschriften', title:'Kälteregulierung beschriften', id:'c_label', type:'label',
+  { kicker:'Beschriften', title:'Kälteregulierung beschriften', id:'c_label', type:'label', diff:'mittel',
     lead:'Ordnen Sie jeder Nummer das richtige Element zu.',
     media:'<img src="images/a.7_Kaelteregulierung_mit_Nummern.png" alt="Schema einer Kälteregulierung mit Legende">',
     items:[
@@ -300,7 +305,7 @@ var ALL = [
       { n:6, name:'Temperaturfühler',                  keys:['temperaturfuehler','temperatursensor','fuehler'] }
     ] },
 
-  { kicker:'Lückentext', title:'Kälteregulierung', id:'d_gaps', type:'gaps',
+  { kicker:'Lückentext', title:'Kälteregulierung', id:'d_gaps', type:'gaps', diff:'mittel',
     lead:'Füllen Sie die Lücken aus.',
     parts:[
       'Das thermostatische ',
@@ -333,7 +338,7 @@ var ALL = [
       }
     ] },
 
-  { kicker:'Beschriften', title:'WRG-Boiler beschriften', id:'e_label', type:'label',
+  { kicker:'Beschriften', title:'WRG-Boiler beschriften', id:'e_label', type:'label', diff:'mittel',
     lead:'Ordnen Sie jeder Nummer den richtigen Begriff zu.',
     media:'<img src="images/a.7_Waermerueckgewinnung_mit_Nummern.png" alt="Schema Boiler mit Wärmerückgewinnung und Legende">',
     items:[
@@ -354,7 +359,7 @@ var ALL = [
       }
     ] },
 
-  { kicker:'Abschluss', title:'Quer durch die Kälteanlagen', id:'boss', boss:true, type:'quiz',
+  { kicker:'Abschluss', title:'Quer durch die Kälteanlagen', id:'boss', boss:true, type:'quiz', diff:'schwer',
     lead:'Gemischte Fragen zum Schluss.',
     questions:[
       { q:'Was ist der Hauptzweck einer Kältemaschine?', opts:['Wärme vom Kühlraum nach aussen transportieren','Kälte erzeugen und in den Kühlraum pumpen','Elektrische Energie in Kälteenergie umwandeln'], correct:0 },
@@ -412,7 +417,8 @@ function buildAll(){
   STATIONS.forEach(function(st, idx){
     var card=document.createElement('div');
     card.className='station'+(st.boss?' boss':'')+(idx===0?'':' hidden'); card.id='station-'+idx;
-    card.innerHTML='<div class="station-kicker">'+st.kicker+'</div>'+
+    var diffBadge = st.diff ? '<span class="diff-badge '+st.diff+'">'+(st.diff==='einfach'?'Einfach':st.diff==='mittel'?'Mittel':'Schwer')+'</span>' : '';
+    card.innerHTML='<div class="station-kicker-row"><span class="station-kicker">'+st.kicker+'</span>'+diffBadge+'</div>'+
       '<div class="station-title">'+st.title+'</div>'+
       '<div class="station-lead">'+st.lead+'</div>'+
       (st.media?'<div class="station-media">'+st.media+'</div>':'')+
