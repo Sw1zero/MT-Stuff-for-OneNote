@@ -7,21 +7,20 @@
   <link rel="stylesheet" href="../style.css">
   <script src="../assets/dnd.js"></script>
   <style>
-    .back-link {
-      display: inline-block;
-      font-size: 0.82rem;
-      color: var(--text-muted);
-      text-decoration: none;
-      margin-bottom: 1.5rem;
-      transition: color 0.15s;
-    }
+    .back-link { display: inline-block; font-size: 0.82rem; color: var(--text-muted); text-decoration: none; margin-bottom: 1rem; }
     .back-link:hover { color: var(--red); }
+
+    .level-bar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:1.25rem; }
+    .level-btn { font-family:var(--font); font-size:0.82rem; font-weight:600; padding:7px 16px; border-radius:20px; border:1.5px solid var(--border); background:var(--surface); color:var(--text-muted); cursor:pointer; transition:all 0.15s; }
+    .level-btn:hover { border-color:var(--blue); color:var(--blue-dark); }
+    .level-btn.active { background:var(--blue-dark); border-color:var(--blue-dark); color:#fff; }
 
     .instruction {
       font-size: 0.84rem;
       color: var(--text-muted);
       margin-bottom: 1.25rem;
       text-align: center;
+      line-height: 1.5;
     }
 
     .word-bank {
@@ -51,6 +50,7 @@
     .word-chip:hover   { border-color: var(--blue); }
     .word-chip.selected { background: var(--blue); border-color: var(--blue); color: #fff; }
     .word-chip.used     { opacity: 0.22; pointer-events: none; }
+    .word-chip.dragging { opacity: 0.4; }
 
     .compare-table {
       width: 100%;
@@ -105,7 +105,44 @@
     .blank-cell.correct { border-color: #16a34a !important; background: #f0fdf4 !important; color: #15803d !important; }
     .blank-cell.wrong   { border-color: var(--red) !important; background: var(--red-light) !important; color: var(--red) !important; }
     .blank-cell.over    { border-color: var(--blue); border-style: solid; background: #e0f2fe; }
-    .word-chip.dragging { opacity: 0.4; }
+
+    /* Mittel: Multiple-Choice-Buttons pro Zelle */
+    .mc-cell { display: flex; flex-direction: column; gap: 0.35rem; }
+    .mc-btn {
+      font-family: var(--font);
+      font-size: 0.78rem;
+      text-align: left;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.4rem 0.6rem;
+      cursor: pointer;
+      color: var(--text);
+      line-height: 1.35;
+      transition: all 0.15s;
+    }
+    .mc-btn:hover { border-color: var(--blue); background: #f0f7ff; }
+    .mc-btn.correct { border-color: #16a34a; background: #f0fdf4; color: #15803d; cursor: default; }
+    .mc-btn.wrong   { border-color: var(--red); background: var(--red-light); color: var(--red); cursor: default; }
+    .mc-btn.locked  { pointer-events: none; opacity: 0.55; }
+    .mc-btn.locked.correct, .mc-btn.locked.wrong { opacity: 1; }
+
+    /* Schwer: Freitext-Eingabe */
+    .type-input {
+      width: 100%;
+      font-family: var(--font);
+      font-size: 0.82rem;
+      padding: 0.4rem 0.6rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #f8fafc;
+      color: var(--text);
+      transition: border-color 0.15s;
+    }
+    .type-input:focus { outline: none; border-color: var(--blue); background: #fff; }
+    .type-input.correct { border-color: #16a34a; background: #f0fdf4; }
+    .type-input.wrong { border-color: var(--red); background: var(--red-light); }
+    .type-sol { font-size: 0.7rem; color: #15803d; margin-top: 3px; display: none; }
 
     .info-box {
       background: #f0f7ff;
@@ -159,45 +196,24 @@
 <main class="page-main">
   <a class="back-link" href="../index.html">← Alle Lerntools</a>
 
-  <p class="instruction">Ordnen Sie jeder Gefahrenquelle die passende Ursache und die passende Sofortmassnahme zu.</p>
+  <div class="level-bar">
+    <button class="level-btn active" id="lvl-einfach" onclick="setLevel('einfach')">Einfach – zuordnen</button>
+    <button class="level-btn"        id="lvl-mittel"  onclick="setLevel('mittel')">Mittel – anklicken</button>
+    <button class="level-btn"        id="lvl-schwer"  onclick="setLevel('schwer')">Schwer – eintippen</button>
+  </div>
 
-  <div class="word-bank" id="wordBank"></div>
+  <p class="instruction" id="instruction"></p>
 
-  <table class="compare-table">
-    <thead>
-      <tr>
-        <th>Gefahrenquelle</th>
-        <th>Ursache</th>
-        <th>Sofortmassnahme</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td class="prop-label">Zu grosser Überdruck</td>
-        <td><span class="blank-cell" data-answer="Pressostat oder Sicherheitsventil versagt, der Brenner schaltet nicht rechtzeitig ab.">—</span></td>
-        <td><span class="blank-cell" data-answer="Wartungs- und Bedienungsvorschriften einhalten, Sicherheitsventil regelmässig kontrollieren.">—</span></td>
-      </tr>
-      <tr>
-        <td class="prop-label">Wassermangel</td>
-        <td><span class="blank-cell" data-answer="Verdampftes Wasser wird nicht nachgespiesen, der Stand sinkt unter die Minimalmarke.">—</span></td>
-        <td><span class="blank-cell" data-answer="Feuerung sofort ausschalten, Sturmleitung öffnen, Kessel abkühlen lassen. Nie kaltes Wasser nachspeisen.">—</span></td>
-      </tr>
-      <tr>
-        <td class="prop-label">Kesselstein</td>
-        <td><span class="blank-cell" data-answer="Hartes Rohwasser lagert sich als Belag an der Heizfläche ab.">—</span></td>
-        <td><span class="blank-cell" data-answer="Speisewasser vor dem Kessel aufbereiten (Enthärtung oder Entsalzung).">—</span></td>
-      </tr>
-    </tbody>
-  </table>
+  <div id="modeBody"></div>
 
   <div class="info-box">
     <strong>Merke:</strong> Alle drei Gefahrenquellen führen über Überhitzung oder Überdruck zur plötzlichen Energiefreigabe.
     Bei Wassermangel gilt: Feuerung sofort ausschalten, nie kaltes Wasser nachspeisen.
   </div>
 
-  <div class="btn-row">
-    <button type="button" class="btn btn-primary" onclick="checkAll()">Überprüfen</button>
-    <button type="button" class="btn btn-ghost"   onclick="resetAll()">Zurücksetzen</button>
+  <div class="btn-row" id="btnRow">
+    <button type="button" class="btn btn-primary" id="checkBtn" onclick="checkLevel()">Überprüfen</button>
+    <button type="button" class="btn btn-ghost"   onclick="resetLevel()">Zurücksetzen</button>
   </div>
 
   <div class="result-banner" id="resultBanner"></div>
@@ -209,23 +225,76 @@
 </footer>
 
 <script>
-var ANSWERS = [
-  'Pressostat oder Sicherheitsventil versagt, der Brenner schaltet nicht rechtzeitig ab.',
-  'Verdampftes Wasser wird nicht nachgespiesen, der Stand sinkt unter die Minimalmarke.',
-  'Hartes Rohwasser lagert sich als Belag an der Heizfläche ab.',
-  'Wartungs- und Bedienungsvorschriften einhalten, Sicherheitsventil regelmässig kontrollieren.',
-  'Feuerung sofort ausschalten, Sturmleitung öffnen, Kessel abkühlen lassen. Nie kaltes Wasser nachspeisen.',
-  'Speisewasser vor dem Kessel aufbereiten (Enthärtung oder Entsalzung).'
+var ROWS = [
+  {
+    gef: 'Zu grosser Überdruck',
+    ursache: 'Pressostat oder Sicherheitsventil versagt, der Brenner schaltet nicht rechtzeitig ab.',
+    ursacheKeys: ['pressostat', 'ventil versagt', 'sicherheitsventil versagt'],
+    massnahme: 'Wartungs- und Bedienungsvorschriften einhalten, Sicherheitsventil regelmässig kontrollieren.',
+    massnahmeKeys: ['wartungsvorschriften', 'bedienungsvorschriften', 'ventil kontrollieren', 'sicherheitsventil kontrollieren']
+  },
+  {
+    gef: 'Wassermangel',
+    ursache: 'Verdampftes Wasser wird nicht nachgespiesen, der Stand sinkt unter die Minimalmarke.',
+    ursacheKeys: ['nicht nachgespiesen', 'minimalmarke', 'stand sinkt'],
+    massnahme: 'Feuerung sofort ausschalten, Sturmleitung öffnen, Kessel abkühlen lassen. Nie kaltes Wasser nachspeisen.',
+    massnahmeKeys: ['feuerung ausschalten', 'sturmleitung', 'abkuehlen lassen']
+  },
+  {
+    gef: 'Kesselstein',
+    ursache: 'Hartes Rohwasser lagert sich als Belag an der Heizfläche ab.',
+    ursacheKeys: ['hartes rohwasser', 'hartes wasser', 'kalzium', 'magnesium', 'belag'],
+    massnahme: 'Speisewasser vor dem Kessel aufbereiten (Enthärtung oder Entsalzung).',
+    massnahmeKeys: ['enthaertung', 'entsalzung', 'speisewasser aufbereiten', 'wasseraufbereitung']
+  }
 ];
 
-var selected   = null;
-var dragWord   = null;
+var ANSWERS = [];
+ROWS.forEach(function(r) { ANSWERS.push(r.ursache); ANSWERS.push(r.massnahme); });
 
+var level = 'einfach';
+var selected = null;
+var dragWord = null;
+var mcScore = 0, mcTotal = 0;
+
+function fold(s) { return String(s).toLowerCase().replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss').replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim(); }
+function matchKeys(input, keys) { var f = fold(input); if (!f) return false; for (var i = 0; i < keys.length; i++) { if (f.indexOf(fold(keys[i])) !== -1) return true; } return false; }
 function isLocked(cell) { return cell.classList.contains('correct') || cell.classList.contains('wrong'); }
 
-function init() {
+function setLevel(l) {
+  level = l;
+  ['einfach','mittel','schwer'].forEach(function(k) { document.getElementById('lvl-'+k).classList.toggle('active', k === l); });
+  resetLevel();
+}
+
+function resetLevel() {
+  document.getElementById('resultBanner').className = 'result-banner';
+  var body = document.getElementById('modeBody');
+  body.innerHTML = '';
+  var checkBtn = document.getElementById('checkBtn');
+  var instr = document.getElementById('instruction');
+  if (level === 'einfach') {
+    checkBtn.style.display = '';
+    instr.textContent = 'Ordnen Sie jeder Gefahrenquelle die passende Ursache und die passende Sofortmassnahme zu. Klicken Sie einen Begriff aus der Wortbank an, dann das leere Feld – oder ziehen Sie ihn hinein.';
+    buildEinfach(body);
+  } else if (level === 'schwer') {
+    checkBtn.style.display = '';
+    instr.textContent = 'Schreiben Sie zu jeder Gefahrenquelle die Ursache und die Sofortmassnahme selbst auf. Kleine Tippfehler werden akzeptiert – es genügt der Kernbegriff.';
+    buildSchwer(body);
+  } else {
+    checkBtn.style.display = 'none';
+    instr.textContent = 'Klicken Sie pro Feld die richtige Antwort an.';
+    buildMittel(body);
+  }
+}
+
+/* ---------- EINFACH: Drag & Drop aus Wortbank ---------- */
+function buildEinfach(body) {
+  body.innerHTML =
+    '<div class="word-bank" id="wordBank"></div>' +
+    '<table class="compare-table"><thead><tr><th>Gefahrenquelle</th><th>Ursache</th><th>Sofortmassnahme</th></tr></thead><tbody id="einfachBody"></tbody></table>';
+
   var bank = document.getElementById('wordBank');
-  bank.innerHTML = '';
   MTDnD.shuffle(ANSWERS).forEach(function(word) {
     var chip = document.createElement('button');
     chip.type = 'button';
@@ -234,18 +303,22 @@ function init() {
     chip.dataset.word = word;
     chip.setAttribute('draggable', 'true');
     chip.onclick = function() { selectChip(this); };
-    chip.addEventListener('dragstart', function(e) {
-      dragWord = word; e.dataTransfer.effectAllowed = 'move'; chip.classList.add('dragging');
-    });
+    chip.addEventListener('dragstart', function(e) { dragWord = word; e.dataTransfer.effectAllowed = 'move'; chip.classList.add('dragging'); });
     chip.addEventListener('dragend', function() { chip.classList.remove('dragging'); });
     chip.addEventListener('touchstart', function(e) { MTDnD.touchStart(e, chip, word, false, '.blank-cell', onDrop); }, {passive: false});
     bank.appendChild(chip);
   });
 
+  var tbody = document.getElementById('einfachBody');
+  ROWS.forEach(function(r) {
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td class="prop-label">' + r.gef + '</td>' +
+      '<td><span class="blank-cell" data-answer="' + r.ursache.replace(/"/g,'&quot;') + '">—</span></td>' +
+      '<td><span class="blank-cell" data-answer="' + r.massnahme.replace(/"/g,'&quot;') + '">—</span></td>';
+    tbody.appendChild(tr);
+  });
+
   document.querySelectorAll('.blank-cell').forEach(function(cell) {
-    cell.textContent = '—';
-    cell.className = 'blank-cell';
-    delete cell.dataset.filled;
     cell.onclick = function() { clickCell(this); };
     cell.addEventListener('dragover', function(e) { e.preventDefault(); if (!isLocked(cell) && !cell.dataset.filled) cell.classList.add('over'); });
     cell.addEventListener('dragleave', function() { cell.classList.remove('over'); });
@@ -254,28 +327,19 @@ function init() {
       if (dragWord) { placeInCell(cell, dragWord); dragWord = null; }
     });
   });
-
   selected = null;
-  document.getElementById('resultBanner').className = 'result-banner';
 }
 
 function selectChip(chip) {
-  if (chip.classList.contains('selected')) {
-    chip.classList.remove('selected');
-    selected = null;
-    clearReady();
-    return;
-  }
+  if (chip.classList.contains('selected')) { chip.classList.remove('selected'); selected = null; clearReady(); return; }
   document.querySelectorAll('.word-chip.selected').forEach(function(c) { c.classList.remove('selected'); });
   chip.classList.add('selected');
   selected = chip.dataset.word;
-
   document.querySelectorAll('.blank-cell').forEach(function(c) {
     c.classList.remove('ready');
     if (!c.dataset.filled && !isLocked(c)) c.classList.add('ready');
   });
 }
-
 function clickCell(cell) {
   if (isLocked(cell)) return;
   if (cell.dataset.filled) {
@@ -289,7 +353,6 @@ function clickCell(cell) {
   if (!selected) return;
   placeInCell(cell, selected);
 }
-
 function placeInCell(cell, word) {
   if (isLocked(cell)) return;
   var displaced = cell.dataset.filled || null;
@@ -299,36 +362,15 @@ function placeInCell(cell, word) {
   markUsed(word);
   if (displaced && displaced !== word) returnWord(displaced);
   selected = null;
-  clearSelectedChip();
+  document.querySelectorAll('.word-chip.selected').forEach(function(c) { c.classList.remove('selected'); });
   clearReady();
 }
+function returnWord(word) { document.querySelectorAll('.word-chip').forEach(function(c) { if (c.dataset.word === word) c.classList.remove('used', 'selected'); }); }
+function markUsed(word) { document.querySelectorAll('.word-chip').forEach(function(c) { if (c.dataset.word === word) { c.classList.remove('selected'); c.classList.add('used'); } }); }
+function clearReady() { document.querySelectorAll('.blank-cell').forEach(function(c) { c.classList.remove('ready'); }); }
+function onDrop(box, word, source) { if (isLocked(box)) return; placeInCell(box, word); }
 
-function clearSelectedChip() {
-  document.querySelectorAll('.word-chip.selected').forEach(function(c) { c.classList.remove('selected'); });
-}
-
-function returnWord(wordId) {
-  document.querySelectorAll('.word-chip').forEach(function(c) {
-    if (c.dataset.word === wordId) c.classList.remove('used', 'selected');
-  });
-}
-
-function markUsed(wordId) {
-  document.querySelectorAll('.word-chip').forEach(function(c) {
-    if (c.dataset.word === wordId) { c.classList.remove('selected'); c.classList.add('used'); }
-  });
-}
-
-function clearReady() {
-  document.querySelectorAll('.blank-cell').forEach(function(c) { c.classList.remove('ready'); });
-}
-
-function onDrop(box, wordId, source) {
-  if (isLocked(box)) return;
-  placeInCell(box, wordId);
-}
-
-function checkAll() {
+function checkEinfach() {
   var correct = 0, filled = 0;
   document.querySelectorAll('.blank-cell').forEach(function(cell) {
     var val = cell.dataset.filled;
@@ -336,22 +378,107 @@ function checkAll() {
     filled++;
     cell.classList.remove('filled', 'ready');
     if (val === cell.dataset.answer) { cell.classList.add('correct'); correct++; }
-    else                              { cell.classList.add('wrong'); }
+    else { cell.classList.add('wrong'); }
   });
+  showResult(correct, filled, ANSWERS.length);
+}
 
+/* ---------- MITTEL: pro Feld anklicken (1 richtig + 2 Ablenker) ---------- */
+function buildMittel(body) {
+  mcScore = 0; mcTotal = 0;
+  var table = document.createElement('table');
+  table.className = 'compare-table';
+  table.innerHTML = '<thead><tr><th>Gefahrenquelle</th><th>Ursache</th><th>Sofortmassnahme</th></tr></thead>';
+  var tbody = document.createElement('tbody');
+  table.appendChild(tbody);
+
+  ROWS.forEach(function(r, i) {
+    var tr = document.createElement('tr');
+    var tdGef = document.createElement('td'); tdGef.className = 'prop-label'; tdGef.textContent = r.gef;
+    var tdUrs = document.createElement('td'); tdUrs.appendChild(buildMcCell(r.ursache, otherFields(i, 'ursache')));
+    var tdMas = document.createElement('td'); tdMas.appendChild(buildMcCell(r.massnahme, otherFields(i, 'massnahme')));
+    tr.appendChild(tdGef); tr.appendChild(tdUrs); tr.appendChild(tdMas);
+    tbody.appendChild(tr);
+  });
+  body.appendChild(table);
+}
+function otherFields(rowIndex, field) {
+  var out = [];
+  ROWS.forEach(function(r, i) { if (i !== rowIndex) out.push(r[field]); });
+  return out;
+}
+function buildMcCell(correctText, distractors) {
+  var wrap = document.createElement('div');
+  wrap.className = 'mc-cell';
+  var options = MTDnD.shuffle([correctText].concat(distractors));
+  options.forEach(function(opt) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'mc-btn';
+    btn.textContent = opt;
+    btn.onclick = function() {
+      var cellBtns = wrap.querySelectorAll('.mc-btn');
+      cellBtns.forEach(function(b) { b.classList.add('locked'); });
+      mcTotal++;
+      if (opt === correctText) { btn.classList.add('correct'); mcScore++; }
+      else {
+        btn.classList.add('wrong');
+        cellBtns.forEach(function(b) { if (b.textContent === correctText) b.classList.add('correct'); });
+      }
+      if (mcTotal === ROWS.length * 2) showResult(mcScore, mcTotal, ROWS.length * 2);
+    };
+    wrap.appendChild(btn);
+  });
+  return wrap;
+}
+
+/* ---------- SCHWER: Freitext eintippen ---------- */
+function buildSchwer(body) {
+  var table = document.createElement('table');
+  table.className = 'compare-table';
+  table.innerHTML = '<thead><tr><th>Gefahrenquelle</th><th>Ursache</th><th>Sofortmassnahme</th></tr></thead>';
+  var tbody = document.createElement('tbody');
+  table.appendChild(tbody);
+
+  ROWS.forEach(function(r, i) {
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td class="prop-label">' + r.gef + '</td>' +
+      '<td><input class="type-input" id="ur-' + i + '" type="text" autocomplete="off" placeholder="Ursache …">' +
+      '<div class="type-sol" id="ursol-' + i + '"></div></td>' +
+      '<td><input class="type-input" id="ma-' + i + '" type="text" autocomplete="off" placeholder="Sofortmassnahme …">' +
+      '<div class="type-sol" id="masol-' + i + '"></div></td>';
+    tbody.appendChild(tr);
+  });
+  body.appendChild(table);
+}
+function checkSchwer() {
+  var correct = 0, total = ROWS.length * 2;
+  ROWS.forEach(function(r, i) {
+    var ur = document.getElementById('ur-' + i), ma = document.getElementById('ma-' + i);
+    var urSol = document.getElementById('ursol-' + i), maSol = document.getElementById('masol-' + i);
+    ur.classList.remove('correct', 'wrong'); ma.classList.remove('correct', 'wrong');
+    if (matchKeys(ur.value, r.ursacheKeys)) { ur.classList.add('correct'); urSol.style.display = 'none'; correct++; }
+    else { ur.classList.add('wrong'); urSol.textContent = '→ ' + r.ursache; urSol.style.display = 'block'; }
+    if (matchKeys(ma.value, r.massnahmeKeys)) { ma.classList.add('correct'); maSol.style.display = 'none'; correct++; }
+    else { ma.classList.add('wrong'); maSol.textContent = '→ ' + r.massnahme; maSol.style.display = 'block'; }
+  });
+  showResult(correct, total, total);
+}
+
+/* ---------- gemeinsam ---------- */
+function checkLevel() { if (level === 'einfach') checkEinfach(); else if (level === 'schwer') checkSchwer(); }
+function showResult(correct, filled, total) {
   var banner = document.getElementById('resultBanner');
-  if (correct === ANSWERS.length) {
-    banner.textContent = 'Perfekt! Alle ' + ANSWERS.length + ' richtig zugeordnet.';
+  if (correct === total) {
+    banner.textContent = 'Perfekt! Alle ' + total + ' richtig zugeordnet.';
     banner.className = 'result-banner show perfect';
   } else {
-    banner.textContent = correct + ' von ' + filled + ' Feldern korrekt. Rot markierte Felder nochmals überprüfen.';
+    banner.textContent = correct + ' von ' + (filled || total) + ' Feldern korrekt. Rot markierte Felder nochmals überprüfen.';
     banner.className = 'result-banner show partial';
   }
 }
 
-function resetAll() { init(); }
-
-init();
+setLevel('einfach');
 </script>
 
 </body>

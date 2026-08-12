@@ -64,7 +64,8 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 │   ├── tabellen-luecken-metalle.html
 │   ├── quiz-werkstoffe-schmierstoffe.html
 │   ├── beschriften.html                  ← 3-Stufen-Tool; ?set=oelbrenner|dampfkessel|warmwasser
-│   ├── zuordnung-dampfkessel-gefahren.html ← Gefahrenquelle → Ursache & Sofortmassnahme
+│   ├── zuordnung-dampfkessel-gefahren.html ← 3 Stufen (Einfach/Mittel/Schwer); Gefahrenquelle → Ursache & Sofortmassnahme
+│   ├── wahr-falsch-dampfkessel.html      ← 12 Aussagen, Swipe-Karten
 │   └── lernsession-waermeerzeugung.html  ← Lernpfad (Standard) / Challenge (?mode=challenge)
 ├── a8-kulturen/
 │   ├── images/
