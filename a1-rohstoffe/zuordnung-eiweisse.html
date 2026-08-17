@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eiweisse der Milch zuordnen</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="../assets/dnd.js"></script>
+  <style>
+    .back-link {
+      display: inline-block;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      margin-bottom: 1.5rem;
+      transition: color 0.15s;
+    }
+    .back-link:hover { color: var(--red); }
+
+    .instruction {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      margin-bottom: 1.25rem;
+      text-align: center;
+    }
+
+    .card-pool {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      background: var(--blue-light);
+      border-radius: var(--radius-md);
+      padding: 0.9rem 1rem;
+      margin-bottom: 1.75rem;
+      min-height: 60px;
+    }
+
+    .karte {
+      font-family: var(--font);
+      font-size: 0.78rem;
+      font-weight: 500;
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.38rem 0.7rem;
+      cursor: grab;
+      color: var(--text);
+      line-height: 1.4;
+      user-select: none;
+      touch-action: none;
+      max-width: 260px;
+      transition: border-color 0.15s, box-shadow 0.15s, opacity 0.15s;
+    }
+    .karte:hover { border-color: var(--blue); }
+    .karte.dragging { opacity: 0.3; }
+    .karte.used { opacity: 0.18; pointer-events: none; }
+    .karte.selected {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: #fff;
+    }
+
+    .spalten-wrap {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 700px) {
+      .spalten-wrap { grid-template-columns: 1fr; }
+    }
+
+    .spalte {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    .spalte-header {
+      background: var(--blue-dark);
+      color: #fff;
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 0.6rem 0.5rem;
+      letter-spacing: 0.01em;
+    }
+
+    .drop-zone {
+      min-height: 220px;
+      margin: 0.7rem;
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      background: #fafbfc;
+      transition: all 0.15s;
+    }
+    .drop-zone.over {
+      border-color: var(--blue);
+      border-style: solid;
+      background: #e8f4ff;
+    }
+    .drop-zone.ready {
+      border-color: var(--blue);
+      border-style: solid;
+      background: #f0f7ff;
+    }
+
+    .placed-karte {
+      font-family: var(--font);
+      font-size: 0.76rem;
+      font-weight: 500;
+      background: var(--surface);
+      border: 2px solid var(--blue);
+      border-radius: var(--radius-sm);
+      padding: 0.3rem 0.55rem;
+      color: var(--text);
+      cursor: grab;
+      user-select: none;
+      touch-action: none;
+      line-height: 1.35;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .placed-karte:hover { border-color: var(--blue-dark); }
+    .placed-karte.dragging { opacity: 0.3; }
+    .placed-karte.correct {
+      border-color: #16a34a !important;
+      background: #f0fdf4 !important;
+      color: #15803d !important;
+      cursor: default;
+      pointer-events: none;
+    }
+    .placed-karte.wrong {
+      border-color: var(--red) !important;
+      background: var(--red-light, #fff0f0) !important;
+      color: var(--red) !important;
+      cursor: default;
+      pointer-events: none;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .result-banner {
+      margin-top: 1.25rem;
+      padding: 0.9rem 1rem;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.92rem;
+      text-align: center;
+      display: none;
+    }
+    .result-banner.show   { display: block; }
+    .result-banner.perfect { background: #f0fdf4; color: #15803d; border: 1.5px solid #bbf7d0; }
+    .result-banner.partial { background: #fff7ed; color: #c2410c; border: 1.5px solid #fed7aa; }
+  </style>
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · a.1</span>
+    <h1>Eiweisse der Milch</h1>
+    <p>Ordnen Sie jede Eigenschaft der richtigen Eiweissart zu.</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+
+  <a class="back-link" href="../index.html">← Alle Lerntools</a>
+
+  <p class="instruction">Ziehen Sie jede Karte in die richtige Spalte.</p>
+
+  <div class="card-pool" id="cardPool"></div>
+
+  <div class="spalten-wrap" id="spaltenWrap">
+    <div class="spalte">
+      <div class="spalte-header">Kasein</div>
+      <div class="drop-zone" data-typ="kasein" id="zone-kasein"></div>
+    </div>
+    <div class="spalte">
+      <div class="spalte-header">Molkenproteine (Albumin)</div>
+      <div class="drop-zone" data-typ="albumin" id="zone-albumin"></div>
+    </div>
+    <div class="spalte">
+      <div class="spalte-header">Globulin</div>
+      <div class="drop-zone" data-typ="globulin" id="zone-globulin"></div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button type="button" class="btn btn-primary" onclick="checkAll()">Überprüfen</button>
+    <button type="button" class="btn btn-ghost" onclick="resetAll()">Neu mischen</button>
+  </div>
+
+  <div class="result-banner" id="resultBanner"></div>
+
+</main>
+
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+
+<script>
+var KARTEN = [
+  { id: 1,  text: "Kügelchen-Durchmesser 0,1 µm oder weniger",                          typ: "kasein"   },
+  { id: 2,  text: "Kügelchen sind negativ geladen und stossen sich gegenseitig ab",      typ: "kasein"   },
+  { id: 3,  text: "Wird bei der Käseproduktion mit Labgerinnung aus der Milch gewonnen", typ: "kasein"   },
+  { id: 4,  text: "Dichte 1450 kg/m³",                                                  typ: "kasein"   },
+  { id: 5,  text: "Anteil in der Milch: 2,5 % (25 g/kg)",                               typ: "kasein"   },
+  { id: 6,  text: "Lässt sich nicht mit Lab ausscheiden",                               typ: "albumin"  },
+  { id: 7,  text: "Gerinnt beim Erhitzen der Milch über 72 °C",                         typ: "albumin"  },
+  { id: 8,  text: "Verursacht den Kochgeschmack bei starker Erhitzung",                 typ: "albumin"  },
+  { id: 9,  text: "Bleibt bei der Käseproduktion in der Molke (Sirte)",                 typ: "albumin"  },
+  { id: 10, text: "Wird gewonnen, indem Molke auf 90 °C erhitzt und Säure zugegeben wird", typ: "albumin" },
+  { id: 11, text: "Teilchengrösse kleiner als 0,01 µm",                                 typ: "globulin" },
+  { id: 12, text: "Noch hitzeempfindlicher als Albumin",                                typ: "globulin" },
+  { id: 13, text: "In normaler Milch nur in Spuren vorhanden",                          typ: "globulin" },
+  { id: 14, text: "In grossen Mengen im Kolostrum (Brieschmilch) enthalten",            typ: "globulin" },
+  { id: 15, text: "Dient neugeborenen Kälbern als Abwehrstoff gegen Krankheitserreger", typ: "globulin" }
+];
+
+var karteById = {};
+for (var ki = 0; ki < KARTEN.length; ki++) { karteById[KARTEN[ki].id] = KARTEN[ki]; }
+
+var dragId     = null;
+var dragSource = null;
+var dragFromPool = false;
+var selectedId = null;
+
+function init() {
+  dragId = dragSource = null;
+  selectedId = null;
+  buildPool();
+  clearAllZones();
+  document.getElementById('resultBanner').className = 'result-banner';
+}
+
+function buildPool() {
+  var pool = document.getElementById('cardPool');
+  pool.innerHTML = '';
+  var shuffled = MTDnD.shuffle(KARTEN.slice());
+  for (var i = 0; i < shuffled.length; i++) {
+    (function(k) { pool.appendChild(makePoolChip(k)); })(shuffled[i]);
+  }
+}
+
+function makePoolChip(k) {
+  var chip = document.createElement('span');
+  chip.className = 'karte';
+  chip.textContent = k.text;
+  chip.dataset.id = k.id;
+  chip.setAttribute('draggable', 'true');
+
+  chip.addEventListener('dragstart', function(e) {
+    dragId = k.id; dragSource = chip; dragFromPool = true;
+    chip.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+  });
+  chip.addEventListener('dragend', function() { chip.classList.remove('dragging'); });
+  chip.addEventListener('touchstart', function(e) { MTDnD.touchStart(e, chip, k.id, false, '.drop-zone', onDrop); }, {passive: false});
+  chip.addEventListener('click', function() { selectPoolChip(chip, k.id); });
+
+  return chip;
+}
+
+function selectPoolChip(chip, id) {
+  if (chip.classList.contains('used')) return;
+  if (selectedId === id) { chip.classList.remove('selected'); selectedId = null; clearReadyZones(); return; }
+  document.querySelectorAll('.karte.selected').forEach(function(c) { c.classList.remove('selected'); });
+  chip.classList.add('selected');
+  selectedId = id;
+  document.querySelectorAll('.drop-zone').forEach(function(z) {
+    z.classList.remove('ready');
+    if (!z.classList.contains('checked')) z.classList.add('ready');
+  });
+}
+
+function clickZone(zone) {
+  if (zone.classList.contains('checked')) return;
+  if (selectedId === null) return;
+  placeCardInZone(zone, selectedId);
+  markPoolChipUsed(selectedId);
+  selectedId = null;
+  document.querySelectorAll('.karte.selected').forEach(function(c) { c.classList.remove('selected'); });
+  clearReadyZones();
+}
+
+function clickPlacedKarte(el, id, zone) {
+  if (el.classList.contains('correct') || el.classList.contains('wrong')) return;
+  if (selectedId !== null) {
+    returnToPool(id);
+    removeFromZone(zone, id);
+    placeCardInZone(zone, selectedId);
+    markPoolChipUsed(selectedId);
+    selectedId = null;
+    document.querySelectorAll('.karte.selected').forEach(function(c) { c.classList.remove('selected'); });
+    clearReadyZones();
+  } else {
+    returnToPool(id);
+    removeFromZone(zone, id);
+  }
+}
+
+function clearReadyZones() { document.querySelectorAll('.drop-zone').forEach(function(z) { z.classList.remove('ready'); }); }
+
+function clearAllZones() {
+  document.querySelectorAll('.drop-zone').forEach(function(z) {
+    z.innerHTML = '';
+    z.classList.remove('checked', 'over', 'ready');
+  });
+}
+
+function placeCardInZone(zone, id) {
+  var k = karteById[id];
+  var el = document.createElement('div');
+  el.className = 'placed-karte';
+  el.textContent = k.text;
+  el.dataset.id = id;
+  el.setAttribute('draggable', 'true');
+
+  el.addEventListener('dragstart', function(e) {
+    if (el.classList.contains('correct') || el.classList.contains('wrong')) { e.preventDefault(); return; }
+    dragId = id; dragSource = el; dragFromPool = false;
+    el.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+  });
+  el.addEventListener('dragend', function() { el.classList.remove('dragging'); });
+  el.addEventListener('touchstart', function(e) {
+    if (el.classList.contains('correct') || el.classList.contains('wrong')) return;
+    MTDnD.touchStart(e, el, id, true, '.drop-zone', onDrop);
+  }, {passive: false});
+  el.addEventListener('click', function(e) { e.stopPropagation(); clickPlacedKarte(el, id, zone); });
+
+  zone.appendChild(el);
+}
+
+function removeFromZone(zone, id) {
+  var children = zone.querySelectorAll('.placed-karte');
+  for (var i = 0; i < children.length; i++) {
+    if (parseInt(children[i].dataset.id) === parseInt(id)) { zone.removeChild(children[i]); return; }
+  }
+}
+
+function findZoneForPlacedEl(el) { return el.closest('.drop-zone'); }
+
+function markPoolChipUsed(id) {
+  document.querySelectorAll('.karte').forEach(function(c) { if (parseInt(c.dataset.id) === parseInt(id)) c.classList.add('used'); });
+}
+function returnToPool(id) {
+  document.querySelectorAll('.karte').forEach(function(c) { if (parseInt(c.dataset.id) === parseInt(id)) c.classList.remove('used'); });
+}
+
+function dropOnZone(zone) {
+  if (!dragId) return;
+  if (zone.classList.contains('checked')) return;
+  if (!dragFromPool && dragSource) {
+    var srcZone = findZoneForPlacedEl(dragSource);
+    if (srcZone) srcZone.removeChild(dragSource);
+  } else if (dragFromPool) {
+    markPoolChipUsed(dragId);
+  }
+  placeCardInZone(zone, dragId);
+  dragId = dragSource = null; dragFromPool = false;
+}
+
+function setupZones() {
+  document.querySelectorAll('.drop-zone').forEach(function(zone) {
+    zone.addEventListener('dragover', function(e) { e.preventDefault(); if (!zone.classList.contains('checked')) zone.classList.add('over'); });
+    zone.addEventListener('dragleave', function() { zone.classList.remove('over'); });
+    zone.addEventListener('drop', function(e) { e.preventDefault(); zone.classList.remove('over'); dropOnZone(zone); });
+    zone.addEventListener('click', function() { clickZone(zone); });
+  });
+}
+
+function onDrop(targetZone, id, source) {
+  if (targetZone.classList.contains('checked')) return;
+  if (source.isSlot) {
+    var srcZone = findZoneForPlacedEl(source.el);
+    if (srcZone) srcZone.removeChild(source.el);
+  } else {
+    markPoolChipUsed(id);
+  }
+  placeCardInZone(targetZone, id);
+}
+
+function checkAll() {
+  var correct = 0, total = 0;
+  document.querySelectorAll('.drop-zone').forEach(function(zone) {
+    var correctTyp = zone.dataset.typ;
+    zone.classList.add('checked');
+    zone.querySelectorAll('.placed-karte').forEach(function(el) {
+      var id = parseInt(el.dataset.id);
+      var k = karteById[id];
+      total++;
+      el.classList.remove('placed-karte');
+      if (k.typ === correctTyp) { el.classList.add('placed-karte', 'correct'); correct++; }
+      else { el.classList.add('placed-karte', 'wrong'); }
+      el.setAttribute('draggable', 'false');
+    });
+  });
+
+  var banner = document.getElementById('resultBanner');
+  if (correct === KARTEN.length && total === KARTEN.length) {
+    banner.textContent = 'Perfekt! Alle ' + KARTEN.length + ' Karten richtig zugeordnet.';
+    banner.className = 'result-banner show perfect';
+  } else {
+    banner.textContent = correct + ' von ' + total + ' Karten korrekt platziert. Rot markierte Karten nochmals überprüfen.';
+    banner.className = 'result-banner show partial';
+  }
+}
+
+function resetAll() { init(); }
+
+setupZones();
+init();
+</script>
+</body>
+</html>

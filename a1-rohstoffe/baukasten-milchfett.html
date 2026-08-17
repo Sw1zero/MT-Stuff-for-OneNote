@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Baukasten – Milchfett (Triglycerid)</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="../assets/dnd.js"></script>
+  <style>
+    .back-link {
+      display: inline-block;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      margin-bottom: 1.5rem;
+      transition: color 0.15s;
+    }
+    .back-link:hover { color: var(--red); }
+
+    .instruction {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      margin-bottom: 1.25rem;
+      text-align: center;
+      line-height: 1.5;
+      max-width: 520px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* ---- E-förmige Molekülstruktur ---- */
+    .e-shape {
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      height: 230px;
+      margin-bottom: 1.5rem;
+    }
+
+    .spine-slot {
+      width: 110px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: #fafbfc;
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-subtle);
+      cursor: pointer;
+      transition: all 0.15s;
+      padding: 0.4rem;
+    }
+    .spine-slot.filled { border-style: solid; border-color: var(--blue); color: var(--text); background: var(--surface); }
+    .spine-slot.over   { border-color: var(--blue); border-style: solid; background: #e8f4ff; }
+    .spine-slot.correct { border-color: #16a34a !important; background: #f0fdf4 !important; color: #15803d !important; }
+    .spine-slot.wrong   { border-color: var(--red) !important; background: var(--red-light) !important; color: var(--red) !important; }
+
+    .arms-col {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      margin-left: 0;
+    }
+    .arm-row { display: flex; align-items: center; }
+    .arm-line { width: 26px; height: 4px; background: var(--border); flex-shrink: 0; }
+    .arm-slot {
+      width: 160px;
+      min-height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: #fafbfc;
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-md);
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-subtle);
+      cursor: pointer;
+      transition: all 0.15s;
+      padding: 0.4rem;
+    }
+    .arm-slot.filled { border-style: solid; border-color: var(--blue); color: var(--text); background: var(--surface); }
+    .arm-slot.over   { border-color: var(--blue); border-style: solid; background: #e8f4ff; }
+    .arm-slot.correct { border-color: #16a34a !important; background: #f0fdf4 !important; color: #15803d !important; }
+    .arm-slot.wrong   { border-color: var(--red) !important; background: var(--red-light) !important; color: var(--red) !important; }
+
+    /* ---- Bauteile-Pool ---- */
+    .fs-pool {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      justify-content: center;
+      background: var(--blue-light);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .fs-tile {
+      font-family: var(--font);
+      font-weight: 700;
+      font-size: 0.85rem;
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.55rem 1.1rem;
+      cursor: pointer;
+      color: var(--text);
+      user-select: none;
+      touch-action: none;
+      transition: border-color 0.15s, box-shadow 0.15s, opacity 0.15s;
+    }
+    .fs-tile:hover { border-color: var(--blue); }
+    .fs-tile.dragging { opacity: 0.4; }
+    .fs-tile.tile-glycerin { color: var(--blue-dark); }
+
+    .btn-row {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .result-banner {
+      margin-top: 1.25rem;
+      padding: 0.9rem 1.1rem;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-align: center;
+      line-height: 1.5;
+      display: none;
+    }
+    .result-banner.show    { display: block; }
+    .result-banner.perfect { background: #f0fdf4; color: #15803d; border: 1.5px solid #bbf7d0; }
+    .result-banner.partial { background: var(--red-light); color: var(--red); border: 1.5px solid #fecaca; }
+
+    @media (max-width: 560px) {
+      .spine-slot { width: 84px; font-size: 0.76rem; }
+      .arm-slot { width: 120px; font-size: 0.72rem; }
+      .arm-line { width: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · a.1</span>
+    <h1>Milchfett-Baukasten</h1>
+    <p>Bauen Sie ein Fettmolekül (Triglycerid) aus Glycerin und Fettsäuren.</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+
+  <a class="back-link" href="../index.html">← Alle Lerntools</a>
+
+  <p class="instruction">Bauen Sie das Fettmolekül ganz selbst zusammen: ein Glycerin in die Mitte, drei Fettsäuren an die drei Arme – so entsteht die Form eines grossen «E», wie im Lehrmittel.</p>
+
+  <div class="e-shape">
+    <div class="spine-slot" id="slot-spine" data-slot="spine">Glycerin?</div>
+    <div class="arms-col">
+      <div class="arm-row"><div class="arm-line"></div><div class="arm-slot" id="slot-arm0" data-slot="arm" data-idx="0">Fettsäure?</div></div>
+      <div class="arm-row"><div class="arm-line"></div><div class="arm-slot" id="slot-arm1" data-slot="arm" data-idx="1">Fettsäure?</div></div>
+      <div class="arm-row"><div class="arm-line"></div><div class="arm-slot" id="slot-arm2" data-slot="arm" data-idx="2">Fettsäure?</div></div>
+    </div>
+  </div>
+
+  <div class="fs-pool" id="fsPool"></div>
+
+  <div class="btn-row">
+    <button type="button" class="btn btn-primary" onclick="assemble()">Fett zusammenbauen</button>
+    <button type="button" class="btn btn-ghost" onclick="resetTask()">Zurücksetzen</button>
+  </div>
+
+  <div class="result-banner" id="resultBanner"></div>
+
+</main>
+
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+
+<script>
+var SLOT_IDS = ['slot-spine', 'slot-arm0', 'slot-arm1', 'slot-arm2'];
+var REQUIRED = { 'slot-spine': 'glycerin', 'slot-arm0': 'fettsaeure', 'slot-arm1': 'fettsaeure', 'slot-arm2': 'fettsaeure' };
+var slotContent = {};
+var dragType = null;
+
+function resetTask() {
+  slotContent = {};
+  SLOT_IDS.forEach(renderSlot);
+  document.getElementById('resultBanner').className = 'result-banner';
+}
+
+function labelFor(id) {
+  return id === 'slot-spine' ? 'Glycerin?' : 'Fettsäure?';
+}
+
+function renderSlot(id) {
+  var el = document.getElementById(id);
+  el.classList.remove('filled', 'correct', 'wrong');
+  if (slotContent[id]) {
+    el.classList.add('filled');
+    el.textContent = slotContent[id] === 'glycerin' ? 'Glycerin' : 'Fettsäure';
+  } else {
+    el.textContent = labelFor(id);
+  }
+}
+
+function fillSlot(id, type) {
+  slotContent[id] = type;
+  renderSlot(id);
+  document.getElementById('resultBanner').className = 'result-banner';
+}
+
+function buildPool() {
+  var pool = document.getElementById('fsPool');
+  pool.innerHTML = '';
+  var items = [];
+  for (var g = 0; g < 4; g++) items.push('glycerin');
+  for (var f = 0; f < 5; f++) items.push('fettsaeure');
+
+  items.forEach(function(type) {
+    var tile = document.createElement('div');
+    tile.className = 'fs-tile' + (type === 'glycerin' ? ' tile-glycerin' : '');
+    tile.textContent = type === 'glycerin' ? 'Glycerin' : 'Fettsäure';
+    tile.setAttribute('draggable', 'true');
+
+    tile.addEventListener('dragstart', function(e) {
+      dragType = type;
+      tile.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    tile.addEventListener('dragend', function() { tile.classList.remove('dragging'); });
+    tile.addEventListener('touchstart', function(e) {
+      MTDnD.touchStart(e, tile, type, false, '.spine-slot, .arm-slot', function(box) { fillSlot(box.id, type); });
+    }, {passive: false});
+    tile.addEventListener('click', function() { selectedType = (selectedType === type) ? null : type; renderPoolSelection(); });
+
+    pool.appendChild(tile);
+  });
+}
+
+var selectedType = null;
+function renderPoolSelection() {
+  document.querySelectorAll('.fs-tile').forEach(function(t) {
+    var isThisType = (t.textContent === 'Glycerin' ? 'glycerin' : 'fettsaeure') === selectedType;
+    t.style.boxShadow = (selectedType && isThisType) ? '0 0 0 2px var(--blue)' : 'none';
+  });
+}
+
+SLOT_IDS.forEach(function(id) {
+  var el = document.getElementById(id);
+  el.addEventListener('click', function() {
+    if (selectedType) { fillSlot(id, selectedType); selectedType = null; renderPoolSelection(); }
+    else if (slotContent[id]) { delete slotContent[id]; renderSlot(id); document.getElementById('resultBanner').className = 'result-banner'; }
+  });
+  el.addEventListener('dragover', function(e) { e.preventDefault(); el.classList.add('over'); });
+  el.addEventListener('dragleave', function() { el.classList.remove('over'); });
+  el.addEventListener('drop', function(e) {
+    e.preventDefault();
+    el.classList.remove('over');
+    if (dragType) { fillSlot(id, dragType); dragType = null; }
+  });
+});
+
+function assemble() {
+  var filledCount = SLOT_IDS.filter(function(id) { return slotContent[id]; }).length;
+  var banner = document.getElementById('resultBanner');
+
+  if (filledCount < 4) {
+    banner.textContent = 'Noch nicht fertig: erst ' + filledCount + ' von 4 Bausteinen platziert.';
+    banner.className = 'result-banner show partial';
+    return;
+  }
+
+  var allCorrect = true;
+  SLOT_IDS.forEach(function(id) {
+    var el = document.getElementById(id);
+    var ok = slotContent[id] === REQUIRED[id];
+    el.classList.add(ok ? 'correct' : 'wrong');
+    if (!ok) allCorrect = false;
+  });
+
+  if (allCorrect) {
+    banner.textContent = 'Richtig! 1 Molekül Glycerin (Mitte) + 3 Moleküle Fettsäuren (Arme) = 1 Molekül Fett (Triglycerid).';
+    banner.className = 'result-banner show perfect';
+  } else {
+    banner.textContent = 'Noch nicht ganz richtig: Genau in die Mitte gehört das Glycerin, an die drei Arme je eine Fettsäure.';
+    banner.className = 'result-banner show partial';
+  }
+}
+
+buildPool();
+resetTask();
+</script>
+</body>
+</html>
