@@ -226,6 +226,10 @@
 var MODE = /[?&]mode=challenge/.test(location.search) ? 'challenge' : 'lernpfad';
 
 var ALL = [
+  { kicker:'Einstieg · Folien', title:'Präsentation zum Kältekreislauf', type:'pdf',
+    lead:'Schauen Sie sich die Folien an, bevor Sie mit den Übungen beginnen.',
+    src:'presentations/03_Kaeltekreislauf.pdf' },
+
   { kicker:'Folien · Kompressionsprinzip', title:'Aufbau und Funktion der Kälteanlage', type:'slides',
     lead:'Lesen Sie alle Folien, danach prüfen Sie sich.',
     slides:[
@@ -314,6 +318,39 @@ var ALL = [
       '. Den Leitungsdruck vor dem Kompressor misst der ',
       { opts:['Pressostat','Thermostat','Temperaturfühler'], correct:0 },
       '.'
+    ] },
+
+  { kicker:'Folien · Gefahren', title:'Gefahren an der Kälteanlage', type:'slides',
+    lead:'Drei Hauptgefahren und das richtige Verhalten.',
+    slides:[
+      { icon:'☠️', color:'#c40027', bg:'#fde8ed',
+        title:'Gefahr 1: Ammoniak-Vergiftung',
+        body:'<p>Ammoniak (NH3) ist giftig und stark reizend für Augen und Atemwege. Es ist <b>leichter als Luft</b> und steigt bei einer Leckage nach oben, deshalb sind Gasmelder im oberen Raumbereich montiert.</p><p>Verhalten bei Alarm oder stechendem Geruch:</p><ol><li>Raum <b>sofort verlassen</b> und Türe schliessen</li><li>Fluchtwege benutzen, nie den Lift</li><li>Fachperson bzw. Notfallorganisation alarmieren</li></ol><div class="factbox">Nur ausgebildetes Fachpersonal darf an NH3-Anlagen Eingriffe vornehmen.</div>'
+      },
+      { icon:'💥', color:'#1e4e8c', bg:'#dbeeff',
+        title:'Gefahr 2: Pressostat-Versagen',
+        body:'<p>Verschmutzte Kondensatorlamellen oder ein defekter <b>Hochdruckpressostat</b> lassen den Druck ungebremst steigen. Ohne rechtzeitige Abschaltung können Leitungen oder Verschraubungen bersten.</p><p>Der Hochdruckpressostat ist die zentrale Sicherheitseinrichtung gegen Überdruck. Er darf nie überbrückt oder ausser Betrieb gesetzt werden.</p><div class="factbox">Ungewöhnliche Geräusche oder ein Überdruck-Alarm: Anlage sofort ausser Betrieb nehmen und Fachperson beiziehen.</div>'
+      },
+      { icon:'🌍', color:'#15803d', bg:'#dcfce7',
+        title:'Gefahr 3: Umweltschäden bei Leckage',
+        body:'<p>FCKW-Kältemittel zerstören die <b>Ozonschicht</b> und dürfen bei einer Leckage nicht mehr nachgefüllt werden. Auch die chlorfreien Kältemittel R134a und R404a tragen bei einer Leckage zum <b>Treibhauseffekt</b> bei.</p><p>Deshalb sind regelmässige <b>Dichtheitskontrollen</b> gesetzlich vorgeschrieben. Eine Leckage muss geortet und behoben werden, bevor nachgefüllt wird.</p><div class="factbox">Einfaches Nachfüllen ohne Ursachenbehebung ist verboten und umweltschädlich.</div>'
+      }
+    ] },
+
+  { kicker:'Lückentext', title:'Gefahren an der Kälteanlage', id:'f_gaps', type:'gaps',
+    lead:'Füllen Sie die Lücken aus.',
+    parts:[
+      'Ammoniak ist ',
+      { opts:['giftig','ungefährlich','brennbar'], correct:0 },
+      ' und bei einer Leckage steigt es nach oben, weil es ',
+      { opts:['leichter als Luft','schwerer als Luft','geruchlos'], correct:0 },
+      ' ist. Der ',
+      { opts:['Hochdruckpressostat','Niederdruckpressostat','Thermostat'], correct:0 },
+      ' schützt die Anlage vor gefährlichem Überdruck und darf nie überbrückt werden. FCKW-Kältemittel zerstören die ',
+      { opts:['Ozonschicht','Kondensatorlamellen','Verdampferoberfläche'], correct:0 },
+      ' und dürfen bei Leckage nicht mehr nachgefüllt werden. Regelmässige ',
+      { opts:['Dichtheitskontrollen','Ölwechsel','Kalibrierungen'], correct:0 },
+      ' verhindern, dass Kältemittel zum Treibhauseffekt beitragen.'
     ] },
 
   { kicker:'Folien · Wartung & WRG', title:'Wartung und Wärmerückgewinnung', type:'slides',
