@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hygiene-Piktogramme zuordnen</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="../assets/dnd.js"></script>
+  <style>
+    .back-link {
+      display: inline-block;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      margin-bottom: 1.5rem;
+      transition: color 0.15s;
+    }
+    .back-link:hover { color: var(--red); }
+
+    .level-bar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:1.25rem; }
+    .level-btn { font-family:var(--font); font-size:0.82rem; font-weight:600; padding:7px 16px; border-radius:20px; border:1.5px solid var(--border); background:var(--surface); color:var(--text-muted); cursor:pointer; transition:all 0.15s; }
+    .level-btn:hover { border-color:var(--blue); color:var(--blue-dark); }
+    .level-btn.active { background:var(--blue-dark); border-color:var(--blue-dark); color:#fff; }
+
+    .instruction {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      margin-bottom: 1.25rem;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .card-pool {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      background: var(--blue-light);
+      border-radius: var(--radius-md);
+      padding: 0.9rem 1rem;
+      margin-bottom: 1.75rem;
+      min-height: 60px;
+    }
+
+    .karte {
+      font-family: var(--font);
+      font-size: 0.80rem;
+      font-weight: 500;
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.38rem 0.75rem;
+      cursor: grab;
+      color: var(--text);
+      line-height: 1.45;
+      user-select: none;
+      touch-action: none;
+      max-width: 280px;
+      transition: border-color 0.15s, box-shadow 0.15s, opacity 0.15s;
+    }
+    .karte:hover { border-color: var(--blue); }
+    .karte.dragging { opacity: 0.3; }
+    .karte.used { opacity: 0.18; pointer-events: none; }
+    .karte.selected {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: #fff;
+    }
+
+    .pikto-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 700px) {
+      .pikto-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .pikto-card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: 0.9rem 0.7rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .pikto-card img { width: 74px; height: 74px; }
+
+    .drop-zone {
+      width: 100%;
+      min-height: 44px;
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.3rem 0.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fafbfc;
+      transition: all 0.15s;
+    }
+    .drop-zone.over {
+      border-color: var(--blue);
+      border-style: solid;
+      background: #e8f4ff;
+    }
+    .drop-zone.ready {
+      border-color: var(--blue);
+      border-style: solid;
+      background: #f0f7ff;
+    }
+
+    .placed-karte {
+      font-family: var(--font);
+      font-size: 0.76rem;
+      font-weight: 500;
+      background: var(--surface);
+      border: 2px solid var(--blue);
+      border-radius: var(--radius-sm);
+      padding: 0.28rem 0.5rem;
+      color: var(--text);
+      cursor: grab;
+      user-select: none;
+      touch-action: none;
+      line-height: 1.35;
+      text-align: center;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .placed-karte:hover { border-color: var(--blue-dark); }
+    .placed-karte.dragging { opacity: 0.3; }
+    .placed-karte.correct {
+      border-color: #16a34a !important;
+      background: #f0fdf4 !important;
+      color: #15803d !important;
+      cursor: default;
+      pointer-events: none;
+    }
+    .placed-karte.wrong {
+      border-color: var(--red) !important;
+      background: var(--red-light, #fff0f0) !important;
+      color: var(--red) !important;
+      cursor: default;
+      pointer-events: none;
+    }
+
+    /* Mittel: Multiple-Choice-Buttons pro Piktogramm */
+    .mc-cell { display: flex; flex-direction: column; gap: 0.35rem; width: 100%; }
+    .mc-btn {
+      font-family: var(--font);
+      font-size: 0.74rem;
+      text-align: left;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.35rem 0.5rem;
+      cursor: pointer;
+      color: var(--text);
+      line-height: 1.3;
+      transition: all 0.15s;
+    }
+    .mc-btn:hover { border-color: var(--blue); background: #f0f7ff; }
+    .mc-btn.correct { border-color: #16a34a; background: #f0fdf4; color: #15803d; cursor: default; }
+    .mc-btn.wrong   { border-color: var(--red); background: var(--red-light); color: var(--red); cursor: default; }
+    .mc-btn.locked  { pointer-events: none; opacity: 0.55; }
+    .mc-btn.locked.correct, .mc-btn.locked.wrong { opacity: 1; }
+
+    /* Schwer: Freitext-Eingabe */
+    .type-input {
+      width: 100%;
+      font-family: var(--font);
+      font-size: 0.8rem;
+      padding: 0.4rem 0.5rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #f8fafc;
+      color: var(--text);
+      transition: border-color 0.15s;
+      text-align: center;
+    }
+    .type-input:focus { outline: none; border-color: var(--blue); background: #fff; }
+    .type-input.correct { border-color: #16a34a; background: #f0fdf4; }
+    .type-input.wrong { border-color: var(--red); background: var(--red-light); }
+    .type-sol { font-size: 0.68rem; color: #15803d; margin-top: 3px; display: none; text-align: center; }
+
+    .btn-row {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .result-banner {
+      margin-top: 1.25rem;
+      padding: 0.9rem 1rem;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.92rem;
+      text-align: center;
+      display: none;
+    }
+    .result-banner.show   { display: block; }
+    .result-banner.perfect { background: #f0fdf4; color: #15803d; border: 1.5px solid #bbf7d0; }
+    .result-banner.partial { background: #fff7ed; color: #c2410c; border: 1.5px solid #fed7aa; }
+  </style>
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · d.1</span>
+    <h1>Hygiene-Piktogramme</h1>
+    <p>Ordnen Sie jedem Piktogramm die richtige Bedeutung zu.</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+
+  <a class="back-link" href="../index.html">← Alle Lerntools</a>
+
+  <div class="level-bar">
+    <button class="level-btn active" id="lvl-einfach" onclick="setLevel('einfach')">Einfach – zuordnen</button>
+    <button class="level-btn"        id="lvl-mittel"  onclick="setLevel('mittel')">Mittel – anklicken</button>
+    <button class="level-btn"        id="lvl-schwer"  onclick="setLevel('schwer')">Schwer – eintippen</button>
+  </div>
+
+  <p class="instruction" id="instruction"></p>
+
+  <div id="modeBody"></div>
+
+  <div class="btn-row" id="btnRow">
+    <button type="button" class="btn btn-primary" id="checkBtn" onclick="checkLevel()">Überprüfen</button>
+    <button type="button" class="btn btn-ghost" onclick="resetLevel()">Neu mischen</button>
+  </div>
+
+  <div class="result-banner" id="resultBanner"></div>
+
+</main>
+
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+
+<script>
+var KARTEN = [
+  { id: 1, text: "Kein Zutritt für Unbefugte",            match: "zutritt",  img: "d.1_piktogramm_zutritt-verboten.svg",           keys: ["zutritt"] },
+  { id: 2, text: "Schmuck ablegen",                        match: "schmuck",  img: "d.1_piktogramm_schmuckverbot.svg",              keys: ["schmuck"] },
+  { id: 3, text: "Verletzungen abdecken",                  match: "wunden",   img: "d.1_piktogramm_wunden-abdecken.svg",            keys: ["verletzung", "wunde"] },
+  { id: 4, text: "Hände waschen",                          match: "haende",   img: "d.1_piktogramm_haende-waschen.svg",             keys: ["haende"] },
+  { id: 5, text: "Saubere Arbeitskleidung tragen",         match: "kleidung", img: "d.1_piktogramm_arbeitskleidung.svg",            keys: ["kleidung"] },
+  { id: 6, text: "Rauchverbot",                            match: "rauchen",  img: "d.1_piktogramm_rauchverbot.svg",                keys: ["rauch"] },
+  { id: 7, text: "Kein Essen und Trinken am Arbeitsplatz", match: "essen",    img: "d.1_piktogramm_essen-trinken-verboten.svg",     keys: ["essen", "trinken"] }
+];
+
+var karteById = {};
+for (var ki = 0; ki < KARTEN.length; ki++) {
+  karteById[KARTEN[ki].id] = KARTEN[ki];
+}
+
+function fold(s) { return String(s).toLowerCase().replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss').replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim(); }
+function matchKeys(input, keys) { var f = fold(input); if (!f) return false; for (var i = 0; i < keys.length; i++) { if (f.indexOf(fold(keys[i])) !== -1) return true; } return false; }
+
+var level = 'einfach';
+var dragId = null, dragSource = null, dragFromPool = false, selectedId = null;
+var mcScore = 0, mcTotal = 0;
+
+function setLevel(l) {
+  level = l;
+  ['einfach','mittel','schwer'].forEach(function(k) { document.getElementById('lvl-'+k).classList.toggle('active', k === l); });
+  resetLevel();
+}
+
+function resetLevel() {
+  document.getElementById('resultBanner').className = 'result-banner';
+  var body = document.getElementById('modeBody');
+  body.innerHTML = '';
+  var checkBtn = document.getElementById('checkBtn');
+  var instr = document.getElementById('instruction');
+  if (level === 'einfach') {
+    checkBtn.style.display = '';
+    instr.textContent = 'Ziehen Sie jede Bedeutung unter das passende Piktogramm.';
+    buildEinfach(body);
+  } else if (level === 'schwer') {
+    checkBtn.style.display = '';
+    instr.textContent = 'Schreiben Sie zu jedem Piktogramm die Bedeutung auf. Es genügt der Kernbegriff.';
+    buildSchwer(body);
+  } else {
+    checkBtn.style.display = 'none';
+    instr.textContent = 'Klicken Sie pro Piktogramm die richtige Bedeutung an.';
+    buildMittel(body);
+  }
+}
+
+/* ---------- EINFACH: Drag & Drop aus Wortbank ---------- */
+function buildEinfach(body) {
+  body.innerHTML = '<div class="card-pool" id="cardPool"></div><div class="pikto-grid" id="piktoGrid"></div>';
+
+  var pool = document.getElementById('cardPool');
+  MTDnD.shuffle(KARTEN.slice()).forEach(function(k) { pool.appendChild(makePoolChip(k)); });
+
+  var grid = document.getElementById('piktoGrid');
+  KARTEN.forEach(function(k) {
+    var card = document.createElement('div');
+    card.className = 'pikto-card';
+    card.innerHTML = '<img src="images/' + k.img + '" alt="">' +
+      '<div class="drop-zone" data-match="' + k.match + '" id="zone-' + k.match + '"></div>';
+    grid.appendChild(card);
+  });
+
+  setupZones();
+  dragId = dragSource = null; selectedId = null;
+}
+
+function makePoolChip(k) {
+  var chip = document.createElement('span');
+  chip.className = 'karte';
+  chip.textContent = k.text;
+  chip.dataset.id = k.id;
+  chip.setAttribute('draggable', 'true');
+
+  chip.addEventListener('dragstart', function(e) {
+    dragId = k.id; dragSource = chip; dragFromPool = true;
+    chip.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+  });
+  chip.addEventListener('dragend', function() { chip.classList.remove('dragging'); });
+  chip.addEventListener('touchstart', function(e) { MTDnD.touchStart(e, chip, k.id, false, '.drop-zone', onDrop); }, {passive: false});
+  chip.addEventListener('click', function() { selectPoolChip(chip, k.id); });
+
+  return chip;
+}
+
+function selectPoolChip(chip, id) {
+  if (chip.classList.contains('used')) return;
+  if (selectedId === id) { chip.classList.remove('selected'); selectedId = null; clearReadyZones(); return; }
+  document.querySelectorAll('.karte.selected').forEach(function(c) { c.classList.remove('selected'); });
+  chip.classList.add('selected');
+  selectedId = id;
+  document.querySelectorAll('.drop-zone').forEach(function(z) {
+    z.classList.remove('ready');
+    if (!z.classList.contains('checked')) z.classList.add('ready');
+  });
+}
+
+function clickZone(zone) {
+  if (zone.classList.contains('checked')) return;
+  if (selectedId === null) return;
+  placeCardInZone(zone, selectedId);
+  markPoolChipUsed(selectedId);
+  selectedId = null;
+  document.querySelectorAll('.karte.selected').forEach(function(c) { c.classList.remove('selected'); });
+  clearReadyZones();
+}
+
+function clickPlacedKarte(el, id, zone) {
+  if (el.classList.contains('correct') || el.classList.contains('wrong')) return;
+  if (selectedId !== null) {
+    returnToPool(id);
+    removeFromZone(zone, id);
+    placeCardInZone(zone, selectedId);
+    markPoolChipUsed(selectedId);
+    selectedId = null;
+    document.querySelectorAll('.karte.selected').forEach(function(c) { c.classList.remove('selected'); });
+    clearReadyZones();
+  } else {
+    returnToPool(id);
+    removeFromZone(zone, id);
+  }
+}
+
+function clearReadyZones() { document.querySelectorAll('.drop-zone').forEach(function(z) { z.classList.remove('ready'); }); }
+
+function placeCardInZone(zone, id) {
+  var existing = zone.querySelector('.placed-karte');
+  if (existing) { returnToPool(parseInt(existing.dataset.id)); zone.removeChild(existing); }
+
+  var k = karteById[id];
+  var el = document.createElement('div');
+  el.className = 'placed-karte';
+  el.textContent = k.text;
+  el.dataset.id = id;
+  el.setAttribute('draggable', 'true');
+
+  el.addEventListener('dragstart', function(e) {
+    if (el.classList.contains('correct') || el.classList.contains('wrong')) { e.preventDefault(); return; }
+    dragId = id; dragSource = el; dragFromPool = false;
+    el.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+  });
+  el.addEventListener('dragend', function() { el.classList.remove('dragging'); });
+  el.addEventListener('touchstart', function(e) {
+    if (el.classList.contains('correct') || el.classList.contains('wrong')) return;
+    MTDnD.touchStart(e, el, id, true, '.drop-zone', onDrop);
+  }, {passive: false});
+  el.addEventListener('click', function(e) { e.stopPropagation(); clickPlacedKarte(el, id, zone); });
+
+  zone.appendChild(el);
+}
+
+function removeFromZone(zone, id) {
+  var children = zone.querySelectorAll('.placed-karte');
+  for (var i = 0; i < children.length; i++) {
+    if (parseInt(children[i].dataset.id) === parseInt(id)) { zone.removeChild(children[i]); return; }
+  }
+}
+
+function findZoneForPlacedEl(el) { return el.closest('.drop-zone'); }
+
+function markPoolChipUsed(id) {
+  document.querySelectorAll('.karte').forEach(function(c) { if (parseInt(c.dataset.id) === parseInt(id)) c.classList.add('used'); });
+}
+function returnToPool(id) {
+  document.querySelectorAll('.karte').forEach(function(c) { if (parseInt(c.dataset.id) === parseInt(id)) c.classList.remove('used'); });
+}
+
+function dropOnZone(zone) {
+  if (!dragId) return;
+  if (zone.classList.contains('checked')) return;
+  if (!dragFromPool && dragSource) {
+    var srcZone = findZoneForPlacedEl(dragSource);
+    if (srcZone) srcZone.removeChild(dragSource);
+  } else if (dragFromPool) {
+    markPoolChipUsed(dragId);
+  }
+  placeCardInZone(zone, dragId);
+  dragId = dragSource = null; dragFromPool = false;
+}
+
+function setupZones() {
+  document.querySelectorAll('.drop-zone').forEach(function(zone) {
+    zone.addEventListener('dragover', function(e) { e.preventDefault(); if (!zone.classList.contains('checked')) zone.classList.add('over'); });
+    zone.addEventListener('dragleave', function() { zone.classList.remove('over'); });
+    zone.addEventListener('drop', function(e) { e.preventDefault(); zone.classList.remove('over'); dropOnZone(zone); });
+    zone.addEventListener('click', function() { clickZone(zone); });
+  });
+}
+
+function onDrop(targetZone, id, source) {
+  if (targetZone.classList.contains('checked')) return;
+  if (source.isSlot) {
+    var srcZone = findZoneForPlacedEl(source.el);
+    if (srcZone) srcZone.removeChild(source.el);
+  } else {
+    markPoolChipUsed(id);
+  }
+  placeCardInZone(targetZone, id);
+}
+
+function checkEinfach() {
+  var correct = 0, total = 0;
+  document.querySelectorAll('.drop-zone').forEach(function(zone) {
+    var correctMatch = zone.dataset.match;
+    zone.classList.add('checked');
+    zone.querySelectorAll('.placed-karte').forEach(function(el) {
+      var id = parseInt(el.dataset.id);
+      var k = karteById[id];
+      total++;
+      el.classList.remove('placed-karte');
+      if (k.match === correctMatch) { el.classList.add('placed-karte', 'correct'); correct++; }
+      else { el.classList.add('placed-karte', 'wrong'); }
+      el.setAttribute('draggable', 'false');
+    });
+  });
+  showResult(correct, total, KARTEN.length);
+}
+
+/* ---------- MITTEL: pro Piktogramm anklicken (1 richtig + 2 Ablenker) ---------- */
+function buildMittel(body) {
+  mcScore = 0; mcTotal = 0;
+  var grid = document.createElement('div');
+  grid.className = 'pikto-grid';
+  KARTEN.forEach(function(k) {
+    var card = document.createElement('div');
+    card.className = 'pikto-card';
+    var img = document.createElement('img');
+    img.src = 'images/' + k.img;
+    card.appendChild(img);
+    card.appendChild(buildMcCell(k));
+    grid.appendChild(card);
+  });
+  body.appendChild(grid);
+}
+function otherTexts(id) {
+  var out = [];
+  KARTEN.forEach(function(k) { if (k.id !== id) out.push(k.text); });
+  return out;
+}
+function buildMcCell(k) {
+  var wrap = document.createElement('div');
+  wrap.className = 'mc-cell';
+  var options = MTDnD.shuffle([k.text].concat(MTDnD.shuffle(otherTexts(k.id)).slice(0, 2)));
+  options.forEach(function(opt) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'mc-btn';
+    btn.textContent = opt;
+    btn.onclick = function() {
+      var cellBtns = wrap.querySelectorAll('.mc-btn');
+      cellBtns.forEach(function(b) { b.classList.add('locked'); });
+      mcTotal++;
+      if (opt === k.text) { btn.classList.add('correct'); mcScore++; }
+      else {
+        btn.classList.add('wrong');
+        cellBtns.forEach(function(b) { if (b.textContent === k.text) b.classList.add('correct'); });
+      }
+      if (mcTotal === KARTEN.length) showResult(mcScore, mcTotal, KARTEN.length);
+    };
+    wrap.appendChild(btn);
+  });
+  return wrap;
+}
+
+/* ---------- SCHWER: Freitext eintippen ---------- */
+function buildSchwer(body) {
+  var grid = document.createElement('div');
+  grid.className = 'pikto-grid';
+  KARTEN.forEach(function(k, i) {
+    var card = document.createElement('div');
+    card.className = 'pikto-card';
+    card.innerHTML = '<img src="images/' + k.img + '" alt="">' +
+      '<input class="type-input" id="ti-' + i + '" type="text" autocomplete="off" placeholder="Bedeutung …">' +
+      '<div class="type-sol" id="tisol-' + i + '"></div>';
+    grid.appendChild(card);
+  });
+  body.appendChild(grid);
+}
+function checkSchwer() {
+  var correct = 0, total = KARTEN.length;
+  KARTEN.forEach(function(k, i) {
+    var input = document.getElementById('ti-' + i), sol = document.getElementById('tisol-' + i);
+    input.classList.remove('correct', 'wrong');
+    if (matchKeys(input.value, k.keys)) { input.classList.add('correct'); sol.style.display = 'none'; correct++; }
+    else { input.classList.add('wrong'); sol.textContent = '→ ' + k.text; sol.style.display = 'block'; }
+  });
+  showResult(correct, total, total);
+}
+
+/* ---------- gemeinsam ---------- */
+function checkLevel() { if (level === 'einfach') checkEinfach(); else if (level === 'schwer') checkSchwer(); }
+function showResult(correct, filled, total) {
+  var banner = document.getElementById('resultBanner');
+  if (correct === total) {
+    banner.textContent = 'Perfekt! Alle ' + total + ' Piktogramme richtig zugeordnet.';
+    banner.className = 'result-banner show perfect';
+  } else {
+    banner.textContent = correct + ' von ' + (filled || total) + ' richtig. Rot markierte nochmals überprüfen.';
+    banner.className = 'result-banner show partial';
+  }
+}
+
+setLevel('einfach');
+</script>
+</body>
+</html>

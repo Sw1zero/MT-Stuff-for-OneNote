@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hygienezonen zuordnen</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="../assets/dnd.js"></script>
+  <style>
+    .back-link {
+      display: inline-block;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      margin-bottom: 1.5rem;
+      transition: color 0.15s;
+    }
+    .back-link:hover { color: var(--red); }
+
+    .level-bar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:1.25rem; }
+    .level-btn { font-family:var(--font); font-size:0.82rem; font-weight:600; padding:7px 16px; border-radius:20px; border:1.5px solid var(--border); background:var(--surface); color:var(--text-muted); cursor:pointer; transition:all 0.15s; }
+    .level-btn:hover { border-color:var(--blue); color:var(--blue-dark); }
+    .level-btn.active { background:var(--blue-dark); border-color:var(--blue-dark); color:#fff; }
+
+    .instruction {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      margin-bottom: 1.25rem;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .card-pool {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      background: var(--blue-light);
+      border-radius: var(--radius-md);
+      padding: 0.9rem 1rem;
+      margin-bottom: 1.75rem;
+      min-height: 60px;
+    }
+
+    .karte {
+      font-family: var(--font);
+      font-size: 0.80rem;
+      font-weight: 500;
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.38rem 0.75rem;
+      cursor: grab;
+      color: var(--text);
+      line-height: 1.45;
+      user-select: none;
+      touch-action: none;
+      max-width: 280px;
+      transition: border-color 0.15s, box-shadow 0.15s, opacity 0.15s;
+    }
+    .karte:hover { border-color: var(--blue); }
+    .karte.dragging { opacity: 0.3; }
+    .karte.used { opacity: 0.18; pointer-events: none; }
+    .karte.selected {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: #fff;
+    }
+
+    .spalten-wrap {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 700px) {
+      .spalten-wrap { grid-template-columns: 1fr; }
+    }
+
+    .spalte {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      border-top: 5px solid var(--zone-color, var(--blue-dark));
+    }
+
+    .spalte-header {
+      text-align: center;
+      padding: 0.7rem 0.5rem 0.3rem;
+    }
+    .spalte-header .zone-name {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .drop-zone {
+      min-height: 120px;
+      margin: 0.7rem;
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      background: #fafbfc;
+      transition: all 0.15s;
+    }
+    .drop-zone.over {
+      border-color: var(--blue);
+      border-style: solid;
+      background: #e8f4ff;
+    }
+    .drop-zone.ready {
+      border-color: var(--blue);
+      border-style: solid;
+      background: #f0f7ff;
+    }
+
+    .placed-karte {
+      font-family: var(--font);
+      font-size: 0.79rem;
+      font-weight: 500;
+      background: var(--surface);
+      border: 2px solid var(--blue);
+      border-radius: var(--radius-sm);
+      padding: 0.32rem 0.6rem;
+      color: var(--text);
+      cursor: grab;
+      user-select: none;
+      touch-action: none;
+      line-height: 1.4;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .placed-karte:hover { border-color: var(--blue-dark); }
+    .placed-karte.dragging { opacity: 0.3; }
+    .placed-karte.correct {
+      border-color: #16a34a !important;
+      background: #f0fdf4 !important;
+      color: #15803d !important;
+      cursor: default;
+      pointer-events: none;
+    }
+    .placed-karte.wrong {
+      border-color: var(--red) !important;
+      background: var(--red-light, #fff0f0) !important;
+      color: var(--red) !important;
+      cursor: default;
+      pointer-events: none;
+    }
+
+    /* Mittel + Schwer: eine Zeile pro Betriebsbereich */
+    .item-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      margin-bottom: 1.5rem;
+    }
+    .item-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      padding: 0.7rem 1rem;
+      flex-wrap: wrap;
+    }
+    .item-label {
+      flex: 1 1 220px;
+      font-size: 0.86rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .mc-cell { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+    .mc-btn {
+      font-family: var(--font);
+      font-size: 0.78rem;
+      font-weight: 600;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.4rem 0.75rem;
+      cursor: pointer;
+      color: var(--text);
+      transition: all 0.15s;
+    }
+    .mc-btn:hover { border-color: var(--blue); background: #f0f7ff; }
+    .mc-btn.correct { border-color: #16a34a; background: #f0fdf4; color: #15803d; cursor: default; }
+    .mc-btn.wrong   { border-color: var(--red); background: var(--red-light); color: var(--red); cursor: default; }
+    .mc-btn.locked  { pointer-events: none; opacity: 0.55; }
+    .mc-btn.locked.correct, .mc-btn.locked.wrong { opacity: 1; }
+
+    .type-input {
+      width: 160px;
+      font-family: var(--font);
+      font-size: 0.82rem;
+      padding: 0.4rem 0.6rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #f8fafc;
+      color: var(--text);
+      transition: border-color 0.15s;
+    }
+    .type-input:focus { outline: none; border-color: var(--blue); background: #fff; }
+    .type-input.correct { border-color: #16a34a; background: #f0fdf4; }
+    .type-input.wrong { border-color: var(--red); background: var(--red-light); }
+    .type-sol { font-size: 0.72rem; color: #15803d; margin-top: 3px; display: none; flex-basis: 100%; }
+
+    .btn-row {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .result-banner {
+      margin-top: 1.25rem;
+      padding: 0.9rem 1rem;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.92rem;
+      text-align: center;
+      display: none;
+    }
+    .result-banner.show   { display: block; }
+    .result-banner.perfect { background: #f0fdf4; color: #15803d; border: 1.5px solid #bbf7d0; }
+    .result-banner.partial { background: #fff7ed; color: #c2410c; border: 1.5px solid #fed7aa; }
+  </style>
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · d.1</span>
+    <h1>Hygienezonen</h1>
+    <p>Ordnen Sie die Betriebsbereiche der richtigen Hygienezone zu.</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+
+  <a class="back-link" href="../index.html">← Alle Lerntools</a>
+
+  <div class="level-bar">
+    <button class="level-btn active" id="lvl-einfach" onclick="setLevel('einfach')">Einfach – zuordnen</button>
+    <button class="level-btn"        id="lvl-mittel"  onclick="setLevel('mittel')">Mittel – anklicken</button>
+    <button class="level-btn"        id="lvl-schwer"  onclick="setLevel('schwer')">Schwer – eintippen</button>
+  </div>
+
+  <p class="instruction" id="instruction"></p>
+
+  <div id="modeBody"></div>
+
+  <div class="btn-row" id="btnRow">
+    <button type="button" class="btn btn-primary" id="checkBtn" onclick="checkLevel()">Überprüfen</button>
+    <button type="button" class="btn btn-ghost" onclick="resetLevel()">Neu mischen</button>
+  </div>
+
+  <div class="result-banner" id="resultBanner"></div>
+
+</main>
+
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+
+<script>
+var ZONES = [
+  { key: "rot",    label: "Zone 1 · Rot",    color: "#c40027" },
+  { key: "orange", label: "Zone 2 · Orange", color: "#d97706" },
+  { key: "gruen",  label: "Zone 3 · Grün",   color: "#15803d" }
+];
+var ZONE_KEYS = {
+  rot:    ["rot", "1"],
+  orange: ["orange", "2"],
+  gruen:  ["gruen", "grun", "3"]
+};
+
+var KARTEN = [
+  { id: 1, text: "Offener Käsefertiger",              zone: "rot"   },
+  { id: 2, text: "Offene Joghurt-Abfüllung",          zone: "rot"   },
+  { id: 3, text: "Offene Fabrikationslinie",          zone: "rot"   },
+  { id: 4, text: "Reifungskeller (verpackter Käse)",  zone: "orange" },
+  { id: 5, text: "Lager für abgepackte Produkte",     zone: "orange" },
+  { id: 6, text: "Labor",                             zone: "orange" },
+  { id: 7, text: "Milchannahme",                      zone: "gruen" },
+  { id: 8, text: "Verkaufsladen",                     zone: "gruen" },
+  { id: 9, text: "Anlieferungsrampe",                 zone: "gruen" }
+];
+
+var karteById = {};
+for (var ki = 0; ki < KARTEN.length; ki++) { karteById[KARTEN[ki].id] = KARTEN[ki]; }
+
+function fold(s) { return String(s).toLowerCase().replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss').replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim(); }
+function matchKeys(input, keys) { var f = fold(input); if (!f) return false; for (var i = 0; i < keys.length; i++) { if (f.indexOf(fold(keys[i])) !== -1) return true; } return false; }
+
+var level = 'einfach';
+var dragId = null, dragSource = null, dragFromPool = false, selectedId = null;
+var mcScore = 0, mcTotal = 0;
+
+function setLevel(l) {
+  level = l;
+  ['einfach','mittel','schwer'].forEach(function(k) { document.getElementById('lvl-'+k).classList.toggle('active', k === l); });
+  resetLevel();
+}
+
+function resetLevel() {
+  document.getElementById('resultBanner').className = 'result-banner';
+  var body = document.getElementById('modeBody');
+  body.innerHTML = '';
+  var checkBtn = document.getElementById('checkBtn');
+  var instr = document.getElementById('instruction');
+  if (level === 'einfach') {
+    checkBtn.style.display = '';
+    instr.textContent = 'Ziehen Sie jede Karte in die richtige Hygienezone.';
+    buildEinfach(body);
+  } else if (level === 'schwer') {
+    checkBtn.style.display = '';
+    instr.textContent = 'Schreiben Sie zu jedem Betriebsbereich die passende Zonenfarbe auf (rot, orange oder grün).';
+    buildSchwer(body);
+  } else {
+    checkBtn.style.display = 'none';
+    instr.textContent = 'Klicken Sie pro Betriebsbereich die richtige Zone an.';
+    buildMittel(body);
+  }
+}
+
+/* ---------- EINFACH: Drag & Drop in Spalten ---------- */
+function buildEinfach(body) {
+  var wrap = document.createElement('div');
+  wrap.className = 'spalten-wrap';
+  ZONES.forEach(function(z) {
+    var col = document.createElement('div');
+    col.className = 'spalte';
+    col.style.setProperty('--zone-color', z.color);
+    col.innerHTML = '<div class="spalte-header"><div class="zone-name">' + z.label + '</div></div>' +
+      '<div class="drop-zone" data-zone="' + z.key + '" id="zone-' + z.key + '"></div>';
+    wrap.appendChild(col);
+  });
+  body.innerHTML = '<div class="card-pool" id="cardPool"></div>';
+  body.appendChild(wrap);
+
+  var pool = document.getElementById('cardPool');
+  MTDnD.shuffle(KARTEN.slice()).forEach(function(k) { pool.appendChild(makePoolChip(k)); });
+
+  setupZones();
+  dragId = dragSource = null; selectedId = null;
+}
+
+function makePoolChip(k) {
+  var chip = document.createElement('span');
+  chip.className = 'karte';
+  chip.textContent = k.text;
+  chip.dataset.id = k.id;
+  chip.setAttribute('draggable', 'true');
+
+  chip.addEventListener('dragstart', function(e) {
+    dragId = k.id; dragSource = chip; dragFromPool = true;
+    chip.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+  });
+  chip.addEventListener('dragend', function() { chip.classList.remove('dragging'); });
+  chip.addEventListener('touchstart', function(e) { MTDnD.touchStart(e, chip, k.id, false, '.drop-zone', onDrop); }, {passive: false});
+  chip.addEventListener('click', function() { selectPoolChip(chip, k.id); });
+
+  return chip;
+}
+
+function selectPoolChip(chip, id) {
+  if (chip.classList.contains('used')) return;
+  if (selectedId === id) { chip.classList.remove('selected'); selectedId = null; clearReadyZones(); return; }
+  document.querySelectorAll('.karte.selected').forEach(function(c) { c.classList.remove('selected'); });
+  chip.classList.add('selected');
+  selectedId = id;
+  document.querySelectorAll('.drop-zone').forEach(function(z) {
+    z.classList.remove('ready');
+    if (!z.classList.contains('checked')) z.classList.add('ready');
+  });
+}
+
+function clickZone(zone) {
+  if (zone.classList.contains('checked')) return;
+  if (selectedId === null) return;
+  placeCardInZone(zone, selectedId);
+  markPoolChipUsed(selectedId);
+  selectedId = null;
+  document.querySelectorAll('.karte.selected').forEach(function(c) { c.classList.remove('selected'); });
+  clearReadyZones();
+}
+
+function clickPlacedKarte(el, id, zone) {
+  if (el.classList.contains('correct') || el.classList.contains('wrong')) return;
+  if (selectedId !== null) {
+    returnToPool(id);
+    removeFromZone(zone, id);
+    placeCardInZone(zone, selectedId);
+    markPoolChipUsed(selectedId);
+    selectedId = null;
+    document.querySelectorAll('.karte.selected').forEach(function(c) { c.classList.remove('selected'); });
+    clearReadyZones();
+  } else {
+    returnToPool(id);
+    removeFromZone(zone, id);
+  }
+}
+
+function clearReadyZones() { document.querySelectorAll('.drop-zone').forEach(function(z) { z.classList.remove('ready'); }); }
+
+function placeCardInZone(zone, id) {
+  var k = karteById[id];
+  var el = document.createElement('div');
+  el.className = 'placed-karte';
+  el.textContent = k.text;
+  el.dataset.id = id;
+  el.setAttribute('draggable', 'true');
+
+  el.addEventListener('dragstart', function(e) {
+    if (el.classList.contains('correct') || el.classList.contains('wrong')) { e.preventDefault(); return; }
+    dragId = id; dragSource = el; dragFromPool = false;
+    el.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+  });
+  el.addEventListener('dragend', function() { el.classList.remove('dragging'); });
+  el.addEventListener('touchstart', function(e) {
+    if (el.classList.contains('correct') || el.classList.contains('wrong')) return;
+    MTDnD.touchStart(e, el, id, true, '.drop-zone', onDrop);
+  }, {passive: false});
+  el.addEventListener('click', function(e) { e.stopPropagation(); clickPlacedKarte(el, id, zone); });
+
+  zone.appendChild(el);
+}
+
+function removeFromZone(zone, id) {
+  var children = zone.querySelectorAll('.placed-karte');
+  for (var i = 0; i < children.length; i++) {
+    if (parseInt(children[i].dataset.id) === parseInt(id)) { zone.removeChild(children[i]); return; }
+  }
+}
+
+function findZoneForPlacedEl(el) { return el.closest('.drop-zone'); }
+
+function markPoolChipUsed(id) {
+  document.querySelectorAll('.karte').forEach(function(c) { if (parseInt(c.dataset.id) === parseInt(id)) c.classList.add('used'); });
+}
+function returnToPool(id) {
+  document.querySelectorAll('.karte').forEach(function(c) { if (parseInt(c.dataset.id) === parseInt(id)) c.classList.remove('used'); });
+}
+
+function dropOnZone(zone) {
+  if (!dragId) return;
+  if (zone.classList.contains('checked')) return;
+  if (!dragFromPool && dragSource) {
+    var srcZone = findZoneForPlacedEl(dragSource);
+    if (srcZone) srcZone.removeChild(dragSource);
+  } else if (dragFromPool) {
+    markPoolChipUsed(dragId);
+  }
+  placeCardInZone(zone, dragId);
+  dragId = dragSource = null; dragFromPool = false;
+}
+
+function setupZones() {
+  document.querySelectorAll('.drop-zone').forEach(function(zone) {
+    zone.addEventListener('dragover', function(e) { e.preventDefault(); if (!zone.classList.contains('checked')) zone.classList.add('over'); });
+    zone.addEventListener('dragleave', function() { zone.classList.remove('over'); });
+    zone.addEventListener('drop', function(e) { e.preventDefault(); zone.classList.remove('over'); dropOnZone(zone); });
+    zone.addEventListener('click', function() { clickZone(zone); });
+  });
+}
+
+function onDrop(targetZone, id, source) {
+  if (targetZone.classList.contains('checked')) return;
+  if (source.isSlot) {
+    var srcZone = findZoneForPlacedEl(source.el);
+    if (srcZone) srcZone.removeChild(source.el);
+  } else {
+    markPoolChipUsed(id);
+  }
+  placeCardInZone(targetZone, id);
+}
+
+function checkEinfach() {
+  var correct = 0, total = 0;
+  document.querySelectorAll('.drop-zone').forEach(function(zone) {
+    var correctZone = zone.dataset.zone;
+    zone.classList.add('checked');
+    zone.querySelectorAll('.placed-karte').forEach(function(el) {
+      var id = parseInt(el.dataset.id);
+      var k = karteById[id];
+      total++;
+      el.classList.remove('placed-karte');
+      if (k.zone === correctZone) { el.classList.add('placed-karte', 'correct'); correct++; }
+      else { el.classList.add('placed-karte', 'wrong'); }
+      el.setAttribute('draggable', 'false');
+    });
+  });
+  showResult(correct, total, KARTEN.length);
+}
+
+/* ---------- MITTEL: pro Betriebsbereich anklicken ---------- */
+function buildMittel(body) {
+  mcScore = 0; mcTotal = 0;
+  var list = document.createElement('div');
+  list.className = 'item-list';
+  MTDnD.shuffle(KARTEN.slice()).forEach(function(k) {
+    var row = document.createElement('div');
+    row.className = 'item-row';
+    var label = document.createElement('div');
+    label.className = 'item-label';
+    label.textContent = k.text;
+    row.appendChild(label);
+    row.appendChild(buildMcCell(k));
+    list.appendChild(row);
+  });
+  body.appendChild(list);
+}
+function buildMcCell(k) {
+  var wrap = document.createElement('div');
+  wrap.className = 'mc-cell';
+  MTDnD.shuffle(ZONES.slice()).forEach(function(z) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'mc-btn';
+    btn.textContent = z.label.split(' · ')[1];
+    btn.onclick = function() {
+      var cellBtns = wrap.querySelectorAll('.mc-btn');
+      cellBtns.forEach(function(b) { b.classList.add('locked'); });
+      mcTotal++;
+      if (z.key === k.zone) { btn.classList.add('correct'); mcScore++; }
+      else {
+        btn.classList.add('wrong');
+        var correctLabel = ZONES.filter(function(zz) { return zz.key === k.zone; })[0].label.split(' · ')[1];
+        cellBtns.forEach(function(b) { if (b.textContent === correctLabel) b.classList.add('correct'); });
+      }
+      if (mcTotal === KARTEN.length) showResult(mcScore, mcTotal, KARTEN.length);
+    };
+    wrap.appendChild(btn);
+  });
+  return wrap;
+}
+
+/* ---------- SCHWER: Freitext eintippen ---------- */
+function buildSchwer(body) {
+  var list = document.createElement('div');
+  list.className = 'item-list';
+  KARTEN.forEach(function(k, i) {
+    var row = document.createElement('div');
+    row.className = 'item-row';
+    row.innerHTML = '<div class="item-label">' + k.text + '</div>' +
+      '<input class="type-input" id="ti-' + i + '" type="text" autocomplete="off" placeholder="rot / orange / grün">' +
+      '<div class="type-sol" id="tisol-' + i + '"></div>';
+    list.appendChild(row);
+  });
+  body.appendChild(list);
+}
+function checkSchwer() {
+  var correct = 0, total = KARTEN.length;
+  KARTEN.forEach(function(k, i) {
+    var input = document.getElementById('ti-' + i), sol = document.getElementById('tisol-' + i);
+    input.classList.remove('correct', 'wrong');
+    if (matchKeys(input.value, ZONE_KEYS[k.zone])) { input.classList.add('correct'); sol.style.display = 'none'; correct++; }
+    else {
+      input.classList.add('wrong');
+      var zoneLabel = ZONES.filter(function(z) { return z.key === k.zone; })[0].label;
+      sol.textContent = '→ ' + zoneLabel;
+      sol.style.display = 'block';
+    }
+  });
+  showResult(correct, total, total);
+}
+
+/* ---------- gemeinsam ---------- */
+function checkLevel() { if (level === 'einfach') checkEinfach(); else if (level === 'schwer') checkSchwer(); }
+function showResult(correct, filled, total) {
+  var banner = document.getElementById('resultBanner');
+  if (correct === total) {
+    banner.textContent = 'Perfekt! Alle ' + total + ' Bereiche richtig zugeordnet.';
+    banner.className = 'result-banner show perfect';
+  } else {
+    banner.textContent = correct + ' von ' + (filled || total) + ' richtig. Rot markierte nochmals überprüfen.';
+    banner.className = 'result-banner show partial';
+  }
+}
+
+setLevel('einfach');
+</script>
+</body>
+</html>
