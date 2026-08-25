@@ -11,16 +11,12 @@
     .back-link:hover { color:var(--red); }
     .ls-wrap { max-width:640px; margin:0 auto; }
 
-    .hud { display:flex; align-items:center; gap:12px; background:var(--blue-dark); color:#fff; border-radius:var(--radius-md); padding:10px 14px; margin-bottom:14px; box-shadow:var(--shadow-sm); }
+    .hud { display:flex; align-items:center; justify-content:space-between; gap:12px; background:var(--blue-dark); color:#fff; border-radius:var(--radius-md); padding:10px 14px; margin-bottom:14px; box-shadow:var(--shadow-sm); }
     .hud-xp { display:flex; align-items:baseline; gap:5px; flex-shrink:0; }
     .hud-label { font-size:0.6rem; font-weight:700; letter-spacing:0.1em; opacity:0.8; }
     .hud-val { font-size:1.15rem; font-weight:800; display:inline-block; }
     .hud-val.pop { animation:xppop 0.4s ease; }
     @keyframes xppop { 0%{transform:scale(1);} 40%{transform:scale(1.45); color:#9ad1e8;} 100%{transform:scale(1);} }
-    .hud-bar { flex:1; height:8px; background:rgba(255,255,255,0.2); border-radius:4px; overflow:hidden; }
-    .hud-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#69A9C9,#9ad1e8); border-radius:4px; transition:width 0.4s ease; }
-    .hud-bar-fill.on-fire { animation:barpulse 0.9s ease-in-out infinite; }
-    @keyframes barpulse { 0%,100%{box-shadow:0 0 4px 1px rgba(154,209,232,0.4);} 50%{box-shadow:0 0 10px 3px rgba(154,209,232,0.85);} }
     .hud-streak { position:relative; display:flex; align-items:center; gap:8px; font-size:0.84rem; font-weight:700; background:rgba(255,255,255,0.14); padding:3px 9px; border-radius:12px; white-space:nowrap; flex-shrink:0; transition:transform 0.15s, background 0.3s; }
     .streak-num-fire { color:#ff8c00; text-shadow:0 0 6px rgba(255,100,0,0.8); }
     .hud-streak.pulse { transform:scale(1.25); }
@@ -219,7 +215,6 @@
   <div class="ls-wrap">
     <div class="hud">
       <div class="hud-xp"><span class="hud-label">XP</span><span class="hud-val" id="hudXp">0</span></div>
-      <div class="hud-bar"><div class="hud-bar-fill" id="hudBar"></div></div>
       <div class="hud-streak" id="hudStreak">
         <span id="hudStreakEmoji">🔥</span>
         <div class="hud-fire-wrap" id="hudFireWrap" style="display:none">
@@ -525,11 +520,8 @@ function matchKeys(input, it){ var f=fold(input); if(!f) return false; if(f===fo
 
 function renderHud(){
   document.getElementById('hudXp').textContent = xp;
-  var sc=0; for(var i=0;i<N;i++){ if(solved[i]) sc++; }
-  document.getElementById('hudBar').style.width = Math.round(sc/N*100)+'%';
   document.getElementById('hudStreakNum').textContent = streak;
   var onFire = streak >= 3;
-  document.getElementById('hudBar').classList.toggle('on-fire', onFire);
   document.getElementById('hudStreakEmoji').style.display = onFire ? 'none' : '';
   document.getElementById('hudFireWrap').style.display = onFire ? 'inline-block' : 'none';
   document.getElementById('hudStreakNum').className = onFire ? 'streak-num-fire' : '';
