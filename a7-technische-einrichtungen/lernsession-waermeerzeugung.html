@@ -17,6 +17,10 @@
     .hud-val { font-size:1.15rem; font-weight:800; display:inline-block; }
     .hud-val.pop { animation:xppop 0.4s ease; }
     @keyframes xppop { 0%{transform:scale(1);} 40%{transform:scale(1.45); color:#9ad1e8;} 100%{transform:scale(1);} }
+    .hud-bar { flex:1; height:8px; background:rgba(255,255,255,0.2); border-radius:4px; overflow:hidden; }
+    .hud-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#69A9C9,#9ad1e8); border-radius:4px; transition:width 0.4s ease; }
+    .hud-bar-fill.on-fire { animation:barpulse 0.9s ease-in-out infinite; }
+    @keyframes barpulse { 0%,100%{box-shadow:0 0 4px 1px rgba(154,209,232,0.4);} 50%{box-shadow:0 0 10px 3px rgba(154,209,232,0.85);} }
     .hud-streak { position:relative; display:flex; align-items:center; gap:8px; font-size:0.84rem; font-weight:700; background:rgba(255,255,255,0.14); padding:3px 9px; border-radius:12px; white-space:nowrap; flex-shrink:0; transition:transform 0.15s, background 0.3s; }
     .streak-num-fire { color:#ff8c00; text-shadow:0 0 6px rgba(255,100,0,0.8); }
     .hud-streak.pulse { transform:scale(1.25); }
@@ -39,16 +43,22 @@
     .hud-fire-wrap .fire-left .particle-fire { position:absolute; top:10%; left:20%; width:10%; height:10%; background:#ef5a00; border-radius:50%; filter:drop-shadow(0 0 10px #d43322); animation:particleUp 3s ease-out infinite both; }
     .hud-fire-wrap .fire-bottom .main-fire { position:absolute; top:30%; left:20%; width:75%; height:75%; background:#ff7800; transform:scaleX(0.8) rotate(45deg); border-radius:0 40% 100% 40%; filter:blur(10px); animation:glow 2s ease-out infinite both; }
 
-    .ls-meta { font-size:0.8rem; font-weight:600; color:var(--text-muted); text-align:center; margin-bottom:2px; }
-    .ls-select-hint { text-align:center; margin-bottom:12px; }
+    .ls-meta { font-size:0.8rem; font-weight:600; color:var(--text-muted); text-align:center; margin-bottom:6px; }
+    .ls-select-hint { display:none; text-align:center; margin-bottom:12px; }
+    .ls-select-hint.show { display:block; }
     .ls-select-badge { display:inline-block; font-size:0.78rem; font-weight:700; color:var(--blue-dark); background:var(--blue-tint); border-radius:20px; padding:6px 16px; }
     @keyframes lsAttract { 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.06); } }
-    .ls-dots { display:flex; gap:8px; justify-content:center; margin-bottom:20px; flex-wrap:wrap; animation:lsAttract 0.8s ease-in-out 2; }
-    .ls-dot { min-width:34px; height:34px; padding:0 5px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:0.78rem; font-weight:800; background:var(--blue-tint); color:var(--blue-dark); border:2px solid transparent; box-shadow:0 1px 3px rgba(0,0,0,0.16); cursor:pointer; transition:transform 0.15s, box-shadow 0.15s; }
-    .ls-dot:hover { transform:scale(1.14) translateY(-2px); box-shadow:0 4px 10px rgba(0,0,0,0.26); }
-    .ls-dot:active { transform:scale(0.94); }
-    .ls-dot.active { background:var(--blue-dark); color:#fff; box-shadow:0 0 0 3px var(--blue-tint), 0 2px 6px rgba(0,0,0,0.22); }
+    .ls-dots { display:flex; gap:5px; justify-content:center; margin-bottom:20px; flex-wrap:wrap; }
+    .ls-dots.selectable { gap:8px; animation:lsAttract 0.8s ease-in-out 2; }
+    .ls-dot { width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:700; background:#edf2f7; color:var(--text-subtle); border:2px solid transparent; }
+    .ls-dot.active { border-color:var(--blue-dark); color:var(--blue-dark); }
     .ls-dot.done { background:#38a169; color:#fff; }
+    /* Challenge only: Posten frei wählbar, sehen wie Buttons aus */
+    .ls-dots.selectable .ls-dot { width:auto; min-width:34px; height:34px; padding:0 5px; border-radius:10px; font-size:0.78rem; font-weight:800; background:var(--blue-tint); color:var(--blue-dark); box-shadow:0 1px 3px rgba(0,0,0,0.16); cursor:pointer; transition:transform 0.15s, box-shadow 0.15s; }
+    .ls-dots.selectable .ls-dot:hover { transform:scale(1.14) translateY(-2px); box-shadow:0 4px 10px rgba(0,0,0,0.26); }
+    .ls-dots.selectable .ls-dot:active { transform:scale(0.94); }
+    .ls-dots.selectable .ls-dot.active { background:var(--blue-dark); color:#fff; border-color:transparent; box-shadow:0 0 0 3px var(--blue-tint), 0 2px 6px rgba(0,0,0,0.22); }
+    .ls-dots.selectable .ls-dot.done { background:#38a169; color:#fff; }
 
     .station { background:var(--surface); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); padding:24px; margin-bottom:18px; }
     .station.hidden { display:none; }
@@ -215,6 +225,7 @@
   <div class="ls-wrap">
     <div class="hud">
       <div class="hud-xp"><span class="hud-label">XP</span><span class="hud-val" id="hudXp">0</span></div>
+      <div class="hud-bar"><div class="hud-bar-fill" id="hudBar"></div></div>
       <div class="hud-streak" id="hudStreak">
         <span id="hudStreakEmoji">🔥</span>
         <div class="hud-fire-wrap" id="hudFireWrap" style="display:none">
@@ -504,6 +515,11 @@ var STATIONS = ALL.filter(function(s){ return MODE === 'challenge' ? (s.type !==
     ? 'Prüfungsmodus – ohne Hilfen, Bauteile eintippen'
     : 'Wissensvermittlung – mit Lesetexten und Übungen';
   document.title = t + ': Wärmeerzeugung (a.7)';
+  if(MODE==='challenge'){
+    document.getElementById('lsDots').classList.add('selectable');
+    document.querySelector('.ls-select-hint').classList.add('show');
+    var hb=document.querySelector('.hud-bar'); if(hb) hb.style.display='none';
+  }
 })();
 
 var N = STATIONS.length;
@@ -520,8 +536,11 @@ function matchKeys(input, it){ var f=fold(input); if(!f) return false; if(f===fo
 
 function renderHud(){
   document.getElementById('hudXp').textContent = xp;
+  var sc=0; for(var i=0;i<N;i++){ if(solved[i]) sc++; }
+  document.getElementById('hudBar').style.width = Math.round(sc/N*100)+'%';
   document.getElementById('hudStreakNum').textContent = streak;
   var onFire = streak >= 3;
+  document.getElementById('hudBar').classList.toggle('on-fire', onFire);
   document.getElementById('hudStreakEmoji').style.display = onFire ? 'none' : '';
   document.getElementById('hudFireWrap').style.display = onFire ? 'inline-block' : 'none';
   document.getElementById('hudStreakNum').className = onFire ? 'streak-num-fire' : '';
@@ -910,8 +929,10 @@ function renderProgress(){
     var d=document.createElement('div');
     d.className='ls-dot'+(i===current?' active':'')+(solved[i]?' done':'');
     d.textContent=solved[i]?'✓':(i+1);
-    d.title=STATIONS[i].kicker+' – '+STATIONS[i].title;
-    d.addEventListener('click', (function(ii){ return function(){ jumpTo(ii); }; })(i));
+    if(MODE==='challenge'){
+      d.title=STATIONS[i].kicker+' – '+STATIONS[i].title;
+      d.addEventListener('click', (function(ii){ return function(){ jumpTo(ii); }; })(i));
+    }
     dots.appendChild(d);
   }
   document.getElementById('lsMeta').textContent = (current<N) ? ('Posten '+(current+1)+' von '+N) : 'Auswertung';
