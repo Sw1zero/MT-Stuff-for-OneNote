@@ -288,13 +288,13 @@ var ALL = [
     slides: [
       { icon: '🧀', color: '#78350f', bg: '#fffbeb',
         title: 'Steckbrief: Emmentaler AOP',
-        body: '<p><b>Emmentaler AOP</b> ist ein Hartkäse mit Propionsäuregärung aus dem Emmental — der Schweizer Grosslochkäse schlechthin.</p>' +
+        body: '<p><b>Emmentaler AOP</b> ist ein Hartkäse mit Propionsäuregärung aus dem Emmental, der Schweizer Grosslochkäse schlechthin.</p>' +
               '<ul><li>Milch: <b>rohe Kuhmilch</b> (Vollfettkäse, 2,9 bis 3,1 % Fett)</li><li>Rund <b>130 Betriebe</b>, Grösse 1 bis 10 Mio. kg Jahresmilch</li><li>Hauptregionen: <b>Bern, Luzern, St. Gallen, Thurgau</b></li></ul>' +
-              '<div class="factbox">Die typische Grosslochung ist kein Zufall und kein Fehler — sie ist das Ergebnis einer präzise gesteuerten, mehrstufigen Gärung.</div>'
+              '<div class="factbox">Die typische Grosslochung ist kein Zufall und kein Fehler: sie ist das Ergebnis einer präzise gesteuerten, mehrstufigen Gärung.</div>'
       },
       { icon: '🌍', color: '#1e40af', bg: '#eff6ff',
         title: 'Das Original, aber selten',
-        body: '<p>Emmentaler-ähnliche Grosslochkäse werden weltweit auch industriell aus wärmebehandelter, bactofugierter Milch hergestellt — teils in Betrieben mit über <b>1 Million Liter</b> Milch pro Tag.</p>' +
+        body: '<p>Emmentaler-ähnliche Grosslochkäse werden weltweit auch industriell aus wärmebehandelter, bactofugierter Milch hergestellt, teils in Betrieben mit über <b>1 Million Liter</b> Milch pro Tag.</p>' +
               '<div class="factbox">Trotzdem erreicht unser Emmentaler AOP weltweit <b>weniger als 4 %</b> der gesamten Grosslochkäse-Produktion. In der Schweiz liegt er nach Gruyère an zweiter Stelle und zählt zu den meistexportierten Käsen.</div>'
       }
     ]
@@ -324,9 +324,9 @@ var ALL = [
               '<div class="factbox">Verboten: Bactofugation, Ultra-/Mikrofiltration, gentechnisch veränderte Kulturen, Sirtenrahm und alle nicht gelisteten Zusatzstoffe.</div>'
       },
       { icon: '📋', color: '#7c3aed', bg: '#f5f3ff',
-        title: 'HNK — der Echtheitsbeweis',
+        title: 'HNK: der Echtheitsbeweis',
         body: '<p>Die <b>Herkunftsnachweiskultur (HNK)</b> hat keine Gärwirkung. Sie dient einzig dazu, den Schweizer Emmentaler AOP von ähnlichen in- und ausländischen Grosslochkäsen zu unterscheiden. Impfmenge: ca. <b>1 ml (eine Pipette) pro Laib</b>.</p>' +
-              '<div class="factbox">«Switzerland Swiss» ist ein Emmentaler-ähnlicher Käse ohne AOP — meist aus bactofugierter, pasteurisierter Milch, in Blockform gereift, als günstigere Alternative.</div>'
+              '<div class="factbox">«Switzerland Swiss» ist ein Emmentaler-ähnlicher Käse ohne AOP: meist aus bactofugierter, pasteurisierter Milch, in Blockform gereift, als günstigere Alternative.</div>'
       }
     ]
   },
@@ -335,12 +335,12 @@ var ALL = [
     lead: 'Entscheide bei jeder Aussage: <b>wahr</b> oder <b>falsch</b>?',
     type: 'tf',
     items: [
-      { s: 'Die Milch darf bactofugiert oder ultrafiltriert werden.', a: false, e: 'Verboten laut Pflichtenheft — ebenso wie gentechnisch veränderte Kulturen und Sirtenrahm.' },
+      { s: 'Die Milch darf bactofugiert oder ultrafiltriert werden.', a: false, e: 'Verboten laut Pflichtenheft, ebenso wie gentechnisch veränderte Kulturen und Sirtenrahm.' },
       { s: 'Die Käserei darf höchstens 20 km (Luftlinie) von den Milchproduktionsbetrieben entfernt sein.', a: true, e: 'So schreibt es das Pflichtenheft vor.' },
       { s: 'Die Verarbeitung muss spätestens 24 Stunden nach der Gewinnung des ältesten Gemelks erfolgen.', a: true, e: 'Zum Ausgleich ist das Überstellen von höchstens einem Laib-Äquivalent möglich.' },
-      { s: 'Die Herkunftsnachweiskultur (HNK) trägt zur Gärung und Lochbildung bei.', a: false, e: 'Die HNK hat keine Gärwirkung — sie dient einzig der Identifizierung der Echtheit.' },
+      { s: 'Die Herkunftsnachweiskultur (HNK) trägt zur Gärung und Lochbildung bei.', a: false, e: 'Die HNK hat keine Gärwirkung. Sie dient einzig der Identifizierung der Echtheit.' },
       { s: 'Pro Tag sind maximal drei Chargen erlaubt.', a: true, e: 'Das begrenzt die Verarbeitungsmenge pro Betrieb und Tag.' },
-      { s: 'Die Rohmilch darf vor der Verarbeitung auf über 40 °C erwärmt werden.', a: false, e: 'Maximal 40 °C — sonst wäre die Milch faktisch wärmebehandelt.' }
+      { s: 'Die Rohmilch darf vor der Verarbeitung auf über 40 °C erwärmt werden.', a: false, e: 'Maximal 40 °C, sonst wäre die Milch faktisch wärmebehandelt.' }
     ]
   },
   /* 4 */ {
@@ -350,13 +350,13 @@ var ALL = [
     slides: [
       { icon: '🦠', color: '#b45309', bg: '#fffbeb',
         title: 'Die drei Gärungs-Kulturen',
-        body: '<p><b>Hauptdarsteller — thermophile, homofermentative Milchsäurebakterien (RMK):</b> vergären den Milchzucker vollständig zu Milchsäure. Sie liefern damit die Nahrung für die Propionsäurebakterien.</p>' +
-              '<p><b>Stars der Gärung — Propionsäurebakterien (PSB):</b> erzeugen aus der Milchsäure das Aroma (Propionsäure) und das Gas (CO₂) für die Löcher.</p>' +
-              '<p><b>Die Regler — fakultativ heterofermentative Laktobazillen:</b> hemmen die PSB und verhindern so ein unerwünschtes Nachgären.</p>'
+        body: '<p><b>Hauptdarsteller: thermophile, homofermentative Milchsäurebakterien (RMK).</b> Sie vergären den Milchzucker vollständig zu Milchsäure und liefern damit die Nahrung für die Propionsäurebakterien.</p>' +
+              '<p><b>Stars der Gärung: Propionsäurebakterien (PSB).</b> Sie erzeugen aus der Milchsäure das Aroma (Propionsäure) und das Gas (CO₂) für die Löcher.</p>' +
+              '<p><b>Die Regler: fakultativ heterofermentative Laktobazillen.</b> Sie hemmen die PSB und verhindern so ein unerwünschtes Nachgären.</p>'
       },
       { icon: '🔎', color: '#0f766e', bg: '#f0fdfa',
         title: 'Die vierte Kultur und die Impfmengen',
-        body: '<ul><li>RMK: <b>1,5 bis 2,5 Liter</b> pro 1000 Liter Verkäsungsmilch</li><li>Propionsäurebakterien: ca. <b>3 bis 5 Tropfen</b> pro Laib</li><li>Fak. het. Laktobazillen: einzelne Tropfen bis einige Deziliter pro Laib</li><li><b>Herkunftsnachweiskultur (HNK):</b> ca. 1 ml (eine Pipette) pro Laib — ohne Gärwirkung</li></ul>' +
+        body: '<ul><li>RMK: <b>1,5 bis 2,5 Liter</b> pro 1000 Liter Verkäsungsmilch</li><li>Propionsäurebakterien: ca. <b>3 bis 5 Tropfen</b> pro Laib</li><li>Fak. het. Laktobazillen: einzelne Tropfen bis einige Deziliter pro Laib</li><li><b>Herkunftsnachweiskultur (HNK):</b> ca. 1 ml (eine Pipette) pro Laib, ohne Gärwirkung</li></ul>' +
               '<div class="factbox">«Junge» RMK (6–9 h, 30–40 °SH) liefern mehr Streptokokken für die Anfangssäure; «alte» RMK (12–18 h, 45–55 °SH) liefern mehr Laktobazillen für die Endsäure. Die Mischung steuert den Gärverlauf.</div>'
       }
     ]
@@ -372,7 +372,7 @@ var ALL = [
       { opts: ['Propionsäurebakterien', 'Laktobazillen', 'Herkunftsnachweiskulturen'], correct: 0 },
       ' wandeln diese Milchsäure in Propion- und Essigsäure sowie ',
       { opts: ['CO2', 'Sauerstoff', 'Stickstoff'], correct: 0 },
-      ' um — dieses Gas bildet die Löcher. Die ',
+      ' um. Dieses Gas bildet die Löcher. Die ',
       { opts: ['fakultativ heterofermentativen Laktobazillen', 'thermophilen Streptokokken', 'Herkunftsnachweiskulturen'], correct: 0 },
       ' hemmen die Propionsäurebakterien und verhindern ein unerwünschtes Nachgären. Die ',
       { opts: ['Herkunftsnachweiskultur', 'Propionsäurebakterienkultur', 'Rohmischkultur'], correct: 0 },
@@ -387,17 +387,17 @@ var ALL = [
       { icon: '💧', color: '#1d4ed8', bg: '#eff6ff',
         title: 'Ohne dehnbaren Teig keine runden Löcher',
         body: '<p>Ohne einen ausreichend <b>dehnbaren (elastischen) Teig</b> würde der Gasdruck während der Gärung zu Rissen führen statt zu runden Löchern.</p>' +
-              '<p><b>Wasserzusatz</b> verdünnt den Milchzucker — das Gärmaterial. Dadurch entsteht weniger Milchsäure, es löst sich weniger Kalzium aus dem Kaseingerüst, und der Teig bleibt dehnbar.</p>'
+              '<p><b>Wasserzusatz</b> verdünnt den Milchzucker, das Gärmaterial. Dadurch entsteht weniger Milchsäure, es löst sich weniger Kalzium aus dem Kaseingerüst, und der Teig bleibt dehnbar.</p>'
       },
       { icon: '⚠️', color: '#92400e', bg: '#fff7ed',
-        title: 'Zwei Zahlen im Umlauf — bitte gegenlesen',
+        title: 'Zwei Zahlen im Umlauf: bitte gegenlesen',
         body: '<p>Zielwert für den pH nach der Milchsäuregärung: <b>5,25 bis 5,35 nach 20 Stunden</b> (Lehrmittel und Präsentation stimmen hier überein).</p>' +
-              '<div class="factbox">Beim <b>Wasserzusatz</b> weichen die Quellen ab: Das Lehrmittel nennt <b>8 bis 12 %</b> Trinkwasser (auf die Milchmenge bezogen), die Präsentation <b>15 bis 18 %</b>. Diese Folie bleibt deshalb bewusst ohne Quiz-Frage dazu — bitte vor dem Einsatz im Unterricht den passenden Wert bestätigen.</div>'
+              '<div class="factbox">Beim <b>Wasserzusatz</b> weichen die Quellen ab: Das Lehrmittel nennt <b>8 bis 12 %</b> Trinkwasser (auf die Milchmenge bezogen), die Präsentation <b>15 bis 18 %</b>. Diese Folie bleibt deshalb bewusst ohne Quiz-Frage dazu, bitte vor dem Einsatz im Unterricht den passenden Wert bestätigen.</div>'
       }
     ]
   },
   /* 7 */ {
-    kicker: 'Entscheidung', title: 'Kein Wasserzusatz beim Emmentaler — was passiert?',
+    kicker: 'Entscheidung', title: 'Kein Wasserzusatz beim Emmentaler: was passiert?',
     lead: 'Sie vergessen versehentlich den Wasserzusatz. Der Käse gärt trotzdem normal durch. <b>Was ist die Folge für die Lochbildung?</b>',
     type: 'decide',
     media:
@@ -406,9 +406,9 @@ var ALL = [
         '<figcaption>Ohne Wasserzusatz reisst der Teig (Gläs) · mit Wasserzusatz dehnt er sich zum runden Loch</figcaption>' +
       '</figure>',
     options: [
-      { t: 'Kein Unterschied — der Teig bleibt gleich elastisch.', correct: false,
-        fb: 'Falsch: Ohne Wasserzusatz entsteht mehr Milchsäure. Diese löst mehr Kalzium aus dem Kaseingerüst — der Teig wird fester statt dehnbar.' },
-      { t: 'Der Teig wird zu fest — der Gasdruck reisst Spalten («Gläs») statt runde Löcher zu bilden.', correct: true,
+      { t: 'Kein Unterschied: der Teig bleibt gleich elastisch.', correct: false,
+        fb: 'Falsch: Ohne Wasserzusatz entsteht mehr Milchsäure. Diese löst mehr Kalzium aus dem Kaseingerüst, der Teig wird fester statt dehnbar.' },
+      { t: 'Der Teig wird zu fest: der Gasdruck reisst Spalten («Gläs») statt runde Löcher zu bilden.', correct: true,
         fb: 'Richtig! Genau das passiert z. B. beim Gruyère (bewusst kein Wasserzusatz, fester Teig gewünscht). Beim Emmentaler braucht es die Elastizität für die Grosslochung.' },
       { t: 'Der Käse reift dadurch schneller.', correct: false,
         fb: 'Falsch: Die Reifegeschwindigkeit wird über Temperatur und Zeit im Gär- und Reifungskeller gesteuert, nicht über den Wasserzusatz.' }
@@ -423,7 +423,7 @@ var ALL = [
         title: 'Vorlagerung im Kühlraum',
         body: '<p>Nach dem Pressen kommen die jungen Käse für <b>5 bis 20 Tage</b> in die Vorlagerung: <b>13 bis 16 °C</b>, 70 bis 80 % relative Feuchte.</p>' +
               '<p>Diese Phase dient der <b>Anpassung</b> der Käse, bevor sie in den warmen Gärkeller kommen.</p>' +
-              '<div class="factbox">Ohne Vorlagerung würde der plötzliche Temperatursprung die Propionsäuregärung unkontrolliert anlaufen lassen — mit dem Risiko einer zu frühen oder ungleichmässigen Lochbildung.</div>'
+              '<div class="factbox">Ohne Vorlagerung würde der plötzliche Temperatursprung die Propionsäuregärung unkontrolliert anlaufen lassen, mit dem Risiko einer zu frühen oder ungleichmässigen Lochbildung.</div>'
       },
       { icon: '⏳', color: '#7c2d12', bg: '#fff7ed',
         title: 'Vom Verkauf bis zur Höhlenreifung',
@@ -440,7 +440,7 @@ var ALL = [
       { s: 'Die Vorlagerung dauert 5 bis 20 Tage bei 13 bis 16 °C.', a: true, e: 'Sie bereitet die Käse auf den warmen Gärkeller vor.' },
       { s: 'Für den Verkauf muss ein Emmentaler mindestens 5 Monate gereift sein.', a: true, e: 'Die mittlere Reife liegt bei 7 bis 8 Monaten.' },
       { s: 'Höhlengereifter Emmentaler muss mindestens 12 Monate reifen, davon mindestens 6 Monate im Felsenkeller.', a: true, e: 'Die Höhlenreifung ist die längste und anspruchsvollste Reifeform.' },
-      { s: 'Nach dem Pressen kommt der Käse direkt in den warmen Gärkeller, ohne Vorlagerung.', a: false, e: 'Die Vorlagerung passt die Käse zuerst an — ohne sie würde die Propionsäuregärung unkontrolliert anlaufen.' },
+      { s: 'Nach dem Pressen kommt der Käse direkt in den warmen Gärkeller, ohne Vorlagerung.', a: false, e: 'Die Vorlagerung passt die Käse zuerst an. Ohne sie würde die Propionsäuregärung unkontrolliert anlaufen.' },
       { s: 'Die richtige Reihenfolge der Reifephasen ist: Gärkeller → Vorlagerung → Reifungskeller.', a: false, e: 'Richtig ist: Vorlagerung → Gärkeller → Reifungskeller.' }
     ]
   },
@@ -482,8 +482,8 @@ var ALL = [
       { s: 'Die Propionsäuregärung findet im warmen Gärkeller bei 21 bis 24 °C statt.', a: true, e: 'Die Temperaturerhöhung aktiviert die Propionsäurebakterien.' },
       { s: 'Der typische Klopfton und die zunehmende Laibhöhe (Wölbung) zeigen den Fortschritt der Lochbildung an.', a: true, e: 'Beides sind die klassischen Überwachungsmethoden im Gärkeller.' },
       { s: 'Die Verweildauer im Gärkeller beträgt üblicherweise 50 bis 60 Tage.', a: true, e: 'Sie bestimmt das Ausmass der Gasbildung und damit die Lochgrösse.' },
-      { s: 'Im Reifungskeller (11 bis 13 °C) läuft die Propionsäuregärung ungebremst weiter.', a: false, e: 'Die Kühlung stoppt die PSB-Aktivität fast vollständig — die Lochstruktur wird dadurch fixiert.' },
-      { s: 'Im Reifungskeller endet auch der Eiweissabbau (Proteolyse) vollständig.', a: false, e: 'Die Proteolyse durch die Enzyme der Milchsäurebakterien läuft weiter — nur die Gärung/Lochbildung stoppt.' },
+      { s: 'Im Reifungskeller (11 bis 13 °C) läuft die Propionsäuregärung ungebremst weiter.', a: false, e: 'Die Kühlung stoppt die PSB-Aktivität fast vollständig. Die Lochstruktur wird dadurch fixiert.' },
+      { s: 'Im Reifungskeller endet auch der Eiweissabbau (Proteolyse) vollständig.', a: false, e: 'Die Proteolyse durch die Enzyme der Milchsäurebakterien läuft weiter, nur die Gärung/Lochbildung stoppt.' },
       { s: 'Wird die gewünschte Lochgrösse erreicht, wird der Käse in den kühleren Reifungskeller umgelagert.', a: true, e: 'Das stoppt die weitere Gasbildung gezielt.' }
     ]
   },
@@ -500,14 +500,14 @@ var ALL = [
       { icon: '✅', color: '#166534', bg: '#f0fdf4',
         title: 'Klassierung & Taxation',
         body: '<p>Im Alter von 3 bis 4 Monaten werden die Käse beim Verkauf an die Käsehandlung beurteilt: <b>Klasse 1</b> (alle Anforderungen erfüllt) oder <b>Klasse 2</b> (darf nicht als «Emmentaler AOP» verkauft werden).</p>' +
-              '<p><b>Taxation</b> (je max. 5 Punkte): Lochung, Teig, Aroma, Aussehen/Form/Lagerfähigkeit — total <b>20 Punkte</b>, Abstufung in ½-Punkten.</p>' +
-              '<div class="factbox">Für die Bezeichnung «Emmentaler AOP» braucht es mindestens <b>18 von 20 Punkten</b> — und kein Einzelkriterium darf unter <b>4 Punkten</b> liegen.</div>'
+              '<p><b>Taxation</b> (je max. 5 Punkte): Lochung, Teig, Aroma, Aussehen/Form/Lagerfähigkeit, total <b>20 Punkte</b>, Abstufung in ½-Punkten.</p>' +
+              '<div class="factbox">Für die Bezeichnung «Emmentaler AOP» braucht es mindestens <b>18 von 20 Punkten</b>. Zudem darf kein Einzelkriterium unter <b>4 Punkten</b> liegen.</div>'
       },
       { icon: '⚠️', color: '#b45309', bg: '#fffbeb',
         title: 'Wenn die Lochung nicht stimmt',
-        body: '<p><b>Gekachelte, «verhockte» Form:</b> Laibe gegen die Mitte eingefallen — Ursache ist ein in der Mitte tieferer pH-Wert, der die Propionsäuregärung dort verzögert.</p>' +
-              '<p><b>Weisser, fester, «kurzer» Teig mit fehlerhafter Lochung:</b> meist unter dem Narben — durch zu rasches Abkühlen der Randzone und Wachstum von Fremdkeimen.</p>' +
-              '<div class="factbox">Ideale Lochung braucht drei Dinge gleichzeitig: elastischen Teig, genügend gleichmässig verteilte Lochansatzstellen, und eine passend dosierte Gasbildung — zu viel Gas ergibt ovale «gezogene» Löcher oder Risse (Nachgärung).</div>'
+        body: '<p><b>Gekachelte, «verhockte» Form:</b> Laibe gegen die Mitte eingefallen. Ursache ist ein in der Mitte tieferer pH-Wert, der die Propionsäuregärung dort verzögert.</p>' +
+              '<p><b>Weisser, fester, «kurzer» Teig mit fehlerhafter Lochung:</b> meist unter dem Narben, durch zu rasches Abkühlen der Randzone und Wachstum von Fremdkeimen.</p>' +
+              '<div class="factbox">Ideale Lochung braucht drei Dinge gleichzeitig: elastischen Teig, genügend gleichmässig verteilte Lochansatzstellen, und eine passend dosierte Gasbildung. Zu viel Gas ergibt ovale «gezogene» Löcher oder Risse (Nachgärung).</div>'
       }
     ]
   },
@@ -521,7 +521,7 @@ var ALL = [
       { label: 'Kultur für die Lochbildung:', value: 'Propionsäurebakterien', wrong: false },
       { label: 'Gärkeller-Temperatur:', value: '21–24 °C', wrong: false },
       { label: 'Verweildauer im Gärkeller:', value: '5 Tage', wrong: true, corr: '50–60 Tage' },
-      { label: 'Herkunftsnachweiskultur (HNK) dient:', value: 'der Gärung und Lochbildung', wrong: true, corr: 'einzig der Identifizierung der Echtheit — keine Gärwirkung' },
+      { label: 'Herkunftsnachweiskultur (HNK) dient:', value: 'der Gärung und Lochbildung', wrong: true, corr: 'einzig der Identifizierung der Echtheit, keine Gärwirkung' },
       { label: 'Reifungskeller-Temperatur:', value: '11–13 °C', wrong: false },
       { label: 'Mindestpunktzahl für «Emmentaler AOP»:', value: '12 von 20 Punkten', wrong: true, corr: 'mindestens 18 von 20 Punkten' }
     ]
@@ -1039,7 +1039,7 @@ function showFinish() {
     '<ul>' +
       '<li><b>Rohmilch</b> im Kupferkessi/-fertiger, max. 20 km Distanz, Verarbeitung binnen 24 h.</li>' +
       '<li>Drei Gärungs-Kulturen: <b>thermophile Milchsäurebakterien</b> (Milchsäure) → <b>Propionsäurebakterien</b> (Aroma + CO₂-Löcher) → <b>fak. het. Laktobazillen</b> (bremsen Nachgärung).</li>' +
-      '<li><b>Wasserzusatz</b> hält den Teig elastisch — sonst reisst der Gasdruck Spalten («Gläs») statt runder Löcher.</li>' +
+      '<li><b>Wasserzusatz</b> hält den Teig elastisch, sonst reisst der Gasdruck Spalten («Gläs») statt runder Löcher.</li>' +
       '<li>Gärkeller <b>21–24 °C, 50–60 Tage</b> → Reifungskeller <b>11–13 °C</b> stoppt die Propionsäurebakterien und fixiert die Lochung.</li>' +
       '<li>Für «Emmentaler AOP» braucht es mindestens <b>18 von 20 Taxationspunkten</b>, kein Kriterium unter 4.</li>' +
     '</ul>' +
