@@ -45,7 +45,8 @@
 
     .ls-meta { font-size:0.8rem; font-weight:600; color:var(--text-muted); text-align:center; margin-bottom:6px; }
     .ls-dots { display:flex; gap:5px; justify-content:center; margin-bottom:20px; flex-wrap:wrap; }
-    .ls-dot { width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:700; background:#edf2f7; color:var(--text-subtle); border:2px solid transparent; }
+    .ls-dot { width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:700; background:#edf2f7; color:var(--text-subtle); border:2px solid transparent; cursor:pointer; transition:transform 0.15s; }
+    .ls-dot:hover { transform:scale(1.15); }
     .ls-dot.active { border-color:var(--blue-dark); color:var(--blue-dark); }
     .ls-dot.done { background:#38a169; color:#fff; }
 
@@ -908,8 +909,19 @@ function buildExplain(idx, st){
 
 function renderProgress(){
   var dots=document.getElementById('lsDots'); dots.innerHTML='';
-  for(var i=0;i<N;i++){ var d=document.createElement('div'); d.className='ls-dot'+(i===current?' active':'')+(solved[i]?' done':''); d.textContent=solved[i]?'✓':(i+1); dots.appendChild(d); }
-  document.getElementById('lsMeta').textContent = (current<N) ? ('Posten '+(current+1)+' von '+N) : 'Auswertung';
+  for(var i=0;i<N;i++){
+    var d=document.createElement('div');
+    d.className='ls-dot'+(i===current?' active':'')+(solved[i]?' done':'');
+    d.textContent=solved[i]?'✓':(i+1);
+    d.title=STATIONS[i].kicker+' – '+STATIONS[i].title;
+    d.addEventListener('click', (function(ii){ return function(){ jumpTo(ii); }; })(i));
+    dots.appendChild(d);
+  }
+  document.getElementById('lsMeta').textContent = (current<N) ? ('Posten '+(current+1)+' von '+N+' – frei wählbar über die Punkte oben') : 'Auswertung';
+}
+function jumpTo(i){
+  if(i===current) return;
+  current=i; showCard(i); updateNav();
 }
 function showCard(which){
   document.querySelectorAll('.station').forEach(function(c){ c.classList.add('hidden'); });
