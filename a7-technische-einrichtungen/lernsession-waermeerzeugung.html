@@ -159,15 +159,19 @@
 
     .check-btn-row { margin-top:16px; }
 
-    .exp-card { border:1.5px solid var(--border); border-radius:var(--radius-md); padding:14px 16px; margin-bottom:14px; }
-    .exp-card:last-child { margin-bottom:0; }
-    .exp-q { font-size:0.92rem; font-weight:600; margin-bottom:10px; }
-    .exp-reveal-btn { font-family:var(--font); font-size:0.82rem; font-weight:600; padding:7px 16px; border-radius:20px; border:1.5px solid var(--blue-light); background:var(--surface); color:var(--blue-dark); cursor:pointer; margin-bottom:10px; }
-    .exp-reveal-btn:hover { background:var(--blue-tint); }
-    .exp-a { font-size:0.86rem; line-height:1.55; color:var(--text); background:var(--blue-tint); border-left:4px solid var(--blue-light); border-radius:var(--radius-sm); padding:10px 14px; margin-bottom:10px; display:none; }
-    .exp-a.show { display:block; }
-    .exp-rate-row { display:none; gap:8px; }
-    .exp-rate-row.show { display:flex; }
+    /* Erklären – Flip-Karte wie lernkaertchen.html */
+    .exp-counter { font-size:0.76rem; color:var(--text-subtle); font-weight:600; text-align:center; margin-bottom:10px; }
+    .exp-scene { width:100%; max-width:440px; height:250px; perspective:900px; cursor:pointer; margin:0 auto 16px; }
+    .exp-flip { width:100%; height:100%; position:relative; transform-style:preserve-3d; transition:transform 0.45s cubic-bezier(0.4,0,0.2,1); }
+    .exp-flip.flipped { transform:rotateY(180deg); }
+    .exp-face { position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; border-radius:var(--radius-lg); padding:26px 28px; display:flex; flex-direction:column; justify-content:center; box-shadow:var(--shadow-md); }
+    .exp-front { background:var(--surface); }
+    .exp-back  { background:var(--blue-light); transform:rotateY(180deg); }
+    .exp-q-text { font-size:1.05rem; font-weight:700; color:var(--text); line-height:1.35; }
+    .exp-hint { margin-top:14px; font-size:0.74rem; color:var(--text-subtle); }
+    .exp-a-text { font-size:0.92rem; color:var(--text); line-height:1.55; }
+    .exp-controls { display:flex; gap:10px; align-items:center; justify-content:center; flex-wrap:wrap; margin-bottom:12px; }
+    .exp-rate-row { display:flex; gap:8px; justify-content:center; }
     .exp-rate-btn { font-family:var(--font); font-size:0.82rem; font-weight:600; padding:7px 14px; border-radius:20px; border:1.5px solid var(--border); background:var(--surface); color:var(--text-muted); cursor:pointer; }
     .exp-rate-btn.rate-good:hover:not(.rated) { border-color:#38a169; color:#276749; }
     .exp-rate-btn.rate-bad:hover:not(.rated) { border-color:var(--red); color:var(--red-dark); }
@@ -833,42 +837,73 @@ function buildQuiz(idx, st){
   });
 }
 
-/* Erklären – Frage lesen, selbst überlegen, Musterlösung aufdecken, ehrlich einschätzen */
+/* Erklären – Flip-Karte wie lernkaertchen.html: Frage vorne, Musterlösung hinten,
+   nach dem Umdrehen selbst einschätzen (Wusste ich / Nochmal üben) */
 function buildExplain(idx, st){
   maxPts[idx]=st.cards.length;
   var body=document.getElementById('body-'+idx);
-  st.cards.forEach(function(c, ci){
-    var card=document.createElement('div'); card.className='exp-card';
-    card.innerHTML='<div class="exp-q">'+(ci+1)+'. '+c.q+'</div>'+
-      '<button class="exp-reveal-btn" id="exprev-'+idx+'-'+ci+'">Musterlösung ansehen</button>'+
-      '<div class="exp-a" id="expa-'+idx+'-'+ci+'">'+c.a+'</div>'+
-      '<div class="exp-rate-row" id="exprate-'+idx+'-'+ci+'">'+
-        '<button class="exp-rate-btn rate-good" data-ci="'+ci+'" data-v="1">Wusste ich ✓</button>'+
-        '<button class="exp-rate-btn rate-bad" data-ci="'+ci+'" data-v="0">Nochmal üben</button>'+
-      '</div>';
-    body.appendChild(card);
-  });
-  st.cards.forEach(function(c, ci){
-    document.getElementById('exprev-'+idx+'-'+ci).addEventListener('click', function(){
-      document.getElementById('expa-'+idx+'-'+ci).classList.add('show');
-      document.getElementById('exprate-'+idx+'-'+ci).classList.add('show');
-      this.disabled=true; this.style.display='none';
-    });
-  });
-  body.querySelectorAll('.exp-rate-btn').forEach(function(btn){
-    btn.addEventListener('click', function(){
-      var ci=+btn.dataset.ci, ok=btn.dataset.v==='1';
-      var row=document.getElementById('exprate-'+idx+'-'+ci);
-      if(row.querySelector('.rated')) return;
-      row.querySelectorAll('.exp-rate-btn').forEach(function(b){ b.classList.add('rated'); b.disabled=true; });
-      btn.classList.add(ok?'picked-good':'picked-bad');
-      if(ok) earned[idx]++;
-      registerAnswer(ok);
-      var answered=0; body.querySelectorAll('.exp-rate-row').forEach(function(r){ if(r.querySelector('.rated')) answered++; });
-      if(answered===st.cards.length) solved[idx]=true;
-      updateNav();
-    });
-  });
+  var cur=0, isFlipped=false;
+  var rated=[]; for(var i=0;i<st.cards.length;i++) rated[i]=null;
+
+  body.innerHTML =
+    '<div class="exp-counter" id="expctr-'+idx+'"></div>'+
+    '<div class="exp-scene" id="expscene-'+idx+'"><div class="exp-flip" id="expflip-'+idx+'">'+
+      '<div class="exp-face exp-front"><div class="exp-q-text" id="expq-'+idx+'"></div>'+
+      '<div class="exp-hint">Karte umdrehen für die Musterlösung</div></div>'+
+      '<div class="exp-face exp-back"><div class="exp-a-text" id="expa-'+idx+'"></div></div>'+
+    '</div></div>'+
+    '<div class="exp-controls">'+
+      '<button class="btn btn-ghost" id="expprev-'+idx+'">← Zurück</button>'+
+      '<button class="btn btn-success" id="expflipbtn-'+idx+'">Umdrehen</button>'+
+      '<button class="btn btn-ghost" id="expnext-'+idx+'">Weiter →</button>'+
+    '</div>'+
+    '<div class="exp-rate-row" id="exprate-'+idx+'" style="visibility:hidden;"></div>';
+
+  function renderRate(){
+    var row=document.getElementById('exprate-'+idx);
+    if(rated[cur]===null){
+      row.innerHTML='<button class="exp-rate-btn rate-good" id="expgood-'+idx+'">Wusste ich ✓</button>'+
+        '<button class="exp-rate-btn rate-bad" id="expbad-'+idx+'">Nochmal üben</button>';
+      document.getElementById('expgood-'+idx).addEventListener('click', function(e){ e.stopPropagation(); rate(true); });
+      document.getElementById('expbad-'+idx).addEventListener('click', function(e){ e.stopPropagation(); rate(false); });
+    } else {
+      row.innerHTML='<button class="exp-rate-btn rated '+(rated[cur]?'picked-good':'picked-bad')+'" disabled>'+(rated[cur]?'Wusste ich ✓':'Nochmal üben')+'</button>';
+    }
+  }
+
+  function rate(ok){
+    if(rated[cur]!==null) return;
+    rated[cur]=ok; registerAnswer(ok);
+    var doneCount=0, goodCount=0;
+    rated.forEach(function(r){ if(r!==null) doneCount++; if(r===true) goodCount++; });
+    earned[idx]=goodCount;
+    if(doneCount===st.cards.length) solved[idx]=true;
+    renderRate(); updateNav();
+  }
+
+  function show(){
+    var c=st.cards[cur];
+    document.getElementById('expq-'+idx).textContent=c.q;
+    document.getElementById('expa-'+idx).textContent=c.a;
+    document.getElementById('expctr-'+idx).textContent='Karte '+(cur+1)+' von '+st.cards.length;
+    document.getElementById('expprev-'+idx).disabled=(cur===0);
+    isFlipped=false; document.getElementById('expflip-'+idx).classList.remove('flipped');
+    document.getElementById('exprate-'+idx).style.visibility='hidden';
+    renderRate();
+  }
+
+  function flip(){
+    isFlipped=!isFlipped;
+    document.getElementById('expflip-'+idx).classList.toggle('flipped');
+    document.getElementById('exprate-'+idx).style.visibility=isFlipped?'visible':'hidden';
+  }
+
+  document.getElementById('expscene-'+idx).addEventListener('click', flip);
+  document.getElementById('expflipbtn-'+idx).addEventListener('click', function(e){ e.stopPropagation(); flip(); });
+  document.getElementById('expnext-'+idx).addEventListener('click', function(e){ e.stopPropagation(); cur=(cur+1)%st.cards.length; show(); });
+  document.getElementById('expprev-'+idx).addEventListener('click', function(e){ e.stopPropagation(); if(cur>0){ cur--; show(); } });
+
+  show();
 }
 
 function renderProgress(){
