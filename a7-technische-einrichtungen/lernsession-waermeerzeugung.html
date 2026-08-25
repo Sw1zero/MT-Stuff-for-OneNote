@@ -43,12 +43,14 @@
     .hud-fire-wrap .fire-left .particle-fire { position:absolute; top:10%; left:20%; width:10%; height:10%; background:#ef5a00; border-radius:50%; filter:drop-shadow(0 0 10px #d43322); animation:particleUp 3s ease-out infinite both; }
     .hud-fire-wrap .fire-bottom .main-fire { position:absolute; top:30%; left:20%; width:75%; height:75%; background:#ff7800; transform:scaleX(0.8) rotate(45deg); border-radius:0 40% 100% 40%; filter:blur(10px); animation:glow 2s ease-out infinite both; }
 
-    .ls-meta { font-size:0.8rem; font-weight:600; color:var(--text-muted); text-align:center; margin-bottom:6px; }
-    .ls-dots { display:flex; gap:5px; justify-content:center; margin-bottom:20px; flex-wrap:wrap; }
-    .ls-dot { width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:700; background:#edf2f7; color:var(--text-subtle); border:2px solid transparent; cursor:pointer; transition:transform 0.15s; }
-    .ls-dot:hover { transform:scale(1.15); }
-    .ls-dot.active { border-color:var(--blue-dark); color:var(--blue-dark); }
-    .ls-dot.done { background:#38a169; color:#fff; }
+    .ls-meta { font-size:0.8rem; font-weight:600; color:var(--text-muted); text-align:center; margin-bottom:2px; }
+    .ls-select-hint { font-size:0.76rem; font-weight:700; color:var(--blue-dark); text-align:center; margin-bottom:10px; }
+    .ls-dots { display:flex; gap:7px; justify-content:center; margin-bottom:20px; flex-wrap:wrap; }
+    .ls-dot { width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.72rem; font-weight:700; background:var(--surface); color:var(--text-subtle); border:2px solid var(--border); box-shadow:0 1px 3px rgba(0,0,0,0.14); cursor:pointer; transition:transform 0.15s, box-shadow 0.15s; }
+    .ls-dot:hover { transform:scale(1.18); box-shadow:0 2px 7px rgba(0,0,0,0.22); }
+    .ls-dot:active { transform:scale(0.94); }
+    .ls-dot.active { border-color:var(--blue-dark); color:var(--blue-dark); box-shadow:0 0 0 3px var(--blue-tint); }
+    .ls-dot.done { background:#38a169; color:#fff; border-color:#38a169; }
 
     .station { background:var(--surface); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); padding:24px; margin-bottom:18px; }
     .station.hidden { display:none; }
@@ -230,6 +232,7 @@
       </div>
     </div>
     <div class="ls-meta" id="lsMeta"></div>
+    <div class="ls-select-hint">👆 Posten antippen, um direkt dorthin zu springen</div>
     <div class="ls-dots" id="lsDots"></div>
     <div id="stage"></div>
     <div class="ls-nav">
@@ -917,7 +920,7 @@ function renderProgress(){
     d.addEventListener('click', (function(ii){ return function(){ jumpTo(ii); }; })(i));
     dots.appendChild(d);
   }
-  document.getElementById('lsMeta').textContent = (current<N) ? ('Posten '+(current+1)+' von '+N+' – frei wählbar über die Punkte oben') : 'Auswertung';
+  document.getElementById('lsMeta').textContent = (current<N) ? ('Posten '+(current+1)+' von '+N) : 'Auswertung';
 }
 function jumpTo(i){
   if(i===current) return;
