@@ -12,14 +12,12 @@
     .ls-wrap { max-width: 640px; margin: 0 auto; }
 
     /* Gamification-HUD */
-    .hud { display:flex; align-items:center; gap:12px; background:var(--blue-dark); color:#fff; border-radius:var(--radius-md); padding:10px 14px; margin-bottom:14px; box-shadow:var(--shadow-sm); }
+    .hud { display:flex; align-items:center; justify-content:space-between; gap:12px; background:var(--blue-dark); color:#fff; border-radius:var(--radius-md); padding:10px 14px; margin-bottom:14px; box-shadow:var(--shadow-sm); }
     .hud-xp { display:flex; align-items:baseline; gap:5px; flex-shrink:0; }
     .hud-label { font-size:0.6rem; font-weight:700; letter-spacing:0.1em; opacity:0.8; }
     .hud-val { font-size:1.15rem; font-weight:800; display:inline-block; }
     .hud-val.pop { animation:xppop 0.4s ease; }
     @keyframes xppop { 0%{transform:scale(1);} 40%{transform:scale(1.45); color:#9ad1e8;} 100%{transform:scale(1);} }
-    .hud-bar { flex:1; height:8px; background:rgba(255,255,255,0.2); border-radius:4px; overflow:hidden; }
-    .hud-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#69A9C9,#9ad1e8); border-radius:4px; transition:width 0.4s ease; }
     .hud-streak { position:relative; display:flex; align-items:center; gap:8px; font-size:0.84rem; font-weight:700; background:rgba(255,255,255,0.14); padding:3px 9px; border-radius:12px; white-space:nowrap; flex-shrink:0; transition:transform 0.15s, background 0.3s; }
     .streak-num-fire { color:#ff8c00; text-shadow:0 0 6px rgba(255,100,0,0.8); }
     .hud-streak.pulse { transform:scale(1.25); }
@@ -43,15 +41,21 @@
     .hud-fire-wrap .fire-bottom .main-fire { position:absolute; top:30%; left:20%; width:75%; height:75%; background:#ff7800; transform:scaleX(0.8) rotate(45deg); border-radius:0 40% 100% 40%; filter:blur(10px); animation:glow 2s ease-out infinite both; }
 
     /* Fortschritt */
-    .ls-meta { font-size:0.8rem; font-weight:600; color:var(--text-muted); text-align:center; margin-bottom:6px; }
-    .ls-dots { display:flex; gap:5px; justify-content:center; margin-bottom:20px; flex-wrap:wrap; }
+    .ls-meta { font-size:0.8rem; font-weight:600; color:var(--text-muted); text-align:center; margin-bottom:2px; }
+    .ls-select-hint { text-align:center; margin-bottom:12px; }
+    .ls-select-badge { display:inline-block; font-size:0.78rem; font-weight:700; color:var(--blue-dark); background:var(--blue-tint); border-radius:20px; padding:6px 16px; }
+    @keyframes lsAttract { 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.06); } }
+    .ls-dots { display:flex; gap:8px; justify-content:center; margin-bottom:20px; flex-wrap:wrap; animation:lsAttract 0.8s ease-in-out 2; }
     .ls-dot {
-      width:28px; height:28px; border-radius:50%;
+      min-width:34px; height:34px; padding:0 5px; border-radius:10px;
       display:flex; align-items:center; justify-content:center;
-      font-size:0.72rem; font-weight:700;
-      background:#edf2f7; color:var(--text-subtle); border:2px solid transparent;
+      font-size:0.78rem; font-weight:800;
+      background:var(--blue-tint); color:var(--blue-dark); border:2px solid transparent;
+      box-shadow:0 1px 3px rgba(0,0,0,0.16); cursor:pointer; transition:transform 0.15s, box-shadow 0.15s;
     }
-    .ls-dot.active { border-color:var(--blue-dark); color:var(--blue-dark); }
+    .ls-dot:hover { transform:scale(1.14) translateY(-2px); box-shadow:0 4px 10px rgba(0,0,0,0.26); }
+    .ls-dot:active { transform:scale(0.94); }
+    .ls-dot.active { background:var(--blue-dark); color:#fff; box-shadow:0 0 0 3px var(--blue-tint), 0 2px 6px rgba(0,0,0,0.22); }
     .ls-dot.done   { background:#38a169; color:#fff; }
 
     /* Station */
@@ -241,7 +245,6 @@
   <div class="ls-wrap">
     <div class="hud">
       <div class="hud-xp"><span class="hud-label">XP</span><span class="hud-val" id="hudXp">0</span></div>
-      <div class="hud-bar"><div class="hud-bar-fill" id="hudBar"></div></div>
       <div class="hud-streak" id="hudStreak">
         <span id="hudStreakEmoji">🔥</span>
         <div class="hud-fire-wrap" id="hudFireWrap" style="display:none">
@@ -257,6 +260,7 @@
     </div>
 
     <div class="ls-meta" id="lsMeta"></div>
+    <div class="ls-select-hint"><span class="ls-select-badge">👆 Posten antippen – frei wählbar, keine feste Reihenfolge</span></div>
     <div class="ls-dots" id="lsDots"></div>
 
     <div id="stage"></div>
@@ -557,9 +561,6 @@ function findIdx(id) {
 /* ---------- HUD / XP / Streak ---------- */
 function renderHud() {
   document.getElementById('hudXp').textContent = xp;
-  var sc = 0;
-  for (var i = 0; i < N; i++) { if (solved[i]) sc++; }
-  document.getElementById('hudBar').style.width = Math.round(sc / N * 100) + '%';
   document.getElementById('hudStreakNum').textContent = streak;
   var onFire = streak >= 3;
   document.getElementById('hudStreakEmoji').style.display = onFire ? 'none' : '';
@@ -937,6 +938,8 @@ function renderProgress() {
     var d = document.createElement('div');
     d.className = 'ls-dot' + (i === current ? ' active' : '') + (solved[i] ? ' done' : '');
     d.textContent = solved[i] ? '✓' : (i + 1);
+    d.title = STATIONS[i].kicker + ' – ' + STATIONS[i].title;
+    d.addEventListener('click', (function (ii) { return function () { jumpTo(ii); }; })(i));
     dots.appendChild(d);
   }
   if (current < N) {
@@ -944,6 +947,10 @@ function renderProgress() {
   } else {
     document.getElementById('lsMeta').textContent = 'Auswertung';
   }
+}
+function jumpTo(i) {
+  if (i === current) return;
+  current = i; showCard(i); updateNav();
 }
 
 function showCard(which) {
