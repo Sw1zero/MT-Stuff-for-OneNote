@@ -159,6 +159,22 @@
 
     .check-btn-row { margin-top:16px; }
 
+    .exp-card { border:1.5px solid var(--border); border-radius:var(--radius-md); padding:14px 16px; margin-bottom:14px; }
+    .exp-card:last-child { margin-bottom:0; }
+    .exp-q { font-size:0.92rem; font-weight:600; margin-bottom:10px; }
+    .exp-reveal-btn { font-family:var(--font); font-size:0.82rem; font-weight:600; padding:7px 16px; border-radius:20px; border:1.5px solid var(--blue-light); background:var(--surface); color:var(--blue-dark); cursor:pointer; margin-bottom:10px; }
+    .exp-reveal-btn:hover { background:var(--blue-tint); }
+    .exp-a { font-size:0.86rem; line-height:1.55; color:var(--text); background:var(--blue-tint); border-left:4px solid var(--blue-light); border-radius:var(--radius-sm); padding:10px 14px; margin-bottom:10px; display:none; }
+    .exp-a.show { display:block; }
+    .exp-rate-row { display:none; gap:8px; }
+    .exp-rate-row.show { display:flex; }
+    .exp-rate-btn { font-family:var(--font); font-size:0.82rem; font-weight:600; padding:7px 14px; border-radius:20px; border:1.5px solid var(--border); background:var(--surface); color:var(--text-muted); cursor:pointer; }
+    .exp-rate-btn.rate-good:hover:not(.rated) { border-color:#38a169; color:#276749; }
+    .exp-rate-btn.rate-bad:hover:not(.rated) { border-color:var(--red); color:var(--red-dark); }
+    .exp-rate-btn.rated { opacity:0.45; cursor:default; }
+    .exp-rate-btn.rated.picked-good { border-color:#38a169; color:#276749; opacity:0.85; }
+    .exp-rate-btn.rated.picked-bad { border-color:var(--red); color:var(--red-dark); opacity:0.85; }
+
     .finish { text-align:center; }
     .finish .rank { font-size:1.25rem; font-weight:800; color:var(--blue-dark); margin:4px 0 2px; }
     .finish .big-score { font-size:2.4rem; font-weight:800; color:var(--blue-dark); margin:6px 0 2px; }
@@ -313,7 +329,8 @@ var ALL = [
       { q:'Was passiert, wenn die Flamme während des Betriebs ausfällt?', opts:['Der Brennerautomat sperrt über das Magnetventil die Ölzufuhr','Der Brenner zündet sofort stärker nach','Die Ölpumpe erhöht den Druck'], correct:0 },
       { q:'Womit wird die Flamme überwacht?', opts:['Mit dem Fotowiderstand (Flammenwächter)','Mit dem Druckreduzierventil','Mit dem Ventilatorrad'], correct:0 },
       { q:'Was dürfen Sie als Milchtechnologe/in am Brenner selbst tun?', opts:['Den Fotowiderstand kontrollieren und reinigen','Den Brenner neu einstellen','Die Düse austauschen'], correct:0 },
-      { q:'Wozu dient die Rauchgasrezirkulation?', opts:['Sie senkt den Ausstoss von Stickstoffoxiden (NOx)','Sie erhöht die Flammentemperatur','Sie spart Zündenergie'], correct:0 }
+      { q:'Wozu dient die Rauchgasrezirkulation?', opts:['Sie senkt den Ausstoss von Stickstoffoxiden (NOx)','Sie erhöht die Flammentemperatur','Sie spart Zündenergie'], correct:0 },
+      { q:'Welche Sicherheitseinrichtung lässt bei einer Verpuffung im Feuerraum den Explosionsdruck ins Heizlokal entweichen?', opts:['Gasexplosionsklappen','Das Sicherheitsventil','Der Fotowiderstand'], correct:0 }
     ] },
   { kicker:'Folien · Dampfkessel', title:'Dampfkessel: Grundlagen', type:'slides',
     lead:'Wozu Dampf dient und welche Bauarten es gibt.',
@@ -330,6 +347,17 @@ var ALL = [
         title:'Funktionsprinzip',
         body:'<p>Alle Bauarten funktionieren nach demselben Wärmeübertragungsprinzip:</p><ol><li>Heisse <b>Rauchgase</b> verlassen den Brenner in den Feuerraum</li><li>Die Rauchgase strömen durch Röhren und geben Wärme ans <b>Kesselwasser</b> ab</li><li>Das Wasser <b>verdampft</b> und strömt zu den Verbrauchern</li><li>Das Kondensat fliesst zurück zum Kessel</li><li>Die abgekühlten Rauchgase verlassen den Kessel über den <b>Kamin</b></li></ol>'
       }
+    ] },
+  { kicker:'Lückentext', title:'Dampfkessel-Bauarten zuordnen', id:'c2_gaps', type:'gaps',
+    lead:'Füllen Sie die Lücken.',
+    parts:[
+      'Ein maximaler Betriebsüberdruck von 0,5 bar ohne SVTI-Kontrollpflicht kennzeichnet den ',
+      { opts:['Niederdruckdampfkessel','Schnelldampferzeuger','Dreizugdampfkessel'], correct:0 },
+      '. Wenig Wasserinhalt, günstiger Preis und kurze Anfahrzeit hat der ',
+      { opts:['Schnelldampferzeuger','Niederdruckdampfkessel','Dreizugdampfkessel'], correct:0 },
+      '. Rohre auf drei Höhen geführt und ein guter Wirkungsgrad kennzeichnen den ',
+      { opts:['Dreizugdampfkessel','Niederdruckdampfkessel','Schnelldampferzeuger'], correct:0 },
+      '.'
     ] },
   { kicker:'Beschriften', title:'Dreizugdampfkessel beschriften', id:'d_label', type:'label',
     lead:'Ordnen Sie jeder Nummer den richtigen Begriff zu.',
@@ -374,6 +402,19 @@ var ALL = [
       '. Kesselstein verhindert man durch ',
       { opts:['Wasseraufbereitung','höheren Druck','mehr Brennstoff'], correct:0 },
       ' vor dem Kessel.'
+    ] },
+  { kicker:'Lückentext', title:'Wassermangel: die richtige Reihenfolge', id:'e2_gaps', type:'gaps',
+    lead:'Füllen Sie die Lücken in der richtigen Reihenfolge.',
+    parts:[
+      'Bei Wassermangel gilt: zuerst ',
+      { opts:['die Feuerung ausschalten','die Sturmleitung öffnen','den Kessel abkühlen lassen','den Kesselinspektor beiziehen'], correct:0 },
+      ', danach ',
+      { opts:['die Sturmleitung öffnen','die Feuerung ausschalten','den Kessel abkühlen lassen','den Kesselinspektor beiziehen'], correct:0 },
+      ', anschliessend ',
+      { opts:['den Kessel abkühlen lassen','die Feuerung ausschalten','die Sturmleitung öffnen','den Kesselinspektor beiziehen'], correct:0 },
+      ' und bei sichtbaren Schäden zuletzt ',
+      { opts:['den Kesselinspektor beiziehen','die Feuerung ausschalten','die Sturmleitung öffnen','den Kessel abkühlen lassen'], correct:0 },
+      '.'
     ] },
   { kicker:'Folien · Warmwasser', title:'Warmwasseranlage', type:'slides',
     lead:'Aufbau und Regelung der Warmwasseranlage.',
@@ -427,6 +468,15 @@ var ALL = [
         title:'Vorschriften und Dokumentation',
         body:'<ul><li>Alle Wartungsarbeiten nach <b>Plan</b> und schriftlich <b>dokumentieren</b></li><li><b>Kaminfeger</b>: reinigt feuerseitig zweimal jährlich</li><li>Dampfkessel über <b>0,5 bar</b>: SVTI-Kontrollpflicht (periodische Inspektion)</li><li>Niederdruckkessel (max. 0,5 bar): keine SVTI-Pflicht</li><li><b>Feuerungskontrolle</b>: staatlich vorgeschrieben (Luftreinhalteverordnung)</li></ul><div class="factbox">Einfache Kontrolle und Reinigung machen Sie selbst. Einstellung, Revision und Inspektion macht der Fachmann.</div>'
       }
+    ] },
+  { kicker:'Erklären', title:'Erklären Sie: Kessel & Warmwasseranlage', id:'h_explain', type:'explain',
+    lead:'Überlegen Sie sich zuerst selbst eine Antwort, dann Musterlösung ansehen und ehrlich einschätzen.',
+    cards:[
+      { q:'Erklären Sie die Funktion des Mischventils in der Warmwasseranlage.', a:'Das Mischventil mischt dem heissen Vorlaufwasser aus dem Verteilerbalken kühleres Rücklaufwasser bei, um die Temperatur des Wassers für den jeweiligen Verbraucher optimal einzustellen.' },
+      { q:'Erklären Sie den Zweck des Expansionsgefässes.', a:'Es nimmt das zusätzliche Wasservolumen auf, das bei der Erwärmung des Wassers entsteht, und gibt es wieder ab, wenn das Volumen abnimmt.' },
+      { q:'Erklären Sie, wie Kesselstein entsteht und wie Sie seine Bildung verhindern.', a:'Hartes Wasser enthält gelöste Kalzium- und Magnesiumsalze, die sich beim Erwärmen als Kesselstein an der Heizfläche ablagern. Verhindert wird dies durch Wasseraufbereitung (Enthärtung oder Entsalzung) vor dem Kessel.' },
+      { q:'Erklären Sie, weshalb Sie bei Wassermangel niemals kaltes Wasser in den Kessel nachspeisen dürfen.', a:'Das kalte Wasser würde die Materialspannungen im heissen Kessel stark erhöhen und damit die Explosionsgefahr wesentlich vergrössern.' },
+      { q:'Nennen Sie 3 Wartungsarbeiten an einer Warmwasseranlage.', a:'Z. B. Überwachung der Temperatur, Überwachung von Druck und Wassermenge (evtl. Wasser nachspeisen), feuerseitige Reinigung 2× jährlich durch den Kaminfeger, Überwachung der Pumpen bezüglich Lärmverhalten.' }
     ] },
   { kicker:'Abschluss', title:'Quer durch die Wärmeerzeugung', id:'boss', boss:true, type:'quiz',
     lead:'Gemischte Fragen zum Schluss.',
@@ -505,6 +555,7 @@ function buildBody(idx, st){
   if(st.type==='label') (MODE==='challenge') ? buildLabelType(idx, st) : buildLabelChoose(idx, st);
   if(st.type==='gaps')  buildGaps(idx, st);
   if(st.type==='quiz')  buildQuiz(idx, st);
+  if(st.type==='explain') buildExplain(idx, st);
 }
 
 function buildPdf(idx, st){
@@ -777,6 +828,44 @@ function buildQuiz(idx, st){
       if(oi!==qq.correct){ btn.classList.add('wrong'); registerAnswer(false); } else { earned[idx]++; registerAnswer(true); }
       var answered=0; for(var k=0;k<st.questions.length;k++){ if(document.querySelector('#body-'+idx+' .opt[data-q="'+k+'"]:disabled')) answered++; }
       if(answered===st.questions.length) solved[idx]=true;
+      updateNav();
+    });
+  });
+}
+
+/* Erklären – Frage lesen, selbst überlegen, Musterlösung aufdecken, ehrlich einschätzen */
+function buildExplain(idx, st){
+  maxPts[idx]=st.cards.length;
+  var body=document.getElementById('body-'+idx);
+  st.cards.forEach(function(c, ci){
+    var card=document.createElement('div'); card.className='exp-card';
+    card.innerHTML='<div class="exp-q">'+(ci+1)+'. '+c.q+'</div>'+
+      '<button class="exp-reveal-btn" id="exprev-'+idx+'-'+ci+'">Musterlösung ansehen</button>'+
+      '<div class="exp-a" id="expa-'+idx+'-'+ci+'">'+c.a+'</div>'+
+      '<div class="exp-rate-row" id="exprate-'+idx+'-'+ci+'">'+
+        '<button class="exp-rate-btn rate-good" data-ci="'+ci+'" data-v="1">Wusste ich ✓</button>'+
+        '<button class="exp-rate-btn rate-bad" data-ci="'+ci+'" data-v="0">Nochmal üben</button>'+
+      '</div>';
+    body.appendChild(card);
+  });
+  st.cards.forEach(function(c, ci){
+    document.getElementById('exprev-'+idx+'-'+ci).addEventListener('click', function(){
+      document.getElementById('expa-'+idx+'-'+ci).classList.add('show');
+      document.getElementById('exprate-'+idx+'-'+ci).classList.add('show');
+      this.disabled=true; this.style.display='none';
+    });
+  });
+  body.querySelectorAll('.exp-rate-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var ci=+btn.dataset.ci, ok=btn.dataset.v==='1';
+      var row=document.getElementById('exprate-'+idx+'-'+ci);
+      if(row.querySelector('.rated')) return;
+      row.querySelectorAll('.exp-rate-btn').forEach(function(b){ b.classList.add('rated'); b.disabled=true; });
+      btn.classList.add(ok?'picked-good':'picked-bad');
+      if(ok) earned[idx]++;
+      registerAnswer(ok);
+      var answered=0; body.querySelectorAll('.exp-rate-row').forEach(function(r){ if(r.querySelector('.rated')) answered++; });
+      if(answered===st.cards.length) solved[idx]=true;
       updateNav();
     });
   });
