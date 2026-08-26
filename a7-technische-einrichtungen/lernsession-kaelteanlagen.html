@@ -427,7 +427,7 @@ var STATIONS = ALL.filter(function(s){ return MODE === 'challenge' ? (s.type !==
   if(MODE==='challenge'){
     document.getElementById('lsDots').classList.add('selectable');
     document.querySelector('.ls-select-hint').classList.add('show');
-    var hb=document.querySelector('.hud-bar'); if(hb) hb.style.display='none';
+    var hud=document.querySelector('.hud'); if(hud) hud.style.display='none';
   }
 })();
 
@@ -824,11 +824,19 @@ function showFinish(){
     { icon:'🥇', name:'Kälte-Meister (90 %)', got: pct>=90 }
   ];
   var got=0, bh=''; badges.forEach(function(b){ if(b.got) got++; bh+='<span class="badge-chip'+(b.got?' earned':'')+'">'+(b.got?b.icon:'<span class="lock">🔒</span>')+' '+b.name+'</span>'; });
+  var headline, scoreSub;
+  if(MODE==='challenge'){
+    var note = max>0 ? Math.round((1 + total/max*5)*2)/2 : 1;
+    headline = '<div class="big-score">Note '+note.toFixed(1)+'</div>';
+    scoreSub = '<div class="score-sub">'+total+' / '+max+' Punkte ('+pct+' %) · simulierte Note, keine offizielle Bewertung</div>';
+  } else {
+    headline = '<div class="rank">'+rank+'</div><div class="big-score">'+xp+' XP</div>';
+    scoreSub = '<div class="score-sub">'+total+' / '+max+' Punkte ('+pct+' %) · längste Serie 🔥 '+bestStreak+' · '+got+'/'+badges.length+' Abzeichen</div>';
+  }
   document.getElementById('finishBody').innerHTML=
     '<div class="station-kicker">'+(MODE==='challenge'?'Prüfung beendet':'Geschafft')+'</div>'+
-    '<div class="rank">'+rank+'</div>'+
-    '<div class="big-score">'+xp+' XP</div>'+
-    '<div class="score-sub">'+total+' / '+max+' Punkte ('+pct+' %) · längste Serie 🔥 '+bestStreak+' · '+got+'/'+badges.length+' Abzeichen</div>'+
+    headline+
+    scoreSub+
     '<div class="badges">'+bh+'</div>'+
     '<button class="btn btn-primary" onclick="restart()">Nochmals starten</button>'+
     '<a class="back-link" href="../index.html" style="display:block;margin-top:14px;">← Alle Lerntools</a>';
