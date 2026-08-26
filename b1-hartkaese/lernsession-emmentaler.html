@@ -226,6 +226,9 @@
     .badge-chip .lock { opacity:0.6; }
     .finish ul { text-align:left; max-width:480px; margin:0 auto 20px; font-size:0.86rem; color:var(--text); line-height:1.6; }
     .finish li { margin-bottom:6px; }
+    .score-breakdown { list-style:none; text-align:left; max-width:420px; margin:0 auto 18px; font-size:0.84rem; color:var(--text); padding:0; }
+    .score-breakdown li { display:flex; justify-content:space-between; gap:12px; padding:5px 0; border-bottom:1px solid var(--border); }
+    .score-breakdown li:last-child { border-bottom:none; }
 
     /* Navigation */
     .ls-nav { display:flex; justify-content:space-between; gap:10px; }
@@ -766,7 +769,7 @@ function buildSlides(body, idx, st) {
 
 /* ---------- Quiz ---------- */
 function buildQuiz(body, idx, st) {
-  maxPts[idx] = st.questions.length;
+  maxPts[idx] = st.questions.length * 0.5;
   st.questions.forEach(function(qq, qi) {
     var block = document.createElement('div');
     block.className = 'q-block';
@@ -787,7 +790,7 @@ function buildQuiz(body, idx, st) {
         if (+b.dataset.o === qq.correct) b.classList.add('correct');
       });
       if (oi !== qq.correct) { btn.classList.add('wrong'); registerAnswer(false); }
-      else { earned[idx]++; registerAnswer(true); }
+      else { earned[idx] += 0.5; registerAnswer(true); }
       evalQuiz(idx, st);
     });
   });
@@ -803,7 +806,7 @@ function evalQuiz(idx, st) {
 
 /* ---------- Wahr / Falsch ---------- */
 function buildTF(body, idx, st) {
-  maxPts[idx] = st.items.length;
+  maxPts[idx] = st.items.length * 0.5;
   st.items.forEach(function(it, ii) {
     var item = document.createElement('div');
     item.className = 'tf-item';
@@ -826,7 +829,7 @@ function buildTF(body, idx, st) {
         b.disabled = true;
         if ((b.dataset.v === 'true') === it.a) b.classList.add('reveal');
       });
-      if (pick === it.a) { btn.classList.add('sel-correct'); earned[idx]++; registerAnswer(true); }
+      if (pick === it.a) { btn.classList.add('sel-correct'); earned[idx] += 0.5; registerAnswer(true); }
       else { btn.classList.add('sel-wrong'); registerAnswer(false); }
       document.getElementById('tfexp-' + idx + '-' + ii).classList.add('show');
       evalTF(idx, st);
@@ -861,7 +864,7 @@ function buildGaps(body, idx, st) {
   });
   html += '</div><div class="check-btn-row"><button class="btn btn-primary" id="gapcheck-' + idx + '">Prüfen</button></div>';
   body.innerHTML = html;
-  maxPts[idx] = gapCount;
+  maxPts[idx] = gapCount * 0.5;
   document.getElementById('gapcheck-' + idx).addEventListener('click', function() {
     var sels = body.querySelectorAll('select');
     var ok = 0;
@@ -873,7 +876,7 @@ function buildGaps(body, idx, st) {
       sel.disabled = true;
       registerAnswer(good);
     });
-    earned[idx] = ok;
+    earned[idx] = ok * 0.5;
     solved[idx] = true;
     this.disabled = true;
     updateNav();
@@ -882,7 +885,7 @@ function buildGaps(body, idx, st) {
 
 /* ---------- Prozess-Entscheid ---------- */
 function buildDecide(body, idx, st) {
-  maxPts[idx] = 1;
+  maxPts[idx] = 0.5;
   var block = document.createElement('div');
   block.className = 'q-block';
   var h = '';
@@ -905,7 +908,7 @@ function buildDecide(body, idx, st) {
       if (op.correct) {
         btn.classList.add('correct');
         body.querySelectorAll('.opt').forEach(function(b) { b.disabled = true; });
-        if (!triedWrong) earned[idx] = 1;
+        if (!triedWrong) earned[idx] = 0.5;
         registerAnswer(!triedWrong);
         solved[idx] = true;
         updateNav();
@@ -922,7 +925,7 @@ function buildDecide(body, idx, st) {
 function buildErrors(body, idx, st) {
   var wrongCount = 0;
   st.items.forEach(function(it) { if (it.wrong) wrongCount++; });
-  maxPts[idx] = wrongCount;
+  maxPts[idx] = wrongCount * 0.5;
 
   var html = '<div class="err-intro">Tippen Sie die falschen Angaben an:</div>';
   st.items.forEach(function(it, ii) {
@@ -954,7 +957,7 @@ function buildErrors(body, idx, st) {
       else if (it.wrong && !marked) { chip.classList.add('missed'); document.getElementById('errcorr-' + idx + '-' + ii).classList.add('show'); }
       else if (!it.wrong && marked) { chip.classList.add('wrong'); chip.style.background = 'var(--red-light)'; chip.style.color = 'var(--red-dark)'; chip.style.borderColor = 'var(--red)'; score--; }
     });
-    earned[idx] = Math.max(0, score);
+    earned[idx] = Math.max(0, score) * 0.5;
     solved[idx] = true;
     this.disabled = true;
     updateNav();
@@ -1035,8 +1038,11 @@ function goPrev() {
 }
 
 function showFinish() {
-  var total = 0, max = 0;
-  for (var i = 0; i < N; i++) { total += earned[i]; max += maxPts[i]; }
+  var total = 0, max = 0, expGood = 0, expTotal = 0;
+  for (var i = 0; i < N; i++) {
+    if (STATIONS[i].type === 'explain') { expGood += earned[i]; expTotal += maxPts[i]; }
+    else { total += earned[i]; max += maxPts[i]; }
+  }
   var pct = max > 0 ? Math.round(total / max * 100) : 0;
 
   var rank;
@@ -1062,11 +1068,19 @@ function showFinish() {
       (b.got ? b.icon : '<span class="lock">🔒</span>') + ' ' + b.name + '</span>';
   });
 
-  var headline, scoreSub;
+  var breakdown = '<ul class="score-breakdown">';
+  for (var bi = 0; bi < N; bi++) {
+    if (STATIONS[bi].type === 'explain') continue;
+    breakdown += '<li><span>' + STATIONS[bi].title + '</span><span>' + earned[bi] + ' / ' + maxPts[bi] + ' P.</span></li>';
+  }
+  breakdown += '</ul>';
+
+  var headline, scoreSub, explainNote = '';
   if (MODE === 'challenge') {
-    var note = max > 0 ? Math.round((1 + total / max * 5) * 2) / 2 : 1;
+    var note = max > 0 ? Math.round((1 + total / max * 5) * 10) / 10 : 1;
     headline = '<div class="big-score">Note ' + note.toFixed(1) + '</div>';
     scoreSub = '<div class="score-sub">' + total + ' / ' + max + ' Punkte (' + pct + ' %) · simulierte Note, keine offizielle Bewertung</div>';
+    if (expTotal > 0) explainNote = '<div class="score-sub">Erklären-Karten: ' + expGood + ' von ' + expTotal + ' selbst als «gewusst» eingeschätzt (nicht in der Note)</div>';
   } else {
     headline = '<div class="rank">' + rank + '</div><div class="big-score">' + xp + ' XP</div>';
     scoreSub = '<div class="score-sub">' + total + ' / ' + max + ' Wissenspunkte (' + pct + ' %) · längste Serie 🔥 ' + bestStreak + ' · ' + gotCount + '/' + badges.length + ' Abzeichen</div>';
@@ -1076,6 +1090,8 @@ function showFinish() {
     '<div class="station-kicker">Geschafft</div>' +
     headline +
     scoreSub +
+    explainNote +
+    breakdown +
     '<div class="badges">' + badgeHtml + '</div>' +
     '<ul>' +
       '<li><b>Rohmilch</b> im Kupferkessi/-fertiger, max. 20 km Distanz, Verarbeitung binnen 24 h.</li>' +
