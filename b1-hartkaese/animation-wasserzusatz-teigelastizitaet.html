@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Animation: Effekt Wasserzusatz auf Teigelastizität</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .back-link {
+      display:inline-flex; align-items:center; gap:4px;
+      font-size:.82rem; color:var(--text-muted); text-decoration:none;
+      margin-bottom:18px;
+    }
+    .back-link:hover { color:var(--red); }
+
+    .anim-wrap { width:600px; max-width:100%; margin:0 auto; display:flex; flex-direction:column; gap:16px; }
+
+    .step-dots { display:flex; justify-content:center; gap:12px; margin-bottom:4px; }
+    .step-dot  { width:11px; height:11px; border-radius:50%; background:var(--border); cursor:pointer; transition:background .2s,transform .15s; }
+    .step-dot.active { background:var(--blue-dark); transform:scale(1.25); }
+    .step-dot:hover  { background:#94a3b8; }
+
+    .anim-card { background:#f0f7ff; border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); overflow:hidden; }
+    .anim-card svg { display:block; width:100%; height:auto; }
+
+    .step-info { background:var(--surface); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); padding:20px 24px; min-height:96px; }
+    .step-title { font-size:.78rem; font-weight:700; color:var(--blue-dark); text-transform:uppercase; letter-spacing:.07em; margin-bottom:8px; }
+    .step-text  { font-size:.9rem; color:var(--text); line-height:1.65; }
+
+    .nav-row { display:flex; justify-content:center; gap:12px; flex-wrap:wrap; }
+    .keyboard-hint { margin-top:6px; text-align:center; }
+
+    /* --- Szenen: Crossfade zwischen den Prozessschritten --- */
+    .scene { opacity:0; transition:opacity .5s ease; }
+    .scene.active { opacity:1; }
+
+    /* --- kleine Dauerschleifen für Lebendigkeit --- */
+    .water-drop { transform-box: fill-box; transform-origin: center; animation: drip 2.4s ease-in infinite; }
+    @keyframes drip {
+      0%   { transform: translateY(0);    opacity:0; }
+      15%  { opacity:1; }
+      85%  { opacity:1; }
+      100% { transform: translateY(55px); opacity:0; }
+    }
+
+    .cube-pulse { transform-box: fill-box; transform-origin: center; animation: pulseCube 2.6s ease-in-out infinite; }
+    @keyframes pulseCube {
+      0%, 100% { transform: scale(1,1); }
+      50%      { transform: scale(1.06,0.96); }
+    }
+
+    .bubble-grow { transform-box: fill-box; transform-origin: center; animation: growBubble 3s ease-in-out infinite alternate; }
+    @keyframes growBubble {
+      0%   { transform: scale(.55); opacity:.55; }
+      100% { transform: scale(1);   opacity:.9; }
+    }
+
+    .drift-away { transform-box: fill-box; transform-origin: center; animation: driftAway 3.2s ease-in-out infinite alternate; }
+    @keyframes driftAway {
+      0%   { transform: translate(0,0);      opacity:.8; }
+      100% { transform: translate(10px,-16px); opacity:.15; }
+    }
+
+    /* --- sanftes Schweben der Milchzucker-/Milchsäure-Teilchen --- */
+    .drift-a, .drift-b, .drift-c { transform-box: fill-box; transform-origin: center; }
+    .drift-a { animation: driftA 3.4s ease-in-out infinite; }
+    .drift-b { animation: driftB 3.9s ease-in-out infinite; }
+    .drift-c { animation: driftC 3.1s ease-in-out infinite; }
+    @keyframes driftA { 0%,100% { transform: translate(0,0); }    50% { transform: translate(3px,-2px); } }
+    @keyframes driftB { 0%,100% { transform: translate(0,0); }    50% { transform: translate(-2.5px,2.5px); } }
+    @keyframes driftC { 0%,100% { transform: translate(0,0); }    50% { transform: translate(2px,2.5px); } }
+
+    /* --- Milchsäure-Tröpfchen pulsieren leicht (aktive Bildung) --- */
+    .pulse-soft { transform-box: fill-box; transform-origin: center; animation: pulseSoft 1.8s ease-in-out infinite; }
+    @keyframes pulseSoft { 0%,100% { transform: scale(1); } 50% { transform: scale(1.14); } }
+
+    /* --- sprödes Gerüst: feines Zittern statt Bewegung --- */
+    .brittle-shake { transform-box: fill-box; transform-origin: center; animation: brittleShake 2.1s ease-in-out infinite; }
+    @keyframes brittleShake {
+      0%, 100% { transform: rotate(0deg); }
+      25%      { transform: rotate(-0.7deg); }
+      75%      { transform: rotate(0.7deg); }
+    }
+  </style>
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · b.1</span>
+    <h1>Effekt Wasserzusatz auf Teigelastizität</h1>
+    <p>Wie der Wasserzusatz die Milchsäurekonzentration und die Dehnbarkeit des Käseteigs beeinflusst</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+
+  <div class="anim-wrap">
+
+    <div class="step-dots" id="stepDots"></div>
+
+    <div class="anim-card">
+      <!-- viewBox: 0–405 Animation | 416–556 Legende -->
+      <svg id="animSvg" viewBox="0 0 560 310" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="dotPat" width="20" height="20" patternUnits="userSpaceOnUse">
+            <circle cx="10" cy="10" r="1.2" fill="#bfdbfe" opacity="0.5"/>
+          </pattern>
+        </defs>
+
+        <rect width="405" height="310" fill="url(#dotPat)"/>
+        <rect width="405" height="310" fill="#e0f2fe" opacity="0.25"/>
+
+        <!-- ============================================================
+             LEGENDE  (x 416–556)
+             ============================================================ -->
+        <rect x="416" y="18" width="140" height="276" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+        <text x="486" y="38" font-family="system-ui,sans-serif" font-size="11" font-weight="700" fill="#134061" text-anchor="middle">Legende</text>
+
+        <circle cx="436" cy="64" r="9" fill="#fde68a" stroke="#d97706" stroke-width="1.5"/>
+        <text x="452" y="67" font-family="system-ui,sans-serif" font-size="8.5" fill="#334155">Milchzucker (Laktose)</text>
+
+        <path d="M436,90 C440.5,94.5 442,98 436,106 C430,98 431.5,94.5 436,90 Z" fill="#60a5fa"/>
+        <text x="452" y="101" font-family="system-ui,sans-serif" font-size="8.5" fill="#334155">Trinkwasser</text>
+
+        <circle cx="436" cy="124" r="9" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/>
+        <text x="436" y="127.5" font-family="system-ui,sans-serif" font-size="7" font-weight="800" fill="#dc2626" text-anchor="middle">MS</text>
+        <text x="452" y="127" font-family="system-ui,sans-serif" font-size="8.5" fill="#334155">Milchsäure</text>
+
+        <circle cx="436" cy="158" r="9" fill="#e2e8f0" stroke="#64748b" stroke-width="1.5"/>
+        <text x="436" y="161" font-family="system-ui,sans-serif" font-size="7" font-weight="800" fill="#334155" text-anchor="middle">Ca</text>
+        <text x="452" y="161" font-family="system-ui,sans-serif" font-size="8.5" fill="#334155">Kalzium (Gerüst)</text>
+
+        <circle cx="436" cy="192" r="9" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+        <text x="436" y="195.5" font-family="system-ui,sans-serif" font-size="7" font-weight="800" fill="#15803d" text-anchor="middle">CO2</text>
+        <text x="452" y="196" font-family="system-ui,sans-serif" font-size="8.5" fill="#334155">Gasbildung (z. B. CO₂)</text>
+
+        <!-- ============================================================
+             SZENEN  – je ein Prozessschritt, per Opacity umgeschaltet
+             ============================================================ -->
+
+        <!-- Szene 0: Ausgangslage – normale Milch, viel Milchzucker -->
+        <g class="scene" id="scene0">
+          <rect x="15" y="48" width="375" height="215" rx="16" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+          <text x="202" y="34" font-family="system-ui,sans-serif" font-size="10" font-weight="700" fill="#92400e" text-anchor="middle">Normale Milch, kein Wasserzusatz</text>
+          <g fill="#fde68a" stroke="#d97706" stroke-width="1.5">
+            <circle class="drift-a" cx="50"  cy="80"  r="6.5"/><circle class="drift-b" cx="110" cy="80"  r="6.5"/><circle class="drift-c" cx="170" cy="80"  r="6.5"/><circle class="drift-a" cx="230" cy="80"  r="6.5"/><circle class="drift-b" cx="290" cy="80"  r="6.5"/><circle class="drift-c" cx="350" cy="80"  r="6.5"/>
+            <circle class="drift-b" cx="50"  cy="130" r="6.5"/><circle class="drift-c" cx="110" cy="130" r="6.5"/><circle class="drift-a" cx="170" cy="130" r="6.5"/><circle class="drift-b" cx="230" cy="130" r="6.5"/><circle class="drift-c" cx="290" cy="130" r="6.5"/><circle class="drift-a" cx="350" cy="130" r="6.5"/>
+            <circle class="drift-c" cx="50"  cy="180" r="6.5"/><circle class="drift-a" cx="110" cy="180" r="6.5"/><circle class="drift-b" cx="170" cy="180" r="6.5"/><circle class="drift-c" cx="230" cy="180" r="6.5"/><circle class="drift-a" cx="290" cy="180" r="6.5"/><circle class="drift-b" cx="350" cy="180" r="6.5"/>
+            <circle class="drift-a" cx="50"  cy="230" r="6.5"/><circle class="drift-b" cx="110" cy="230" r="6.5"/><circle class="drift-c" cx="170" cy="230" r="6.5"/><circle class="drift-a" cx="230" cy="230" r="6.5"/><circle class="drift-b" cx="290" cy="230" r="6.5"/><circle class="drift-c" cx="350" cy="230" r="6.5"/>
+          </g>
+        </g>
+
+        <!-- Szene 1: Wasserzusatz verdünnt den Milchzucker (Vergleich) -->
+        <g class="scene" id="scene1">
+          <rect x="15"  y="48" width="180" height="215" rx="14" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+          <rect x="210" y="48" width="180" height="215" rx="14" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+          <line x1="202" y1="44" x2="202" y2="267" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <text x="105" y="34" font-family="system-ui,sans-serif" font-size="9.5" font-weight="700" fill="#475569" text-anchor="middle">ohne Wasserzusatz</text>
+          <text x="300" y="34" font-family="system-ui,sans-serif" font-size="9.5" font-weight="700" fill="#1e4e8c" text-anchor="middle">mit Wasserzusatz</text>
+
+          <g fill="#fde68a" stroke="#d97706" stroke-width="1.5">
+            <circle class="drift-a" cx="45"  cy="80"  r="6.5"/><circle class="drift-b" cx="105" cy="80"  r="6.5"/><circle class="drift-c" cx="165" cy="80"  r="6.5"/>
+            <circle class="drift-b" cx="45"  cy="130" r="6.5"/><circle class="drift-c" cx="105" cy="130" r="6.5"/><circle class="drift-a" cx="165" cy="130" r="6.5"/>
+            <circle class="drift-c" cx="45"  cy="180" r="6.5"/><circle class="drift-a" cx="105" cy="180" r="6.5"/><circle class="drift-b" cx="165" cy="180" r="6.5"/>
+            <circle class="drift-a" cx="45"  cy="230" r="6.5"/><circle class="drift-b" cx="105" cy="230" r="6.5"/><circle class="drift-c" cx="165" cy="230" r="6.5"/>
+          </g>
+
+          <g class="water-drop" style="animation-delay:0s">   <path d="M250,10 C255,15 257,19 250,27 C243,19 245,15 250,10 Z" fill="#60a5fa"/></g>
+          <g class="water-drop" style="animation-delay:.7s">  <path d="M320,4  C325,9  327,13 320,21 C313,13 315,9  320,4  Z" fill="#60a5fa"/></g>
+          <g class="water-drop" style="animation-delay:1.4s"> <path d="M360,12 C365,17 367,21 360,29 C353,21 355,17 360,12 Z" fill="#60a5fa"/></g>
+
+          <g fill="#fde68a" stroke="#d97706" stroke-width="1.5">
+            <circle class="drift-a" cx="240" cy="85"  r="6.5"/><circle class="drift-b" cx="320" cy="80"  r="6.5"/><circle class="drift-c" cx="370" cy="125" r="6.5"/>
+            <circle class="drift-b" cx="230" cy="155" r="6.5"/><circle class="drift-c" cx="310" cy="150" r="6.5"/><circle class="drift-a" cx="370" cy="195" r="6.5"/>
+            <circle class="drift-c" cx="250" cy="225" r="6.5"/><circle class="drift-a" cx="330" cy="230" r="6.5"/>
+          </g>
+          <text x="300" y="255" font-family="system-ui,sans-serif" font-size="9" font-weight="700" fill="#1e4e8c" text-anchor="middle">+10 % Trinkwasser</text>
+        </g>
+
+        <!-- Szene 2: Wirkung auf die Milchsäurekonzentration (Vergleich) -->
+        <g class="scene" id="scene2">
+          <rect x="15"  y="48" width="180" height="215" rx="14" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+          <rect x="210" y="48" width="180" height="215" rx="14" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+          <line x1="202" y1="44" x2="202" y2="267" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <text x="105" y="34" font-family="system-ui,sans-serif" font-size="9.5" font-weight="700" fill="#c40027" text-anchor="middle">hohe Milchsäurekonzentration</text>
+          <text x="300" y="34" font-family="system-ui,sans-serif" font-size="9.5" font-weight="700" fill="#15803d" text-anchor="middle">tiefe Milchsäurekonzentration</text>
+
+          <g font-family="system-ui,sans-serif" font-size="7" font-weight="800" fill="#dc2626" text-anchor="middle">
+            <g class="pulse-soft" style="animation-delay:0s">    <circle cx="45"  cy="80"  r="7" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/><text x="45"  y="83">MS</text></g>
+            <g class="pulse-soft" style="animation-delay:.2s">   <circle cx="105" cy="80"  r="7" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/><text x="105" y="83">MS</text></g>
+            <g class="pulse-soft" style="animation-delay:.4s">   <circle cx="165" cy="80"  r="7" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/><text x="165" y="83">MS</text></g>
+            <g class="pulse-soft" style="animation-delay:.6s">   <circle cx="45"  cy="130" r="7" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/><text x="45"  y="133">MS</text></g>
+            <g class="pulse-soft" style="animation-delay:.8s">   <circle cx="105" cy="130" r="7" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/><text x="105" y="133">MS</text></g>
+            <g class="pulse-soft" style="animation-delay:1s">    <circle cx="165" cy="130" r="7" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/><text x="165" y="133">MS</text></g>
+            <g class="pulse-soft" style="animation-delay:1.2s">  <circle cx="45"  cy="180" r="7" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/><text x="45"  y="183">MS</text></g>
+            <g class="pulse-soft" style="animation-delay:1.4s">  <circle cx="105" cy="180" r="7" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/><text x="105" y="183">MS</text></g>
+            <g class="pulse-soft" style="animation-delay:1.6s">  <circle cx="165" cy="180" r="7" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/><text x="165" y="183">MS</text></g>
+            <g class="pulse-soft" style="animation-delay:.3s">   <circle cx="105" cy="230" r="7" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/><text x="105" y="233">MS</text></g>
+          </g>
+
+          <g font-family="system-ui,sans-serif" font-size="7" font-weight="800" fill="#dc2626" text-anchor="middle">
+            <g class="pulse-soft" style="animation-delay:0s">   <circle cx="250" cy="95"  r="7" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/><text x="250" y="98">MS</text></g>
+            <g class="pulse-soft" style="animation-delay:.5s">  <circle cx="330" cy="115" r="7" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/><text x="330" y="118">MS</text></g>
+            <g class="pulse-soft" style="animation-delay:1s">   <circle cx="280" cy="190" r="7" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/><text x="280" y="193">MS</text></g>
+            <g class="pulse-soft" style="animation-delay:1.5s"> <circle cx="350" cy="225" r="7" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/><text x="350" y="228">MS</text></g>
+          </g>
+        </g>
+
+        <!-- Szene 3: Wirkung auf das Kaseingerüst (Vergleich) -->
+        <g class="scene" id="scene3">
+          <rect x="15"  y="48" width="180" height="215" rx="14" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+          <rect x="210" y="48" width="180" height="215" rx="14" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+          <line x1="202" y1="44" x2="202" y2="267" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <text x="105" y="34" font-family="system-ui,sans-serif" font-size="8.5" font-weight="700" fill="#c40027" text-anchor="middle">kurzer, spröder Teig</text>
+          <text x="300" y="34" font-family="system-ui,sans-serif" font-size="8.5" font-weight="700" fill="#15803d" text-anchor="middle">langer, dehnbarer Teig</text>
+
+          <!-- links: Gerüst geschwächt, Kanten gestrichelt = brüchig, Gerüst zittert unter Spannung -->
+          <g class="brittle-shake">
+            <g fill="none" stroke="#d97706" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="6,4">
+              <line x1="40" y1="115" x2="155" y2="115"/><line x1="155" y1="115" x2="155" y2="195"/><line x1="155" y1="195" x2="40" y2="195"/><line x1="40" y1="195" x2="40" y2="115"/>
+              <line x1="60" y1="90"  x2="175" y2="90"/> <line x1="175" y1="90"  x2="175" y2="170"/><line x1="175" y1="170" x2="60" y2="170"/><line x1="60" y1="170" x2="60" y2="90"/>
+              <line x1="40" y1="115" x2="60" y2="90"/>  <line x1="155" y1="115" x2="175" y2="90"/> <line x1="155" y1="195" x2="175" y2="170"/><line x1="40" y1="195" x2="60" y2="170"/>
+            </g>
+            <!-- Ca geblieben (4 von 12) -->
+            <g fill="#e2e8f0" stroke="#64748b" stroke-width="1.5">
+              <circle cx="97.5" cy="115"   r="6.5"/><circle cx="117.5" cy="90"   r="6.5"/><circle cx="50" cy="102.5" r="6.5"/><circle cx="165" cy="102.5" r="6.5"/>
+            </g>
+            <g font-family="system-ui,sans-serif" font-size="6" font-weight="800" fill="#334155" text-anchor="middle">
+              <text x="97.5" y="118">Ca</text><text x="117.5" y="93">Ca</text><text x="50" y="105.5">Ca</text><text x="165" y="105.5">Ca</text>
+            </g>
+
+            <!-- Ca weg, still hier verblieben (5 von 12, leere gestrichelte Position) -->
+            <g fill="none" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="2,2" opacity="0.5">
+              <circle cx="40" cy="155" r="6.5"/><circle cx="175" cy="130" r="6.5"/><circle cx="117.5" cy="170" r="6.5"/><circle cx="50" cy="182.5" r="6.5"/><circle cx="165" cy="182.5" r="6.5"/>
+            </g>
+          </g>
+
+          <!-- Ca weg, gerade am Herauslösen (3 von 12, animiert) -->
+          <g class="drift-away"><circle cx="155" cy="155" r="6.5" fill="#e2e8f0" stroke="#64748b" stroke-width="1.5"/><text x="155" y="158" font-family="system-ui,sans-serif" font-size="6" font-weight="800" fill="#334155" text-anchor="middle">Ca</text></g>
+          <g class="drift-away" style="animation-delay:.9s"><circle cx="97.5" cy="195" r="6.5" fill="#e2e8f0" stroke="#64748b" stroke-width="1.5"/><text x="97.5" y="198" font-family="system-ui,sans-serif" font-size="6" font-weight="800" fill="#334155" text-anchor="middle">Ca</text></g>
+          <g class="drift-away" style="animation-delay:1.6s"><circle cx="60" cy="130" r="6.5" fill="#e2e8f0" stroke="#64748b" stroke-width="1.5"/><text x="60" y="133" font-family="system-ui,sans-serif" font-size="6" font-weight="800" fill="#334155" text-anchor="middle">Ca</text></g>
+
+          <!-- Milchsäure löst das Kalzium heraus: viele MS-Tröpfchen direkt an den Verlust-Stellen -->
+          <g font-family="system-ui,sans-serif" font-size="6" font-weight="800" fill="#dc2626" text-anchor="middle">
+            <g class="pulse-soft" style="animation-delay:0s">   <circle cx="172" cy="148" r="6" fill="#fee2e2" stroke="#dc2626" stroke-width="1.3"/><text x="172" y="151">MS</text></g>
+            <g class="pulse-soft" style="animation-delay:.4s">  <circle cx="112" cy="208" r="6" fill="#fee2e2" stroke="#dc2626" stroke-width="1.3"/><text x="112" y="211">MS</text></g>
+            <g class="pulse-soft" style="animation-delay:.8s">  <circle cx="42"  cy="118" r="6" fill="#fee2e2" stroke="#dc2626" stroke-width="1.3"/><text x="42"  y="121">MS</text></g>
+            <g class="pulse-soft" style="animation-delay:1.2s"> <circle cx="24"  cy="150" r="6" fill="#fee2e2" stroke="#dc2626" stroke-width="1.3"/><text x="24"  y="153">MS</text></g>
+            <g class="pulse-soft" style="animation-delay:1.6s"> <circle cx="187" cy="120" r="6" fill="#fee2e2" stroke="#dc2626" stroke-width="1.3"/><text x="187" y="123">MS</text></g>
+          </g>
+
+          <!-- rechts: Kalzium-Gerüst grösstenteils intakt, dehnt sich mit CO2 -->
+          <g class="cube-pulse">
+            <g fill="none" stroke="#d97706" stroke-width="2.5" stroke-linecap="round">
+              <line x1="235" y1="115" x2="350" y2="115"/><line x1="350" y1="115" x2="350" y2="195"/><line x1="350" y1="195" x2="235" y2="195"/><line x1="235" y1="195" x2="235" y2="115"/>
+              <line x1="255" y1="90"  x2="370" y2="90"/> <line x1="370" y1="90"  x2="370" y2="170"/><line x1="370" y1="170" x2="255" y2="170"/><line x1="255" y1="170" x2="255" y2="90"/>
+              <line x1="235" y1="115" x2="255" y2="90"/> <line x1="350" y1="115" x2="370" y2="90"/> <line x1="350" y1="195" x2="370" y2="170"/><line x1="235" y1="195" x2="255" y2="170"/>
+            </g>
+
+            <!-- Ca geblieben (10 von 12) -->
+            <g fill="#e2e8f0" stroke="#64748b" stroke-width="1.5">
+              <circle cx="292.5" cy="115"   r="6.5"/><circle cx="350" cy="155"   r="6.5"/><circle cx="235" cy="155"   r="6.5"/>
+              <circle cx="312.5" cy="90"    r="6.5"/><circle cx="370" cy="130"   r="6.5"/><circle cx="255" cy="130"   r="6.5"/>
+              <circle cx="245" cy="102.5"   r="6.5"/><circle cx="360" cy="102.5" r="6.5"/><circle cx="360" cy="182.5" r="6.5"/><circle cx="245" cy="182.5" r="6.5"/>
+            </g>
+            <g font-family="system-ui,sans-serif" font-size="6" font-weight="800" fill="#334155" text-anchor="middle">
+              <text x="292.5" y="118">Ca</text><text x="350" y="158">Ca</text><text x="235" y="158">Ca</text>
+              <text x="312.5" y="93">Ca</text><text x="370" y="133">Ca</text><text x="255" y="133">Ca</text>
+              <text x="245" y="105.5">Ca</text><text x="360" y="105.5">Ca</text><text x="360" y="185.5">Ca</text><text x="245" y="185.5">Ca</text>
+            </g>
+
+            <!-- Ca weg (nur 2 von 12, minimaler Verlust) -->
+            <g fill="none" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="2,2" opacity="0.5">
+              <circle cx="292.5" cy="195" r="6.5"/><circle cx="312.5" cy="170" r="6.5"/>
+            </g>
+          </g>
+
+          <!-- kaum Milchsäure vorhanden, nur ein vereinzeltes Tröpfchen -->
+          <g class="pulse-soft" font-family="system-ui,sans-serif" font-size="6" font-weight="800" fill="#dc2626" text-anchor="middle" opacity="0.6">
+            <circle cx="305" cy="210" r="5.5" fill="#fee2e2" stroke="#dc2626" stroke-width="1.2"/><text x="305" y="213">MS</text>
+          </g>
+          <g class="bubble-grow">
+            <circle cx="292" cy="150" r="20" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+            <text x="292" y="153" font-family="system-ui,sans-serif" font-size="8" font-weight="800" fill="#15803d" text-anchor="middle">CO₂</text>
+          </g>
+        </g>
+      </svg>
+    </div>
+
+    <div class="step-info">
+      <div class="step-title" id="stepTitle"></div>
+      <div class="step-text"  id="stepText"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-ghost"   id="prevBtn" onclick="prevStep()">&#8592; Zurück</button>
+      <button class="btn btn-primary" id="playBtn" onclick="toggleAutoplay()">&#9654; Abspielen</button>
+      <button class="btn btn-ghost"   id="nextBtn" onclick="nextStep()">Weiter &#8594;</button>
+    </div>
+    <p class="keyboard-hint"><kbd>&#8592;</kbd> <kbd>&#8594;</kbd> navigieren · <kbd>Leertaste</kbd> abspielen</p>
+
+  </div>
+
+</main>
+
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+
+<script>
+var STEPS = [
+  {
+    scene: 'scene0',
+    title: 'Ausgangslage: normale Milch',
+    text:  'Milch ohne Wasserzusatz enthält eine hohe Konzentration an Milchzucker (Laktose), dem Gärmaterial für die Milchsäuregärung.',
+  },
+  {
+    scene: 'scene1',
+    title: 'Wasserzusatz verdünnt den Milchzucker',
+    text:  'Käser setzen der Milch oder dem Bruch bis zu 10 Prozent Trinkwasser zu. Der Milchzucker verteilt sich dadurch auf mehr Volumen, seine Konzentration sinkt.',
+  },
+  {
+    scene: 'scene2',
+    title: 'Wirkung auf die Milchsäurekonzentration',
+    text:  'Weniger Milchzucker ergibt weniger Milchsäure. Der Käser kann so die Milchsäuremenge im Käse gezielt über den Wasserzusatz steuern.',
+  },
+  {
+    scene: 'scene3',
+    title: 'Wirkung auf das Kaseingerüst',
+    text:  'Milchsäure löst Kalzium aus dem Kasein-Kalzium-Gerüst. Bei hoher Konzentration löst sich viel Kalzium, der Teig wird kurz und spröde. Bei tiefer Konzentration bleibt das Gerüst weitgehend intakt, der Teig bleibt lang und dehnbar und hält auch Gasdruck stand, ohne zu reissen.',
+  },
+];
+
+var currentStep = 0;
+
+function applyStepVisuals() {
+  var s = STEPS[currentStep];
+
+  document.querySelectorAll('.scene').forEach(function(sc) {
+    sc.classList.toggle('active', sc.id === s.scene);
+  });
+
+  document.getElementById('stepTitle').textContent = s.title;
+  document.getElementById('stepText').textContent  = s.text;
+
+  document.getElementById('prevBtn').disabled = (currentStep === 0);
+  document.getElementById('nextBtn').disabled = (currentStep === STEPS.length-1);
+
+  document.querySelectorAll('.step-dot').forEach(function(d,i) {
+    d.classList.toggle('active', i === currentStep);
+  });
+}
+
+function goToStep(newStep) {
+  if (newStep < 0 || newStep >= STEPS.length) return;
+  currentStep = newStep;
+  applyStepVisuals();
+}
+
+function nextStep() { goToStep(currentStep+1); }
+function prevStep() { goToStep(currentStep-1); }
+
+var autoplay = false, autoTimer = null;
+function scheduleNext() {
+  autoTimer = setTimeout(function() {
+    if (!autoplay) return;
+    goToStep((currentStep+1) % STEPS.length);
+    scheduleNext();
+  }, 4200);
+}
+function setPlayLabel() {
+  document.getElementById('playBtn').innerHTML = autoplay ? '&#10074;&#10074; Pause' : '&#9654; Abspielen';
+}
+function toggleAutoplay() {
+  autoplay = !autoplay;
+  setPlayLabel();
+  clearTimeout(autoTimer);
+  if (autoplay) {
+    if (currentStep === STEPS.length-1) goToStep(0);
+    scheduleNext();
+  }
+}
+
+var dotsWrap = document.getElementById('stepDots');
+for (var i = 0; i < STEPS.length; i++) {
+  (function(idx) {
+    var d = document.createElement('div');
+    d.className = 'step-dot';
+    d.title = STEPS[idx].title;
+    d.addEventListener('click', function() { goToStep(idx); });
+    dotsWrap.appendChild(d);
+  })(i);
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight') { nextStep(); }
+  if (e.key === 'ArrowLeft')  { prevStep(); }
+  if (e.key === ' ')          { e.preventDefault(); toggleAutoplay(); }
+});
+
+applyStepVisuals();
+setPlayLabel();
+</script>
+</body>
+</html>

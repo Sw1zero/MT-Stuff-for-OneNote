@@ -23,7 +23,8 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 │   ├── memory-aop-kaese.html
 │   ├── quiz-gesetzliches-kaese.html
 │   ├── tabellen-luecken-vlth-artikel.html
-│   └── zuordnung-verordnungen.html
+│   ├── zuordnung-verordnungen.html
+│   └── animation-wasserzusatz-teigelastizitaet.html
 ├── b5-quark/
 │   └── animation-labgerinnung.html
 ├── b7-sauermilch/
