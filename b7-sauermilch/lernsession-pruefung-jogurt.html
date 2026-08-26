@@ -153,6 +153,9 @@
     .badge-chip .lock { opacity:0.6; }
     .finish ul { text-align:left; max-width:500px; margin:0 auto 20px; font-size:0.86rem; color:var(--text); line-height:1.6; }
     .finish li { margin-bottom:6px; }
+    .score-breakdown { list-style:none; text-align:left; max-width:420px; margin:0 auto 18px; font-size:0.84rem; color:var(--text); padding:0; }
+    .score-breakdown li { display:flex; justify-content:space-between; gap:12px; padding:5px 0; border-bottom:1px solid var(--border); }
+    .score-breakdown li:last-child { border-bottom:none; }
 
     .ls-nav { display:flex; justify-content:space-between; gap:10px; }
     .ls-nav .spacer { flex:1; }
@@ -596,7 +599,7 @@ document.addEventListener('touchend', function(){
 
 /* Wahr / Falsch */
 function buildTF(idx, st){
-  maxPts[idx]=st.items.length;
+  maxPts[idx]=st.items.length*0.5;
   var body=document.getElementById('body-'+idx);
   st.items.forEach(function(it, ii){
     var item=document.createElement('div'); item.className='tf-item';
@@ -612,7 +615,7 @@ function buildTF(idx, st){
       if(body.querySelector('.tf-btn[data-i="'+ii+'"]:disabled')) return;
       var it=st.items[ii];
       body.querySelectorAll('.tf-btn[data-i="'+ii+'"]').forEach(function(b){ b.disabled=true; if((b.dataset.v==='true')===it.a) b.classList.add('reveal'); });
-      if(pick===it.a){ btn.classList.add('sel-correct'); earned[idx]++; registerAnswer(true); } else { btn.classList.add('sel-wrong'); registerAnswer(false); }
+      if(pick===it.a){ btn.classList.add('sel-correct'); earned[idx]+=0.5; registerAnswer(true); } else { btn.classList.add('sel-wrong'); registerAnswer(false); }
       document.getElementById('tfexp-'+idx+'-'+ii).classList.add('show');
       var answered=0; for(var k=0;k<st.items.length;k++){ if(document.querySelector('#body-'+idx+' .tf-btn[data-i="'+k+'"]:disabled')) answered++; }
       if(answered===st.items.length) solved[idx]=true;
@@ -624,7 +627,7 @@ function buildTF(idx, st){
 /* Beschriften */
 /* Beschriften – Challenge: eintippen */
 function buildLabelType(idx, st){
-  maxPts[idx]=st.items.length;
+  maxPts[idx]=st.items.length*0.5;
   var html='<div class="slots-grid">';
   st.items.forEach(function(it){
     html+='<div class="slot-row"><div class="slot-num">'+it.n+'</div><div class="type-cell">'+
@@ -647,13 +650,13 @@ function buildLabelType(idx, st){
       if(ok){ inp.classList.add('correct'); sol.style.display='none'; correct++; } else { inp.classList.add('wrong'); sol.textContent='→ '+it.name; sol.style.display='block'; }
       registerAnswer(ok);
     });
-    earned[idx]=correct; solved[idx]=true; this.disabled=true; updateNav();
+    earned[idx]=correct*0.5; solved[idx]=true; this.disabled=true; updateNav();
   });
 }
 
 /* Beschriften – Lernpfad: zuordnen per Auswahl */
 function buildLabelChoose(idx, st){
-  maxPts[idx]=st.items.length;
+  maxPts[idx]=st.items.length*0.5;
   var names=st.items.map(function(it){return it.name;}).filter(function(v,i,a){return a.indexOf(v)===i;});
   var optHtml=shuffle(names).map(function(o){return '<option>'+o+'</option>';}).join('');
   var html='<div class="slots-grid">';
@@ -673,7 +676,7 @@ function buildLabelChoose(idx, st){
       if(ok){ sel.classList.add('correct'); sol.style.display='none'; correct++; } else { sel.classList.add('wrong'); sol.textContent='→ '+it.name; sol.style.display='block'; }
       sel.disabled=true; registerAnswer(ok);
     });
-    earned[idx]=correct; solved[idx]=true; this.disabled=true; updateNav();
+    earned[idx]=correct*0.5; solved[idx]=true; this.disabled=true; updateNav();
   });
 }
 
@@ -690,18 +693,18 @@ function buildGaps(idx, st){
   });
   html+='</div><div class="check-btn-row"><button class="btn btn-primary" id="gapcheck-'+idx+'">Prüfen</button></div>';
   document.getElementById('body-'+idx).innerHTML=html;
-  maxPts[idx]=gapCount;
+  maxPts[idx]=gapCount*0.5;
   document.getElementById('gapcheck-'+idx).addEventListener('click', function(){
     if(solved[idx]) return;
     var sels=document.querySelectorAll('#body-'+idx+' select'); var ok=0;
     sels.forEach(function(sel){ sel.classList.remove('correct','wrong'); var good=(+sel.value===+sel.dataset.correct); if(good){sel.classList.add('correct'); ok++;} else sel.classList.add('wrong'); sel.disabled=true; registerAnswer(good); });
-    earned[idx]=ok; solved[idx]=true; this.disabled=true; updateNav();
+    earned[idx]=ok*0.5; solved[idx]=true; this.disabled=true; updateNav();
   });
 }
 
 /* Quiz */
 function buildQuiz(idx, st){
-  maxPts[idx]=st.questions.length;
+  maxPts[idx]=st.questions.length*0.5;
   var body=document.getElementById('body-'+idx);
   st.questions.forEach(function(qq, qi){
     var block=document.createElement('div'); block.className='q-block';
@@ -714,7 +717,7 @@ function buildQuiz(idx, st){
       var qi=+btn.dataset.q, oi=+btn.dataset.o, qq=st.questions[qi];
       if(body.querySelector('.opt[data-q="'+qi+'"]:disabled')) return;
       body.querySelectorAll('.opt[data-q="'+qi+'"]').forEach(function(b){ b.disabled=true; if(+b.dataset.o===qq.correct) b.classList.add('correct'); });
-      if(oi!==qq.correct){ btn.classList.add('wrong'); registerAnswer(false); } else { earned[idx]++; registerAnswer(true); }
+      if(oi!==qq.correct){ btn.classList.add('wrong'); registerAnswer(false); } else { earned[idx]+=0.5; registerAnswer(true); }
       var answered=0; for(var k=0;k<st.questions.length;k++){ if(document.querySelector('#body-'+idx+' .opt[data-q="'+k+'"]:disabled')) answered++; }
       if(answered===st.questions.length) solved[idx]=true;
       updateNav();
@@ -756,7 +759,11 @@ function goNext(){ if(current<N){ if(!solved[current]) return; current++; if(cur
 function goPrev(){ if(current===0) return; if(current>=N) current=N-1; else current--; showCard(current); document.getElementById('nextBtn').style.visibility='visible'; document.getElementById('nextBtn').disabled=false; updateNav(); }
 
 function showFinish(){
-  var total=0, max=0; for(var i=0;i<N;i++){ total+=earned[i]; max+=maxPts[i]; }
+  var total=0, max=0, expGood=0, expTotal=0;
+  for(var i=0;i<N;i++){
+    if(STATIONS[i].type==='explain'){ expGood+=earned[i]; expTotal+=maxPts[i]; }
+    else { total+=earned[i]; max+=maxPts[i]; }
+  }
   var pct=max>0?Math.round(total/max*100):0;
   var rank = pct>=90?'Joghurt-Meister 🥇' : pct>=75?'Joghurt-Profi' : pct>=50?'Joghurt-Geselle' : 'Joghurt-Lehrling';
   var aIdx=findIdx('anlage'), kIdx=findIdx('kulturen'), bIdx=findIdx('boss'), oIdx=findIdx('ablauf');
@@ -769,11 +776,20 @@ function showFinish(){
     { icon:'🥇', name:'Joghurt-Meister (90%)', got: pct>=90 }
   ];
   var got=0, bh=''; badges.forEach(function(b){ if(b.got) got++; bh+='<span class="badge-chip'+(b.got?' earned':'')+'">'+(b.got?b.icon:'<span class="lock">🔒</span>')+' '+b.name+'</span>'; });
-  var headline, scoreSub;
+
+  var breakdown='<ul class="score-breakdown">';
+  for(var bi=0;bi<N;bi++){
+    if(STATIONS[bi].type==='explain') continue;
+    breakdown+='<li><span>'+STATIONS[bi].title+'</span><span>'+earned[bi]+' / '+maxPts[bi]+' P.</span></li>';
+  }
+  breakdown+='</ul>';
+
+  var headline, scoreSub, explainNote='';
   if(MODE==='challenge'){
-    var note = max>0 ? Math.round((1 + total/max*5)*2)/2 : 1;
+    var note = max>0 ? Math.round((1 + total/max*5)*10)/10 : 1;
     headline = '<div class="big-score">Note '+note.toFixed(1)+'</div>';
     scoreSub = '<div class="score-sub">'+total+' / '+max+' Punkte ('+pct+' %) · simulierte Note, keine offizielle Bewertung</div>';
+    if(expTotal>0) explainNote = '<div class="score-sub">Erklären-Karten: '+expGood+' von '+expTotal+' selbst als «gewusst» eingeschätzt (nicht in der Note)</div>';
   } else {
     headline = '<div class="rank">'+rank+'</div><div class="big-score">'+xp+' XP</div>';
     scoreSub = '<div class="score-sub">'+total+' / '+max+' Punkte ('+pct+' %) · längste Serie 🔥 '+bestStreak+' · '+got+'/'+badges.length+' Abzeichen</div>';
@@ -782,6 +798,8 @@ function showFinish(){
     '<div class="station-kicker">Geschafft</div>'+
     headline+
     scoreSub+
+    explainNote+
+    breakdown+
     '<div class="badges">'+bh+'</div>'+
     '<ul>'+
       '<li>Ablauf: aufbereiten (standardisieren, Trockenmasse, homogenisieren, erhitzen) → säuern (kühlen, impfen, bebrüten) → fertigstellen.</li>'+
