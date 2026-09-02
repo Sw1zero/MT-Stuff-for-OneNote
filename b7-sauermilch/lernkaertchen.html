@@ -112,6 +112,37 @@
       justify-content: center;
       margin-bottom: 12px;
     }
+
+    /* ---- Richtig/Falsch-Bestätigung ---- */
+    .rating-row {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+
+    .btn-danger {
+      background: var(--red);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(204,51,51,0.25);
+    }
+
+    .btn-danger:hover { background: var(--red-dark); }
+
+    /* ---- Abschluss-Bildschirm ---- */
+    .complete-panel {
+      width: 440px;
+      max-width: 92vw;
+      padding: 40px 36px;
+      text-align: center;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      margin-bottom: 32px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+    }
   </style>
 </head>
 <body>
@@ -138,7 +169,7 @@
     <div class="progress-bar-fill" id="progressBar"></div>
   </div>
 
-  <div class="scene" id="scene" onclick="flipCard()">
+  <div class="scene" id="scene">
     <div class="card" id="card">
       <div class="card-face card-front">
         <span class="card-category-badge" id="frontLabel"></span>
@@ -152,13 +183,22 @@
     </div>
   </div>
 
-  <div class="controls">
-    <button class="btn btn-ghost" onclick="prevCard()">&#8592; Zurück</button>
-    <button class="btn btn-success" onclick="flipCard()">Umdrehen</button>
-    <button class="btn btn-ghost" onclick="nextCard()">Weiter &#8594;</button>
+  <div class="complete-panel" id="completePanel" hidden>
+    <p id="completeText">Alle Karten gewusst.</p>
+  </div>
+
+  <div class="rating-row" id="ratingRow" hidden>
+    <button class="btn btn-danger" id="unknownBtn">Wusste ich nicht</button>
+    <button class="btn btn-success" id="knownBtn">Wusste ich</button>
+  </div>
+
+  <div class="controls" id="controlsNav">
+    <button class="btn btn-ghost" id="prevBtn">&#8592; Zurück</button>
+    <button class="btn btn-success" id="flipBtn">Umdrehen</button>
+    <button class="btn btn-ghost" id="nextBtn">Weiter &#8594;</button>
   </div>
   <div class="controls">
-    <button class="btn btn-primary" onclick="shuffle()">&#x21C4; Mischen</button>
+    <button class="btn btn-primary" id="shuffleBtn">&#x21C4; Mischen</button>
   </div>
 
   <p class="keyboard-hint" style="margin-top:12px;">
@@ -248,82 +288,10 @@
       "Qualitätsmängel":  { bg: "#ffedd5", fg: "#9a3412" },
     };
 
-    let deck = [...ALL_CARDS];
-    let currentIndex = 0;
-    let isFlipped = false;
-    let activeCategory = "Alle";
-
-    function getFilteredDeck() {
-      return activeCategory === "Alle" ? [...ALL_CARDS] : ALL_CARDS.filter(c => c.category === activeCategory);
-    }
-
-    function renderFilters() {
-      const wrap = document.getElementById("filterWrap");
-      const categories = ["Alle", ...Object.keys(CATEGORY_COLORS)];
-      wrap.innerHTML = categories.map(cat => {
-        const count = cat === "Alle" ? ALL_CARDS.length : ALL_CARDS.filter(c => c.category === cat).length;
-        return `<button class="filter-btn ${cat === activeCategory ? "active" : ""}"
-                  onclick="setCategory('${cat}')">${cat} <span style="opacity:0.65;font-size:0.68rem">${count}</span></button>`;
-      }).join("");
-    }
-
-    function setCategory(cat) {
-      activeCategory = cat;
-      deck = getFilteredDeck();
-      currentIndex = 0;
-      renderFilters();
-      showCard();
-    }
-
-    function shuffle() {
-      for (let i = deck.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [deck[i], deck[j]] = [deck[j], deck[i]];
-      }
-      currentIndex = 0;
-      showCard(true);
-    }
-
-    function showCard(forceUnflip = false) {
-      if (isFlipped || forceUnflip) {
-        isFlipped = false;
-        document.getElementById("card").classList.remove("flipped");
-      }
-      const c = deck[currentIndex];
-      const col = CATEGORY_COLORS[c.category] || { bg: "#f1f5f9", fg: "#4a5568" };
-
-      document.getElementById("frontTerm").textContent = c.term;
-      document.getElementById("backExplanation").textContent = c.explanation;
-
-      ["frontLabel", "backLabel"].forEach(id => {
-        const el = document.getElementById(id);
-        el.textContent = c.category;
-        el.style.background = col.bg;
-        el.style.color = col.fg;
-      });
-
-      const total = deck.length;
-      document.getElementById("progressText").textContent = `Karte ${currentIndex + 1} von ${total}`;
-      document.getElementById("progressBar").style.width = `${((currentIndex + 1) / total) * 100}%`;
-    }
-
-    function flipCard() {
-      isFlipped = !isFlipped;
-      document.getElementById("card").classList.toggle("flipped");
-    }
-
-    function nextCard() { currentIndex = (currentIndex + 1) % deck.length; showCard(true); }
-    function prevCard() { currentIndex = (currentIndex - 1 + deck.length) % deck.length; showCard(true); }
-
-    document.addEventListener("keydown", e => {
-      if (e.key === " " || e.key === "Enter") { e.preventDefault(); flipCard(); }
-      if (e.key === "ArrowRight") nextCard();
-      if (e.key === "ArrowLeft")  prevCard();
-      if (e.key === "s" || e.key === "S") shuffle();
-    });
-
-    renderFilters();
-    showCard();
+  </script>
+  <script src="../assets/lernkaertchen-engine.js"></script>
+  <script>
+    MTFlashcards.init({ cards: ALL_CARDS, categoryColors: CATEGORY_COLORS });
   </script>
 </body>
 </html>
