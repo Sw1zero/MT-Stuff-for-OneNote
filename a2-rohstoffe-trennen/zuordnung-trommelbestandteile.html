@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Trommelbestandteile zuordnen – a.2</title>
   <link rel="stylesheet" href="../style.css">
+  <script src="../assets/dnd.js"></script>
   <style>
     .back-link { display:inline-block; font-size:0.82rem; color:var(--text-muted); text-decoration:none; margin-bottom:1rem; }
     .back-link:hover { color:var(--red); }
@@ -129,13 +130,6 @@
     .result-msg.success { color: #15803d; }
 
     .actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
-
-    #touchClone {
-      position: fixed; pointer-events: none; z-index: 9999; opacity: 0.88; transform: scale(1.06);
-      border-radius: 20px; padding: 0.32rem 0.85rem; background: var(--blue-dark); color: #fff;
-      font-family: var(--font); font-size: 0.82rem; font-weight: 500;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.25); white-space: nowrap; display: none;
-    }
   </style>
 </head>
 <body>
@@ -174,8 +168,6 @@
 </div>
 </main>
 
-<div id="touchClone"></div>
-
 <footer class="bzwu-footer">
   BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
   <br><span style="font-size:0.68rem;">&copy; Biblioth&egrave;que BBZN</span>
@@ -198,32 +190,23 @@ var PARTS = [
 
 var selectedChip = null;
 var dragWord = null, dragSource = null;
-var touchWord = null, touchSource = null;
-var touchCloneEl = document.getElementById('touchClone');
-var touchOffX = 0, touchOffY = 0;
-
-function shuffle(arr) {
-  var a = arr.slice();
-  for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; }
-  return a;
-}
 
 function buildUI() {
   buildBank();
   buildGrid();
-  selectedChip = dragWord = dragSource = touchWord = touchSource = null;
+  selectedChip = dragWord = dragSource = null;
   clearResultMsg();
 }
 
 function buildBank() {
   var bank = document.getElementById('wordBank');
   bank.innerHTML = '';
-  shuffle(PARTS.map(function(p){ return p.name; })).forEach(function(word) {
+  MTDnD.shuffle(PARTS.map(function(p){ return p.name; })).forEach(function(word) {
     var chip = document.createElement('span');
     chip.className = 'word-chip'; chip.textContent = word; chip.dataset.word = word;
     chip.setAttribute('draggable', 'true');
     chip.addEventListener('dragstart', function(e) { dragWord = word; dragSource = chip; e.dataTransfer.effectAllowed = 'move'; });
-    chip.addEventListener('touchstart', function(e) { onTouchStart(e, chip, word, false); }, {passive:false});
+    chip.addEventListener('touchstart', function(e) { MTDnD.touchStart(e, chip, word, false, '.photo-card', onDropTouch); }, {passive:false});
     chip.addEventListener('click', function() { selectChip(chip, word); });
     bank.appendChild(chip);
   });
@@ -232,7 +215,7 @@ function buildBank() {
 function buildGrid() {
   var grid = document.getElementById('photoGrid');
   grid.innerHTML = '';
-  shuffle(PARTS.slice()).forEach(function(part) {
+  MTDnD.shuffle(PARTS.slice()).forEach(function(part) {
     var card = document.createElement('div');
     card.className = 'photo-card'; card.dataset.partId = part.id;
 
@@ -301,40 +284,12 @@ function placeChipInSlot(slot, card, word, bankChip) {
   };
 }
 
-function onTouchStart(e, el, word, isChip) {
-  if (e.touches.length !== 1) return;
-  e.preventDefault();
-  var t = e.touches[0], rect = el.getBoundingClientRect();
-  touchWord = word; touchSource = {el:el, isChip:isChip};
-  touchOffX = t.clientX - rect.left; touchOffY = t.clientY - rect.top;
-  touchCloneEl.textContent = word;
-  touchCloneEl.style.left = (t.clientX - touchOffX) + 'px';
-  touchCloneEl.style.top  = (t.clientY - touchOffY) + 'px';
-  touchCloneEl.style.display = 'block';
-  el.style.opacity = '0.25';
-}
-document.addEventListener('touchmove', function(e) {
-  if (!touchWord) return;
-  e.preventDefault();
-  var t = e.touches[0];
-  touchCloneEl.style.left = (t.clientX - touchOffX) + 'px';
-  touchCloneEl.style.top  = (t.clientY - touchOffY) + 'px';
-}, {passive:false});
-document.addEventListener('touchend', function(e) {
-  if (!touchWord) return;
-  var t = e.changedTouches[0];
-  touchCloneEl.style.display = 'none';
-  touchSource.el.style.opacity = '';
-  var under = document.elementFromPoint(t.clientX, t.clientY);
-  var card = under ? under.closest('.photo-card') : null;
-  if (card) {
-    var slot = card.querySelector('.photo-slot');
-    if (!slot.classList.contains('filled') && !slot.classList.contains('correct')) {
-      placeChipInSlot(slot, card, touchWord, touchSource.el);
-    }
+function onDropTouch(card, word, source) {
+  var slot = card.querySelector('.photo-slot');
+  if (!slot.classList.contains('filled') && !slot.classList.contains('correct')) {
+    placeChipInSlot(slot, card, word, source.el);
   }
-  touchWord = touchSource = null;
-});
+}
 
 function clearResultMsg() {
   document.getElementById('resultMsg').textContent = '';
