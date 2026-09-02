@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Wahr oder Falsch – Personalhygiene</title>
   <link rel="stylesheet" href="../style.css">
+  <script src="../assets/wahr-falsch-swipe.js"></script>
   <style>
     .back-link {
       display: inline-block;
@@ -260,8 +261,8 @@
     <div class="card-stack" id="cardStack"></div>
 
     <div class="action-btns">
-      <button type="button" class="action-btn btn-falsch" onclick="swipe('left')"  title="Falsch">✕</button>
-      <button type="button" class="action-btn btn-wahr"   onclick="swipe('right')" title="Wahr">✓</button>
+      <button type="button" class="action-btn btn-falsch" onclick="MTWahrFalsch.swipe('left')"  title="Falsch">✕</button>
+      <button type="button" class="action-btn btn-wahr"   onclick="MTWahrFalsch.swipe('right')" title="Wahr">✓</button>
     </div>
 
     <p class="keyboard-hint">
@@ -271,7 +272,7 @@
     <div class="end-screen" id="endScreen">
       <div class="end-score" id="endScore">0 <span>/ 12</span></div>
       <div class="end-msg"   id="endMsg"></div>
-      <button type="button" class="btn btn-primary" onclick="startGame()">Nochmals spielen</button>
+      <button type="button" class="btn btn-primary" onclick="MTWahrFalsch.startGame()">Nochmals spielen</button>
     </div>
 
   </div>
@@ -350,235 +351,7 @@ var CARDS = [
   }
 ];
 
-var deck = [];
-var current = 0;
-var scoreCorrect = 0;
-var scoreWrong   = 0;
-
-var dragging   = false;
-var startX     = 0;
-var currentX   = 0;
-var topCard    = null;
-var toastTimer = null;
-
-function shuffle(arr) {
-  var a = arr.slice();
-  for (var i = a.length - 1; i > 0; i--) {
-    var j = Math.floor(Math.random() * (i + 1));
-    var t = a[i]; a[i] = a[j]; a[j] = t;
-  }
-  return a;
-}
-
-function startGame() {
-  deck = shuffle(CARDS);
-  current = 0;
-  scoreCorrect = 0;
-  scoreWrong   = 0;
-  document.getElementById('scoreCorrect').textContent = '0';
-  document.getElementById('scoreWrong').textContent   = '0';
-  document.getElementById('endScreen').className = 'end-screen';
-  document.getElementById('cardStack').style.display = '';
-  document.querySelector('.action-btns').style.display = '';
-  buildStack();
-}
-
-function buildStack() {
-  var stack = document.getElementById('cardStack');
-  stack.innerHTML = '';
-
-  for (var i = Math.min(current + 2, deck.length - 1); i >= current; i--) {
-    var card = createCardEl(i);
-    if (i === current) {
-      card.classList.add('top');
-      attachDrag(card);
-      topCard = card;
-    } else if (i === current + 1) {
-      card.classList.add('behind-1');
-    } else {
-      card.classList.add('behind-2');
-    }
-    stack.appendChild(card);
-  }
-
-  document.getElementById('cardNum').textContent = current + 1;
-}
-
-function createCardEl(idx) {
-  var card = document.createElement('div');
-  card.className = 'swipe-card';
-
-  var num = document.createElement('div');
-  num.className = 'card-number';
-  num.textContent = 'Aussage ' + (idx + 1) + ' von ' + CARDS.length;
-
-  var stmt = document.createElement('div');
-  stmt.className = 'card-statement';
-  stmt.textContent = deck[idx].statement;
-
-  var vW = document.createElement('div');
-  vW.className = 'vote-overlay vote-wahr';
-  vW.textContent = 'WAHR';
-
-  var vF = document.createElement('div');
-  vF.className = 'vote-overlay vote-falsch';
-  vF.textContent = 'FALSCH';
-
-  card.appendChild(num);
-  card.appendChild(stmt);
-  card.appendChild(vW);
-  card.appendChild(vF);
-  return card;
-}
-
-function attachDrag(card) {
-  card.addEventListener('mousedown', function(e) {
-    dragging = true;
-    startX   = e.clientX;
-    card.classList.remove('snapping');
-  });
-  document.addEventListener('mousemove', onMove);
-  document.addEventListener('mouseup',   onEnd);
-
-  card.addEventListener('touchstart', function(e) {
-    dragging = true;
-    startX   = e.touches[0].clientX;
-    card.classList.remove('snapping');
-  }, {passive: true});
-  document.addEventListener('touchmove', onMoveTouch, {passive: true});
-  document.addEventListener('touchend',  onEndTouch);
-}
-
-function onMove(e) {
-  if (!dragging || !topCard) return;
-  currentX = e.clientX - startX;
-  updateCardPos();
-}
-function onMoveTouch(e) {
-  if (!dragging || !topCard) return;
-  currentX = e.touches[0].clientX - startX;
-  updateCardPos();
-}
-
-function updateCardPos() {
-  var rotate  = currentX / 12;
-  var opacity = Math.min(Math.abs(currentX) / 80, 1);
-  topCard.style.transform = 'translateX(' + currentX + 'px) rotate(' + rotate + 'deg)';
-
-  var vW = topCard.querySelector('.vote-wahr');
-  var vF = topCard.querySelector('.vote-falsch');
-  if (currentX > 0) {
-    vW.style.opacity = opacity;
-    vF.style.opacity = 0;
-  } else {
-    vF.style.opacity = opacity;
-    vW.style.opacity = 0;
-  }
-}
-
-function onEnd() {
-  if (!dragging) return;
-  dragging = false;
-  finishDrag();
-  document.removeEventListener('mousemove', onMove);
-  document.removeEventListener('mouseup',   onEnd);
-}
-function onEndTouch() {
-  if (!dragging) return;
-  dragging = false;
-  finishDrag();
-  document.removeEventListener('touchmove', onMoveTouch);
-  document.removeEventListener('touchend',  onEndTouch);
-}
-
-function finishDrag() {
-  if (!topCard) return;
-  if (Math.abs(currentX) > 80) {
-    swipe(currentX > 0 ? 'right' : 'left');
-  } else {
-    topCard.classList.add('snapping');
-    topCard.style.transform = '';
-    topCard.querySelector('.vote-wahr').style.opacity = 0;
-    topCard.querySelector('.vote-falsch').style.opacity = 0;
-  }
-  currentX = 0;
-}
-
-function swipe(dir) {
-  if (!topCard || current >= deck.length) return;
-
-  var answered = dir === 'right';
-  var correct  = answered === deck[current].answer;
-
-  if (correct) scoreCorrect++;
-  else         scoreWrong++;
-
-  document.getElementById('scoreCorrect').textContent = scoreCorrect;
-  document.getElementById('scoreWrong').textContent   = scoreWrong;
-
-  topCard.querySelector('.vote-wahr').style.opacity   = dir === 'right' ? 1 : 0;
-  topCard.querySelector('.vote-falsch').style.opacity = dir === 'left'  ? 1 : 0;
-
-  var flyClass = dir === 'right' ? 'flying-right' : 'flying-left';
-  topCard.classList.add(flyClass);
-  topCard.style.transform = 'translateX(' + (dir === 'right' ? '150%' : '-150%') + ') rotate(' + (dir === 'right' ? 25 : -25) + 'deg)';
-  topCard.style.opacity   = '0';
-
-  showFeedback(correct, deck[current].explanation);
-
-  current++;
-  var cardRef = topCard;
-  topCard = null;
-
-  setTimeout(function() {
-    cardRef.remove();
-    if (current < deck.length) {
-      buildStack();
-    } else {
-      showEnd();
-    }
-  }, 380);
-}
-
-function showFeedback(correct, text) {
-  var toast = document.getElementById('feedbackToast');
-  var label = document.getElementById('feedbackLabel');
-  var msg   = document.getElementById('feedbackText');
-
-  clearTimeout(toastTimer);
-  toast.className = 'feedback-toast';
-  label.className = 'feedback-label ' + (correct ? 'correct' : 'wrong');
-  label.textContent = correct ? 'Richtig!' : 'Falsch!';
-  msg.textContent   = text;
-
-  requestAnimationFrame(function() {
-    toast.classList.add('show', correct ? 'correct' : 'wrong');
-  });
-
-  toastTimer = setTimeout(function() {
-    toast.classList.remove('show');
-  }, 2800);
-}
-
-function showEnd() {
-  document.getElementById('cardStack').style.display = 'none';
-  document.querySelector('.action-btns').style.display = 'none';
-
-  var pct = Math.round(scoreCorrect / CARDS.length * 100);
-  document.getElementById('endScore').innerHTML = scoreCorrect + ' <span>/ ' + CARDS.length + '</span>';
-  document.getElementById('endMsg').textContent =
-    pct >= 85 ? 'Ausgezeichnet! Sie kennen die Regeln der Personalhygiene sehr gut.' :
-    pct >= 60 ? 'Gut gemacht! Einige Punkte nochmals wiederholen.' :
-                'Üben Sie weiter – schauen Sie nochmals ins Lehrmittel.';
-  document.getElementById('endScreen').className = 'end-screen show';
-}
-
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'ArrowRight') swipe('right');
-  if (e.key === 'ArrowLeft')  swipe('left');
-});
-
-startGame();
+MTWahrFalsch.init({ cards: CARDS, topicPhrase: 'die Regeln der Personalhygiene' });
 </script>
 
 </body>
