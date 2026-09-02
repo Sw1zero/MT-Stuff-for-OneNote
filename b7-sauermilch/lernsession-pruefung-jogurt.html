@@ -505,7 +505,7 @@ function buildOrder(idx, st){
       '<div class="ord-btns"><button type="button" class="ord-btn" data-dir="-1">▲</button><button type="button" class="ord-btn" data-dir="1">▼</button></div>'+
       '<div class="ord-text">'+st.steps[si]+'</div><div class="ord-tag"></div></div>';
   });
-  html+='</div><div class="check-btn-row"><button class="btn btn-primary" id="ordcheck-'+idx+'">Reihenfolge prüfen</button></div>';
+  html+='</div><div class="check-btn-row"><button class="btn btn-primary" id="ordcheck-'+idx+'">Überprüfen</button></div>';
   document.getElementById('body-'+idx).innerHTML=html;
   var list=document.getElementById('ord-'+idx);
 
