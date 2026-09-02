@@ -398,6 +398,15 @@ var ALL = [
         body:'<p><b>Lytischer Zyklus</b>: Die Phagen-Erbmasse übernimmt sofort das Kommando. Die Bakterienzelle bildet in 20–80 Minuten 50–300 neue Phagen, danach wird die Zellwand aufgelöst (Lyse) – das Bakterium ist zerstört, Kettenreaktion. <b>Folge: Säuerungsstörung.</b></p><p><b>Lysogener Zyklus</b>: Phagen-Erbsubstanz und Bakterien-Erbsubstanz bilden eine Einheit (Prophage) und vermehren sich gemeinsam bei der Zellteilung. Das Bakterium arbeitet normal weiter – keine Säuerungsstörung. Ein späterer Wechsel in den lytischen Zyklus ist möglich (ausgelöst z. B. durch veränderte Bedingungen, chemische Substanzen, UV-Strahlen).</p>'
       }
     ] },
+  { kicker:'Beschriften', title:'Bakteriophage beschriften', id:'phagen_label', type:'label',
+    lead:'Ordnen Sie jeder Nummer das richtige Bauteil zu.',
+    media:'<div style="position:relative;display:inline-block;width:300px;"><img src="images/a.8_Phage_unbeschriftet.png" alt="Aufbau eines Bakteriophagen mit vier nummerierten Linien" style="width:300px;display:block;"><span style="position:absolute;left:175px;top:54px;width:22px;height:22px;border-radius:50%;background:#134061;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;">1</span><span style="position:absolute;left:158px;top:90px;width:22px;height:22px;border-radius:50%;background:#134061;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;">2</span><span style="position:absolute;left:161px;top:223px;width:22px;height:22px;border-radius:50%;background:#134061;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;">3</span><span style="position:absolute;left:161px;top:327px;width:22px;height:22px;border-radius:50%;background:#134061;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;">4</span></div>',
+    items:[
+      { n:1, name:'Erbsubstanz', keys:['erbsubstanz','dna','erbgut','erbmasse'] },
+      { n:2, name:'Kopf',        keys:['kopf','traeger'] },
+      { n:3, name:'Schwanz',     keys:['schwanz'] },
+      { n:4, name:'Stachel',     keys:['stachel','anker'] }
+    ] },
   { kicker:'Quiz', title:'Bakteriophagen', id:'phagen_quiz', type:'quiz',
     lead:'Fünf Fragen.',
     questions:[
@@ -781,6 +790,110 @@ function buildExplain(idx, st){
   document.getElementById('expprev-'+idx).addEventListener('click', function(e){ e.stopPropagation(); if(cur>0){ cur--; show(); } });
 
   show();
+}
+
+/* Beschriften – Challenge: eintippen */
+function buildLabelType(idx, st){
+  maxPts[idx]=st.items.length*0.5;
+  var html='<div class="slots-grid">';
+  st.items.forEach(function(it){
+    html+='<div class="slot-row"><div class="slot-num">'+it.n+'</div><div class="type-cell">'+
+      '<input class="type-input" id="lb-'+idx+'-'+it.n+'" type="text" autocomplete="off" placeholder="Nr. '+it.n+' …">'+
+      '<div class="type-sol" id="lbsol-'+idx+'-'+it.n+'" style="display:none;"></div></div></div>';
+  });
+  html+='</div><div class="check-btn-row"><button class="btn btn-primary" id="lbcheck-'+idx+'">Überprüfen</button></div>';
+  document.getElementById('body-'+idx).innerHTML=html;
+  st.items.forEach(function(it, i){
+    document.getElementById('lb-'+idx+'-'+it.n).addEventListener('keydown', function(e){
+      if(e.key==='Enter'){ e.preventDefault(); var nx=st.items[i+1]; if(nx) document.getElementById('lb-'+idx+'-'+nx.n).focus(); }
+    });
+  });
+  document.getElementById('lbcheck-'+idx).addEventListener('click', function(){
+    if(solved[idx]) return; var correct=0;
+    st.items.forEach(function(it){
+      var inp=document.getElementById('lb-'+idx+'-'+it.n); var sol=document.getElementById('lbsol-'+idx+'-'+it.n);
+      inp.classList.remove('correct','wrong');
+      var ok=matchKeys(inp.value, it);
+      if(ok){ inp.classList.add('correct'); sol.style.display='none'; correct++; } else { inp.classList.add('wrong'); sol.textContent='→ '+it.name; sol.style.display='block'; }
+      registerAnswer(ok);
+    });
+    earned[idx]=correct*0.5; solved[idx]=true; this.disabled=true; updateNav();
+  });
+}
+
+/* Beschriften – Lernpfad: Drag & Drop (wie beschriften.html buildEinfach) */
+var _lbD={word:null,src:null,bank:null,sel:null,selChip:null};
+function _lbOnDrop(box, word, source){
+  if(box.classList.contains('correct')||box.classList.contains('wrong')) return;
+  var disp=box.dataset.filled||null;
+  if(source.isSlot){ _lbClear(source.el); if(disp) _lbFill(source.el,disp); }
+  else { _lbUse(word,_lbD.bank); if(disp) _lbRet(disp,_lbD.bank); }
+  _lbFill(box,word);
+}
+function _lbFill(box,word){ box.dataset.filled=word; box.textContent=word; box.className='lb-slot lb-filled'; box.setAttribute('draggable','true'); }
+function _lbClear(box){ delete box.dataset.filled; box.textContent='—'; box.className='lb-slot'; box.setAttribute('draggable','false'); }
+function _lbUse(word,bank){ var ok=false; bank.querySelectorAll('.lb-chip').forEach(function(c){ if(!ok&&c.dataset.word===word&&!c.classList.contains('used')){c.classList.add('used');ok=true;} }); }
+function _lbRet(word,bank){ var ok=false; bank.querySelectorAll('.lb-chip').forEach(function(c){ if(!ok&&c.dataset.word===word&&c.classList.contains('used')){c.classList.remove('used');ok=true;} }); }
+function _lbDrop(box){
+  if(!_lbD.word||box.classList.contains('correct')||box.classList.contains('wrong')) return;
+  var disp=box.dataset.filled||null;
+  if(_lbD.src&&_lbD.src.classList.contains('lb-slot')){ _lbClear(_lbD.src); if(disp) _lbFill(_lbD.src,disp); }
+  else { _lbUse(_lbD.word,_lbD.bank); if(disp) _lbRet(disp,_lbD.bank); }
+  _lbFill(box,_lbD.word); _lbD.word=_lbD.src=null;
+}
+function _lbSelChip(chip,word,bank){
+  if(chip.classList.contains('selected')){ chip.classList.remove('selected'); _lbD.sel=null; _lbD.selChip=null; document.querySelectorAll('.lb-slot.lb-ready').forEach(function(b){b.classList.remove('lb-ready');}); return; }
+  document.querySelectorAll('.lb-chip.selected').forEach(function(c){c.classList.remove('selected');});
+  chip.classList.add('selected'); _lbD.sel=word; _lbD.selChip=chip; _lbD.bank=bank;
+  document.querySelectorAll('.lb-slot').forEach(function(b){ b.classList.remove('lb-ready'); if(!b.dataset.filled&&!b.classList.contains('correct')&&!b.classList.contains('wrong')) b.classList.add('lb-ready'); });
+}
+function _lbClickBox(box,bank){
+  if(box.classList.contains('correct')||box.classList.contains('wrong')) return;
+  if(box.dataset.filled){ _lbRet(box.dataset.filled,bank); _lbClear(box); if(_lbD.sel) box.classList.add('lb-ready'); return; }
+  if(!_lbD.sel) return;
+  _lbFill(box,_lbD.sel); _lbUse(_lbD.sel,bank); _lbD.sel=null;
+  if(_lbD.selChip){_lbD.selChip.classList.remove('selected');_lbD.selChip=null;}
+  document.querySelectorAll('.lb-slot.lb-ready').forEach(function(b){b.classList.remove('lb-ready');});
+}
+function buildLabelChoose(idx,st){
+  maxPts[idx]=st.items.length*0.5;
+  var names=st.items.map(function(it){return it.name;}).filter(function(v,i,a){return a.indexOf(v)===i;});
+  var body=document.getElementById('body-'+idx);
+  var bank=document.createElement('div'); bank.className='lb-bank';
+  shuffle(names).forEach(function(word){
+    var chip=document.createElement('span'); chip.className='lb-chip'; chip.textContent=word; chip.dataset.word=word; chip.setAttribute('draggable','true');
+    chip.addEventListener('dragstart',function(e){_lbD.word=word;_lbD.src=chip;_lbD.bank=bank;e.dataTransfer.effectAllowed='move';});
+    chip.addEventListener('touchstart',function(e){_lbD.bank=bank;MTDnD.touchStart(e,chip,word,false,'.lb-slot',_lbOnDrop);},{passive:false});
+    chip.addEventListener('click',function(){_lbSelChip(chip,word,bank);});
+    bank.appendChild(chip);
+  });
+  body.appendChild(bank);
+  var grid=document.createElement('div'); grid.className='slots-grid';
+  st.items.forEach(function(p){
+    var row=document.createElement('div'); row.className='slot-row';
+    var badge=document.createElement('div'); badge.className='slot-num'; badge.textContent=p.n;
+    var box=document.createElement('div'); box.className='lb-slot'; box.dataset.slot=p.n; box.textContent='—';
+    box.addEventListener('dragover',function(e){e.preventDefault();if(!box.classList.contains('correct')&&!box.classList.contains('wrong'))box.classList.add('lb-over');});
+    box.addEventListener('dragleave',function(){box.classList.remove('lb-over');});
+    box.addEventListener('drop',function(e){e.preventDefault();box.classList.remove('lb-over');_lbDrop(box);});
+    box.addEventListener('dragstart',function(e){if(!box.dataset.filled){e.preventDefault();return;}_lbD.word=box.dataset.filled;_lbD.src=box;_lbD.bank=bank;e.dataTransfer.effectAllowed='move';});
+    box.addEventListener('touchstart',function(e){if(!box.dataset.filled)return;_lbD.bank=bank;MTDnD.touchStart(e,box,box.dataset.filled,true,'.lb-slot',_lbOnDrop);},{passive:false});
+    box.addEventListener('click',function(){_lbClickBox(box,bank);});
+    row.appendChild(badge);row.appendChild(box);grid.appendChild(row);
+  });
+  body.appendChild(grid);
+  var checkBtn=document.createElement('button'); checkBtn.className='btn btn-primary'; checkBtn.style.marginTop='12px';
+  checkBtn.textContent='Überprüfen';
+  checkBtn.addEventListener('click',function(){
+    if(solved[idx]) return; var correct=0;
+    st.items.forEach(function(p){
+      var box=grid.querySelector('[data-slot="'+p.n+'"]');
+      box.classList.remove('lb-filled','lb-over','lb-ready');
+      if(box.dataset.filled===p.name){box.classList.add('correct');correct++;}else{box.classList.add('wrong');}
+    });
+    earned[idx]=correct*0.5; solved[idx]=true; checkBtn.disabled=true; updateNav();
+  });
+  body.appendChild(checkBtn);
 }
 
 function renderProgress(){
