@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kulturen zubereiten – Prüfungsvorbereitung (a.8)</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="../assets/dnd.js"></script>
+  <style>
+    .back-link { display:inline-block; font-size:0.82rem; color:var(--text-muted); text-decoration:none; margin-bottom:1rem; }
+    .back-link:hover { color:var(--red); }
+    .ls-wrap { max-width:640px; margin:0 auto; }
+
+    .hud { display:flex; align-items:center; justify-content:space-between; gap:12px; background:var(--blue-dark); color:#fff; border-radius:var(--radius-md); padding:10px 14px; margin-bottom:14px; box-shadow:var(--shadow-sm); }
+    .hud-xp { display:flex; align-items:baseline; gap:5px; flex-shrink:0; }
+    .hud-label { font-size:0.6rem; font-weight:700; letter-spacing:0.1em; opacity:0.8; }
+    .hud-val { font-size:1.15rem; font-weight:800; display:inline-block; }
+    .hud-val.pop { animation:xppop 0.4s ease; }
+    @keyframes xppop { 0%{transform:scale(1);} 40%{transform:scale(1.45); color:#9ad1e8;} 100%{transform:scale(1);} }
+    .hud-bar { flex:1; height:8px; background:rgba(255,255,255,0.2); border-radius:4px; overflow:hidden; }
+    .hud-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#69A9C9,#9ad1e8); border-radius:4px; transition:width 0.4s ease; }
+    .hud-bar-fill.on-fire { animation:barpulse 0.9s ease-in-out infinite; }
+    @keyframes barpulse { 0%,100%{box-shadow:0 0 4px 1px rgba(154,209,232,0.4);} 50%{box-shadow:0 0 10px 3px rgba(154,209,232,0.85);} }
+    .hud-streak { position:relative; display:flex; align-items:center; gap:8px; font-size:0.84rem; font-weight:700; background:rgba(255,255,255,0.14); padding:3px 9px; border-radius:12px; white-space:nowrap; flex-shrink:0; transition:transform 0.15s, background 0.3s; }
+    .streak-num-fire { color:#ff8c00; text-shadow:0 0 6px rgba(255,100,0,0.8); }
+    .hud-streak.pulse { transform:scale(1.25); }
+    .streak-pop { position:absolute; top:-4px; right:-4px; font-size:0.72rem; font-weight:800; color:#ffa040; pointer-events:none; white-space:nowrap; animation:streakPopAnim 0.9s ease-out forwards; }
+    @keyframes streakPopAnim { 0%{opacity:1;transform:translateY(0) scale(1);} 70%{opacity:1;} 100%{opacity:0;transform:translateY(-20px) scale(0.75);} }
+    .hud-fire-wrap { display:inline-block; position:relative; width:22px; height:22px; vertical-align:middle; overflow:visible; flex-shrink:0; }
+    .hud-fire-wrap .fire { position:absolute; width:100px; height:100px; top:50%; left:50%; transform:translate(-50%,-50%) scale(0.22); transform-origin:center center; background:transparent; }
+    @keyframes scaleUpDown { 0%,100%{transform:scaleY(1) scaleX(1);} 50%,90%{transform:scaleY(1.1);} 75%{transform:scaleY(0.95);} 80%{transform:scaleX(0.95);} }
+    @keyframes shake { 0%,100%{transform:skewX(0) scale(1);} 50%{transform:skewX(5deg) scale(0.9);} }
+    @keyframes particleUp { 0%{opacity:0;} 20%{opacity:1;} 80%{opacity:1;} 100%{opacity:0;top:-100%;transform:scale(0.5);} }
+    @keyframes glow { 0%,100%{background-color:#ef5a00;} 50%{background-color:#ff7800;} }
+    .hud-fire-wrap .fire-center { position:absolute; height:100%; width:100%; animation:scaleUpDown 3s ease-out infinite both; }
+    .hud-fire-wrap .fire-center .main-fire { position:absolute; width:100%; height:100%; background-image:radial-gradient(farthest-corner at 10px 0,#d43300 0%,#ef5a00 95%); transform:scaleX(0.8) rotate(45deg); border-radius:0 40% 60% 40%; filter:drop-shadow(0 0 10px #d43322); }
+    .hud-fire-wrap .fire-center .particle-fire { position:absolute; top:60%; left:45%; width:10px; height:10px; background:#ef5a00; border-radius:50%; filter:drop-shadow(0 0 10px #d43322); animation:particleUp 2s ease-out infinite both; }
+    .hud-fire-wrap .fire-right { height:100%; width:100%; position:absolute; animation:shake 2s ease-out infinite both; }
+    .hud-fire-wrap .fire-right .main-fire { position:absolute; top:15%; right:-25%; width:80%; height:80%; background:#ef5a00; transform:scaleX(0.8) rotate(45deg); border-radius:0 40% 60% 40%; filter:drop-shadow(0 0 10px #d43322); }
+    .hud-fire-wrap .fire-right .particle-fire { position:absolute; top:45%; left:50%; width:15px; height:15px; background:#ef5a00; transform:scaleX(0.8) rotate(45deg); border-radius:50%; filter:drop-shadow(0 0 10px #d43322); animation:particleUp 2s ease-out infinite both; }
+    .hud-fire-wrap .fire-left { position:absolute; height:100%; width:100%; animation:shake 3s ease-out infinite both; }
+    .hud-fire-wrap .fire-left .main-fire { position:absolute; top:15%; left:-20%; width:80%; height:80%; background:#ef5a00; transform:scaleX(0.8) rotate(45deg); border-radius:0 40% 60% 40%; filter:drop-shadow(0 0 10px #d43322); }
+    .hud-fire-wrap .fire-left .particle-fire { position:absolute; top:10%; left:20%; width:10%; height:10%; background:#ef5a00; border-radius:50%; filter:drop-shadow(0 0 10px #d43322); animation:particleUp 3s ease-out infinite both; }
+    .hud-fire-wrap .fire-bottom .main-fire { position:absolute; top:30%; left:20%; width:75%; height:75%; background:#ff7800; transform:scaleX(0.8) rotate(45deg); border-radius:0 40% 100% 40%; filter:blur(10px); animation:glow 2s ease-out infinite both; }
+
+    .ls-meta { font-size:0.8rem; font-weight:600; color:var(--text-muted); text-align:center; margin-bottom:6px; }
+    .ls-select-hint { display:none; text-align:center; margin-bottom:12px; }
+    .ls-select-hint.show { display:block; }
+    .ls-select-badge { display:inline-block; font-size:0.78rem; font-weight:700; color:var(--blue-dark); background:var(--blue-tint); border-radius:20px; padding:6px 16px; }
+    @keyframes lsAttract { 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.06); } }
+    .ls-dots { display:flex; gap:5px; justify-content:center; margin-bottom:20px; flex-wrap:wrap; }
+    .ls-dots.selectable { gap:8px; animation:lsAttract 0.8s ease-in-out 2; }
+    .ls-dot { width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:700; background:#edf2f7; color:var(--text-subtle); border:2px solid transparent; }
+    .ls-dot.active { border-color:var(--blue-dark); color:var(--blue-dark); }
+    .ls-dot.done { background:#38a169; color:#fff; }
+    /* Challenge only: Posten frei wählbar, sehen wie Buttons aus */
+    .ls-dots.selectable .ls-dot { width:auto; min-width:34px; height:34px; padding:0 5px; border-radius:10px; font-size:0.78rem; font-weight:800; background:var(--blue-tint); color:var(--blue-dark); box-shadow:0 1px 3px rgba(0,0,0,0.16); cursor:pointer; transition:transform 0.15s, box-shadow 0.15s; }
+    .ls-dots.selectable .ls-dot:hover { transform:scale(1.14) translateY(-2px); box-shadow:0 4px 10px rgba(0,0,0,0.26); }
+    .ls-dots.selectable .ls-dot:active { transform:scale(0.94); }
+    .ls-dots.selectable .ls-dot.active { background:var(--blue-dark); color:#fff; border-color:transparent; box-shadow:0 0 0 3px var(--blue-tint), 0 2px 6px rgba(0,0,0,0.22); }
+    .ls-dots.selectable .ls-dot.done { background:#38a169; color:#fff; }
+
+    .station { background:var(--surface); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); padding:24px; margin-bottom:18px; }
+    .station.hidden { display:none; }
+    .station-kicker { font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--blue-light); margin-bottom:4px; }
+    .station-title { font-size:1.15rem; font-weight:700; color:var(--blue-dark); margin-bottom:10px; }
+    .station-lead { font-size:0.9rem; color:var(--text); line-height:1.6; margin-bottom:18px; }
+    .station-lead b { color:var(--blue-dark); }
+    .station.boss { border:2px solid #f0c36d; box-shadow:0 0 0 4px #fff7e6; }
+    .station.boss .station-kicker { color:#d97706; }
+
+    .read { font-size:0.9rem; line-height:1.65; color:var(--text); }
+    .read p { margin-bottom:12px; }
+    .read h4 { font-size:0.92rem; color:var(--blue-dark); margin:14px 0 6px; }
+    .read ul { margin:0 0 12px 1.15rem; }
+    .read li { margin-bottom:5px; }
+    .read b { color:var(--blue-dark); }
+    .read .factbox { background:var(--blue-tint); border-left:4px solid var(--blue-light); border-radius:var(--radius-sm); padding:10px 14px; margin:12px 0; font-size:0.86rem; line-height:1.55; }
+    .read-btn-row { margin-top:16px; }
+    .pdf-frame { width:100%; height:520px; border:1px solid var(--border); border-radius:var(--radius-md); display:block; }
+    @media(max-width:560px){ .pdf-frame { height:360px; } }
+
+    .read-btn { width:210px; height:42px; border-radius:40px; border:1px solid rgba(255,255,255,0.25); background-color:var(--blue-dark); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:transform 0.3s; overflow:hidden; font-family:var(--font); padding:0 6px; }
+    .read-btn-icon { width:32px; height:32px; background:linear-gradient(to bottom,var(--blue-light),#2a6fa8); border-radius:50px; display:flex; align-items:center; justify-content:center; overflow:hidden; z-index:2; transition:width 0.3s; flex-shrink:0; }
+    .read-btn-text { flex:1; display:flex; align-items:center; justify-content:center; color:#fff; font-size:0.88rem; font-weight:600; white-space:nowrap; overflow:hidden; transition:all 0.3s; }
+    .read-btn:hover:not(:disabled) .read-btn-icon { width:190px; }
+    .read-btn:hover:not(:disabled) .read-btn-text { width:0; font-size:0; opacity:0; }
+    .read-btn:active:not(:disabled) { transform:scale(0.95); }
+    .read-btn:disabled { cursor:default; }
+    .read-btn.done .read-btn-icon { background:linear-gradient(to bottom,#48bb78,#38a169); }
+
+    /* ---- Slideshow ---- */
+    .slideshow { border-radius:10px; overflow:hidden; box-shadow:0 6px 28px rgba(0,0,0,0.13),0 1px 4px rgba(0,0,0,0.07); border:1px solid rgba(0,0,0,0.08); }
+    .slide-panel { display:none; }
+    .slide-panel.active { display:block; }
+    .slide-panel.slide-in-right { animation:slideInRight 0.3s cubic-bezier(0.22,0.61,0.36,1) both; }
+    .slide-panel.slide-in-left  { animation:slideInLeft  0.3s cubic-bezier(0.22,0.61,0.36,1) both; }
+    @keyframes slideInRight { from{transform:translateX(44px);opacity:0} to{transform:translateX(0);opacity:1} }
+    @keyframes slideInLeft  { from{transform:translateX(-44px);opacity:0} to{transform:translateX(0);opacity:1} }
+    .slide-header { padding:20px 22px 16px; display:flex; align-items:center; gap:16px; border-bottom:1px solid rgba(0,0,0,0.09); }
+    .slide-icon { font-size:2.5rem; line-height:1; flex-shrink:0; width:56px; height:56px; display:flex; align-items:center; justify-content:center; border-radius:10px; background:rgba(255,255,255,0.52); box-shadow:0 1px 5px rgba(0,0,0,0.12); }
+    .slide-htitle { font-size:1.05rem; font-weight:700; line-height:1.3; }
+    .slide-body { padding:16px 22px 14px; font-size:0.9rem; line-height:1.65; color:var(--text); background:var(--surface); }
+    .slide-body p { margin-bottom:10px; }
+    .slide-body ul,.slide-body ol { margin:0 0 10px 1.2rem; }
+    .slide-body li { margin-bottom:6px; }
+    .slide-body b { color:var(--blue-dark); }
+    .slide-body .factbox { background:var(--blue-tint); border-left:4px solid var(--blue-light); border-radius:var(--radius-sm); padding:9px 13px; margin:10px 0 2px; font-size:0.84rem; line-height:1.55; }
+    .slide-nav-row { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:16px; }
+    .slide-dots { display:flex; gap:6px; align-items:center; }
+    .slide-dot { width:8px; height:8px; border-radius:50%; background:var(--border); transition:background 0.2s,transform 0.2s; cursor:pointer; }
+    .slide-dot.active { background:var(--blue-dark); transform:scale(1.35); }
+    .slide-dot.done { background:var(--blue-light); }
+    .slide-nav-btn { font-family:var(--font); font-size:0.82rem; font-weight:600; padding:7px 14px; border-radius:20px; border:1.5px solid var(--border); background:var(--surface); color:var(--text-muted); cursor:pointer; transition:all 0.15s; }
+    .slide-nav-btn:hover:not(:disabled) { border-color:var(--blue-light); color:var(--blue-dark); }
+    .slide-nav-btn:disabled { opacity:0.32; cursor:default; }
+    .slide-counter { font-size:0.76rem; color:var(--text-subtle); font-weight:600; white-space:nowrap; }
+
+    .station-media { margin-bottom:18px; }
+    .station-media img { width:100%; height:auto; display:block; border-radius:var(--radius-md); border:1px solid var(--border); box-shadow:var(--shadow-sm); }
+
+    .q-block { margin-bottom:18px; }
+    .q-block:last-child { margin-bottom:0; }
+    .q-text { font-size:0.92rem; font-weight:600; margin-bottom:10px; }
+    .opt { display:block; width:100%; text-align:left; font-family:var(--font); font-size:0.88rem; color:var(--text); background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius-md); padding:11px 14px; margin-bottom:8px; cursor:pointer; transition:all 0.15s; line-height:1.4; }
+    .opt:hover:not(:disabled) { border-color:var(--blue-light); }
+    .opt:disabled { cursor:default; }
+    .opt.correct { border-color:#38a169; background:#f0fff4; }
+    .opt.wrong { border-color:var(--red); background:var(--red-light); }
+
+    .tf-item { padding:12px 0; border-bottom:1px solid var(--border); }
+    .tf-item:last-child { border-bottom:none; }
+    .tf-statement { font-size:0.9rem; margin-bottom:8px; }
+    .tf-btns { display:flex; gap:8px; }
+    .tf-btn { font-family:var(--font); font-size:0.82rem; font-weight:600; padding:7px 18px; border-radius:20px; border:1.5px solid var(--border); background:var(--surface); color:var(--text-muted); cursor:pointer; transition:all 0.15s; }
+    .tf-btn:hover:not(:disabled) { border-color:var(--blue-light); }
+    .tf-btn:disabled { cursor:default; }
+    .tf-btn.sel-correct { background:#38a169; border-color:#38a169; color:#fff; }
+    .tf-btn.sel-wrong { background:var(--red); border-color:var(--red); color:#fff; }
+    .tf-btn.reveal { border-color:#38a169; color:#276749; }
+    .tf-exp { font-size:0.78rem; color:var(--text-muted); margin-top:8px; display:none; }
+    .tf-exp.show { display:block; }
+
+    .gap-text { font-size:0.95rem; line-height:2.1; }
+    .gap-text select, .lp-select { font-family:var(--font); font-size:0.85rem; font-weight:600; border:1.5px solid var(--blue-light); border-radius:var(--radius-sm); padding:3px 6px; background:var(--blue-tint); color:var(--blue-dark); }
+    .gap-text select.correct, .lp-select.correct { border-color:#38a169; background:#f0fff4; color:#276749; }
+    .gap-text select.wrong, .lp-select.wrong { border-color:var(--red); background:var(--red-light); color:var(--red-dark); }
+    .lp-select { width:100%; }
+
+    .slots-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.55rem; margin-bottom:0.5rem; }
+    @media (max-width:560px){ .slots-grid { grid-template-columns:1fr; } }
+    .lb-bank { display:flex; flex-wrap:wrap; gap:0.5rem; background:var(--blue-light); border-radius:var(--radius-md); padding:0.9rem 1rem; margin-bottom:1rem; min-height:52px; }
+    .lb-chip { font-family:var(--font); font-size:0.82rem; font-weight:500; background:var(--surface); border:2px solid var(--border); border-radius:20px; padding:0.3rem 0.8rem; cursor:grab; color:var(--text); user-select:none; touch-action:none; transition:border-color 0.15s,opacity 0.15s; }
+    .lb-chip:hover { border-color:var(--blue-light); }
+    .lb-chip.used { opacity:0.2; pointer-events:none; }
+    .lb-chip.selected { background:var(--blue-dark); border-color:var(--blue-dark); color:#fff; }
+    .lb-slot { flex:1; min-height:36px; border:2px dashed var(--border); border-radius:var(--radius-sm); padding:0.3rem 0.65rem; font-size:0.82rem; font-family:var(--font); color:var(--text-subtle); display:flex; align-items:center; transition:all 0.15s; background:var(--surface); }
+    .lb-slot.lb-over,.lb-slot.lb-ready { border-color:var(--blue-light); border-style:solid; background:#f0f7ff; }
+    .lb-slot.lb-filled { border-style:solid; border-color:var(--blue-light); color:var(--text); font-weight:500; cursor:grab; touch-action:none; user-select:none; }
+    .lb-slot.correct { border-color:#16a34a !important; background:#f0fdf4 !important; color:#15803d !important; cursor:default; }
+    .lb-slot.wrong   { border-color:var(--red) !important; background:var(--red-light) !important; color:var(--red) !important; cursor:default; }
+    .slot-row { display:flex; align-items:flex-start; gap:0.5rem; }
+    .slot-num { width:28px; height:28px; flex-shrink:0; border-radius:50%; background:var(--blue-dark); color:#fff; font-size:0.76rem; font-weight:700; display:flex; align-items:center; justify-content:center; margin-top:3px; }
+    .type-cell { flex:1; }
+    .type-input { width:100%; font-family:var(--font); font-size:0.84rem; padding:0.45rem 0.65rem; border:1.5px solid var(--border); border-radius:var(--radius-sm); background:#f8fafc; color:var(--text); transition:border-color 0.15s; }
+    .type-input:focus { outline:none; border-color:var(--blue); background:#fff; }
+    .type-input.correct { border-color:#16a34a; background:#f0fdf4; }
+    .type-input.wrong { border-color:var(--red); background:var(--red-light); }
+    .type-sol { font-size:0.72rem; color:#15803d; margin-top:2px; }
+
+    .check-btn-row { margin-top:16px; }
+
+    /* Erklären – Flip-Karte wie lernkaertchen.html */
+    .exp-counter { font-size:0.76rem; color:var(--text-subtle); font-weight:600; text-align:center; margin-bottom:10px; }
+    .exp-scene { width:100%; max-width:440px; height:250px; perspective:900px; cursor:pointer; margin:0 auto 16px; }
+    .exp-flip { width:100%; height:100%; position:relative; transform-style:preserve-3d; transition:transform 0.45s cubic-bezier(0.4,0,0.2,1); }
+    .exp-flip.flipped { transform:rotateY(180deg); }
+    .exp-face { position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; border-radius:var(--radius-lg); padding:26px 28px; display:flex; flex-direction:column; justify-content:center; box-shadow:var(--shadow-md); }
+    .exp-front { background:var(--surface); }
+    .exp-back  { background:var(--blue-light); transform:rotateY(180deg); }
+    .exp-q-text { font-size:1.05rem; font-weight:700; color:var(--text); line-height:1.35; }
+    .exp-hint { margin-top:14px; font-size:0.74rem; color:var(--text-subtle); }
+    .exp-a-text { font-size:0.92rem; color:var(--text); line-height:1.55; }
+    .exp-controls { display:flex; gap:10px; align-items:center; justify-content:center; flex-wrap:wrap; margin-bottom:12px; }
+    .exp-rate-row { display:flex; gap:8px; justify-content:center; }
+    .exp-rate-btn { font-family:var(--font); font-size:0.82rem; font-weight:600; padding:7px 14px; border-radius:20px; border:1.5px solid var(--border); background:var(--surface); color:var(--text-muted); cursor:pointer; }
+    .exp-rate-btn.rate-good:hover:not(.rated) { border-color:#38a169; color:#276749; }
+    .exp-rate-btn.rate-bad:hover:not(.rated) { border-color:var(--red); color:var(--red-dark); }
+    .exp-rate-btn.rated { opacity:0.45; cursor:default; }
+    .exp-rate-btn.rated.picked-good { border-color:#38a169; color:#276749; opacity:0.85; }
+    .exp-rate-btn.rated.picked-bad { border-color:var(--red); color:var(--red-dark); opacity:0.85; }
+
+    .finish { text-align:center; }
+    .finish .rank { font-size:1.25rem; font-weight:800; color:var(--blue-dark); margin:4px 0 2px; }
+    .finish .big-score { font-size:2.4rem; font-weight:800; color:var(--blue-dark); margin:6px 0 2px; }
+    .finish .score-sub { font-size:0.86rem; color:var(--text-muted); margin-bottom:16px; }
+    .badges { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin:0 auto 18px; max-width:520px; }
+    .badge-chip { display:inline-flex; align-items:center; gap:5px; font-size:0.76rem; font-weight:600; padding:6px 12px; border-radius:20px; border:1.5px solid var(--border); background:#f8fafc; color:var(--text-subtle); }
+    .badge-chip.earned { background:#fff7e6; border-color:#f0c36d; color:#92400e; }
+    .badge-chip .lock { opacity:0.6; }
+    .finish ul { text-align:left; max-width:500px; margin:0 auto 20px; font-size:0.86rem; color:var(--text); line-height:1.6; }
+    .finish li { margin-bottom:6px; }
+    .score-breakdown { list-style:none; text-align:left; max-width:420px; margin:0 auto 18px; font-size:0.84rem; color:var(--text); padding:0; }
+    .score-breakdown li { display:flex; justify-content:space-between; gap:12px; padding:5px 0; border-bottom:1px solid var(--border); }
+    .score-breakdown li:last-child { border-bottom:none; }
+
+    .ls-nav { display:flex; justify-content:space-between; gap:10px; }
+    .ls-nav .spacer { flex:1; }
+  </style>
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+  <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · a.8</span>
+  <h1 id="pageTitle">Kulturen zubereiten & einsetzen</h1>
+  <p id="subtitle">Kühlung bis Milchsäuregärung – Prüfungsvorbereitung</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+  <a class="back-link" href="../index.html">← Alle Lerntools</a>
+
+  <div class="ls-wrap">
+    <div class="hud">
+      <div class="hud-xp"><span class="hud-label">XP</span><span class="hud-val" id="hudXp">0</span></div>
+      <div class="hud-bar"><div class="hud-bar-fill" id="hudBar"></div></div>
+      <div class="hud-streak" id="hudStreak">
+        <span id="hudStreakEmoji">🔥</span>
+        <div class="hud-fire-wrap" id="hudFireWrap" style="display:none">
+          <div class="fire">
+            <div class="fire-bottom"><div class="main-fire"></div></div>
+            <div class="fire-center"><div class="main-fire"></div><div class="particle-fire"></div></div>
+            <div class="fire-right"><div class="main-fire"></div><div class="particle-fire"></div></div>
+            <div class="fire-left"><div class="main-fire"></div><div class="particle-fire"></div></div>
+          </div>
+        </div>
+        <span id="hudStreakNum">0</span>
+      </div>
+    </div>
+    <div class="ls-meta" id="lsMeta"></div>
+    <div class="ls-select-hint"><span class="ls-select-badge">👆 Posten antippen – frei wählbar, keine feste Reihenfolge</span></div>
+    <div class="ls-dots" id="lsDots"></div>
+    <div id="stage"></div>
+    <div class="ls-nav">
+      <button class="btn btn-ghost" id="prevBtn" onclick="goPrev()">← Zurück</button>
+      <span class="spacer"></span>
+      <button class="btn btn-primary" id="nextBtn" onclick="goNext()">Weiter →</button>
+    </div>
+  </div>
+</main>
+
+<footer class="bzwu-footer">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm</footer>
+
+<script>
+/* ============================================================
+   a.8 Kulturen zubereiten und einsetzen. Prüfungsvorbereitung
+   (Lektion 1–10 des Rest-Moduls MIT25b, Prüfung 14.09.2026 —
+   Lektion 11 Fallstudie und Kokken-/Stäbchen-Verwendung sind
+   bewusst NICHT Teil dieses Prüfungsumfangs).
+   Eine Datei, zwei Modi:
+   ?mode=lernpfad (Standard) = Wissensvermittlung: mit Lesetexten,
+        Übungen einfach/mittel.
+   ?mode=challenge = Prüfungsmodus: ohne Lesetexte, voll gamifiziert.
+   ============================================================ */
+var MODE = /[?&]mode=challenge/.test(location.search) ? 'challenge' : 'lernpfad';
+
+var ALL = [
+  { kicker:'Folien · Kühlung', title:'Kühlung, Tiefkühlung, Schnellgefrierung', type:'slides',
+    lead:'Lesen Sie alle Folien, danach prüfen Sie sich.',
+    slides:[
+      { icon:'🧊', color:'#1e4e8c', bg:'#dbeeff',
+        title:'Drei Methoden im Vergleich',
+        body:'<p><b>Kühlung (1–5 °C)</b>: vermindert die Aktivität der meisten Mikroorganismen deutlich. Ausnahme: psychrotrophe (kältetolerante) Mikroorganismen betreiben auch unter 7 °C noch Stoffwechsel und vermehren sich langsam weiter.</p><p><b>Tiefkühlung (-18 °C)</b>: hemmt das Wachstum aller Mikroorganismen vollständig. Wirkung durch Temperaturabsenkung und Wasserentzug infolge der Eisbildung – die Eiskristalle können die Mikroorganismenzelle sogar beschädigen.</p><p><b>Schnellgefrierung (-30 bis -40 °C)</b>: blockiert die Enzymaktivität vollständig. Leicht verderbliche Lebensmittel bleiben dadurch länger haltbar als durch blosse Tiefkühlung.</p>'
+      },
+      { icon:'🌡️', color:'#15803d', bg:'#dcfce7',
+        title:'Verknüpfung mit den Temperaturklassen',
+        body:'<ul><li><b>Psychrotroph</b> (kältetolerant): bleibt bei Kühlung noch aktiv. Beispiele: Pseudomonas, Proteus, viele Schimmel, z. T. Hefen.</li><li><b>Mesophil</b> (mittlere Temperatur liebend): z. B. Laktokokkus lactis, Propionsäurebakterien (wichtig für Emmentaler).</li><li><b>Thermophil</b> (wärmeliebend): z. B. Streptococcus salivarius subsp. thermophilus, Lactobacillus delbrueckii subsp. lactis (Joghurt).</li></ul><div class="factbox">Die meisten psychrotrophen Mikroorganismen sind eigentlich mesophil – sie können aber auch bei tiefer Temperatur noch wachsen. Deshalb reicht Kühlung allein nicht, um alle Mikroorganismen zu stoppen.</div>'
+      }
+    ] },
+  { kicker:'Wahr oder Falsch', title:'Kühlung, Tiefkühlung, Schnellgefrierung', id:'kuehlung_tf', type:'tf',
+    lead:'Stimmt die Aussage?',
+    items:[
+      { s:'Die Kühlung (1–5 °C) hemmt das Wachstum aller Mikroorganismen vollständig.', a:false, e:'Nur die Aktivität wird deutlich vermindert – psychrotrophe Mikroorganismen bleiben aktiv.' },
+      { s:'Tiefkühlung wirkt durch Temperaturabsenkung und Wasserentzug infolge Eisbildung.', a:true, e:'Beide Effekte zusammen hemmen das Wachstum vollständig.' },
+      { s:'Schnellgefrierung blockiert die Enzymaktivität vollständig.', a:true, e:'Deshalb bleiben leicht verderbliche Produkte länger haltbar.' },
+      { s:'Psychrotrophe Mikroorganismen können auch unter 7 °C noch Stoffwechsel betreiben.', a:true, e:'Das macht Kühlung allein unzuverlässig.' },
+      { s:'Schnellgefrierung macht leicht verderbliche Lebensmittel weniger haltbar als blosse Tiefkühlung.', a:false, e:'Im Gegenteil – durch die vollständige Enzymblockade länger haltbar.' },
+      { s:'Propionsäurebakterien, wichtig für den Emmentaler, sind mesophil.', a:true, e:'Mesophil = mittlere Temperatur liebend.' }
+    ] },
+  { kicker:'Folien · Lebensabschnitte', title:'Lebensabschnitte der Mikroorganismen', type:'slides',
+    lead:'Vier Phasen, die jede Bakterienkultur durchläuft.',
+    slides:[
+      { icon:'🌱', color:'#6b21a8', bg:'#f3e8ff',
+        title:'Die vier Phasen einer Kultur',
+        body:'<p><b>Anpassungsphase</b>: Die Bakterien passen sich der neuen Umwelt an, es findet praktisch keine Vermehrung statt, der Stoffwechsel ist schwach.</p><p><b>Vermehrungsphase</b>: sehr starke und sehr schnelle Vermehrung, kürzeste Generationszeit, intensivster Stoffwechsel – die Keimzahl nimmt schnell zu.</p><p><b>Stationäre Phase</b>: Nährstoffmangel und ungünstige Bedingungen (Säure) bremsen Vermehrung und Stoffwechsel. Die Keimzahl bleibt konstant – Gleichgewicht zwischen neu entstehenden und sterbenden Zellen.</p><p><b>Absterbephase</b>: Nährstoffmangel und Umweltbedingungen werden sehr ungünstig, die Keimzahl sinkt, ein hoher Anteil der Zellen stirbt ab.</p>'
+      },
+      { icon:'🏖️', color:'#92400e', bg:'#fff7ed',
+        title:'Merkhilfe: wie im Ferien-Vergleich',
+        body:'<p><b>Anpassungsphase</b> = Ankunft am Ferienort, Sie müssen sich erst zurechtfinden.</p><p><b>Vermehrungsphase</b> = Sie fühlen sich richtig wohl, voller Elan, viele neue Ausflüge.</p><p><b>Stationäre Phase</b> = Sie kennen schon alles, eine gewisse Langeweile setzt ein.</p><p><b>Absterbephase</b> = Sie haben genug, Heimweh, wollen nur noch nach Hause.</p><div class="factbox">Reihenfolge merken: Anpassung → Vermehrung → Stationär → Absterben.</div>'
+      }
+    ] },
+  { kicker:'Lückentext', title:'Lebensabschnitte zuordnen', id:'lebensabschnitte_gaps', type:'gaps',
+    lead:'Füllen Sie die Lücken.',
+    parts:[
+      'In der ',
+      { opts:['Anpassungsphase','Vermehrungsphase','stationären Phase'], correct:0 },
+      ' passen sich die Bakterien der neuen Umwelt an, es findet praktisch keine Vermehrung statt. In der ',
+      { opts:['Vermehrungsphase','Anpassungsphase','Absterbephase'], correct:0 },
+      ' ist die Generationszeit am kürzesten und die Keimzahl nimmt am schnellsten zu. In der ',
+      { opts:['stationären Phase','Vermehrungsphase','Absterbephase'], correct:0 },
+      ' bleibt die Keimzahl konstant, weil sich neu entstehende und sterbende Zellen die Waage halten. In der ',
+      { opts:['Absterbephase','stationären Phase','Anpassungsphase'], correct:0 },
+      ' sinkt die Keimzahl, weil ein hoher Anteil der Zellen abstirbt.'
+    ] },
+  { kicker:'Folien · Kulturenformen', title:'Kulturenformen im Vergleich', type:'slides',
+    lead:'Flüssig, lyophilisiert oder gefroren – je mit eigenen Vor- und Nachteilen.',
+    slides:[
+      { icon:'💧', color:'#1e4e8c', bg:'#dbeeff',
+        title:'Flüssigkulturen',
+        body:'<p><b>Vorteile</b>: sehr gute Aktivitätsbereitschaft – die Vermehrung beginnt sofort nach der Beimpfung; keine Artenverarmung durch Gefriertrocknung.</p><p><b>Nachteile</b>: empfindlich gegenüber Temperaturschwankungen bei Transport/Lagerung; kurze Vorratshaltung (bei &lt;5 °C nur 7–10 Tage bei MSB-Kulturen, Oberflächenreifungskulturen bis 12 Wochen).</p>'
+      },
+      { icon:'❄️', color:'#6b21a8', bg:'#f3e8ff',
+        title:'Lyophilisiert (gefriergetrocknet)',
+        body:'<p><b>Vorteile</b>: weniger empfindlich bei Temperaturschwankungen (Postversand möglich); Vorratshaltung bei -18 °C mindestens 3 Monate; jederzeit verfügbar, unabhängig von eigener Herstellung; grosse Auswahl, hohe Flexibilität.</p><p><b>Nachteile</b>: verzögerte Anfangsaktivität – die Zellen müssen zuerst wieder Wasser aufnehmen, um sich zu reaktivieren; Selektion/Verarmung der Flora-Vielfalt (v. a. Laktobazillen werden reduziert); ohne eigene Nachzucht keine ständige Aktivitätskontrolle, grössere Abhängigkeit von Lieferanten.</p>'
+      },
+      { icon:'🧊', color:'#15803d', bg:'#dcfce7',
+        title:'Gefroren & Lagerung',
+        body:'<p><b>Gefrorene Kulturen</b>: normale Aktivität durch Restflüssigkeit in den Zellen. Haltbarkeit je nach Lagertemperatur: -20 °C mind. 2 Wochen, -45 °C mind. 3 Monate, -196 °C (Flüssigstickstoff) bis zu einem Jahr. Braucht aber ununterbrochene Kühlhaltung.</p><p><b>Lagerung allgemein</b>: einwandfreie Hygiene der Lagerräume ist zwingend – Verschmutzung birgt Infektionsgefahr beim Impfen. Lagertemperaturen kontrollieren und immer einhalten.</p>'
+      }
+    ] },
+  { kicker:'Quiz', title:'Kulturenformen', id:'kulturenformen_quiz', type:'quiz',
+    lead:'Fünf Fragen.',
+    questions:[
+      { q:'Welche Kulturenform kann per Post zugestellt werden?', opts:['Lyophilisierte (gefriergetrocknete) Kultur','Flüssigkultur','Gefrorene Kultur'], correct:0 },
+      { q:'Warum haben lyophilisierte Kulturen eine verzögerte Anfangsaktivität?', opts:['Die Zellen müssen zuerst wieder Wasser aufnehmen, um sich zu reaktivieren','Sie enthalten zu wenig Bakterien','Sie müssen zuerst aufgetaut werden'], correct:0 },
+      { q:'Welcher Nachteil trifft auf Flüssigkulturen zu?', opts:['Kurze Vorratshaltung, nur wenige Tage bei &lt;5 °C','Verzögerte Anfangsaktivität','Ununterbrochene Kühlhaltung nötig'], correct:0 },
+      { q:'Wie lange sind gefrorene Kulturen bei -196 °C (Flüssigstickstoff) haltbar?', opts:['Bis zu einem Jahr','Nur zwei Wochen','Unbegrenzt'], correct:0 },
+      { q:'Was ist ein Nachteil des Gefriertrocknungs-Verfahrens selbst?', opts:['Selektion/Verarmung der Flora-Vielfalt, vor allem bei Laktobazillen','Zu hohe Aktivität','Zu kurze Haltbarkeit'], correct:0 }
+    ] },
+  { kicker:'Folien · Kontrolle', title:'Kontrolle der Kulturenaktivität', type:'slides',
+    lead:'Fünf Methoden, um eine Kultur vor dem Einsatz zu prüfen.',
+    slides:[
+      { icon:'👁️', color:'#92400e', bg:'#fff7ed',
+        title:'Visuelle & organoleptische Kontrolle',
+        body:'<p><b>Visuelle Kontrolle</b>: schon vor der Impfung – Farbe der sterilisierten Magermilch beurteilen, soll leicht bräunlich/karamellfarbig sein. Weiss = zu wenig gekocht/sterilisiert, nicht keimfrei. Dunkelbraun = zu starke Wärmeeinwirkung, optimale Vermehrung nicht gewährleistet.</p><p><b>Organoleptische Kontrolle</b>: Degustation – eine einwandfreie Kultur hat einen angenehmen, reinen säuerlichen Geschmack.</p>'
+      },
+      { icon:'🧪', color:'#1e4e8c', bg:'#dbeeff',
+        title:'Säuregrad, pH-Wert und Mikroskop',
+        body:'<p><b>Säuregradkontrolle (°SH)</b>: &lt;28 °SH = zu wenig fortgeschritten (zu tiefe Bebrütungstemperatur/-zeit oder Hemmstoff); ca. 35 °SH = «junge» Kultur mit hohem Kokkenanteil für die Anfangssäuerung; &gt;40 °SH = «alte» Kultur mit vielen Stäbchen für die Endsäuerung.</p><p><b>pH-Kontrolle</b>: misst die aktive Säure (H⁺-Konzentration) – Ursachen und Auswirkungen analog zur °SH-Bestimmung.</p><p><b>Mikroskop-Kontrolle</b>: lange, unförmige Stäbchen deuten auf eine zu lange Bebrütung hin; zeigt auch das Verhältnis Kokken/Stäbchen.</p><div class="factbox">5 Methoden zu unterschiedlichem Zeitpunkt – visuell schon vor der Impfung, organoleptisch erst beim Einsatz.</div>'
+      }
+    ] },
+  { kicker:'Lückentext', title:'Kontrolle zuordnen', id:'kontrolle_gaps', type:'gaps',
+    lead:'Füllen Sie die Lücken.',
+    parts:[
+      'Ein Säuregrad von unter 28 °SH deutet auf ',
+      { opts:['eine zu wenig fortgeschrittene Milchsäuregärung','eine zu alte Kultur','eine Infektion'], correct:0 },
+      ' hin. Ein Säuregrad von über 40 °SH deutet auf eine ',
+      { opts:['alte Kultur mit vielen Stäbchen','junge Kultur mit vielen Kokken','verdorbene Kultur'], correct:0 },
+      ' hin. Lange, unförmige Stäbchen unter dem Mikroskop deuten auf eine ',
+      { opts:['zu lange Bebrütung','zu kurze Bebrütung','Phageninfektion'], correct:0 },
+      ' hin. Die Farbe Weiss bei der visuellen Kontrolle der Magermilch bedeutet, dass diese ',
+      { opts:['zu wenig gekocht/sterilisiert wurde','zu stark erhitzt wurde','korrekt ist'], correct:0 },
+      '.'
+    ] },
+  { kicker:'Folien · Ursachen', title:'Technische Ursachen bei Abweichungen', type:'slides',
+    lead:'Was tun, wenn der Säuregrad nicht dem Soll-Wert entspricht?',
+    slides:[
+      { icon:'⬇️', color:'#1e4e8c', bg:'#dbeeff',
+        title:'Zu tiefer Säuregrad (Kultur zu flüssig)',
+        body:'<p><b>Ursachen</b>: zu tiefe Bebrütungstemperatur, zu kurze Bebrütungszeit, Hemmstoff in der Ausgangsmilch, Impfmenge zu klein.</p><p><b>Massnahmen</b>: Temperatur/Thermometer kontrollieren, Bebrütungszeit anpassen, Hemmstoffnachweis (z. B. Delvo- oder SNAP-Test), Impfmenge anpassen.</p>'
+      },
+      { icon:'⬆️', color:'#c40027', bg:'#fde8ed',
+        title:'Zu hoher Säuregrad (Kultur zu sauer)',
+        body:'<p><b>Ursachen</b>: zu hohe Bebrütungstemperatur, zu lange Bebrütungszeit.</p><p><b>Massnahmen</b>: Temperatur/Thermometer kontrollieren, Bebrütungszeit anpassen.</p>'
+      }
+    ] },
+  { kicker:'Quiz', title:'Ursachen und Massnahmen', id:'ursachen_quiz', type:'quiz',
+    lead:'Drei Fragen.',
+    questions:[
+      { q:'Die Kultur ist zu flüssig (zu tiefer Säuregrad). Welche Ursache passt?', opts:['Zu tiefe Bebrütungstemperatur','Zu hohe Bebrütungstemperatur','Zu lange Bebrütungszeit'], correct:0 },
+      { q:'Womit weisen Sie einen Hemmstoff in der Ausgangsmilch nach?', opts:['Delvo- oder SNAP-Test','Mit dem Mikroskop','Mit dem pH-Meter'], correct:0 },
+      { q:'Die Kultur ist sehr sauer (zu hoher Säuregrad). Welche Massnahme passt?', opts:['Bebrütungszeit anpassen/verkürzen','Impfmenge erhöhen','Hemmstoffnachweis durchführen'], correct:0 }
+    ] },
+  { kicker:'Folien · Bakteriophagen', title:'Bakteriophagen: Aufbau & Zyklen', type:'slides',
+    lead:'Die gefürchtetste mikrobiologische Ursache für Säuerungsstörungen.',
+    slides:[
+      { icon:'🦠', color:'#6b21a8', bg:'#f3e8ff',
+        title:'Was ist ein Bakteriophage?',
+        body:'<p>Ein <b>Bakteriophage</b> ist ein Virus, das Bakterien als Wirtszelle befällt. Er kann sich in einer Bakterienzelle <b>50- bis 300-fach</b> vermehren. Besonders gefürchtet in Milchsäurebakterien-Kulturen: Die Zerstörung der Milchsäurebakterien verursacht Säuerungsstörungen in der Fabrikation.</p><p><b>Aufbau</b>: Erbsubstanz, Kopf (Träger), Schwanz, Stachel (Anker in der Bakterien-Zellwand).</p><div class="factbox">4 Eigenschaften: wenig hitzeempfindlich · empfindlich auf chlor-/peroxidhaltige Desinfektionsmittel · empfindlich auf pH &lt;3 und &gt;11 · wirtsspezifisch (nur einen oder wenige Stämme einer Bakterienart).</div>'
+      },
+      { icon:'🔁', color:'#92400e', bg:'#fff7ed',
+        title:'Lytischer vs. lysogener Zyklus',
+        body:'<p><b>Lytischer Zyklus</b>: Die Phagen-Erbmasse übernimmt sofort das Kommando. Die Bakterienzelle bildet in 20–80 Minuten 50–300 neue Phagen, danach wird die Zellwand aufgelöst (Lyse) – das Bakterium ist zerstört, Kettenreaktion. <b>Folge: Säuerungsstörung.</b></p><p><b>Lysogener Zyklus</b>: Phagen-Erbsubstanz und Bakterien-Erbsubstanz bilden eine Einheit (Prophage) und vermehren sich gemeinsam bei der Zellteilung. Das Bakterium arbeitet normal weiter – keine Säuerungsstörung. Ein späterer Wechsel in den lytischen Zyklus ist möglich (ausgelöst z. B. durch veränderte Bedingungen, chemische Substanzen, UV-Strahlen).</p>'
+      }
+    ] },
+  { kicker:'Quiz', title:'Bakteriophagen', id:'phagen_quiz', type:'quiz',
+    lead:'Fünf Fragen.',
+    questions:[
+      { q:'Um wie viel kann sich ein Bakteriophage in einer Bakterienzelle vermehren?', opts:['50- bis 300-fach','2- bis 5-fach','1000-fach'], correct:0 },
+      { q:'Welche Aussage zu Bakteriophagen trifft zu?', opts:['Sie sind wirtsspezifisch','Sie sind sehr hitzeempfindlich','Sie vertragen jeden pH-Wert'], correct:0 },
+      { q:'Was passiert beim lytischen Zyklus am Ende?', opts:['Die Bakterienzellwand wird aufgelöst, das Bakterium wird zerstört','Das Bakterium wächst normal weiter','Der Phage wird inaktiv'], correct:0 },
+      { q:'Wie nennt man die im Bakteriengenom eingebaute, ruhende Phagen-Erbsubstanz?', opts:['Prophage','Endophage','Retrophage'], correct:0 },
+      { q:'Wogegen sind Bakteriophagen empfindlich?', opts:['Chlor-/peroxidhaltige Desinfektionsmittel und extreme pH-Werte','Kälte','Milchzucker'], correct:0 }
+    ] },
+  { kicker:'Wahr oder Falsch', title:'Bekämpfung von Bakteriophagen', id:'bekaempfung_tf', type:'tf',
+    lead:'Stimmt die Aussage?',
+    items:[
+      { s:'Kulturen sollten in einem separaten, trockenen Raum zubereitet werden, nicht im Fabrikationsraum.', a:true, e:'So bleiben sie von Phagen aus der Fabrikationsluft geschützt.' },
+      { s:'Molke- und Milchproduktespritzer sind unbedenklich, da sie keine Phagen enthalten.', a:false, e:'Sie können grosse Mengen Phagen enthalten – unbedingt vermeiden.' },
+      { s:'Kulturenrotation (Wechsel alle 2 bis 3 Tage) hilft, weil nicht alle Kulturen gleich empfindlich auf Phagen reagieren.', a:true, e:'Trotz gleicher Eigenschaften unterschiedlich sensibel.' },
+      { s:'Bei anhaltenden Problemen sollte man die Kulturen erneuern.', a:true, e:'Letzte Massnahme bei hartnäckigem Phagenbefall.' },
+      { s:'Konstante Bebrütungsbedingungen spielen bei der Phagen-Bekämpfung keine Rolle.', a:false, e:'Konstante Temperatur und Dauer gehören zu den Massnahmen.' },
+      { s:'Aseptisches (keimfreies) Arbeiten bei der Kulturenzubereitung ist eine Bekämpfungsmassnahme.', a:true, e:'Verhindert das Einschleppen von Phagen.' }
+    ] },
+  { kicker:'Folien · Milchsäuregärung', title:'Milchsäuregärung: Arten & Hauptaufgaben', type:'slides',
+    lead:'Das Schlüsselthema fast jeder Käse- und Sauermilchproduktion.',
+    slides:[
+      { icon:'⚗️', color:'#1e4e8c', bg:'#dbeeff',
+        title:'Homofermentativ vs. heterofermentativ',
+        body:'<p><b>Homofermentative Gärung</b>: Milchzucker wird zu über 90 % zu Milchsäure vergoren.</p><p><b>Heterofermentative Gärung</b>: Milchzucker wird zu 50–90 % zu Milchsäure vergoren, zusätzlich entstehen Essigsäure, CO2 und teilweise Alkohol – bei einigen Produkten erwünscht wegen des Aromastoffs <b>Diacetyl</b>.</p><p><b>Endoenzyme</b>: wirken in der Bakterienzelle selbst, spalten Nährstoffe (v. a. Proteine) – wichtig für die Käsereifung, vor allem bei den Laktobazillen.</p>'
+      },
+      { icon:'🎯', color:'#15803d', bg:'#dcfce7',
+        title:'Die fünf Hauptaufgaben der Milchsäure',
+        body:'<ul><li><b>Säuregerinnung</b>: die Milch gerinnt, verantwortlich auch für den sauren Geschmack.</li><li><b>Konservierung</b>: hemmt Colibakterien und eiweisszersetzende Bakterien – ausser Hefen und Schimmel.</li><li><b>Griffbildung/Synärese</b>: rasche Milchsäurebildung = grössere Molkenausscheidung = besserer Griff.</li><li><b>Teigbeschaffenheit</b>: zu viel Milchsäure = Calciumverlust, kurzer Teig; zu wenig = langer, zäher Teig.</li><li><b>Substrat</b> für weitere Gärungen, z. B. Propionsäuregärung, Buttersäuregärung.</li></ul>'
+      }
+    ] },
+  { kicker:'Lückentext', title:'Milchsäuregärung zuordnen', id:'msg_gaps', type:'gaps',
+    lead:'Füllen Sie die Lücken.',
+    parts:[
+      'Bei der ',
+      { opts:['homofermentativen','heterofermentativen'], correct:0 },
+      ' Milchsäuregärung entsteht zu über 90 % Milchsäure. Bei der ',
+      { opts:['heterofermentativen','homofermentativen'], correct:0 },
+      ' Gärung entstehen zusätzlich Essigsäure, CO2 und teilweise Alkohol – erwünscht wegen des Aromastoffs ',
+      { opts:['Diacetyl','Ethanol','Laktose'], correct:0 },
+      '. Wird zu viel Milchsäure gebildet, verliert der Käseteig zu viel Calcium und wird ',
+      { opts:['kurz','lang und zäh'], correct:0 },
+      '. Die Milchsäure dient auch als Substrat für spätere Gärungen wie die ',
+      { opts:['Propionsäuregärung','Alkoholgärung'], correct:0 },
+      '.'
+    ] },
+  { kicker:'Erklären', title:'Erklären Sie: Quer durch a.8', id:'boss_explain', type:'explain',
+    lead:'Überlegen Sie sich zuerst selbst eine Antwort, dann Musterlösung ansehen und ehrlich einschätzen.',
+    cards:[
+      { q:'Erklären Sie, weshalb die Kühlung (1–5 °C) das Wachstum der Mikroorganismen nicht vollständig stoppt.', a:'Nur die Aktivität der meisten Mikroorganismen wird deutlich vermindert. Psychrotrophe (kältetolerante) Mikroorganismen können auch bei diesen Temperaturen noch Stoffwechsel betreiben und sich langsam vermehren.' },
+      { q:'Erklären Sie den Unterschied zwischen der Vermehrungsphase und der stationären Phase einer Kultur.', a:'In der Vermehrungsphase vermehren sich die Bakterien sehr stark und schnell (kürzeste Generationszeit, intensivster Stoffwechsel). In der stationären Phase herrscht Nährstoffmangel, Vermehrung und Stoffwechsel sind gebremst, die Keimzahl bleibt konstant, weil sich neu entstehende und sterbende Zellen die Waage halten.' },
+      { q:'Erklären Sie, weshalb lyophilisierte Kulturen eine verzögerte Anfangsaktivität haben.', a:'Die durch die Gefriertrocknung haltbar gemachten Bakterienzellen müssen zuerst wieder Wasser aufnehmen, damit sie sich reaktivieren können.' },
+      { q:'Erklären Sie, was ein zu hoher Säuregrad (über 40 °SH) über eine Kultur aussagt.', a:'Das deutet auf eine «alte» Kultur hin, die länger bebrütet wurde. Sie enthält viele Stäbchen und mehr Milchsäure und dient vor allem der Endsäuerung.' },
+      { q:'Erklären Sie den Unterschied zwischen lytischem und lysogenem Zyklus bei Bakteriophagen.', a:'Beim lytischen Zyklus übernimmt die Phagen-Erbmasse sofort das Kommando, die Bakterienzelle bildet neue Phagen und wird dabei zerstört (Säuerungsstörung). Beim lysogenen Zyklus wird die Phagen-Erbsubstanz als Prophage ins Bakteriengenom eingebaut, das Bakterium arbeitet normal weiter – keine Säuerungsstörung, aber ein späterer Wechsel in den lytischen Zyklus ist möglich.' },
+      { q:'Nennen Sie 3 Massnahmen zur Bekämpfung von Bakteriophagen.', a:'Z. B. Kulturen in separatem, trockenem Raum zubereiten; aseptisch arbeiten; regelmässige Reinigung/Entkeimung der Anlagen; Kulturenrotation alle 2–3 Tage; Molke-/Milchproduktespritzer vermeiden; bei anhaltenden Problemen die Kulturen erneuern.' },
+      { q:'Erklären Sie, weshalb die heterofermentative Milchsäuregärung bei einigen Produkten erwünscht ist.', a:'Weil dabei der Aromastoff Diacetyl entsteht, der für den charakteristischen Geschmack gewünscht wird, z. B. bei Rahmsäurewecker-Kulturen.' },
+      { q:'Nennen Sie 2 der 5 Hauptaufgaben der Milchsäure und beschreiben Sie eine davon.', a:'Z. B. Säuregerinnung (Milch gerinnt durch die gebildete Milchsäure), Konservierung (hemmt Colibakterien und eiweisszersetzende Bakterien), Griffbildung/Synärese, Teigbeschaffenheit, Substrat für weitere Gärungen.' }
+    ] },
+  { kicker:'Abschluss', title:'Quer durch die Kulturen', id:'boss', boss:true, type:'quiz',
+    lead:'Gemischte Fragen zum Schluss.',
+    questions:[
+      { q:'Welche Kühlungsmethode blockiert die Enzymaktivität vollständig?', opts:['Schnellgefrierung (-30 bis -40 °C)','Kühlung (1–5 °C)','Tiefkühlung allein'], correct:0 },
+      { q:'In welcher Phase einer Bakterienkultur ist die Generationszeit am kürzesten?', opts:['Vermehrungsphase','Anpassungsphase','Absterbephase'], correct:0 },
+      { q:'Welche Kulturenform ist per Post zustellbar?', opts:['Lyophilisierte Kultur','Flüssigkultur','Fettsirtenkultur'], correct:0 },
+      { q:'Ein Säuregrad von 35 °SH deutet auf welche Kultur hin?', opts:['Eine «junge» Kultur mit hohem Kokkenanteil','Eine «alte» Kultur mit vielen Stäbchen','Eine infizierte Kultur'], correct:0 },
+      { q:'Was zerstört die Bakterienzelle letztlich beim lytischen Zyklus?', opts:['Die Auflösung der Zellwand nach der Phagen-Vermehrung','Der pH-Wert der Milch','Die Bebrütungstemperatur'], correct:0 },
+      { q:'Welche Massnahme bekämpft Bakteriophagen wirksam?', opts:['Kulturenrotation alle 2 bis 3 Tage','Höhere Bebrütungstemperatur','Grössere Impfmenge'], correct:0 },
+      { q:'Welche Produktgruppe profitiert von der heterofermentativen Gärung wegen Diacetyl?', opts:['Rahmsäurewecker-Produkte','UHT-Milch','Hartkäse mit Lb. helveticus'], correct:0 }
+    ] }
+];
+
+/* Challenge = ohne Lesetexte (Slides) */
+var STATIONS = ALL.filter(function(s){ return MODE === 'challenge' ? (s.type !== 'info' && s.type !== 'pdf' && s.type !== 'slides') : true; });
+
+(function(){
+  var t = (MODE === 'challenge') ? 'Challenge' : 'Lernpfad';
+  document.getElementById('pageTitle').textContent = t + ': Kulturen zubereiten';
+  document.getElementById('subtitle').textContent = (MODE === 'challenge')
+    ? 'Prüfungsmodus – ohne Hilfen, direkt auf den Punkt'
+    : 'Wissensvermittlung – mit Lesetexten und Übungen';
+  document.title = t + ': Kulturen zubereiten (a.8)';
+  if(MODE==='challenge'){
+    document.getElementById('lsDots').classList.add('selectable');
+    document.querySelector('.ls-select-hint').classList.add('show');
+    var hud=document.querySelector('.hud'); if(hud) hud.style.display='none';
+  }
+})();
+
+var N = STATIONS.length;
+var current = 0;
+var solved = [], earned = [], maxPts = [];
+for (var i = 0; i < N; i++) { solved[i] = false; earned[i] = 0; maxPts[i] = 0; }
+var xp = 0, streak = 0, bestStreak = 0;
+
+function findIdx(id){ for(var i=0;i<N;i++){ if(STATIONS[i].id===id) return i; } return -1; }
+function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;} return a; }
+function shuffleIdx(n){ var a=[]; for(var i=0;i<n;i++) a.push(i); return shuffle(a); }
+function fold(s){ return String(s).toLowerCase().replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss').replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim(); }
+function matchKeys(input, it){ var f=fold(input); if(!f) return false; if(f===fold(it.name)) return true; for(var i=0;i<it.keys.length;i++){ if(f.indexOf(fold(it.keys[i]))!==-1) return true; } return false; }
+
+function renderHud(){
+  document.getElementById('hudXp').textContent = xp;
+  var sc=0; for(var i=0;i<N;i++){ if(solved[i]) sc++; }
+  document.getElementById('hudBar').style.width = Math.round(sc/N*100)+'%';
+  document.getElementById('hudStreakNum').textContent = streak;
+  var onFire = streak >= 3;
+  document.getElementById('hudBar').classList.toggle('on-fire', onFire);
+  document.getElementById('hudStreakEmoji').style.display = onFire ? 'none' : '';
+  document.getElementById('hudFireWrap').style.display = onFire ? 'inline-block' : 'none';
+  document.getElementById('hudStreakNum').className = onFire ? 'streak-num-fire' : '';
+}
+function addXp(n){ xp+=n; var el=document.getElementById('hudXp'); renderHud(); el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
+function showStreakPop(){ var el=document.createElement('span'); el.className='streak-pop'; el.textContent='+1 🔥'; document.getElementById('hudStreak').appendChild(el); setTimeout(function(){ el.remove(); }, 900); }
+function registerAnswer(ok){
+  if(ok){ streak++; if(streak>bestStreak) bestStreak=streak; addXp(10+(streak>=3?5:0)); showStreakPop(); var s=document.getElementById('hudStreak'); s.classList.remove('pulse'); void s.offsetWidth; s.classList.add('pulse'); }
+  else { streak=0; renderHud(); }
+}
+
+function buildAll(){
+  var stage=document.getElementById('stage'); stage.innerHTML='';
+  STATIONS.forEach(function(st, idx){
+    var card=document.createElement('div');
+    card.className='station'+(st.boss?' boss':'')+(idx===0?'':' hidden'); card.id='station-'+idx;
+    card.innerHTML='<div class="station-kicker">'+st.kicker+'</div>'+
+      '<div class="station-title">'+st.title+'</div>'+
+      '<div class="station-lead">'+st.lead+'</div>'+
+      (st.media?'<div class="station-media">'+st.media+'</div>':'')+
+      '<div class="station-body" id="body-'+idx+'"></div>';
+    stage.appendChild(card);
+    buildBody(idx, st);
+  });
+  var fin=document.createElement('div'); fin.className='station hidden'; fin.id='station-finish';
+  fin.innerHTML='<div class="finish" id="finishBody"></div>'; stage.appendChild(fin);
+}
+function buildBody(idx, st){
+  if(st.type==='pdf')   buildPdf(idx, st);
+  if(st.type==='info')  buildInfo(idx, st);
+  if(st.type==='slides') buildSlides(idx, st);
+  if(st.type==='tf')    buildTF(idx, st);
+  if(st.type==='label')  (MODE==='challenge') ? buildLabelType(idx, st) : buildLabelChoose(idx, st);
+  if(st.type==='gaps')  buildGaps(idx, st);
+  if(st.type==='quiz')  buildQuiz(idx, st);
+  if(st.type==='explain') buildExplain(idx, st);
+}
+
+var CHECK_SVG = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+
+function buildPdf(idx, st){
+  maxPts[idx]=0;
+  document.getElementById('body-'+idx).innerHTML=
+    '<iframe src="'+st.src+'" class="pdf-frame"></iframe>'+
+    '<p style="font-size:0.78rem;color:var(--text-muted);margin:6px 0 14px;">'+
+      'PDF wird nicht angezeigt? <a href="'+st.src+'" target="_blank">Folien herunterladen</a></p>'+
+    '<div class="read-btn-row"><button class="read-btn" id="pdfbtn-'+idx+'">'+
+    '<div class="read-btn-icon">'+CHECK_SVG+'</div>'+
+    '<span class="read-btn-text">Gelesen ✓ (+5 XP)</span></button></div>';
+  document.getElementById('pdfbtn-'+idx).addEventListener('click', function(){
+    if(solved[idx]) return; solved[idx]=true; addXp(5);
+    this.disabled=true; this.classList.add('done');
+    this.querySelector('.read-btn-text').textContent='Gelesen ✓';
+    updateNav();
+  });
+}
+
+function buildInfo(idx, st){
+  maxPts[idx]=0;
+  document.getElementById('body-'+idx).innerHTML='<div class="read">'+st.read+'</div>'+
+    '<div class="read-btn-row"><button class="read-btn" id="readbtn-'+idx+'">'+
+    '<div class="read-btn-icon">'+CHECK_SVG+'</div>'+
+    '<span class="read-btn-text">Gelesen ✓ (+5 XP)</span></button></div>';
+  document.getElementById('readbtn-'+idx).addEventListener('click', function(){
+    if(solved[idx]) return; solved[idx]=true; addXp(5);
+    this.disabled=true; this.classList.add('done');
+    this.querySelector('.read-btn-text').textContent='Gelesen ✓';
+    updateNav();
+  });
+}
+
+function buildSlides(idx, st){
+  maxPts[idx]=0;
+  var cur=0;
+  var slides=st.slides;
+  var body=document.getElementById('body-'+idx);
+
+  var html='<div class="slideshow" id="ssw-'+idx+'">';
+  slides.forEach(function(sl,si){
+    html+='<div class="slide-panel'+(si===0?' active':'')+'" id="ssp-'+idx+'-'+si+'">';
+    html+='<div class="slide-header" style="background:'+sl.bg+';">';
+    html+='<span class="slide-icon">'+sl.icon+'</span>';
+    html+='<span class="slide-htitle" style="color:'+sl.color+';">'+sl.title+'</span>';
+    html+='</div><div class="slide-body read">'+sl.body+'</div></div>';
+  });
+  html+='</div>';
+  html+='<div class="slide-nav-row">';
+  html+='<button class="slide-nav-btn" id="sprev-'+idx+'" disabled>← Zurück</button>';
+  html+='<div style="display:flex;align-items:center;gap:8px;"><div class="slide-dots" id="sdots-'+idx+'"></div>';
+  html+='<span class="slide-counter" id="sctr-'+idx+'"></span></div>';
+  html+='<button class="slide-nav-btn" id="snext-'+idx+'">Weiter →</button>';
+  html+='</div>';
+  html+='<div class="read-btn-row" id="sbtnrow-'+idx+'" style="display:'+(slides.length<=1?'':'none')+'">';
+  html+='<button class="read-btn" id="readbtn-'+idx+'">';
+  html+='<div class="read-btn-icon">'+CHECK_SVG+'</div>';
+  html+='<span class="read-btn-text">Gelesen ✓ (+5 XP)</span></button></div>';
+  body.innerHTML=html;
+
+  function renderDots(){
+    var el=document.getElementById('sdots-'+idx); el.innerHTML='';
+    slides.forEach(function(sl,si){
+      var d=document.createElement('span'); d.className='slide-dot'+(si===cur?' active':si<cur?' done':'');
+      d.addEventListener('click',function(){ if(si!==cur) go(si); });
+      el.appendChild(d);
+    });
+    var ctr=document.getElementById('sctr-'+idx);
+    if(ctr) ctr.textContent=(cur+1)+' / '+slides.length;
+  }
+  function renderNav(){
+    document.getElementById('sprev-'+idx).disabled=(cur===0);
+    document.getElementById('snext-'+idx).disabled=(cur===slides.length-1);
+    var btnRow=document.getElementById('sbtnrow-'+idx);
+    if(btnRow) btnRow.style.display=(cur===slides.length-1)?'':'none';
+  }
+  function go(newIdx){
+    var dir=newIdx>cur?'right':'left';
+    var panel=document.getElementById('ssp-'+idx+'-'+newIdx);
+    slides.forEach(function(sl,si){ document.getElementById('ssp-'+idx+'-'+si).classList.remove('active','slide-in-right','slide-in-left'); });
+    panel.classList.add('active',dir==='right'?'slide-in-right':'slide-in-left');
+    cur=newIdx; renderDots(); renderNav();
+  }
+  renderDots(); renderNav();
+  document.getElementById('sprev-'+idx).addEventListener('click',function(){ if(cur>0) go(cur-1); });
+  document.getElementById('snext-'+idx).addEventListener('click',function(){ if(cur<slides.length-1) go(cur+1); });
+
+  var tsX=0;
+  document.getElementById('ssw-'+idx).addEventListener('touchstart',function(e){ tsX=e.touches[0].clientX; },{passive:true});
+  document.getElementById('ssw-'+idx).addEventListener('touchend',function(e){
+    var dx=e.changedTouches[0].clientX-tsX;
+    if(Math.abs(dx)>42){ if(dx<0&&cur<slides.length-1) go(cur+1); else if(dx>0&&cur>0) go(cur-1); }
+  },{passive:true});
+
+  document.getElementById('readbtn-'+idx).addEventListener('click',function(){
+    if(solved[idx]) return; solved[idx]=true; addXp(5);
+    this.disabled=true; this.classList.add('done');
+    this.querySelector('.read-btn-text').textContent='Gelesen ✓';
+    updateNav();
+  });
+}
+
+function buildTF(idx, st){
+  maxPts[idx]=st.items.length*0.5;
+  var body=document.getElementById('body-'+idx);
+  st.items.forEach(function(it, ii){
+    var item=document.createElement('div'); item.className='tf-item';
+    item.innerHTML='<div class="tf-statement">'+it.s+'</div>'+
+      '<div class="tf-btns"><button class="tf-btn" data-i="'+ii+'" data-v="true">Wahr</button>'+
+      '<button class="tf-btn" data-i="'+ii+'" data-v="false">Falsch</button></div>'+
+      '<div class="tf-exp" id="tfexp-'+idx+'-'+ii+'">'+it.e+'</div>';
+    body.appendChild(item);
+  });
+  body.querySelectorAll('.tf-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var ii=+btn.dataset.i; var pick=btn.dataset.v==='true';
+      if(body.querySelector('.tf-btn[data-i="'+ii+'"]:disabled')) return;
+      var it=st.items[ii];
+      body.querySelectorAll('.tf-btn[data-i="'+ii+'"]').forEach(function(b){ b.disabled=true; if((b.dataset.v==='true')===it.a) b.classList.add('reveal'); });
+      if(pick===it.a){ btn.classList.add('sel-correct'); earned[idx]+=0.5; registerAnswer(true); } else { btn.classList.add('sel-wrong'); registerAnswer(false); }
+      document.getElementById('tfexp-'+idx+'-'+ii).classList.add('show');
+      var answered=0; for(var k=0;k<st.items.length;k++){ if(document.querySelector('#body-'+idx+' .tf-btn[data-i="'+k+'"]:disabled')) answered++; }
+      if(answered===st.items.length) solved[idx]=true;
+      updateNav();
+    });
+  });
+}
+
+function buildGaps(idx, st){
+  var gapCount=0; var html='<div class="gap-text">';
+  st.parts.forEach(function(part){
+    if(typeof part==='string'){ html+=part; }
+    else { var gi=gapCount++; var opts=shuffleIdx(part.opts.length);
+      html+='<select data-g="'+gi+'" data-correct="'+part.correct+'"><option value="-1">…</option>';
+      opts.forEach(function(oi){ html+='<option value="'+oi+'">'+part.opts[oi]+'</option>'; });
+      html+='</select>';
+    }
+  });
+  html+='</div><div class="check-btn-row"><button class="btn btn-primary" id="gapcheck-'+idx+'">Prüfen</button></div>';
+  document.getElementById('body-'+idx).innerHTML=html;
+  maxPts[idx]=gapCount*0.5;
+  document.getElementById('gapcheck-'+idx).addEventListener('click', function(){
+    if(solved[idx]) return;
+    var sels=document.querySelectorAll('#body-'+idx+' select'); var ok=0;
+    sels.forEach(function(sel){ sel.classList.remove('correct','wrong'); var good=(+sel.value===+sel.dataset.correct); if(good){sel.classList.add('correct'); ok++;} else sel.classList.add('wrong'); sel.disabled=true; registerAnswer(good); });
+    earned[idx]=ok*0.5; solved[idx]=true; this.disabled=true; updateNav();
+  });
+}
+
+function buildQuiz(idx, st){
+  maxPts[idx]=st.questions.length*0.5;
+  var body=document.getElementById('body-'+idx);
+  st.questions.forEach(function(qq, qi){
+    var block=document.createElement('div'); block.className='q-block';
+    var h='<div class="q-text">'+(qi+1)+'. '+qq.q+'</div>';
+    shuffleIdx(qq.opts.length).forEach(function(oi){ h+='<button class="opt" data-q="'+qi+'" data-o="'+oi+'">'+qq.opts[oi]+'</button>'; });
+    block.innerHTML=h; body.appendChild(block);
+  });
+  body.querySelectorAll('.opt').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var qi=+btn.dataset.q, oi=+btn.dataset.o, qq=st.questions[qi];
+      if(body.querySelector('.opt[data-q="'+qi+'"]:disabled')) return;
+      body.querySelectorAll('.opt[data-q="'+qi+'"]').forEach(function(b){ b.disabled=true; if(+b.dataset.o===qq.correct) b.classList.add('correct'); });
+      if(oi!==qq.correct){ btn.classList.add('wrong'); registerAnswer(false); } else { earned[idx]+=0.5; registerAnswer(true); }
+      var answered=0; for(var k=0;k<st.questions.length;k++){ if(document.querySelector('#body-'+idx+' .opt[data-q="'+k+'"]:disabled')) answered++; }
+      if(answered===st.questions.length) solved[idx]=true;
+      updateNav();
+    });
+  });
+}
+
+/* Erklären – Flip-Karte wie lernkaertchen.html: Frage vorne, Musterlösung hinten,
+   nach dem Umdrehen selbst einschätzen (Wusste ich / Nochmal üben) */
+function buildExplain(idx, st){
+  maxPts[idx]=st.cards.length;
+  var body=document.getElementById('body-'+idx);
+  var cur=0, isFlipped=false;
+  var rated=[]; for(var i=0;i<st.cards.length;i++) rated[i]=null;
+
+  body.innerHTML =
+    '<div class="exp-counter" id="expctr-'+idx+'"></div>'+
+    '<div class="exp-scene" id="expscene-'+idx+'"><div class="exp-flip" id="expflip-'+idx+'">'+
+      '<div class="exp-face exp-front"><div class="exp-q-text" id="expq-'+idx+'"></div>'+
+      '<div class="exp-hint">Karte umdrehen für die Musterlösung</div></div>'+
+      '<div class="exp-face exp-back"><div class="exp-a-text" id="expa-'+idx+'"></div></div>'+
+    '</div></div>'+
+    '<div class="exp-controls">'+
+      '<button class="btn btn-ghost" id="expprev-'+idx+'">← Zurück</button>'+
+      '<button class="btn btn-success" id="expflipbtn-'+idx+'">Umdrehen</button>'+
+      '<button class="btn btn-ghost" id="expnext-'+idx+'">Weiter →</button>'+
+    '</div>'+
+    '<div class="exp-rate-row" id="exprate-'+idx+'" style="visibility:hidden;"></div>';
+
+  function renderRate(){
+    var row=document.getElementById('exprate-'+idx);
+    if(rated[cur]===null){
+      row.innerHTML='<button class="exp-rate-btn rate-good" id="expgood-'+idx+'">Wusste ich ✓</button>'+
+        '<button class="exp-rate-btn rate-bad" id="expbad-'+idx+'">Nochmal üben</button>';
+      document.getElementById('expgood-'+idx).addEventListener('click', function(e){ e.stopPropagation(); rate(true); });
+      document.getElementById('expbad-'+idx).addEventListener('click', function(e){ e.stopPropagation(); rate(false); });
+    } else {
+      row.innerHTML='<button class="exp-rate-btn rated '+(rated[cur]?'picked-good':'picked-bad')+'" disabled>'+(rated[cur]?'Wusste ich ✓':'Nochmal üben')+'</button>';
+    }
+  }
+
+  function rate(ok){
+    if(rated[cur]!==null) return;
+    rated[cur]=ok; registerAnswer(ok);
+    var doneCount=0, goodCount=0;
+    rated.forEach(function(r){ if(r!==null) doneCount++; if(r===true) goodCount++; });
+    earned[idx]=goodCount;
+    if(doneCount===st.cards.length) solved[idx]=true;
+    renderRate(); updateNav();
+  }
+
+  function show(){
+    var c=st.cards[cur];
+    document.getElementById('expq-'+idx).textContent=c.q;
+    document.getElementById('expa-'+idx).textContent=c.a;
+    document.getElementById('expctr-'+idx).textContent='Karte '+(cur+1)+' von '+st.cards.length;
+    document.getElementById('expprev-'+idx).disabled=(cur===0);
+    isFlipped=false; document.getElementById('expflip-'+idx).classList.remove('flipped');
+    document.getElementById('exprate-'+idx).style.visibility='hidden';
+    renderRate();
+  }
+
+  function flip(){
+    isFlipped=!isFlipped;
+    document.getElementById('expflip-'+idx).classList.toggle('flipped');
+    document.getElementById('exprate-'+idx).style.visibility=isFlipped?'visible':'hidden';
+  }
+
+  document.getElementById('expscene-'+idx).addEventListener('click', flip);
+  document.getElementById('expflipbtn-'+idx).addEventListener('click', function(e){ e.stopPropagation(); flip(); });
+  document.getElementById('expnext-'+idx).addEventListener('click', function(e){ e.stopPropagation(); cur=(cur+1)%st.cards.length; show(); });
+  document.getElementById('expprev-'+idx).addEventListener('click', function(e){ e.stopPropagation(); if(cur>0){ cur--; show(); } });
+
+  show();
+}
+
+function renderProgress(){
+  var dots=document.getElementById('lsDots'); dots.innerHTML='';
+  for(var i=0;i<N;i++){
+    var d=document.createElement('div');
+    d.className='ls-dot'+(i===current?' active':'')+(solved[i]?' done':'');
+    d.textContent=solved[i]?'✓':(i+1);
+    if(MODE==='challenge'){
+      d.title=STATIONS[i].kicker+' – '+STATIONS[i].title;
+      d.addEventListener('click', (function(ii){ return function(){ jumpTo(ii); }; })(i));
+    }
+    dots.appendChild(d);
+  }
+  document.getElementById('lsMeta').textContent = (current<N) ? ('Posten '+(current+1)+' von '+N) : 'Auswertung';
+}
+function jumpTo(i){
+  if(i===current) return;
+  current=i; showCard(i); updateNav();
+}
+function showCard(which){
+  document.querySelectorAll('.station').forEach(function(c){ c.classList.add('hidden'); });
+  document.getElementById(which==='finish'?'station-finish':'station-'+which).classList.remove('hidden');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function updateNav(){
+  var nextBtn=document.getElementById('nextBtn'), prevBtn=document.getElementById('prevBtn');
+  prevBtn.style.visibility=(current===0)?'hidden':'visible';
+  if(current<N){ nextBtn.disabled=!solved[current]; nextBtn.textContent=(current===N-1)?'Zur Auswertung →':'Weiter →'; }
+  renderProgress(); renderHud();
+}
+function goNext(){ if(current<N){ if(!solved[current]) return; current++; if(current<N){ showCard(current); updateNav(); } else { showFinish(); } } }
+function goPrev(){ if(current===0) return; if(current>=N) current=N-1; else current--; showCard(current); document.getElementById('nextBtn').style.visibility='visible'; document.getElementById('nextBtn').disabled=false; updateNav(); }
+
+function showFinish(){
+  var total=0, max=0, expGood=0, expTotal=0;
+  for(var i=0;i<N;i++){
+    if(STATIONS[i].type==='explain'){ expGood+=earned[i]; expTotal+=maxPts[i]; }
+    else { total+=earned[i]; max+=maxPts[i]; }
+  }
+  var pct=max>0?Math.round(total/max*100):0;
+  var rank = pct>=90?'Kulturen-Meister 🥇' : pct>=75?'Kulturen-Profi' : pct>=50?'Kulturen-Geselle' : 'Kulturen-Lehrling';
+  var badges=[
+    { icon:'📖', name:'Aufmerksamer Leser', got: MODE!=='challenge' },
+    { icon:'🧊', name:'Kühl-Profi', got: findIdx('kuehlung_tf')>=0 && earned[findIdx('kuehlung_tf')]===maxPts[findIdx('kuehlung_tf')] },
+    { icon:'🦠', name:'Phagen-Experte', got: findIdx('phagen_quiz')>=0 && earned[findIdx('phagen_quiz')]===maxPts[findIdx('phagen_quiz')] },
+    { icon:'⚗️', name:'Gärungs-Kenner', got: findIdx('msg_gaps')>=0 && earned[findIdx('msg_gaps')]===maxPts[findIdx('msg_gaps')] },
+    { icon:'⚡', name:'Serie (Streak 8+)', got: bestStreak>=8 },
+    { icon:'🥇', name:'Kulturen-Meister (90%)', got: pct>=90 }
+  ];
+  var got=0, bh=''; badges.forEach(function(b){ if(b.got) got++; bh+='<span class="badge-chip'+(b.got?' earned':'')+'">'+(b.got?b.icon:'<span class="lock">🔒</span>')+' '+b.name+'</span>'; });
+
+  var headline, scoreSub, explainNote='', breakdown='';
+  if(MODE==='challenge'){
+    var note = max>0 ? Math.round((1 + total/max*5)*10)/10 : 1;
+    headline = '<div class="big-score">Note '+note.toFixed(1)+'</div>';
+    scoreSub = '<div class="score-sub">'+total+' / '+max+' Punkte ('+pct+' %) · simulierte Note, keine offizielle Bewertung</div>';
+    if(expTotal>0) explainNote = '<div class="score-sub">Erklären-Karten: '+expGood+' von '+expTotal+' selbst als «gewusst» eingeschätzt (nicht in der Note)</div>';
+    breakdown='<ul class="score-breakdown">';
+    for(var bi=0;bi<N;bi++){
+      if(STATIONS[bi].type==='explain') continue;
+      breakdown+='<li><span>'+STATIONS[bi].title+'</span><span>'+earned[bi]+' / '+maxPts[bi]+' P.</span></li>';
+    }
+    breakdown+='</ul>';
+  } else {
+    headline = '<div class="rank">'+rank+'</div><div class="big-score">'+xp+' XP</div>';
+    scoreSub = '<div class="score-sub">'+total+' / '+max+' Punkte ('+pct+' %) · längste Serie 🔥 '+bestStreak+' · '+got+'/'+badges.length+' Abzeichen</div>';
+  }
+  document.getElementById('finishBody').innerHTML=
+    '<div class="station-kicker">'+(MODE==='challenge'?'Prüfung beendet':'Geschafft')+'</div>'+
+    headline+
+    scoreSub+
+    explainNote+
+    breakdown+
+    '<div class="badges">'+bh+'</div>'+
+    '<button class="btn btn-primary" onclick="restart()">Nochmals starten</button>'+
+    '<a class="back-link" href="../index.html" style="display:block;margin-top:14px;">← Alle Lerntools</a>';
+  showCard('finish');
+  document.getElementById('nextBtn').style.visibility='hidden';
+  document.getElementById('prevBtn').style.visibility='visible';
+  renderProgress();
+}
+function restart(){
+  current=0; xp=0; streak=0; bestStreak=0;
+  for(var i=0;i<N;i++){ solved[i]=false; earned[i]=0; }
+  document.getElementById('nextBtn').style.visibility='visible';
+  buildAll(); showCard(0); updateNav();
+}
+
+buildAll(); showCard(0); updateNav();
+</script>
+</body>
+</html>

@@ -78,7 +78,8 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 │   ├── quiz-kulturenformen.html
 │   ├── quiz-abweichungen-phagen.html
 │   ├── kreuzwortraetsel-kulturen.html
-│   └── spiel-homofermentativ.html
+│   ├── spiel-homofermentativ.html
+│   └── lernsession-pruefung-kulturen.html  ← Lernpfad (Standard) / Challenge (?mode=challenge)
 ├── d1-hygiene/
 │   └── spiel-desinfektion.html
 └── tools/
