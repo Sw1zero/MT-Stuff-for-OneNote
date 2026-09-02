@@ -77,8 +77,8 @@
       align-self: flex-start;
     }
 
-    /* Frage (etwas kleiner als card-term, da ganzer Satz) */
-    .card-question {
+    /* Frage (etwas kleiner als in lernkaertchen.html, da ganzer Satz) */
+    .card-term {
       font-size: 0.97rem;
       font-weight: 600;
       color: var(--text);
@@ -92,7 +92,7 @@
     }
 
     /* Antwort */
-    .card-answer {
+    .card-explanation {
       font-size: 0.9rem;
       color: var(--text);
       line-height: 1.6;
@@ -100,9 +100,9 @@
       max-height: 210px;
     }
 
-    .card-answer strong { color: var(--blue-dark); }
+    .card-explanation strong { color: var(--blue-dark); }
 
-    .card-answer ul {
+    .card-explanation ul {
       margin: 6px 0 0 0;
       padding-left: 16px;
       display: flex;
@@ -118,6 +118,37 @@
       flex-wrap: wrap;
       justify-content: center;
       margin-bottom: 12px;
+    }
+
+    /* ---- Richtig/Falsch-Bestätigung ---- */
+    .rating-row {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+
+    .btn-danger {
+      background: var(--red);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(204,51,51,0.25);
+    }
+
+    .btn-danger:hover { background: var(--red-dark); }
+
+    /* ---- Abschluss-Bildschirm ---- */
+    .complete-panel {
+      width: 440px;
+      max-width: 92vw;
+      padding: 40px 36px;
+      text-align: center;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      margin-bottom: 32px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
     }
   </style>
 </head>
@@ -144,27 +175,36 @@
     <div class="progress-bar-fill" id="progressBar"></div>
   </div>
 
-  <div class="scene" id="scene" onclick="flipCard()">
+  <div class="scene" id="scene">
     <div class="card" id="card">
       <div class="card-face card-front">
         <span class="card-category-badge" id="frontLabel"></span>
-        <div class="card-question" id="frontQuestion"></div>
+        <div class="card-term" id="frontTerm"></div>
         <div class="card-hint">Karte umdrehen für die Antwort</div>
       </div>
       <div class="card-face card-back">
         <span class="card-category-badge" id="backLabel"></span>
-        <div class="card-answer" id="backAnswer"></div>
+        <div class="card-explanation" id="backExplanation"></div>
       </div>
     </div>
   </div>
 
-  <div class="controls">
-    <button class="btn btn-ghost"   onclick="prevCard()">&#8592; Zurück</button>
-    <button class="btn btn-success" onclick="flipCard()">Umdrehen</button>
-    <button class="btn btn-ghost"   onclick="nextCard()">Weiter &#8594;</button>
+  <div class="complete-panel" id="completePanel" hidden>
+    <p id="completeText">Alle Karten gewusst.</p>
+  </div>
+
+  <div class="rating-row" id="ratingRow" hidden>
+    <button class="btn btn-danger" id="unknownBtn">Wusste ich nicht</button>
+    <button class="btn btn-success" id="knownBtn">Wusste ich</button>
+  </div>
+
+  <div class="controls" id="controlsNav">
+    <button class="btn btn-ghost"   id="prevBtn">&#8592; Zurück</button>
+    <button class="btn btn-success" id="flipBtn">Umdrehen</button>
+    <button class="btn btn-ghost"   id="nextBtn">Weiter &#8594;</button>
   </div>
   <div class="controls">
-    <button class="btn btn-primary" onclick="shuffleCards()">&#x21C4; Mischen</button>
+    <button class="btn btn-primary" id="shuffleBtn">&#x21C4; Mischen</button>
   </div>
 
   <p class="keyboard-hint" style="margin-top:12px;">
@@ -182,53 +222,53 @@
     const ALL_CARDS = [
       {
         category: 'Mikrobiologisch',
-        question:  'Erklären Sie, wie es zu einer geblähten Jogurtverpackung kommen kann. Nennen Sie drei Möglichkeiten, wie das passieren kann.',
-        answer:    '<strong>Ursache:</strong> Hefen produzieren bei der Gärung CO₂ → Druck in der Verpackung steigt.<br><br><strong>Eintragsquellen:</strong><ul><li>Raumluft</li><li>Kontaminierter Grundstoff oder Zucker</li><li>Unsaubere Anlagen oder Kontakt mit den Händen</li></ul>',
+        term:      'Erklären Sie, wie es zu einer geblähten Jogurtverpackung kommen kann. Nennen Sie drei Möglichkeiten, wie das passieren kann.',
+        explanation: '<strong>Ursache:</strong> Hefen produzieren bei der Gärung CO₂ → Druck in der Verpackung steigt.<br><br><strong>Eintragsquellen:</strong><ul><li>Raumluft</li><li>Kontaminierter Grundstoff oder Zucker</li><li>Unsaubere Anlagen oder Kontakt mit den Händen</li></ul>',
       },
       {
         category: 'Mikrobiologisch',
-        question:  'Beschreiben Sie, auf welchem Weg Schimmelpilze auf die Jogurtoberfläche gelangen können. Bringen Sie ein Beispiel.',
-        answer:    'Schimmelpilze gelangen über <strong>Raumluft</strong> (z. B. offene Fenster im Abfüllraum), über <strong>unsaubere Verpackungen</strong> oder über <strong>Spritzwasser</strong> auf die Oberfläche.',
+        term:  'Beschreiben Sie, auf welchem Weg Schimmelpilze auf die Jogurtoberfläche gelangen können. Bringen Sie ein Beispiel.',
+        explanation:    'Schimmelpilze gelangen über <strong>Raumluft</strong> (z. B. offene Fenster im Abfüllraum), über <strong>unsaubere Verpackungen</strong> oder über <strong>Spritzwasser</strong> auf die Oberfläche.',
       },
       {
         category: 'Konsistenz & Struktur',
-        question:  'Erklären Sie, welche Produktionsfehler zu einem griesigen Jogurt führen können. Nennen Sie vier Ursachen.',
-        answer:    '<ul><li>Nature-Jogurt zu wenig strukturbearbeitet</li><li>Abfallende Bebrütungstemperatur</li><li>Zu hohe Bebrütungstemperatur (Lb.-Anteil zu hoch)</li><li>Zu hohe fettfreie Milchtrockenmasse</li></ul>',
+        term:  'Erklären Sie, welche Produktionsfehler zu einem griesigen Jogurt führen können. Nennen Sie vier Ursachen.',
+        explanation:    '<ul><li>Nature-Jogurt zu wenig strukturbearbeitet</li><li>Abfallende Bebrütungstemperatur</li><li>Zu hohe Bebrütungstemperatur (Lb.-Anteil zu hoch)</li><li>Zu hohe fettfreie Milchtrockenmasse</li></ul>',
       },
       {
         category: 'Konsistenz & Struktur',
-        question:  'Erklären Sie, warum eine ungenügende thermische Belastung der Milch zu einer zu tiefen Viskosität des Jogurts führt.',
-        answer:    'Bei ungenügender Erhitzung werden die <strong>Molkenproteine nicht ausreichend denaturiert</strong>. Sie können dann nicht genügend Wasser binden → Jogurt wird zu dünnflüssig.',
+        term:  'Erklären Sie, warum eine ungenügende thermische Belastung der Milch zu einer zu tiefen Viskosität des Jogurts führt.',
+        explanation:    'Bei ungenügender Erhitzung werden die <strong>Molkenproteine nicht ausreichend denaturiert</strong>. Sie können dann nicht genügend Wasser binden → Jogurt wird zu dünnflüssig.',
       },
       {
         category: 'Konsistenz & Struktur',
-        question:  'Beschreiben Sie fünf verschiedene Ursachen, die zu einem zu dünnflüssigen Jogurt führen können.',
-        answer:    '<ul><li>Ungenügende thermische Belastung der Milch</li><li>Keine oder ungenügende Homogenisation</li><li>Zu starke mechanische Belastung der Gallerte (starkes Rühren, ungeeignete Pumpen)</li><li>Zu tiefe fettfreie Trockenmasse / Verwässerung</li><li>Ungenügende Säuerung</li></ul>',
+        term:  'Beschreiben Sie fünf verschiedene Ursachen, die zu einem zu dünnflüssigen Jogurt führen können.',
+        explanation:    '<ul><li>Ungenügende thermische Belastung der Milch</li><li>Keine oder ungenügende Homogenisation</li><li>Zu starke mechanische Belastung der Gallerte (starkes Rühren, ungeeignete Pumpen)</li><li>Zu tiefe fettfreie Trockenmasse / Verwässerung</li><li>Ungenügende Säuerung</li></ul>',
       },
       {
         category: 'Konsistenz & Struktur',
-        question:  'Erklären Sie, warum Erschütterungen während der Gerinnung oder des Kühlens zur Molkenabscheidung führen können. Bringen Sie ein Beispiel.',
-        answer:    'Die Gallerte ist während der Gerinnung und beim Kühlen mechanisch empfindlich. <strong>Erschütterungen</strong> (z. B. Transport auf unebener Strasse) zerstören das Proteingerüst → Molke tritt aus.',
+        term:  'Erklären Sie, warum Erschütterungen während der Gerinnung oder des Kühlens zur Molkenabscheidung führen können. Bringen Sie ein Beispiel.',
+        explanation:    'Die Gallerte ist während der Gerinnung und beim Kühlen mechanisch empfindlich. <strong>Erschütterungen</strong> (z. B. Transport auf unebener Strasse) zerstören das Proteingerüst → Molke tritt aus.',
       },
       {
         category: 'Konsistenz & Struktur',
-        question:  'Beschreiben Sie, wie Lufteinzug beim Mischen die Qualität des Jogurts beeinflussen kann. Erklären Sie den Zusammenhang mit der Molkenabscheidung.',
-        answer:    'Luftblasen, die durch undichte Leitungen oder falsches Mischen eingetragen werden, <strong>stören die Gallertstruktur</strong>. Das Proteingerüst wird beschädigt → Molke scheidet sich ab → Molkenlässigkeit.',
+        term:  'Beschreiben Sie, wie Lufteinzug beim Mischen die Qualität des Jogurts beeinflussen kann. Erklären Sie den Zusammenhang mit der Molkenabscheidung.',
+        explanation:    'Luftblasen, die durch undichte Leitungen oder falsches Mischen eingetragen werden, <strong>stören die Gallertstruktur</strong>. Das Proteingerüst wird beschädigt → Molke scheidet sich ab → Molkenlässigkeit.',
       },
       {
         category: 'Konsistenz & Struktur',
-        question:  'Beschreiben Sie zwei mögliche Ursachen für einen fadenziehenden Jogurt. Bringen Sie je ein Beispiel.',
-        answer:    '<ul><li><strong>Zu tiefe Bebrütungstemperatur</strong> (z. B. Thermostat defekt) → Fadenziehende Milchsäurebakterien sind im Vorteil</li><li><strong>Infektion mit fadenziehenden Milchsäurebakterien</strong> (z. B. durch unzureichende Anlagenreinigung)</li></ul>',
+        term:  'Beschreiben Sie zwei mögliche Ursachen für einen fadenziehenden Jogurt. Bringen Sie je ein Beispiel.',
+        explanation:    '<ul><li><strong>Zu tiefe Bebrütungstemperatur</strong> (z. B. Thermostat defekt) → Fadenziehende Milchsäurebakterien sind im Vorteil</li><li><strong>Infektion mit fadenziehenden Milchsäurebakterien</strong> (z. B. durch unzureichende Anlagenreinigung)</li></ul>',
       },
       {
         category: 'Geschmack',
-        question:  'Erklären Sie, warum ein zu langsames oder ungenügendes Kühlen nach der Bebrütung zu einem übersäuerten Jogurt führt.',
-        answer:    'Bei hoher Temperatur arbeiten die Milchsäurebakterien weiter → <strong>Nachsäuerung</strong>: Milchsäureproduktion setzt sich fort → Säuregehalt steigt an. Erst unter 10 °C wird die Säuerung gestoppt.',
+        term:  'Erklären Sie, warum ein zu langsames oder ungenügendes Kühlen nach der Bebrütung zu einem übersäuerten Jogurt führt.',
+        explanation:    'Bei hoher Temperatur arbeiten die Milchsäurebakterien weiter → <strong>Nachsäuerung</strong>: Milchsäureproduktion setzt sich fort → Säuregehalt steigt an. Erst unter 10 °C wird die Säuerung gestoppt.',
       },
       {
         category: 'Geschmack',
-        question:  'Erklären Sie den Einfluss eines hohen Laktobazillenanteils in der Jogurtkultur auf die Säuerung. Bringen Sie ein Beispiel.',
-        answer:    'Laktobazillen säuern <strong>stärker</strong> als Streptokokken. Ein zu hoher Lb.-Anteil führt zu übermässiger Milchsäurebildung → Jogurt wird übersäuert (z. B. wenn die Kultur aus dem Gleichgewicht gerät und Lb. dominieren).',
+        term:  'Erklären Sie den Einfluss eines hohen Laktobazillenanteils in der Jogurtkultur auf die Säuerung. Bringen Sie ein Beispiel.',
+        explanation:    'Laktobazillen säuern <strong>stärker</strong> als Streptokokken. Ein zu hoher Lb.-Anteil führt zu übermässiger Milchsäurebildung → Jogurt wird übersäuert (z. B. wenn die Kultur aus dem Gleichgewicht gerät und Lb. dominieren).',
       },
     ];
 
@@ -238,84 +278,10 @@
       'Geschmack':           { bg: '#dcfce7', fg: '#15803d' },
     };
 
-    let deck = [...ALL_CARDS];
-    let currentIndex = 0;
-    let isFlipped = false;
-    let activeCategory = 'Alle';
-
-    function getFilteredDeck() {
-      return activeCategory === 'Alle' ? [...ALL_CARDS]
-        : ALL_CARDS.filter(c => c.category === activeCategory);
-    }
-
-    function renderFilters() {
-      const wrap = document.getElementById('filterWrap');
-      const categories = ['Alle', ...Object.keys(CATEGORY_COLORS)];
-      wrap.innerHTML = categories.map(cat => {
-        const count = cat === 'Alle' ? ALL_CARDS.length
-          : ALL_CARDS.filter(c => c.category === cat).length;
-        return `<button class="filter-btn ${cat === activeCategory ? 'active' : ''}"
-                  onclick="setCategory('${cat}')">${cat} <span style="opacity:0.65;font-size:0.68rem">${count}</span></button>`;
-      }).join('');
-    }
-
-    function setCategory(cat) {
-      activeCategory = cat;
-      deck = getFilteredDeck();
-      currentIndex = 0;
-      renderFilters();
-      showCard();
-    }
-
-    function shuffleCards() {
-      for (let i = deck.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [deck[i], deck[j]] = [deck[j], deck[i]];
-      }
-      currentIndex = 0;
-      showCard(true);
-    }
-
-    function showCard(forceUnflip = false) {
-      if (isFlipped || forceUnflip) {
-        isFlipped = false;
-        document.getElementById('card').classList.remove('flipped');
-      }
-      const c   = deck[currentIndex];
-      const col = CATEGORY_COLORS[c.category] || { bg: '#f1f5f9', fg: '#4a5568' };
-
-      document.getElementById('frontQuestion').textContent = c.question;
-      document.getElementById('backAnswer').innerHTML = c.answer;
-
-      ['frontLabel', 'backLabel'].forEach(id => {
-        const el = document.getElementById(id);
-        el.textContent   = c.category;
-        el.style.background = col.bg;
-        el.style.color      = col.fg;
-      });
-
-      const total = deck.length;
-      document.getElementById('progressText').textContent = `Karte ${currentIndex + 1} von ${total}`;
-      document.getElementById('progressBar').style.width  = `${((currentIndex + 1) / total) * 100}%`;
-    }
-
-    function flipCard() {
-      isFlipped = !isFlipped;
-      document.getElementById('card').classList.toggle('flipped');
-    }
-
-    function nextCard() { currentIndex = (currentIndex + 1) % deck.length; showCard(true); }
-    function prevCard() { currentIndex = (currentIndex - 1 + deck.length) % deck.length; showCard(true); }
-
-    document.addEventListener('keydown', e => {
-      if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); flipCard(); }
-      if (e.key === 'ArrowRight') nextCard();
-      if (e.key === 'ArrowLeft')  prevCard();
-      if (e.key === 's' || e.key === 'S') shuffleCards();
-    });
-
-    renderFilters();
-    showCard();
+  </script>
+  <script src="../assets/lernkaertchen-engine.js"></script>
+  <script>
+    MTFlashcards.init({ cards: ALL_CARDS, categoryColors: CATEGORY_COLORS });
   </script>
 </body>
 </html>
