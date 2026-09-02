@@ -712,22 +712,64 @@ function buildGaps(idx, st){
   });
 }
 
+/* Zuordnungs-Tabelle – Drag & Drop (wie buildLabelChoose, aber Tabellenzeilen statt Bild-Slots;
+   mehrere Zeilen dürfen denselben Chip-Text als Lösung haben, dafür keine Namens-Deduplizierung) */
 function buildTable(idx, st){
-  var html='<table class="gap-table"><thead><tr><th>'+st.stmtHeader+'</th><th>'+st.pickHeader+'</th></tr></thead><tbody>';
-  st.rows.forEach(function(row, ri){
-    var opts=shuffleIdx(row.opts.length);
-    html+='<tr><td class="gt-stmt">'+row.text+'</td><td class="gt-pick"><select class="lp-select" data-g="'+ri+'" data-correct="'+row.correct+'"><option value="-1">…</option>';
-    opts.forEach(function(oi){ html+='<option value="'+oi+'">'+row.opts[oi]+'</option>'; });
-    html+='</select></td></tr>';
-  });
-  html+='</tbody></table><div class="check-btn-row"><button class="btn btn-primary" id="tablecheck-'+idx+'">Prüfen</button></div>';
-  document.getElementById('body-'+idx).innerHTML=html;
   maxPts[idx]=st.rows.length*0.5;
-  document.getElementById('tablecheck-'+idx).addEventListener('click', function(){
-    if(solved[idx]) return;
-    var sels=document.querySelectorAll('#body-'+idx+' select'); var ok=0;
-    sels.forEach(function(sel){ sel.classList.remove('correct','wrong'); var good=(+sel.value===+sel.dataset.correct); if(good){sel.classList.add('correct'); ok++;} else sel.classList.add('wrong'); sel.disabled=true; registerAnswer(good); });
-    earned[idx]=ok*0.5; solved[idx]=true; this.disabled=true; updateNav();
+  var body=document.getElementById('body-'+idx);
+  body.innerHTML='';
+
+  var correctWords=st.rows.map(function(row){ return row.opts[row.correct]; });
+  var uniqueCorrect=correctWords.filter(function(v,i,a){ return a.indexOf(v)===i; });
+  var allOpts=[]; st.rows.forEach(function(row){ row.opts.forEach(function(o){ if(allOpts.indexOf(o)===-1) allOpts.push(o); }); });
+  var distractorWords=allOpts.filter(function(o){ return uniqueCorrect.indexOf(o)===-1; });
+  var chipWords=correctWords.slice();
+  distractorWords.forEach(function(d){ chipWords.push(d); chipWords.push(d); });
+
+  var bank=document.createElement('div'); bank.className='lb-bank';
+  shuffle(chipWords).forEach(function(word){
+    var chip=document.createElement('span'); chip.className='lb-chip'; chip.textContent=word; chip.dataset.word=word; chip.setAttribute('draggable','true');
+    chip.addEventListener('dragstart',function(e){_lbD.word=word;_lbD.src=chip;_lbD.bank=bank;e.dataTransfer.effectAllowed='move';});
+    chip.addEventListener('touchstart',function(e){_lbD.bank=bank;MTDnD.touchStart(e,chip,word,false,'.lb-slot',_lbOnDrop);},{passive:false});
+    chip.addEventListener('click',function(){_lbSelChip(chip,word,bank);});
+    bank.appendChild(chip);
+  });
+  body.appendChild(bank);
+
+  var table=document.createElement('table'); table.className='gap-table';
+  table.innerHTML='<thead><tr><th>'+st.stmtHeader+'</th><th>'+st.pickHeader+'</th></tr></thead>';
+  var tbody=document.createElement('tbody');
+  st.rows.forEach(function(row, ri){
+    var tr=document.createElement('tr');
+    var tdStmt=document.createElement('td'); tdStmt.className='gt-stmt'; tdStmt.textContent=row.text;
+    var tdPick=document.createElement('td'); tdPick.className='gt-pick';
+    var box=document.createElement('div'); box.className='lb-slot'; box.dataset.row=ri; box.dataset.correct=row.opts[row.correct]; box.textContent='—';
+    box.addEventListener('dragover',function(e){e.preventDefault();if(!box.classList.contains('correct')&&!box.classList.contains('wrong'))box.classList.add('lb-over');});
+    box.addEventListener('dragleave',function(){box.classList.remove('lb-over');});
+    box.addEventListener('drop',function(e){e.preventDefault();box.classList.remove('lb-over');_lbDrop(box);});
+    box.addEventListener('dragstart',function(e){if(!box.dataset.filled){e.preventDefault();return;}_lbD.word=box.dataset.filled;_lbD.src=box;_lbD.bank=bank;e.dataTransfer.effectAllowed='move';});
+    box.addEventListener('touchstart',function(e){if(!box.dataset.filled)return;_lbD.bank=bank;MTDnD.touchStart(e,box,box.dataset.filled,true,'.lb-slot',_lbOnDrop);},{passive:false});
+    box.addEventListener('click',function(){_lbClickBox(box,bank);});
+    tdPick.appendChild(box);
+    tr.appendChild(tdStmt); tr.appendChild(tdPick);
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  body.appendChild(table);
+
+  var checkRow=document.createElement('div'); checkRow.className='check-btn-row';
+  var checkBtn=document.createElement('button'); checkBtn.className='btn btn-primary'; checkBtn.textContent='Prüfen';
+  checkRow.appendChild(checkBtn); body.appendChild(checkRow);
+
+  checkBtn.addEventListener('click', function(){
+    if(solved[idx]) return; var correct=0;
+    table.querySelectorAll('.lb-slot').forEach(function(box){
+      box.classList.remove('lb-filled','lb-over','lb-ready');
+      var good=(box.dataset.filled===box.dataset.correct);
+      if(good){ box.classList.add('correct'); correct++; } else { box.classList.add('wrong'); }
+      registerAnswer(good);
+    });
+    earned[idx]=correct*0.5; solved[idx]=true; checkBtn.disabled=true; updateNav();
   });
 }
 
