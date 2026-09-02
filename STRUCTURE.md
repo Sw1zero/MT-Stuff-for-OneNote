@@ -78,6 +78,7 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 │   ├── quiz-abweichungen-phagen.html
 │   ├── kreuzwortraetsel-kulturen.html
 │   ├── spiel-homofermentativ.html
+│   ├── begruenden-massnahmen-abweichungen.html  ← 3 Stufen (Einfach/Mittel/Schwer); Pilot für "begründen" (TS4)
 │   └── lernsession-pruefung-kulturen.html  ← Lernpfad (Standard) / Challenge (?mode=challenge)
 ├── d1-hygiene/
 │   └── spiel-desinfektion.html

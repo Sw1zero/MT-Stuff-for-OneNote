@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Begründen – Massnahmen bei Abweichungen</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="../assets/dnd.js"></script>
+  <style>
+    .back-link { display: inline-block; font-size: 0.82rem; color: var(--text-muted); text-decoration: none; margin-bottom: 1rem; }
+    .back-link:hover { color: var(--red); }
+
+    .level-bar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:1.25rem; }
+    .level-btn { font-family:var(--font); font-size:0.82rem; font-weight:600; padding:7px 16px; border-radius:20px; border:1.5px solid var(--border); background:var(--surface); color:var(--text-muted); cursor:pointer; transition:all 0.15s; }
+    .level-btn:hover { border-color:var(--blue); color:var(--blue-dark); }
+    .level-btn.active { background:var(--blue-dark); border-color:var(--blue-dark); color:#fff; }
+
+    .instruction {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      margin-bottom: 1.25rem;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .word-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      background: var(--blue-light);
+      border-radius: var(--radius-md);
+      padding: 0.9rem 1rem;
+      margin-bottom: 1.5rem;
+      min-height: 52px;
+    }
+    .word-chip {
+      font-family: var(--font);
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 16px;
+      padding: 0.35rem 0.85rem;
+      cursor: pointer;
+      color: var(--text);
+      transition: all 0.15s;
+      line-height: 1.4;
+      max-width: 300px;
+    }
+    .word-chip:hover   { border-color: var(--blue); }
+    .word-chip.selected { background: var(--blue); border-color: var(--blue); color: #fff; }
+    .word-chip.used     { opacity: 0.22; pointer-events: none; }
+    .word-chip.dragging { opacity: 0.4; }
+
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.5rem;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+    .compare-table th,
+    .compare-table td {
+      padding: 0.7rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.86rem;
+      vertical-align: top;
+    }
+    .compare-table tr:last-child td { border-bottom: none; }
+    .compare-table thead th {
+      background: var(--red);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+    .compare-table thead th:first-child { background: #c40027; }
+    .compare-table td.prop-label {
+      font-weight: 500;
+      color: var(--text);
+      background: #f8f9fb;
+      width: 26%;
+      line-height: 1.45;
+      font-size: 0.82rem;
+    }
+
+    .blank-cell {
+      min-width: 150px;
+      min-height: 36px;
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.3rem 0.65rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-subtle);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      line-height: 1.35;
+      transition: all 0.15s;
+    }
+    .blank-cell.ready  { border-color: var(--blue); border-style: solid; background: #f0f7ff; }
+    .blank-cell.filled { border-style: solid; border-color: var(--blue); color: var(--text); }
+    .blank-cell.correct { border-color: #16a34a !important; background: #f0fdf4 !important; color: #15803d !important; }
+    .blank-cell.wrong   { border-color: var(--red) !important; background: var(--red-light) !important; color: var(--red) !important; }
+    .blank-cell.over    { border-color: var(--blue); border-style: solid; background: #e0f2fe; }
+
+    /* Mittel: 3 Kandidaten-Sätze pro Szenario */
+    .mc-cell { display: flex; flex-direction: column; gap: 0.4rem; }
+    .mc-btn {
+      font-family: var(--font);
+      font-size: 0.8rem;
+      text-align: left;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.5rem 0.7rem;
+      cursor: pointer;
+      color: var(--text);
+      line-height: 1.4;
+      transition: all 0.15s;
+    }
+    .mc-btn:hover { border-color: var(--blue); background: #f0f7ff; }
+    .mc-btn.correct { border-color: #16a34a; background: #f0fdf4; color: #15803d; cursor: default; }
+    .mc-btn.wrong   { border-color: var(--red); background: var(--red-light); color: var(--red); cursor: default; }
+    .mc-btn.locked  { pointer-events: none; opacity: 0.6; }
+    .mc-btn.locked.correct, .mc-btn.locked.wrong { opacity: 1; }
+    .mc-hint { font-size: 0.72rem; color: var(--text-muted); margin-top: 0.3rem; display: none; }
+    .mc-hint.show { display: block; }
+
+    /* Schwer: Freitext-Begründung */
+    .type-textarea {
+      width: 100%;
+      min-height: 90px;
+      font-family: var(--font);
+      font-size: 0.82rem;
+      padding: 0.55rem 0.7rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #f8fafc;
+      color: var(--text);
+      resize: vertical;
+      line-height: 1.45;
+      transition: border-color 0.15s;
+    }
+    .type-textarea:focus { outline: none; border-color: var(--blue); background: #fff; }
+
+    .reveal-box {
+      margin-top: 0.6rem;
+      display: none;
+    }
+    .reveal-box.show { display: block; }
+    .reveal-answer {
+      background: #f0fdf4;
+      border-left: 3px solid #16a34a;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 0.6rem 0.8rem;
+      font-size: 0.8rem;
+      color: var(--text);
+      line-height: 1.5;
+      margin-bottom: 0.5rem;
+    }
+    .checklist { display: flex; flex-direction: column; gap: 0.3rem; }
+    .checklist label {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.4rem;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .checklist input[type="checkbox"] { margin-top: 2px; }
+
+    .info-box {
+      background: #f0f7ff;
+      border-left: 3px solid var(--blue);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 0.75rem 1rem;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+    .info-box strong { color: var(--text); }
+
+    .btn-row { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+    .result-banner {
+      margin-top: 1.25rem;
+      padding: 0.9rem 1rem;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.92rem;
+      text-align: center;
+      display: none;
+    }
+    .result-banner.show    { display: block; }
+    .result-banner.perfect { background: #f0fdf4; color: #15803d; border: 1.5px solid #bbf7d0; }
+    .result-banner.partial { background: #fff7ed; color: #c2410c; border: 1.5px solid #fed7aa; }
+
+    @media (max-width: 600px) {
+      .compare-table th,
+      .compare-table td { padding: 0.5rem 0.55rem; font-size: 0.76rem; }
+      .blank-cell { min-width: 110px; font-size: 0.74rem; }
+      .compare-table td.prop-label { width: auto; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+  <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · a.8</span>
+  <h1>Begründen</h1>
+  <p>Massnahmen bei Abweichungen der Kultur richtig begründen</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+  <a class="back-link" href="../index.html">← Alle Lerntools</a>
+
+  <div class="level-bar">
+    <button class="level-btn active" id="lvl-einfach" onclick="setLevel('einfach')">Einfach – zuordnen</button>
+    <button class="level-btn"        id="lvl-mittel"  onclick="setLevel('mittel')">Mittel – anklicken</button>
+    <button class="level-btn"        id="lvl-schwer"  onclick="setLevel('schwer')">Schwer – eintippen</button>
+  </div>
+
+  <p class="instruction" id="instruction"></p>
+
+  <div id="modeBody"></div>
+
+  <div class="info-box">
+    <strong>Merke:</strong> Eine Massnahme nur zu nennen reicht nicht. Eine echte Begründung nennt die Ursache,
+    die Massnahme dagegen und erklärt, warum diese Massnahme das Problem tatsächlich löst.
+  </div>
+
+  <div class="btn-row" id="btnRow">
+    <button type="button" class="btn btn-primary" id="checkBtn" onclick="checkLevel()">Überprüfen</button>
+    <button type="button" class="btn btn-ghost"   onclick="resetLevel()">Zurücksetzen</button>
+  </div>
+
+  <div class="result-banner" id="resultBanner"></div>
+
+</main>
+
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+
+<script>
+/* a.8.7.2 Pilot: "begründen" statt nur "nennen/erklären üben" — 3-Stufen-Muster
+   kopiert von a7-technische-einrichtungen/zuordnung-dampfkessel-gefahren.html.
+   Szenarien bewusst anders formuliert als die echte Prüfung (PR_a.8_kulturen.md
+   Aufgabe 7), damit dieselbe Ursachen/Massnahmen-Logik geübt wird, ohne dass
+   der Prüfungswortlaut vorweggenommen wird. */
+var ROWS = [
+  {
+    situation: 'Sie kontrollieren eine Kultur nach der vorgesehenen Bebrütungszeit und messen einen Säuregrad von 44 °SH, deutlich über dem Sollwert.',
+    ursache: 'Die Bebrütungszeit war zu lang.',
+    massnahme: 'Sie passen die Bebrütungszeit an und kontrollieren sie künftig mit einem Timer.',
+    wirkung: 'So bricht die Milchsäuregärung rechtzeitig ab, bevor der Säuregrad den Sollwert übersteigt.',
+    ursacheKeys: ['bebrütungszeit zu lang', 'zu lange bebrütet', 'zu lange zeit'],
+    massnahmeKeys: ['zeit anpassen', 'bebrütungszeit anpassen', 'zeit kontrollieren', 'timer'],
+    wirkungKeys: ['gärung bricht ab', 'rechtzeitig ab', 'säuregrad übersteigt', 'nicht übersteigt'],
+    mittel: {
+      correct: 'Die Bebrütungszeit war zu lang, deshalb passen Sie sie an und kontrollieren sie künftig mit einem Timer, damit die Gärung rechtzeitig abbricht.',
+      bare: 'Sie passen einfach die Bebrütungszeit an.',
+      wrong: 'Die Impfmenge war zu klein, deshalb erhöhen Sie sie.'
+    }
+  },
+  {
+    situation: 'Eine neue Lernende meldet: ihre Kultur ist nach der planmässigen Bebrütungszeit noch komplett flüssig, der Säuregrad liegt bei nur 18 °SH.',
+    ursache: 'Die Bebrütungstemperatur war zu tief.',
+    massnahme: 'Sie kontrollieren die Temperatur mit einem Thermometer und stellen sie auf den Sollwert ein.',
+    wirkung: 'Bei der richtigen Temperatur läuft die Milchsäuregärung im normalen Tempo ab, und der Säuregrad erreicht rechtzeitig den Sollwert.',
+    ursacheKeys: ['temperatur zu tief', 'zu tiefe temperatur', 'bebrütungstemperatur zu tief'],
+    massnahmeKeys: ['thermometer', 'temperatur kontrollieren', 'temperatur einstellen'],
+    wirkungKeys: ['normalen tempo', 'gärung läuft', 'erreicht den sollwert', 'rechtzeitig'],
+    mittel: {
+      correct: 'Die Bebrütungstemperatur war zu tief, deshalb kontrollieren Sie sie mit dem Thermometer und stellen sie auf den Sollwert ein, damit die Gärung im normalen Tempo abläuft.',
+      bare: 'Sie stellen die Temperatur einfach höher.',
+      wrong: 'Ein Hemmstoff in der Milch bremst die Bakterien, deshalb führen Sie einen Hemmstoffnachweis durch.'
+    }
+  },
+  {
+    situation: 'Trotz korrekter Temperatur und Zeit bleibt eine Kultur ungewöhnlich dünnflüssig. Sie vermuten ein Problem mit der Ausgangsmilch.',
+    ursache: 'Ein Hemmstoff in der Ausgangsmilch bremst die Bakterientätigkeit.',
+    massnahme: 'Sie führen einen Hemmstoffnachweis durch, zum Beispiel einen Delvo- oder SNAP-Test.',
+    wirkung: 'So erkennen Sie, ob zum Beispiel Antibiotikarückstände die Bakterien hemmen, und können die betroffene Milch aussortieren.',
+    ursacheKeys: ['hemmstoff', 'bremst die bakterien'],
+    massnahmeKeys: ['hemmstoffnachweis', 'delvo', 'snap'],
+    wirkungKeys: ['antibiotikarückstände', 'milch aussortieren', 'erkennen ob'],
+    mittel: {
+      correct: 'Ein Hemmstoff in der Ausgangsmilch bremst die Bakterientätigkeit, deshalb führen Sie einen Hemmstoffnachweis durch, um die betroffene Milch zu erkennen und auszusortieren.',
+      bare: 'Sie machen einfach einen Test mit der Milch.',
+      wrong: 'Die Bebrütungszeit war zu kurz, deshalb verlängern Sie sie.'
+    }
+  },
+  {
+    situation: 'Eine Kultur zeigt nach der Bebrütung einen deutlich zu tiefen Säuregrad, obwohl Temperatur und Zeit korrekt eingehalten wurden. Im Betriebsjournal fällt eine kleinere Kulturmenge als sonst auf.',
+    ursache: 'Die Impfmenge war zu klein.',
+    massnahme: 'Sie passen die Impfmenge an die Vorgaben an.',
+    wirkung: 'Mit ausreichend Kulturmenge steht von Anfang an genug Bakterienmasse zur Verfügung, damit die Säuerung im vorgesehenen Tempo abläuft.',
+    ursacheKeys: ['impfmenge zu klein', 'zu wenig kultur', 'zu kleine impfmenge'],
+    massnahmeKeys: ['impfmenge anpassen', 'impfmenge erhöhen'],
+    wirkungKeys: ['genug bakterienmasse', 'vorgesehenen tempo', 'ausreichend kulturmenge'],
+    mittel: {
+      correct: 'Die Impfmenge war zu klein, deshalb passen Sie sie an die Vorgaben an, damit von Anfang an genug Bakterienmasse für eine termingerechte Säuerung vorhanden ist.',
+      bare: 'Sie geben einfach mehr Kultur dazu.',
+      wrong: 'Die Bebrütungstemperatur war zu hoch, deshalb senken Sie sie.'
+    }
+  }
+];
+
+var ANSWERS = [];
+ROWS.forEach(function(r) { ANSWERS.push(r.ursache); ANSWERS.push(r.massnahme); ANSWERS.push(r.wirkung); });
+
+var level = 'einfach';
+var selected = null;
+var dragWord = null;
+var mcScore = 0, mcTotal = 0;
+
+function fold(s) { return String(s).toLowerCase().replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss').replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim(); }
+function matchKeys(input, keys) { var f = fold(input); if (!f) return false; for (var i = 0; i < keys.length; i++) { if (f.indexOf(fold(keys[i])) !== -1) return true; } return false; }
+function isLocked(cell) { return cell.classList.contains('correct') || cell.classList.contains('wrong'); }
+
+function setLevel(l) {
+  level = l;
+  ['einfach','mittel','schwer'].forEach(function(k) { document.getElementById('lvl-'+k).classList.toggle('active', k === l); });
+  resetLevel();
+}
+
+function resetLevel() {
+  document.getElementById('resultBanner').className = 'result-banner';
+  var body = document.getElementById('modeBody');
+  body.innerHTML = '';
+  var checkBtn = document.getElementById('checkBtn');
+  var instr = document.getElementById('instruction');
+  if (level === 'einfach') {
+    checkBtn.style.display = '';
+    instr.textContent = 'Ordnen Sie jeder Situation die passende Ursache, Massnahme und Wirkung zu. Klicken Sie einen Begriff aus der Wortbank an, dann das leere Feld – oder ziehen Sie ihn hinein.';
+    buildEinfach(body);
+  } else if (level === 'schwer') {
+    checkBtn.style.display = 'none';
+    instr.textContent = 'Schreiben Sie zu jeder Situation Ihre eigene Begründung: Ursache, Massnahme und warum die Massnahme wirkt. Vergleichen Sie danach mit der Musterantwort.';
+    buildSchwer(body);
+  } else {
+    checkBtn.style.display = 'none';
+    instr.textContent = 'Welcher Satz begründet die Massnahme wirklich, statt sie nur zu nennen? Klicken Sie den richtigen Satz an.';
+    buildMittel(body);
+  }
+}
+
+/* ---------- EINFACH: Drag & Drop aus Wortbank ---------- */
+function buildEinfach(body) {
+  body.innerHTML =
+    '<div class="word-bank" id="wordBank"></div>' +
+    '<table class="compare-table"><thead><tr><th>Situation</th><th>Ursache</th><th>Massnahme</th><th>Wirkung</th></tr></thead><tbody id="einfachBody"></tbody></table>';
+
+  var bank = document.getElementById('wordBank');
+  MTDnD.shuffle(ANSWERS).forEach(function(word) {
+    var chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'word-chip';
+    chip.textContent = word;
+    chip.dataset.word = word;
+    chip.setAttribute('draggable', 'true');
+    chip.onclick = function() { selectChip(this); };
+    chip.addEventListener('dragstart', function(e) { dragWord = word; e.dataTransfer.effectAllowed = 'move'; chip.classList.add('dragging'); });
+    chip.addEventListener('dragend', function() { chip.classList.remove('dragging'); });
+    chip.addEventListener('touchstart', function(e) { MTDnD.touchStart(e, chip, word, false, '.blank-cell', onDrop); }, {passive: false});
+    bank.appendChild(chip);
+  });
+
+  var tbody = document.getElementById('einfachBody');
+  ROWS.forEach(function(r) {
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td class="prop-label">' + r.situation + '</td>' +
+      '<td><span class="blank-cell" data-answer="' + r.ursache.replace(/"/g,'&quot;') + '">—</span></td>' +
+      '<td><span class="blank-cell" data-answer="' + r.massnahme.replace(/"/g,'&quot;') + '">—</span></td>' +
+      '<td><span class="blank-cell" data-answer="' + r.wirkung.replace(/"/g,'&quot;') + '">—</span></td>';
+    tbody.appendChild(tr);
+  });
+
+  document.querySelectorAll('.blank-cell').forEach(function(cell) {
+    cell.onclick = function() { clickCell(this); };
+    cell.addEventListener('dragover', function(e) { e.preventDefault(); if (!isLocked(cell) && !cell.dataset.filled) cell.classList.add('over'); });
+    cell.addEventListener('dragleave', function() { cell.classList.remove('over'); });
+    cell.addEventListener('drop', function(e) {
+      e.preventDefault(); cell.classList.remove('over');
+      if (dragWord) { placeInCell(cell, dragWord); dragWord = null; }
+    });
+  });
+  selected = null;
+}
+
+function selectChip(chip) {
+  if (chip.classList.contains('selected')) { chip.classList.remove('selected'); selected = null; clearReady(); return; }
+  document.querySelectorAll('.word-chip.selected').forEach(function(c) { c.classList.remove('selected'); });
+  chip.classList.add('selected');
+  selected = chip.dataset.word;
+  document.querySelectorAll('.blank-cell').forEach(function(c) {
+    c.classList.remove('ready');
+    if (!c.dataset.filled && !isLocked(c)) c.classList.add('ready');
+  });
+}
+function clickCell(cell) {
+  if (isLocked(cell)) return;
+  if (cell.dataset.filled) {
+    returnWord(cell.dataset.filled);
+    delete cell.dataset.filled;
+    cell.textContent = '—';
+    cell.className = 'blank-cell';
+    if (selected) cell.classList.add('ready');
+    return;
+  }
+  if (!selected) return;
+  placeInCell(cell, selected);
+}
+function placeInCell(cell, word) {
+  if (isLocked(cell)) return;
+  var displaced = cell.dataset.filled || null;
+  cell.dataset.filled = word;
+  cell.textContent = word;
+  cell.className = 'blank-cell filled';
+  markUsed(word);
+  if (displaced && displaced !== word) returnWord(displaced);
+  selected = null;
+  document.querySelectorAll('.word-chip.selected').forEach(function(c) { c.classList.remove('selected'); });
+  clearReady();
+}
+function returnWord(word) { document.querySelectorAll('.word-chip').forEach(function(c) { if (c.dataset.word === word) c.classList.remove('used', 'selected'); }); }
+function markUsed(word) { document.querySelectorAll('.word-chip').forEach(function(c) { if (c.dataset.word === word) { c.classList.remove('selected'); c.classList.add('used'); } }); }
+function clearReady() { document.querySelectorAll('.blank-cell').forEach(function(c) { c.classList.remove('ready'); }); }
+function onDrop(box, word, source) { if (isLocked(box)) return; placeInCell(box, word); }
+
+function checkEinfach() {
+  var correct = 0, filled = 0;
+  document.querySelectorAll('.blank-cell').forEach(function(cell) {
+    var val = cell.dataset.filled;
+    if (!val) return;
+    filled++;
+    cell.classList.remove('filled', 'ready');
+    if (val === cell.dataset.answer) { cell.classList.add('correct'); correct++; }
+    else { cell.classList.add('wrong'); }
+  });
+  showResult(correct, filled, ANSWERS.length);
+}
+
+/* ---------- MITTEL: pro Situation den echt begründenden Satz anklicken ---------- */
+function buildMittel(body) {
+  mcScore = 0; mcTotal = 0;
+  var table = document.createElement('table');
+  table.className = 'compare-table';
+  table.innerHTML = '<thead><tr><th>Situation</th><th>Welcher Satz begründet die Massnahme richtig?</th></tr></thead>';
+  var tbody = document.createElement('tbody');
+  table.appendChild(tbody);
+
+  ROWS.forEach(function(r) {
+    var tr = document.createElement('tr');
+    var tdSit = document.createElement('td'); tdSit.className = 'prop-label'; tdSit.textContent = r.situation;
+    var tdOpt = document.createElement('td'); tdOpt.appendChild(buildMcCell(r.mittel));
+    tr.appendChild(tdSit); tr.appendChild(tdOpt);
+    tbody.appendChild(tr);
+  });
+  body.appendChild(table);
+}
+function buildMcCell(m) {
+  var wrap = document.createElement('div');
+  wrap.className = 'mc-cell';
+  var options = MTDnD.shuffle([
+    { text: m.correct, kind: 'correct' },
+    { text: m.bare, kind: 'bare' },
+    { text: m.wrong, kind: 'wrong' }
+  ]);
+  var hint = document.createElement('div');
+  hint.className = 'mc-hint';
+  options.forEach(function(opt) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'mc-btn';
+    btn.textContent = opt.text;
+    btn.onclick = function() {
+      var cellBtns = wrap.querySelectorAll('.mc-btn');
+      cellBtns.forEach(function(b) { b.classList.add('locked'); });
+      mcTotal++;
+      if (opt.kind === 'correct') {
+        btn.classList.add('correct');
+        mcScore++;
+        hint.textContent = 'Richtig: das ist eine vollständige Begründung (Ursache + Massnahme + Wirkung).';
+      } else {
+        btn.classList.add('wrong');
+        cellBtns.forEach(function(b, i) { if (options[i].kind === 'correct') b.classList.add('correct'); });
+        hint.textContent = opt.kind === 'bare'
+          ? 'Das nennt nur die Massnahme, ohne Ursache oder Wirkung zu erklären – keine vollständige Begründung.'
+          : 'Das benennt die falsche Ursache für diese Situation.';
+      }
+      hint.classList.add('show');
+      if (mcTotal === ROWS.length) showResult(mcScore, mcTotal, ROWS.length);
+    };
+    wrap.appendChild(btn);
+  });
+  wrap.appendChild(hint);
+  return wrap;
+}
+
+/* ---------- SCHWER: Freitext-Begründung + Musterantwort/Checkliste zum Selbstvergleich ---------- */
+function buildSchwer(body) {
+  ROWS.forEach(function(r, i) {
+    var box = document.createElement('div');
+    box.style.marginBottom = '1.5rem';
+    box.innerHTML =
+      '<p style="font-size:0.86rem;font-weight:600;color:var(--text);margin-bottom:0.5rem;">' + r.situation + '</p>' +
+      '<textarea class="type-textarea" id="ans-' + i + '" placeholder="Ihre Begründung: Ursache, Massnahme, Wirkung …"></textarea>' +
+      '<div class="btn-row" style="margin-top:0.5rem;">' +
+      '<button type="button" class="btn btn-ghost" onclick="revealModel(' + i + ')">Musterantwort anzeigen</button>' +
+      '</div>' +
+      '<div class="reveal-box" id="reveal-' + i + '">' +
+      '<div class="reveal-answer"><strong>Musterantwort:</strong> ' + r.ursache + ' ' + r.massnahme + ' ' + r.wirkung + '</div>' +
+      '<div class="checklist">' +
+      '<label><input type="checkbox"> Habe ich die Ursache genannt?</label>' +
+      '<label><input type="checkbox"> Habe ich die Massnahme genannt?</label>' +
+      '<label><input type="checkbox"> Habe ich erklärt, warum die Massnahme wirkt?</label>' +
+      '</div></div>';
+    body.appendChild(box);
+  });
+}
+function revealModel(i) {
+  document.getElementById('reveal-' + i).classList.add('show');
+}
+
+/* ---------- gemeinsam ---------- */
+function checkLevel() { if (level === 'einfach') checkEinfach(); }
+function showResult(correct, filled, total) {
+  var banner = document.getElementById('resultBanner');
+  if (correct === total) {
+    banner.textContent = 'Perfekt! Alle ' + total + ' richtig zugeordnet.';
+    banner.className = 'result-banner show perfect';
+  } else {
+    banner.textContent = correct + ' von ' + (filled || total) + ' korrekt. Rot markierte Felder nochmals überprüfen.';
+    banner.className = 'result-banner show partial';
+  }
+}
+
+setLevel('einfach');
+</script>
+
+</body>
+</html>
