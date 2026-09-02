@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Challenge: Prüfungsvorbereitung Joghurt (b.7)</title>
   <link rel="stylesheet" href="../style.css">
+  <script src="../assets/lernsession-engine.js"></script>
   <style>
     .back-link { display:inline-block; font-size:0.82rem; color:var(--text-muted); text-decoration:none; margin-bottom:1rem; }
     .back-link:hover { color:var(--red); }
@@ -200,9 +201,9 @@
     <div class="ls-dots" id="lsDots"></div>
     <div id="stage"></div>
     <div class="ls-nav">
-      <button class="btn btn-ghost" id="prevBtn" onclick="goPrev()">← Zurück</button>
+      <button class="btn btn-ghost" id="prevBtn" onclick="LSEngine.goPrev()">← Zurück</button>
       <span class="spacer"></span>
-      <button class="btn btn-primary" id="nextBtn" onclick="goNext()">Weiter →</button>
+      <button class="btn btn-primary" id="nextBtn" onclick="LSEngine.goNext()">Weiter →</button>
     </div>
   </div>
 </main>
@@ -437,74 +438,51 @@ var ALL = [
 
 var MODE = /[?&]mode=challenge/.test(location.search) ? 'challenge' : 'lernpfad';
 var STATIONS = ALL.filter(function(s){ return MODE === 'challenge' ? s.type !== 'info' : true; });
-(function(){
-  var t = (MODE === 'challenge') ? 'Challenge' : 'Lernpfad';
-  document.getElementById('pageTitle').textContent = t + ': Joghurt herstellen';
-  document.getElementById('subtitle').textContent = (MODE === 'challenge')
-    ? 'Prüfungsmodus – ohne Hilfen, Anlagenteile eintippen'
-    : 'Wissensvermittlung – mit Lesetexten und Übungen';
-  document.title = t + ': Joghurt herstellen (b.7)';
-  if(MODE==='challenge'){
-    document.getElementById('lsDots').classList.add('selectable');
-    document.querySelector('.ls-select-hint').classList.add('show');
-    var hud=document.querySelector('.hud'); if(hud) hud.style.display='none';
+
+LSEngine.configure({
+  unitLabel: 'Posten',
+  modeBanner: {
+    pageTitle: function(mode){ return (mode==='challenge'?'Challenge':'Lernpfad') + ': Joghurt herstellen'; },
+    subtitle: function(mode){ return mode==='challenge'
+      ? 'Prüfungsmodus – ohne Hilfen, Anlagenteile eintippen'
+      : 'Wissensvermittlung – mit Lesetexten und Übungen'; },
+    docTitle: function(mode){ return (mode==='challenge'?'Challenge':'Lernpfad') + ': Joghurt herstellen (b.7)'; }
+  },
+  finish: {
+    rank: function(pct){ return pct>=90?'Joghurt-Meister 🥇' : pct>=75?'Joghurt-Profi' : pct>=50?'Joghurt-Geselle' : 'Joghurt-Lehrling'; },
+    badges: function(pct){
+      var aIdx=LSEngine.findIdx('anlage'), kIdx=LSEngine.findIdx('kulturen'), oIdx=LSEngine.findIdx('ablauf');
+      return [
+        { icon:'📖', name:'Aufmerksamer Leser', got:true },
+        { icon:'🔢', name:'Ablauf-Profi', got: oIdx>=0 && earned[oIdx]===maxPts[oIdx] },
+        { icon:'🏭', name:'Anlagen-Kenner', got: aIdx>=0 && earned[aIdx]===maxPts[aIdx] },
+        { icon:'🦠', name:'Kultur-Kenner', got: kIdx>=0 && earned[kIdx]===maxPts[kIdx] },
+        { icon:'🔥', name:'Serien-Säurer (Streak 8+)', got: bestStreak>=8 },
+        { icon:'🥇', name:'Joghurt-Meister (90%)', got: pct>=90 }
+      ];
+    },
+    headerLabel: function(){ return 'Geschafft'; },
+    backLink: false,
+    closingHtml:
+      '<ul>'+
+        '<li>Ablauf: aufbereiten (standardisieren, Trockenmasse, homogenisieren, erhitzen) → säuern (kühlen, impfen, bebrüten) → fertigstellen.</li>'+
+        '<li>Kulturen <b>Sc. thermophilus</b> (Anfangssäure, Viskosität) + <b>Lb. bulgaricus</b> (Endsäure, Aroma) in <b>Symbiose</b>.</li>'+
+        '<li>Säuregerinnung: Laktose → Milchsäure → pH sinkt → bei pH 4,6 gerinnt das Kasein.</li>'+
+        '<li>Erhitzen > 72 °C denaturiert Molkenproteine (Wasserbindung); Homogenisieren verhindert Aufrahmen.</li>'+
+        '<li>Nachsäuern verhindern: schnell auf < 5 °C kühlen, Kühlkette halten, wenig Laktobazillen.</li>'+
+      '</ul>'
   }
-})();
+});
 
-var N = STATIONS.length;
-var current = 0;
-var solved = [], earned = [], maxPts = [];
-for (var i = 0; i < N; i++) { solved[i] = false; earned[i] = 0; maxPts[i] = 0; }
-var xp = 0, streak = 0, bestStreak = 0;
+LSEngine.initState();
 
-function findIdx(id){ for(var i=0;i<N;i++){ if(STATIONS[i].id===id) return i; } return -1; }
-function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;} return a; }
-function shuffleIdx(n){ var a=[]; for(var i=0;i<n;i++) a.push(i); return shuffle(a); }
-function fold(s){ return String(s).toLowerCase().replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss').replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim(); }
-function matchKeys(input, it){ var f=fold(input); if(!f) return false; if(f===fold(it.name)) return true; for(var i=0;i<it.keys.length;i++){ if(f.indexOf(fold(it.keys[i]))!==-1) return true; } return false; }
-
-/* HUD */
-function renderHud(){
-  document.getElementById('hudXp').textContent = xp;
-  var sc=0; for(var i=0;i<N;i++){ if(solved[i]) sc++; }
-  document.getElementById('hudBar').style.width = Math.round(sc/N*100)+'%';
-  document.getElementById('hudStreakNum').textContent = streak;
-  var onFire = streak >= 3;
-  document.getElementById('hudStreakEmoji').style.display = onFire ? 'none' : '';
-  document.getElementById('hudFireWrap').style.display = onFire ? 'inline-block' : 'none';
-  document.getElementById('hudStreakNum').className = onFire ? 'streak-num-fire' : '';
-}
-function addXp(n){ xp+=n; var el=document.getElementById('hudXp'); renderHud(); el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
-function showStreakPop(){ var el=document.createElement('span'); el.className='streak-pop'; el.textContent='+1 🔥'; document.getElementById('hudStreak').appendChild(el); setTimeout(function(){ el.remove(); }, 900); }
-function registerAnswer(ok){
-  if(ok){ streak++; if(streak>bestStreak) bestStreak=streak; addXp(10+(streak>=3?5:0)); showStreakPop(); var s=document.getElementById('hudStreak'); s.classList.remove('pulse'); void s.offsetWidth; s.classList.add('pulse'); }
-  else { streak=0; renderHud(); }
-}
-
-/* Aufbau */
-function buildAll(){
-  var stage=document.getElementById('stage'); stage.innerHTML='';
-  STATIONS.forEach(function(st, idx){
-    var card=document.createElement('div');
-    card.className='station'+(st.boss?' boss':'')+(idx===0?'':' hidden'); card.id='station-'+idx;
-    card.innerHTML='<div class="station-kicker">'+st.kicker+'</div>'+
-      '<div class="station-title">'+st.title+'</div>'+
-      '<div class="station-lead">'+st.lead+'</div>'+
-      (st.media?'<div class="station-media">'+st.media+'</div>':'')+
-      '<div class="station-body" id="body-'+idx+'"></div>';
-    stage.appendChild(card);
-    buildBody(idx, st);
-  });
-  var fin=document.createElement('div'); fin.className='station hidden'; fin.id='station-finish';
-  fin.innerHTML='<div class="finish" id="finishBody"></div>'; stage.appendChild(fin);
-}
 function buildBody(idx, st){
   if(st.type==='info')  buildInfo(idx, st);
   if(st.type==='order') buildOrder(idx, st);
-  if(st.type==='tf')    buildTF(idx, st);
-  if(st.type==='label') (MODE==='challenge'?buildLabelType:buildLabelChoose)(idx, st);
-  if(st.type==='gaps')  buildGaps(idx, st);
-  if(st.type==='quiz')  buildQuiz(idx, st);
+  if(st.type==='tf')    LSEngine.buildTF(idx, st);
+  if(st.type==='label') (MODE==='challenge'?LSEngine.buildLabelType:buildLabelChoose)(idx, st);
+  if(st.type==='gaps')  LSEngine.buildGaps(idx, st);
+  if(st.type==='quiz')  LSEngine.buildQuiz(idx, st);
 }
 
 /* Info */
@@ -512,7 +490,7 @@ function buildInfo(idx, st){
   maxPts[idx]=0;
   document.getElementById('body-'+idx).innerHTML='<div class="read">'+st.read+'</div>'+
     '<div class="read-btn-row"><button class="btn btn-primary" id="readbtn-'+idx+'">Gelesen ✓ (+5 XP)</button></div>';
-  document.getElementById('readbtn-'+idx).addEventListener('click', function(){ if(solved[idx]) return; solved[idx]=true; addXp(5); this.disabled=true; this.textContent='Gelesen ✓'; updateNav(); });
+  document.getElementById('readbtn-'+idx).addEventListener('click', function(){ if(solved[idx]) return; solved[idx]=true; LSEngine.addXp(5); this.disabled=true; this.textContent='Gelesen ✓'; LSEngine.updateNav(); });
 }
 
 /* Reihenfolge: Klick (▲▼) + Drag & Drop + Touch */
@@ -521,7 +499,7 @@ var ordDrag=null, ordTouchRow=null, ordTouchList=null, ordClone=null, ordOffY=0;
 function buildOrder(idx, st){
   maxPts[idx]=st.steps.length;
   var html='<div class="ord-list" id="ord-'+idx+'">';
-  shuffleIdx(st.steps.length).forEach(function(si){
+  LSEngine.shuffleIdx(st.steps.length).forEach(function(si){
     html+='<div class="ord-row" draggable="true" data-step="'+si+'">'+
       '<span class="ord-grip">⋮⋮</span>'+
       '<div class="ord-btns"><button type="button" class="ord-btn" data-dir="-1">▲</button><button type="button" class="ord-btn" data-dir="1">▼</button></div>'+
@@ -570,9 +548,9 @@ function buildOrder(idx, st){
       var ok=(+row.dataset.step===pos);
       row.classList.add(ok?'ord-correct':'ord-wrong'); row.setAttribute('draggable','false');
       row.querySelector('.ord-tag').textContent = ok?'✓':('→ '+(+row.dataset.step+1));
-      registerAnswer(ok); if(ok) correct++;
+      LSEngine.registerAnswer(ok); if(ok) correct++;
     });
-    earned[idx]=correct; solved[idx]=true; this.disabled=true; updateNav();
+    earned[idx]=correct; solved[idx]=true; this.disabled=true; LSEngine.updateNav();
   });
 }
 
@@ -597,68 +575,11 @@ document.addEventListener('touchend', function(){
   ordTouchRow.style.opacity=''; ordTouchRow=null; ordTouchList=null;
 });
 
-/* Wahr / Falsch */
-function buildTF(idx, st){
-  maxPts[idx]=st.items.length*0.5;
-  var body=document.getElementById('body-'+idx);
-  st.items.forEach(function(it, ii){
-    var item=document.createElement('div'); item.className='tf-item';
-    item.innerHTML='<div class="tf-statement">'+it.s+'</div>'+
-      '<div class="tf-btns"><button class="tf-btn" data-i="'+ii+'" data-v="true">Zutat</button>'+
-      '<button class="tf-btn" data-i="'+ii+'" data-v="false">Keine Zutat</button></div>'+
-      '<div class="tf-exp" id="tfexp-'+idx+'-'+ii+'">'+it.e+'</div>';
-    body.appendChild(item);
-  });
-  body.querySelectorAll('.tf-btn').forEach(function(btn){
-    btn.addEventListener('click', function(){
-      var ii=+btn.dataset.i; var pick=btn.dataset.v==='true';
-      if(body.querySelector('.tf-btn[data-i="'+ii+'"]:disabled')) return;
-      var it=st.items[ii];
-      body.querySelectorAll('.tf-btn[data-i="'+ii+'"]').forEach(function(b){ b.disabled=true; if((b.dataset.v==='true')===it.a) b.classList.add('reveal'); });
-      if(pick===it.a){ btn.classList.add('sel-correct'); earned[idx]+=0.5; registerAnswer(true); } else { btn.classList.add('sel-wrong'); registerAnswer(false); }
-      document.getElementById('tfexp-'+idx+'-'+ii).classList.add('show');
-      var answered=0; for(var k=0;k<st.items.length;k++){ if(document.querySelector('#body-'+idx+' .tf-btn[data-i="'+k+'"]:disabled')) answered++; }
-      if(answered===st.items.length) solved[idx]=true;
-      updateNav();
-    });
-  });
-}
-
-/* Beschriften */
-/* Beschriften – Challenge: eintippen */
-function buildLabelType(idx, st){
-  maxPts[idx]=st.items.length*0.5;
-  var html='<div class="slots-grid">';
-  st.items.forEach(function(it){
-    html+='<div class="slot-row"><div class="slot-num">'+it.n+'</div><div class="type-cell">'+
-      '<input class="type-input" id="lb-'+idx+'-'+it.n+'" type="text" autocomplete="off" placeholder="Nr. '+it.n+' …">'+
-      '<div class="type-sol" id="lbsol-'+idx+'-'+it.n+'" style="display:none;"></div></div></div>';
-  });
-  html+='</div><div class="check-btn-row"><button class="btn btn-primary" id="lbcheck-'+idx+'">Überprüfen</button></div>';
-  document.getElementById('body-'+idx).innerHTML=html;
-  st.items.forEach(function(it, i){
-    document.getElementById('lb-'+idx+'-'+it.n).addEventListener('keydown', function(e){
-      if(e.key==='Enter'){ e.preventDefault(); var nx=st.items[i+1]; if(nx) document.getElementById('lb-'+idx+'-'+nx.n).focus(); }
-    });
-  });
-  document.getElementById('lbcheck-'+idx).addEventListener('click', function(){
-    if(solved[idx]) return; var correct=0;
-    st.items.forEach(function(it){
-      var inp=document.getElementById('lb-'+idx+'-'+it.n); var sol=document.getElementById('lbsol-'+idx+'-'+it.n);
-      inp.classList.remove('correct','wrong');
-      var ok=matchKeys(inp.value, it);
-      if(ok){ inp.classList.add('correct'); sol.style.display='none'; correct++; } else { inp.classList.add('wrong'); sol.textContent='→ '+it.name; sol.style.display='block'; }
-      registerAnswer(ok);
-    });
-    earned[idx]=correct*0.5; solved[idx]=true; this.disabled=true; updateNav();
-  });
-}
-
 /* Beschriften – Lernpfad: zuordnen per Auswahl */
 function buildLabelChoose(idx, st){
   maxPts[idx]=st.items.length*0.5;
   var names=st.items.map(function(it){return it.name;}).filter(function(v,i,a){return a.indexOf(v)===i;});
-  var optHtml=shuffle(names).map(function(o){return '<option>'+o+'</option>';}).join('');
+  var optHtml=LSEngine.shuffle(names).map(function(o){return '<option>'+o+'</option>';}).join('');
   var html='<div class="slots-grid">';
   st.items.forEach(function(it){
     html+='<div class="slot-row"><div class="slot-num">'+it.n+'</div><div class="type-cell">'+
@@ -674,153 +595,13 @@ function buildLabelChoose(idx, st){
       sel.classList.remove('correct','wrong');
       var ok=(sel.value===it.name);
       if(ok){ sel.classList.add('correct'); sol.style.display='none'; correct++; } else { sel.classList.add('wrong'); sol.textContent='→ '+it.name; sol.style.display='block'; }
-      sel.disabled=true; registerAnswer(ok);
+      sel.disabled=true; LSEngine.registerAnswer(ok);
     });
-    earned[idx]=correct*0.5; solved[idx]=true; this.disabled=true; updateNav();
+    earned[idx]=correct*0.5; solved[idx]=true; this.disabled=true; LSEngine.updateNav();
   });
 }
 
-/* Lücken */
-function buildGaps(idx, st){
-  var gapCount=0; var html='<div class="gap-text">';
-  st.parts.forEach(function(part){
-    if(typeof part==='string'){ html+=part; }
-    else { var gi=gapCount++; var opts=shuffleIdx(part.opts.length);
-      html+='<select data-g="'+gi+'" data-correct="'+part.correct+'"><option value="-1">…</option>';
-      opts.forEach(function(oi){ html+='<option value="'+oi+'">'+part.opts[oi]+'</option>'; });
-      html+='</select>';
-    }
-  });
-  html+='</div><div class="check-btn-row"><button class="btn btn-primary" id="gapcheck-'+idx+'">Prüfen</button></div>';
-  document.getElementById('body-'+idx).innerHTML=html;
-  maxPts[idx]=gapCount*0.5;
-  document.getElementById('gapcheck-'+idx).addEventListener('click', function(){
-    if(solved[idx]) return;
-    var sels=document.querySelectorAll('#body-'+idx+' select'); var ok=0;
-    sels.forEach(function(sel){ sel.classList.remove('correct','wrong'); var good=(+sel.value===+sel.dataset.correct); if(good){sel.classList.add('correct'); ok++;} else sel.classList.add('wrong'); sel.disabled=true; registerAnswer(good); });
-    earned[idx]=ok*0.5; solved[idx]=true; this.disabled=true; updateNav();
-  });
-}
-
-/* Quiz */
-function buildQuiz(idx, st){
-  maxPts[idx]=st.questions.length*0.5;
-  var body=document.getElementById('body-'+idx);
-  st.questions.forEach(function(qq, qi){
-    var block=document.createElement('div'); block.className='q-block';
-    var h='<div class="q-text">'+(qi+1)+'. '+qq.q+'</div>';
-    shuffleIdx(qq.opts.length).forEach(function(oi){ h+='<button class="opt" data-q="'+qi+'" data-o="'+oi+'">'+qq.opts[oi]+'</button>'; });
-    block.innerHTML=h; body.appendChild(block);
-  });
-  body.querySelectorAll('.opt').forEach(function(btn){
-    btn.addEventListener('click', function(){
-      var qi=+btn.dataset.q, oi=+btn.dataset.o, qq=st.questions[qi];
-      if(body.querySelector('.opt[data-q="'+qi+'"]:disabled')) return;
-      body.querySelectorAll('.opt[data-q="'+qi+'"]').forEach(function(b){ b.disabled=true; if(+b.dataset.o===qq.correct) b.classList.add('correct'); });
-      if(oi!==qq.correct){ btn.classList.add('wrong'); registerAnswer(false); } else { earned[idx]+=0.5; registerAnswer(true); }
-      var answered=0; for(var k=0;k<st.questions.length;k++){ if(document.querySelector('#body-'+idx+' .opt[data-q="'+k+'"]:disabled')) answered++; }
-      if(answered===st.questions.length) solved[idx]=true;
-      updateNav();
-    });
-  });
-}
-
-/* Navigation */
-function renderProgress(){
-  var dots=document.getElementById('lsDots'); dots.innerHTML='';
-  for(var i=0;i<N;i++){
-    var d=document.createElement('div');
-    d.className='ls-dot'+(i===current?' active':'')+(solved[i]?' done':'');
-    d.textContent=solved[i]?'✓':(i+1);
-    if(MODE==='challenge'){
-      d.title=STATIONS[i].kicker+' – '+STATIONS[i].title;
-      d.addEventListener('click', (function(ii){ return function(){ jumpTo(ii); }; })(i));
-    }
-    dots.appendChild(d);
-  }
-  document.getElementById('lsMeta').textContent = (current<N) ? ('Posten '+(current+1)+' von '+N) : 'Auswertung';
-}
-function jumpTo(i){
-  if(i===current) return;
-  current=i; showCard(i); updateNav();
-}
-function showCard(which){
-  document.querySelectorAll('.station').forEach(function(c){ c.classList.add('hidden'); });
-  document.getElementById(which==='finish'?'station-finish':'station-'+which).classList.remove('hidden');
-  window.scrollTo({top:0, behavior:'smooth'});
-}
-function updateNav(){
-  var nextBtn=document.getElementById('nextBtn'), prevBtn=document.getElementById('prevBtn');
-  prevBtn.style.visibility=(current===0)?'hidden':'visible';
-  if(current<N){ nextBtn.disabled=!solved[current]; nextBtn.textContent=(current===N-1)?'Zur Auswertung →':'Weiter →'; }
-  renderProgress(); renderHud();
-}
-function goNext(){ if(current<N){ if(!solved[current]) return; current++; if(current<N){ showCard(current); updateNav(); } else { showFinish(); } } }
-function goPrev(){ if(current===0) return; if(current>=N) current=N-1; else current--; showCard(current); document.getElementById('nextBtn').style.visibility='visible'; document.getElementById('nextBtn').disabled=false; updateNav(); }
-
-function showFinish(){
-  var total=0, max=0, expGood=0, expTotal=0;
-  for(var i=0;i<N;i++){
-    if(STATIONS[i].type==='explain'){ expGood+=earned[i]; expTotal+=maxPts[i]; }
-    else { total+=earned[i]; max+=maxPts[i]; }
-  }
-  var pct=max>0?Math.round(total/max*100):0;
-  var rank = pct>=90?'Joghurt-Meister 🥇' : pct>=75?'Joghurt-Profi' : pct>=50?'Joghurt-Geselle' : 'Joghurt-Lehrling';
-  var aIdx=findIdx('anlage'), kIdx=findIdx('kulturen'), bIdx=findIdx('boss'), oIdx=findIdx('ablauf');
-  var badges=[
-    { icon:'📖', name:'Aufmerksamer Leser', got:true },
-    { icon:'🔢', name:'Ablauf-Profi', got: oIdx>=0 && earned[oIdx]===maxPts[oIdx] },
-    { icon:'🏭', name:'Anlagen-Kenner', got: aIdx>=0 && earned[aIdx]===maxPts[aIdx] },
-    { icon:'🦠', name:'Kultur-Kenner', got: kIdx>=0 && earned[kIdx]===maxPts[kIdx] },
-    { icon:'🔥', name:'Serien-Säurer (Streak 8+)', got: bestStreak>=8 },
-    { icon:'🥇', name:'Joghurt-Meister (90%)', got: pct>=90 }
-  ];
-  var got=0, bh=''; badges.forEach(function(b){ if(b.got) got++; bh+='<span class="badge-chip'+(b.got?' earned':'')+'">'+(b.got?b.icon:'<span class="lock">🔒</span>')+' '+b.name+'</span>'; });
-
-  var headline, scoreSub, explainNote='', breakdown='';
-  if(MODE==='challenge'){
-    var note = max>0 ? Math.round((1 + total/max*5)*10)/10 : 1;
-    headline = '<div class="big-score">Note '+note.toFixed(1)+'</div>';
-    scoreSub = '<div class="score-sub">'+total+' / '+max+' Punkte ('+pct+' %) · simulierte Note, keine offizielle Bewertung</div>';
-    if(expTotal>0) explainNote = '<div class="score-sub">Erklären-Karten: '+expGood+' von '+expTotal+' selbst als «gewusst» eingeschätzt (nicht in der Note)</div>';
-    breakdown='<ul class="score-breakdown">';
-    for(var bi=0;bi<N;bi++){
-      if(STATIONS[bi].type==='explain') continue;
-      breakdown+='<li><span>'+STATIONS[bi].title+'</span><span>'+earned[bi]+' / '+maxPts[bi]+' P.</span></li>';
-    }
-    breakdown+='</ul>';
-  } else {
-    headline = '<div class="rank">'+rank+'</div><div class="big-score">'+xp+' XP</div>';
-    scoreSub = '<div class="score-sub">'+total+' / '+max+' Punkte ('+pct+' %) · längste Serie 🔥 '+bestStreak+' · '+got+'/'+badges.length+' Abzeichen</div>';
-  }
-  document.getElementById('finishBody').innerHTML=
-    '<div class="station-kicker">Geschafft</div>'+
-    headline+
-    scoreSub+
-    explainNote+
-    breakdown+
-    '<div class="badges">'+bh+'</div>'+
-    '<ul>'+
-      '<li>Ablauf: aufbereiten (standardisieren, Trockenmasse, homogenisieren, erhitzen) → säuern (kühlen, impfen, bebrüten) → fertigstellen.</li>'+
-      '<li>Kulturen <b>Sc. thermophilus</b> (Anfangssäure, Viskosität) + <b>Lb. bulgaricus</b> (Endsäure, Aroma) in <b>Symbiose</b>.</li>'+
-      '<li>Säuregerinnung: Laktose → Milchsäure → pH sinkt → bei pH 4,6 gerinnt das Kasein.</li>'+
-      '<li>Erhitzen > 72 °C denaturiert Molkenproteine (Wasserbindung); Homogenisieren verhindert Aufrahmen.</li>'+
-      '<li>Nachsäuern verhindern: schnell auf < 5 °C kühlen, Kühlkette halten, wenig Laktobazillen.</li>'+
-    '</ul>'+
-    '<button class="btn btn-primary" onclick="restart()">Nochmals starten</button>';
-  showCard('finish');
-  document.getElementById('nextBtn').style.visibility='hidden';
-  document.getElementById('prevBtn').style.visibility='visible';
-  renderProgress();
-}
-function restart(){
-  current=0; xp=0; streak=0; bestStreak=0;
-  for(var i=0;i<N;i++){ solved[i]=false; earned[i]=0; }
-  document.getElementById('nextBtn').style.visibility='visible';
-  buildAll(); showCard(0); updateNav();
-}
-
-buildAll(); showCard(0); updateNav();
+LSEngine.buildAll(); LSEngine.showCard(0); LSEngine.updateNav();
 </script>
 </body>
 </html>
