@@ -147,6 +147,14 @@
     .gap-text select.wrong, .lp-select.wrong { border-color:var(--red); background:var(--red-light); color:var(--red-dark); }
     .lp-select { width:100%; }
 
+    .gap-table { width:100%; border-collapse:collapse; margin-bottom:1rem; background:var(--surface); border-radius:var(--radius-lg); overflow:hidden; box-shadow:var(--shadow-sm); }
+    .gap-table th, .gap-table td { padding:0.65rem 0.9rem; text-align:left; border-bottom:1px solid var(--border); font-size:0.86rem; vertical-align:middle; }
+    .gap-table tr:last-child td { border-bottom:none; }
+    .gap-table thead th { background:var(--blue-dark); color:#fff; font-weight:700; font-size:0.8rem; }
+    .gap-table td.gt-stmt { color:var(--text); }
+    .gap-table td.gt-pick { width:38%; }
+    @media (max-width:520px){ .gap-table th,.gap-table td{padding:0.5rem 0.55rem;font-size:0.78rem;} }
+
     .slots-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.55rem; margin-bottom:0.5rem; }
     @media (max-width:560px){ .slots-grid { grid-template-columns:1fr; } }
     .lb-bank { display:flex; flex-wrap:wrap; gap:0.5rem; background:var(--blue-light); border-radius:var(--radius-md); padding:0.9rem 1rem; margin-bottom:1rem; min-height:52px; }
@@ -333,22 +341,16 @@ var ALL = [
         body:'<p><b>Gefrorene Kulturen</b>: normale Aktivität durch Restflüssigkeit in den Zellen. Haltbarkeit je nach Lagertemperatur: -20 °C mind. 2 Wochen, -45 °C mind. 3 Monate, -196 °C (Flüssigstickstoff) bis zu einem Jahr. Braucht aber ununterbrochene Kühlhaltung.</p><p><b>Lagerung allgemein</b>: einwandfreie Hygiene der Lagerräume ist zwingend, denn Verschmutzung birgt Infektionsgefahr beim Impfen. Lagertemperaturen kontrollieren und immer einhalten.</p>'
       }
     ] },
-  { kicker:'Zuordnung', title:'Kulturenformen: Vor- und Nachteile zuordnen', id:'kulturenformen_gaps', type:'gaps',
-    lead:'Welche Kulturenform passt? Vorsicht, es gibt auch falsche Optionen.',
-    parts:[
-      'Die ',
-      { opts:['Flüssigkultur','lyophilisierte Kultur','gefrorene Kultur'], correct:0 },
-      ' beginnt ihre Vermehrung sofort nach dem Beimpfen, weil sie sofort aktivitätsbereit ist. Weil sie weniger empfindlich auf Temperaturschwankungen reagiert, kann die ',
-      { opts:['lyophilisierte Kultur','Flüssigkultur','gefrorene Kultur'], correct:0 },
-      ' problemlos per Post verschickt werden. Bei der ',
-      { opts:['Flüssigkultur','lyophilisierten Kultur','gefrorenen Kultur'], correct:0 },
-      ' ist die Vorratshaltung bei unter 5 °C auf nur 7 bis 10 Tage beschränkt. Die ',
-      { opts:['lyophilisierte Kultur','Flüssigkultur','gefrorene Kultur'], correct:0 },
-      ' zeigt eine verzögerte Anfangsaktivität, weil die Zellen zuerst wieder Wasser aufnehmen müssen. Ein Nachteil der ',
-      { opts:['lyophilisierten Kultur','Flüssigkultur','gefrorenen Kultur'], correct:0 },
-      ' ist die Verarmung der Artenvielfalt, vor allem bei den Laktobazillen. Weil sie keinen Gefriertrocknungsvorgang durchläuft, zeigt die ',
-      { opts:['Flüssigkultur','lyophilisierte Kultur','gefrorene Kultur'], correct:0 },
-      ' keine solche Verarmung der Artenvielfalt.'
+  { kicker:'Tabelle', title:'Kulturenformen: Vor- und Nachteile zuordnen', id:'kulturenformen_table', type:'table',
+    lead:'Welcher Kulturenform passt die Aussage? Vorsicht, es gibt auch falsche Optionen.',
+    stmtHeader:'Aussage', pickHeader:'Kulturenform',
+    rows:[
+      { text:'Beginnt die Vermehrung sofort nach dem Beimpfen, weil sie sofort aktivitätsbereit ist.', opts:['Flüssigkultur','lyophilisierte Kultur','gefrorene Kultur'], correct:0 },
+      { text:'Kann wegen der geringen Temperaturempfindlichkeit problemlos per Post verschickt werden.', opts:['Flüssigkultur','lyophilisierte Kultur','gefrorene Kultur'], correct:1 },
+      { text:'Hat bei unter 5 °C eine Vorratshaltung von nur 7 bis 10 Tagen.', opts:['Flüssigkultur','lyophilisierte Kultur','gefrorene Kultur'], correct:0 },
+      { text:'Zeigt eine verzögerte Anfangsaktivität, weil die Zellen zuerst wieder Wasser aufnehmen müssen.', opts:['Flüssigkultur','lyophilisierte Kultur','gefrorene Kultur'], correct:1 },
+      { text:'Zeigt eine Verarmung der Artenvielfalt, vor allem bei den Laktobazillen.', opts:['Flüssigkultur','lyophilisierte Kultur','gefrorene Kultur'], correct:1 },
+      { text:'Zeigt keine Verarmung der Artenvielfalt, weil sie keinen Gefriertrocknungsvorgang durchläuft.', opts:['Flüssigkultur','lyophilisierte Kultur','gefrorene Kultur'], correct:0 }
     ] },
   { kicker:'Folien · Kontrolle', title:'Kontrolle der Kulturenaktivität', type:'slides',
     lead:'Fünf Methoden, um eine Kultur vor dem Einsatz zu prüfen.',
@@ -556,6 +558,7 @@ function buildBody(idx, st){
   if(st.type==='tf')    buildTF(idx, st);
   if(st.type==='label')  (MODE==='challenge') ? buildLabelType(idx, st) : buildLabelChoose(idx, st);
   if(st.type==='gaps')  buildGaps(idx, st);
+  if(st.type==='table') buildTable(idx, st);
   if(st.type==='quiz')  buildQuiz(idx, st);
   if(st.type==='explain') buildExplain(idx, st);
 }
@@ -702,6 +705,25 @@ function buildGaps(idx, st){
   document.getElementById('body-'+idx).innerHTML=html;
   maxPts[idx]=gapCount*0.5;
   document.getElementById('gapcheck-'+idx).addEventListener('click', function(){
+    if(solved[idx]) return;
+    var sels=document.querySelectorAll('#body-'+idx+' select'); var ok=0;
+    sels.forEach(function(sel){ sel.classList.remove('correct','wrong'); var good=(+sel.value===+sel.dataset.correct); if(good){sel.classList.add('correct'); ok++;} else sel.classList.add('wrong'); sel.disabled=true; registerAnswer(good); });
+    earned[idx]=ok*0.5; solved[idx]=true; this.disabled=true; updateNav();
+  });
+}
+
+function buildTable(idx, st){
+  var html='<table class="gap-table"><thead><tr><th>'+st.stmtHeader+'</th><th>'+st.pickHeader+'</th></tr></thead><tbody>';
+  st.rows.forEach(function(row, ri){
+    var opts=shuffleIdx(row.opts.length);
+    html+='<tr><td class="gt-stmt">'+row.text+'</td><td class="gt-pick"><select class="lp-select" data-g="'+ri+'" data-correct="'+row.correct+'"><option value="-1">…</option>';
+    opts.forEach(function(oi){ html+='<option value="'+oi+'">'+row.opts[oi]+'</option>'; });
+    html+='</select></td></tr>';
+  });
+  html+='</tbody></table><div class="check-btn-row"><button class="btn btn-primary" id="tablecheck-'+idx+'">Prüfen</button></div>';
+  document.getElementById('body-'+idx).innerHTML=html;
+  maxPts[idx]=st.rows.length*0.5;
+  document.getElementById('tablecheck-'+idx).addEventListener('click', function(){
     if(solved[idx]) return;
     var sels=document.querySelectorAll('#body-'+idx+' select'); var ok=0;
     sels.forEach(function(sel){ sel.classList.remove('correct','wrong'); var good=(+sel.value===+sel.dataset.correct); if(good){sel.classList.add('correct'); ok++;} else sel.classList.add('wrong'); sel.disabled=true; registerAnswer(good); });
