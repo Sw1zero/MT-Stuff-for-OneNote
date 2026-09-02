@@ -13,6 +13,14 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 ├── style.css                           ← Gemeinsames Design-System (BZWU Grundbildung)
 ├── STRUCTURE.md                        ← Diese Datei
 ├── assets/
+│   ├── dnd.js                           ← Gemeinsamer Touch-Drag&Drop-Layer (MTDnD)
+│   ├── lernsession-engine.js            ← HUD/XP/Streak/Navigation für lernsession-*.html
+│   ├── zuordnung3.js                    ← 3-Stufen-Muster (Zuordnung3.karten / Zuordnung3.wortbank)
+│   ├── zellen-zuordnung.js              ← Drag-in-Tabellenzelle (tabellen-luecken-*, zuordnung-verordnungen)
+│   ├── wahr-falsch-swipe.js             ← Tinder-Swipe-Engine (MTWahrFalsch)
+│   ├── anlagenteile-engine.js           ← Zuordnung Anlagenteile (b7, geruehrt/stichfest)
+│   ├── quiz-engine.js                   ← Multiple-Choice-Quiz (MTQuiz)
+│   ├── lernkaertchen-engine.js          ← Flip-Karten + Richtig/Falsch-Bestätigung (MTFlashcards)
 │   └── logos/
 │       ├── bzwu.png                    ← BZWU-Logo (weisser Hintergrund)
 │       └── milchtechnologen.svg        ← Branchenlogo
@@ -207,109 +215,36 @@ Warum dieses Format lernwirksam ist — nicht nur was es tut. Wo ein Typ zu kein
 
 ### Lernsession / Lernpfad (Canonical Pattern)
 
-Referenz: `a7-technische-einrichtungen/lernsession-waermeerzeugung.html` ← **immer von hier kopieren**
+Die HUD/XP/Streak/Navigation-Engine ist gemeinsam in **`assets/lernsession-engine.js`** ausgelagert (nicht mehr copy-pasten). Referenz für den Init-Aufruf: `a7-technische-einrichtungen/lernsession-waermeerzeugung.html` oder jede andere `lernsession-*.html`.
 
-#### Pflicht-CSS (vollständig, nichts weglassen)
+**Neues Tool erstellen:**
+1. `<script src="../assets/lernsession-engine.js"></script>` einbinden.
+2. Eigenes `STATIONS`-Array (Daten) + `buildBody()` für stationseigene Bau-Logik definieren.
+3. `LSEngine.configure({...})` mit modul-eigenen Texten/Badges/Rank-Namen aufrufen (siehe JSDoc-Kopf der Engine für die Config-Felder, u.a. `finish` für Rang-Texte/Badges).
+4. Stations-Typen `pdf`, `video`, `slides`, `tf`, `gaps`, `quiz`, `labelType`, `labelChoose`, `explain` sind in der Engine vorgebaut. Modul-eigene Sonderstationen (z.B. `buildDecide`/`buildErrors`/`buildTable`/`buildOrder`) bleiben lokal in der HTML-Datei, wenn sie zu stark vom Standard abweichen — nicht erzwingen.
 
-```css
-/* HUD */
-.hud { display:flex; align-items:center; gap:12px; background:var(--blue-dark); color:#fff; border-radius:var(--radius-md); padding:10px 14px; margin-bottom:14px; box-shadow:var(--shadow-sm); }
-.hud-xp { display:flex; align-items:baseline; gap:5px; flex-shrink:0; }
-.hud-label { font-size:0.6rem; font-weight:700; letter-spacing:0.1em; opacity:0.8; }
-.hud-val { font-size:1.15rem; font-weight:800; display:inline-block; }
-.hud-val.pop { animation:xppop 0.4s ease; }
-@keyframes xppop { 0%{transform:scale(1);} 40%{transform:scale(1.45); color:#9ad1e8;} 100%{transform:scale(1);} }
-.hud-bar { flex:1; height:8px; background:rgba(255,255,255,0.2); border-radius:4px; overflow:hidden; }
-.hud-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#69A9C9,#9ad1e8); border-radius:4px; transition:width 0.4s ease; }
-/* Streak + animierte Flamme */
-.hud-streak { position:relative; display:flex; align-items:center; gap:8px; font-size:0.84rem; font-weight:700; background:rgba(255,255,255,0.14); padding:3px 9px; border-radius:12px; white-space:nowrap; flex-shrink:0; transition:transform 0.15s, background 0.3s; }
-.streak-num-fire { color:#ff8c00; text-shadow:0 0 6px rgba(255,100,0,0.8); }
-.hud-streak.pulse { transform:scale(1.25); }
-.streak-pop { position:absolute; top:-4px; right:-4px; font-size:0.72rem; font-weight:800; color:#ffa040; pointer-events:none; white-space:nowrap; animation:streakPopAnim 0.9s ease-out forwards; }
-@keyframes streakPopAnim { 0%{opacity:1;transform:translateY(0) scale(1);} 70%{opacity:1;} 100%{opacity:0;transform:translateY(-20px) scale(0.75);} }
-/* Feuer-Animation (ab Streak ≥ 3) */
-.hud-fire-wrap { display:inline-block; position:relative; width:22px; height:22px; vertical-align:middle; overflow:visible; flex-shrink:0; }
-/* ... (vollständiger Block: aus lernsession-waermeerzeugung.html Zeilen 29–44 kopieren) */
-
-/* Read-Button */
-.read-btn-row { margin-top:16px; }
-.read-btn { width:210px; height:42px; border-radius:40px; border:1px solid rgba(255,255,255,0.25); background-color:var(--blue-dark); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:transform 0.3s; overflow:hidden; font-family:var(--font); padding:0 6px; }
-.read-btn-icon { width:32px; height:32px; background:linear-gradient(to bottom,var(--blue-light),#2a6fa8); border-radius:50px; display:flex; align-items:center; justify-content:center; overflow:hidden; z-index:2; transition:width 0.3s; flex-shrink:0; }
-.read-btn-text { flex:1; display:flex; align-items:center; justify-content:center; color:#fff; font-size:0.88rem; font-weight:600; white-space:nowrap; overflow:hidden; transition:all 0.3s; }
-.read-btn:hover:not(:disabled) .read-btn-icon { width:190px; }
-.read-btn:hover:not(:disabled) .read-btn-text { width:0; font-size:0; opacity:0; }
-.read-btn:active:not(:disabled) { transform:scale(0.95); }
-.read-btn:disabled { cursor:default; }
-.read-btn.done .read-btn-icon { background:linear-gradient(to bottom,#48bb78,#38a169); }
-```
-
-#### Pflicht-HTML (HUD)
-
-```html
-<div class="hud">
-  <div class="hud-xp"><span class="hud-label">XP</span><span class="hud-val" id="hudXp">0</span></div>
-  <div class="hud-bar"><div class="hud-bar-fill" id="hudBar"></div></div>
-  <div class="hud-streak" id="hudStreak">
-    <span id="hudStreakEmoji">🔥</span>
-    <div class="hud-fire-wrap" id="hudFireWrap" style="display:none">
-      <div class="fire">
-        <div class="fire-bottom"><div class="main-fire"></div></div>
-        <div class="fire-center"><div class="main-fire"></div><div class="particle-fire"></div></div>
-        <div class="fire-right"><div class="main-fire"></div><div class="particle-fire"></div></div>
-        <div class="fire-left"><div class="main-fire"></div><div class="particle-fire"></div></div>
-      </div>
-    </div>
-    <span id="hudStreakNum">0</span>
-  </div>
-</div>
-```
-
-#### Pflicht-JS (Gamification-Kern)
-
-```javascript
-var CHECK_SVG = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
-
-var xp = 0, streak = 0, bestStreak = 0;
-
-function renderHud() {
-  document.getElementById('hudXp').textContent = xp;
-  var sc = 0; for (var i = 0; i < N; i++) { if (solved[i]) sc++; }
-  document.getElementById('hudBar').style.width = Math.round(sc / N * 100) + '%';
-  document.getElementById('hudStreakNum').textContent = streak;
-  var onFire = streak >= 3;
-  document.getElementById('hudStreakEmoji').style.display = onFire ? 'none' : '';
-  document.getElementById('hudFireWrap').style.display = onFire ? 'inline-block' : 'none';
-  document.getElementById('hudStreakNum').className = onFire ? 'streak-num-fire' : '';
-}
-function addXp(n) { xp += n; var el = document.getElementById('hudXp'); renderHud(); el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
-function showStreakPop() { var el = document.createElement('span'); el.className = 'streak-pop'; el.textContent = '+1 🔥'; document.getElementById('hudStreak').appendChild(el); setTimeout(function() { el.remove(); }, 900); }
-function registerAnswer(ok) {
-  if (ok) { streak++; if (streak > bestStreak) bestStreak = streak; addXp(10 + (streak >= 3 ? 5 : 0)); showStreakPop(); var s = document.getElementById('hudStreak'); s.classList.remove('pulse'); void s.offsetWidth; s.classList.add('pulse'); }
-  else { streak = 0; renderHud(); }
-}
-```
-
-#### STATIONS-Filter (Challenge-Modus)
-
+**STATIONS-Filter (Challenge-Modus)**, weiterhin pro Datei:
 ```javascript
 var STATIONS = ALL.filter(function(s) {
   return MODE === 'challenge' ? (s.type !== 'info' && s.type !== 'pdf' && s.type !== 'slides') : true;
 });
 ```
 
-#### Inhaltsregeln für Slides-Stationen
-
-Siehe [Slides-Station Canonical Pattern](#slides-station-in-lernsession-canonical-pattern) weiter unten.
+Inhaltsregeln für Slides-Stationen: siehe [Slides-Station Canonical Pattern](#slides-station-in-lernsession-canonical-pattern) weiter unten.
 
 ---
 
 ### 3-Stufen-Muster (Einfach / Mittel / Schwer)
 
-Referenz: `d1-hygiene/zuordnung-piktogramme.html` (auch `a7-technische-einrichtungen/zuordnung-dampfkessel-gefahren.html`) ← **immer von hier kopieren**.
+Die Engine ist gemeinsam in **`assets/zuordnung3.js`** ausgelagert (nicht mehr copy-pasten), als zwei Sub-Namespaces, je nach Interaktionsmuster:
+- **`Zuordnung3.karten`** – Karten aus einem Pool in Drop-Zonen ziehen. Referenz: `d1-hygiene/zuordnung-piktogramme.html`, `d1-hygiene/zuordnung-hygienezonen.html`.
+- **`Zuordnung3.wortbank`** – Begriffe aus einer Wortbank in Tabellen-Lücken ziehen (Stufe Einfach identisch; Mittel/Schwer bleiben pro Datei, wenn die Pädagogik abweicht). Referenz: `a7-technische-einrichtungen/zuordnung-dampfkessel-gefahren.html`, `a8-kulturen/begruenden-massnahmen-abweichungen.html`.
+
+Beide Sub-Namespaces teilen `fold`/`matchKeys`/`showResult` und das Level-Grundgerüst `Zuordnung3.levelBar` (`setLevel`/`resetLevel`/`checkLevel`, global für `onclick`-Attribute im Markup).
 
 Verwendet in: `milchsammelwagen-beschriften.html`, `mid-beschriften.html`, `beschriften.html`, `zuordnung-dampfkessel-gefahren.html`, `zuordnung-piktogramme.html`, `zuordnung-hygienezonen.html`, `zuordnung-kulturenformen.html`, `begruenden-massnahmen-abweichungen.html`.
 
-**Aufbau:** ein `level-bar` mit drei Buttons (`setLevel('einfach'|'mittel'|'schwer')`), pro Stufe ein eigener `resetLevel()`-Aufbau und eine eigene `checkEinfach()`/`checkMittel()`/`checkSchwer()`-Auswertung im selben `<script>`-Block. Einfach nutzt HTML5-Drag-and-Drop + Touch-Events (Desktop und Mobil), Mittel meist Anklicken aus einer kurzen Optionsliste, Schwer ein Texteingabefeld.
+**Aufbau:** ein `level-bar` mit drei Buttons (`setLevel('einfach'|'mittel'|'schwer')`), pro Stufe ein eigener `resetLevel()`-Aufbau und eine eigene `checkEinfach()`/`checkMittel()`/`checkSchwer()`-Auswertung. Einfach nutzt HTML5-Drag-and-Drop + Touch-Events (Desktop und Mobil), Mittel meist Anklicken aus einer kurzen Optionsliste, Schwer ein Texteingabefeld.
 
 **Didaktische Begründung (Fading):** dieselbe Inhaltsmenge bedient sowohl schwächere als auch fortgeschrittene Lernende, indem die Unterstützung stufenweise abgebaut wird — von geführter Zuordnung über Auswahl bis zur freien Eingabe. Das folgt dem Prinzip des "Fading" aus der Forschung zu Worked Examples: Gerüst schrittweise entfernen, sobald Kompetenz wächst.
 
@@ -383,77 +318,21 @@ Jedes neue Tool **muss** diesen Vorlagen folgen. Abweichungen nur bei technische
 
 ### Lernkärtchen (Canonical Pattern)
 
-Referenz: `b7-sauermilch/lernkaertchen.html` und `b7-sauermilch/qualitaetsmaengel-jogurt.html`
+Die Engine ist gemeinsam in **`assets/lernkaertchen-engine.js`** ausgelagert (nicht mehr copy-pasten). Referenz: `b7-sauermilch/lernkaertchen.html` und `b7-sauermilch/qualitaetsmaengel-jogurt.html` (Init-Aufruf `MTFlashcards.init({...})`).
 
 **Karten-Grösse:**
 - Begriff ↔ Erklärung (kurze Inhalte): `width: 440px; height: 270px`
 - Frage ↔ Antwort (K2-Fragen, längere Inhalte): `width: 440px; height: 310px`
 
-**HTML-Gerüst:**
-```html
-<div class="scene" id="scene" onclick="flipCard()">
-  <div class="card" id="card">
-    <div class="card-face card-front">
-      <span class="card-category-badge" id="frontLabel"></span>
-      <div class="card-term" id="frontTerm"></div>          <!-- oder card-question -->
-      <div class="card-hint">Karte umdrehen für die Erklärung</div>
-    </div>
-    <div class="card-face card-back">
-      <span class="card-category-badge" id="backLabel"></span>
-      <div class="card-explanation" id="backExplanation"></div>  <!-- oder card-answer -->
-    </div>
-  </div>
-</div>
-```
+**Feldschema (immer, keine Alt-Varianten wie `{cat,q,a}` mehr):** `{category, front, back}`, Markup-Klassen `.card-term`/`.card-explanation` (bzw. `.card-question` für K2-Fragenkarten).
 
-**CSS-Klassen (in style.css definiert):**
-- `.scene` – perspektivischer Container
-- `.card` – flip-fähige Karte (`transform-style: preserve-3d`)
-- `.card.flipped` – rotierter Zustand (`transform: rotateY(180deg)`)
-- `.card-face` – gemeinsame Stile für Vorder-/Rückseite
-- `.card-front` – weisser Hintergrund (`var(--surface)`)
-- `.card-back` – blauer Hintergrund (`var(--blue-light)`)
-- `.card-category-badge` – Kategorie-Pill oben links
-- `.card-term` – grosser Begriff (1.42rem, fett)
-- `.card-question` – K2-Frage (0.97rem, fett) – für Frage-Karten
-- `.card-explanation` / `.card-answer` – Erklärungstext Rückseite
+**Richtig/Falsch-Bestätigung (Pflicht seit 2026-09):** nach dem Umdrehen erscheinen zwei Buttons "Wusste ich" / "Wusste ich nicht". Als "Wusste ich nicht" markierte Karten werden ans Ende des aktuellen Durchgangs angehängt (nicht neu gemischt); der Durchgang wiederholt sich, bis alle Karten in einem Durchgang "gewusst" wurden. Fortschrittstext zeigt "Karte X von Y", ab dem zweiten Durchgang zusätzlich "(Durchgang n)" bzw. "noch Z zu wiederholen". Kein Score/Punktesystem — reine Selbsteinschätzung.
 
-**Steuerung (immer gleich):**
-```html
-<div class="controls">
-  <button class="btn btn-ghost"   onclick="prevCard()">← Zurück</button>
-  <button class="btn btn-success" onclick="flipCard()">Umdrehen</button>
-  <button class="btn btn-ghost"   onclick="nextCard()">Weiter →</button>
-</div>
-<div class="controls">
-  <button class="btn btn-primary" onclick="shuffleCards()">⇄ Mischen</button>
-</div>
-<p class="keyboard-hint">
-  ← → navigieren | Leertaste umdrehen | S mischen
-</p>
-```
-
-**Keyboard-Shortcuts (immer identisch):**
-```javascript
-document.addEventListener('keydown', e => {
-  if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); flipCard(); }
-  if (e.key === 'ArrowRight') nextCard();
-  if (e.key === 'ArrowLeft')  prevCard();
-  if (e.key === 's' || e.key === 'S') shuffleCards();
-});
-```
-
-**Fortschrittsanzeige (immer gleich):**
-```html
-<div class="progress-text" id="progressText"></div>
-<div class="progress-bar-wrap">
-  <div class="progress-bar-fill" id="progressBar"></div>
-</div>
-```
-```javascript
-document.getElementById('progressText').textContent = `Karte ${currentIndex + 1} von ${total}`;
-document.getElementById('progressBar').style.width  = `${((currentIndex + 1) / total) * 100}%`;
-```
+**Neues Tool erstellen:**
+1. `<link rel="stylesheet" href="../style.css">` (Card-Flip-/Progress-Bar-CSS ist dort unter `/* Lernkärtchen-Engine */` definiert, nicht mehr inline duplizieren).
+2. `<script src="../assets/lernkaertchen-engine.js"></script>` einbinden.
+3. Eigenes Karten-Array (`{category, front, back}`) + Markup-Grundgerüst übernehmen, `MTFlashcards.init({cards, ...})` aufrufen.
+4. Bestehende Steuerung (Vorne/Hinten, Mischen, Kategoriefilter, Tastatur-Shortcuts ← → Leertaste/Enter S) kommt automatisch aus der Engine.
 
 **Kategorie-Badge-Farben (Standard):**
 ```javascript
