@@ -6,6 +6,7 @@
   <title>Begründen – Massnahmen bei Abweichungen</title>
   <link rel="stylesheet" href="../style.css">
   <script src="../assets/dnd.js"></script>
+  <script src="../assets/zuordnung3.js"></script>
   <style>
     .back-link { display: inline-block; font-size: 0.82rem; color: var(--text-muted); text-decoration: none; margin-bottom: 1rem; }
     .back-link:hover { color: var(--red); }
@@ -321,41 +322,8 @@ var ROWS = [
 var ANSWERS = [];
 ROWS.forEach(function(r) { ANSWERS.push(r.ursache); ANSWERS.push(r.massnahme); ANSWERS.push(r.wirkung); });
 
-var level = 'einfach';
-var selected = null;
-var dragWord = null;
+var engine = Zuordnung3.wortbank.createEngine();
 var mcScore = 0, mcTotal = 0;
-
-function fold(s) { return String(s).toLowerCase().replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss').replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim(); }
-function matchKeys(input, keys) { var f = fold(input); if (!f) return false; for (var i = 0; i < keys.length; i++) { if (f.indexOf(fold(keys[i])) !== -1) return true; } return false; }
-function isLocked(cell) { return cell.classList.contains('correct') || cell.classList.contains('wrong'); }
-
-function setLevel(l) {
-  level = l;
-  ['einfach','mittel','schwer'].forEach(function(k) { document.getElementById('lvl-'+k).classList.toggle('active', k === l); });
-  resetLevel();
-}
-
-function resetLevel() {
-  document.getElementById('resultBanner').className = 'result-banner';
-  var body = document.getElementById('modeBody');
-  body.innerHTML = '';
-  var checkBtn = document.getElementById('checkBtn');
-  var instr = document.getElementById('instruction');
-  if (level === 'einfach') {
-    checkBtn.style.display = '';
-    instr.textContent = 'Ordnen Sie jeder Situation die passende Ursache, Massnahme und Wirkung zu. Klicken Sie einen Begriff aus der Wortbank an, dann das leere Feld – oder ziehen Sie ihn hinein.';
-    buildEinfach(body);
-  } else if (level === 'schwer') {
-    checkBtn.style.display = 'none';
-    instr.textContent = 'Schreiben Sie zu jeder Situation Ihre eigene Begründung: Ursache, Massnahme und warum die Massnahme wirkt. Vergleichen Sie danach mit der Musterantwort.';
-    buildSchwer(body);
-  } else {
-    checkBtn.style.display = 'none';
-    instr.textContent = 'Welcher Satz begründet die Massnahme wirklich, statt sie nur zu nennen? Klicken Sie den richtigen Satz an.';
-    buildMittel(body);
-  }
-}
 
 /* ---------- EINFACH: Drag & Drop aus Wortbank ---------- */
 function buildEinfach(body) {
@@ -363,20 +331,7 @@ function buildEinfach(body) {
     '<div class="word-bank" id="wordBank"></div>' +
     '<table class="compare-table"><thead><tr><th>Situation</th><th>Ursache</th><th>Massnahme</th><th>Wirkung</th></tr></thead><tbody id="einfachBody"></tbody></table>';
 
-  var bank = document.getElementById('wordBank');
-  MTDnD.shuffle(ANSWERS).forEach(function(word) {
-    var chip = document.createElement('button');
-    chip.type = 'button';
-    chip.className = 'word-chip';
-    chip.textContent = word;
-    chip.dataset.word = word;
-    chip.setAttribute('draggable', 'true');
-    chip.onclick = function() { selectChip(this); };
-    chip.addEventListener('dragstart', function(e) { dragWord = word; e.dataTransfer.effectAllowed = 'move'; chip.classList.add('dragging'); });
-    chip.addEventListener('dragend', function() { chip.classList.remove('dragging'); });
-    chip.addEventListener('touchstart', function(e) { MTDnD.touchStart(e, chip, word, false, '.blank-cell', onDrop); }, {passive: false});
-    bank.appendChild(chip);
-  });
+  engine.wireBank(document.getElementById('wordBank'), ANSWERS);
 
   var tbody = document.getElementById('einfachBody');
   ROWS.forEach(function(r) {
@@ -388,69 +343,12 @@ function buildEinfach(body) {
     tbody.appendChild(tr);
   });
 
-  document.querySelectorAll('.blank-cell').forEach(function(cell) {
-    cell.onclick = function() { clickCell(this); };
-    cell.addEventListener('dragover', function(e) { e.preventDefault(); if (!isLocked(cell) && !cell.dataset.filled) cell.classList.add('over'); });
-    cell.addEventListener('dragleave', function() { cell.classList.remove('over'); });
-    cell.addEventListener('drop', function(e) {
-      e.preventDefault(); cell.classList.remove('over');
-      if (dragWord) { placeInCell(cell, dragWord); dragWord = null; }
-    });
-  });
-  selected = null;
+  engine.wireCells();
 }
-
-function selectChip(chip) {
-  if (chip.classList.contains('selected')) { chip.classList.remove('selected'); selected = null; clearReady(); return; }
-  document.querySelectorAll('.word-chip.selected').forEach(function(c) { c.classList.remove('selected'); });
-  chip.classList.add('selected');
-  selected = chip.dataset.word;
-  document.querySelectorAll('.blank-cell').forEach(function(c) {
-    c.classList.remove('ready');
-    if (!c.dataset.filled && !isLocked(c)) c.classList.add('ready');
-  });
-}
-function clickCell(cell) {
-  if (isLocked(cell)) return;
-  if (cell.dataset.filled) {
-    returnWord(cell.dataset.filled);
-    delete cell.dataset.filled;
-    cell.textContent = '—';
-    cell.className = 'blank-cell';
-    if (selected) cell.classList.add('ready');
-    return;
-  }
-  if (!selected) return;
-  placeInCell(cell, selected);
-}
-function placeInCell(cell, word) {
-  if (isLocked(cell)) return;
-  var displaced = cell.dataset.filled || null;
-  cell.dataset.filled = word;
-  cell.textContent = word;
-  cell.className = 'blank-cell filled';
-  markUsed(word);
-  if (displaced && displaced !== word) returnWord(displaced);
-  selected = null;
-  document.querySelectorAll('.word-chip.selected').forEach(function(c) { c.classList.remove('selected'); });
-  clearReady();
-}
-function returnWord(word) { document.querySelectorAll('.word-chip').forEach(function(c) { if (c.dataset.word === word) c.classList.remove('used', 'selected'); }); }
-function markUsed(word) { document.querySelectorAll('.word-chip').forEach(function(c) { if (c.dataset.word === word) { c.classList.remove('selected'); c.classList.add('used'); } }); }
-function clearReady() { document.querySelectorAll('.blank-cell').forEach(function(c) { c.classList.remove('ready'); }); }
-function onDrop(box, word, source) { if (isLocked(box)) return; placeInCell(box, word); }
 
 function checkEinfach() {
-  var correct = 0, filled = 0;
-  document.querySelectorAll('.blank-cell').forEach(function(cell) {
-    var val = cell.dataset.filled;
-    if (!val) return;
-    filled++;
-    cell.classList.remove('filled', 'ready');
-    if (val === cell.dataset.answer) { cell.classList.add('correct'); correct++; }
-    else { cell.classList.add('wrong'); }
-  });
-  showResult(correct, filled, ANSWERS.length);
+  var res = engine.checkEinfach();
+  showResult(res.correct, res.filled, ANSWERS.length);
 }
 
 /* ---------- MITTEL: pro Situation den echt begründenden Satz anklicken ---------- */
@@ -536,18 +434,25 @@ function revealModel(i) {
 }
 
 /* ---------- gemeinsam ---------- */
-function checkLevel() { if (level === 'einfach') checkEinfach(); }
 function showResult(correct, filled, total) {
   var banner = document.getElementById('resultBanner');
   if (correct === total) {
-    banner.textContent = 'Perfekt! Alle ' + total + ' richtig zugeordnet.';
-    banner.className = 'result-banner show perfect';
+    Zuordnung3.showResult(banner, true, 'Perfekt! Alle ' + total + ' richtig zugeordnet.');
   } else {
-    banner.textContent = correct + ' von ' + (filled || total) + ' korrekt. Rot markierte Felder nochmals überprüfen.';
-    banner.className = 'result-banner show partial';
+    Zuordnung3.showResult(banner, false, correct + ' von ' + (filled || total) + ' korrekt. Rot markierte Felder nochmals überprüfen.');
   }
 }
 
+Zuordnung3.levelBar({
+  instructions: {
+    einfach: 'Ordnen Sie jeder Situation die passende Ursache, Massnahme und Wirkung zu. Klicken Sie einen Begriff aus der Wortbank an, dann das leere Feld – oder ziehen Sie ihn hinein.',
+    mittel:  'Welcher Satz begründet die Massnahme wirklich, statt sie nur zu nennen? Klicken Sie den richtigen Satz an.',
+    schwer:  'Schreiben Sie zu jeder Situation Ihre eigene Begründung: Ursache, Massnahme und warum die Massnahme wirkt. Vergleichen Sie danach mit der Musterantwort.'
+  },
+  checkBtn: { einfach: '', mittel: 'none', schwer: 'none' },
+  build: { einfach: buildEinfach, mittel: buildMittel, schwer: buildSchwer },
+  check: { einfach: checkEinfach }
+});
 setLevel('einfach');
 </script>
 

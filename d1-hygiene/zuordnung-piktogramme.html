@@ -6,6 +6,7 @@
   <title>Hygiene-Piktogramme zuordnen</title>
   <link rel="stylesheet" href="../style.css">
   <script src="../assets/dnd.js"></script>
+  <script src="../assets/zuordnung3.js"></script>
   <style>
     .back-link {
       display: inline-block;
@@ -258,51 +259,16 @@ var KARTEN = [
   { id: 7, text: "Kein Essen und Trinken am Arbeitsplatz", match: "essen",    img: "d.1_piktogramm_essen-trinken-verboten.svg",     keys: ["essen", "trinken"] }
 ];
 
-var karteById = {};
-for (var ki = 0; ki < KARTEN.length; ki++) {
-  karteById[KARTEN[ki].id] = KARTEN[ki];
-}
+var engine = Zuordnung3.karten.createEngine(KARTEN, 'match', { singleSlot: true });
+var karteById = engine.karteById;
 
-function fold(s) { return String(s).toLowerCase().replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss').replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim(); }
-function matchKeys(input, keys) { var f = fold(input); if (!f) return false; for (var i = 0; i < keys.length; i++) { if (f.indexOf(fold(keys[i])) !== -1) return true; } return false; }
-
-var level = 'einfach';
-var dragId = null, dragSource = null, dragFromPool = false, selectedId = null;
 var mcScore = 0, mcTotal = 0;
-
-function setLevel(l) {
-  level = l;
-  ['einfach','mittel','schwer'].forEach(function(k) { document.getElementById('lvl-'+k).classList.toggle('active', k === l); });
-  resetLevel();
-}
-
-function resetLevel() {
-  document.getElementById('resultBanner').className = 'result-banner';
-  var body = document.getElementById('modeBody');
-  body.innerHTML = '';
-  var checkBtn = document.getElementById('checkBtn');
-  var instr = document.getElementById('instruction');
-  if (level === 'einfach') {
-    checkBtn.style.display = '';
-    instr.textContent = 'Ziehen Sie jede Bedeutung unter das passende Piktogramm.';
-    buildEinfach(body);
-  } else if (level === 'schwer') {
-    checkBtn.style.display = '';
-    instr.textContent = 'Schreiben Sie zu jedem Piktogramm die Bedeutung auf. Es genügt der Kernbegriff.';
-    buildSchwer(body);
-  } else {
-    checkBtn.style.display = 'none';
-    instr.textContent = 'Klicken Sie pro Piktogramm die richtige Bedeutung an.';
-    buildMittel(body);
-  }
-}
 
 /* ---------- EINFACH: Drag & Drop aus Wortbank ---------- */
 function buildEinfach(body) {
   body.innerHTML = '<div class="card-pool" id="cardPool"></div><div class="pikto-grid" id="piktoGrid"></div>';
 
-  var pool = document.getElementById('cardPool');
-  MTDnD.shuffle(KARTEN.slice()).forEach(function(k) { pool.appendChild(makePoolChip(k)); });
+  engine.renderPool(document.getElementById('cardPool'));
 
   var grid = document.getElementById('piktoGrid');
   KARTEN.forEach(function(k) {
@@ -313,161 +279,12 @@ function buildEinfach(body) {
     grid.appendChild(card);
   });
 
-  setupZones();
-  dragId = dragSource = null; selectedId = null;
-}
-
-function makePoolChip(k) {
-  var chip = document.createElement('span');
-  chip.className = 'karte';
-  chip.textContent = k.text;
-  chip.dataset.id = k.id;
-  chip.setAttribute('draggable', 'true');
-
-  chip.addEventListener('dragstart', function(e) {
-    dragId = k.id; dragSource = chip; dragFromPool = true;
-    chip.classList.add('dragging');
-    e.dataTransfer.effectAllowed = 'move';
-  });
-  chip.addEventListener('dragend', function() { chip.classList.remove('dragging'); });
-  chip.addEventListener('touchstart', function(e) { MTDnD.touchStart(e, chip, k.id, false, '.drop-zone', onDrop); }, {passive: false});
-  chip.addEventListener('click', function() { selectPoolChip(chip, k.id); });
-
-  return chip;
-}
-
-function selectPoolChip(chip, id) {
-  if (chip.classList.contains('used')) return;
-  if (selectedId === id) { chip.classList.remove('selected'); selectedId = null; clearReadyZones(); return; }
-  document.querySelectorAll('.karte.selected').forEach(function(c) { c.classList.remove('selected'); });
-  chip.classList.add('selected');
-  selectedId = id;
-  document.querySelectorAll('.drop-zone').forEach(function(z) {
-    z.classList.remove('ready');
-    if (!z.classList.contains('checked')) z.classList.add('ready');
-  });
-}
-
-function clickZone(zone) {
-  if (zone.classList.contains('checked')) return;
-  if (selectedId === null) return;
-  placeCardInZone(zone, selectedId);
-  markPoolChipUsed(selectedId);
-  selectedId = null;
-  document.querySelectorAll('.karte.selected').forEach(function(c) { c.classList.remove('selected'); });
-  clearReadyZones();
-}
-
-function clickPlacedKarte(el, id, zone) {
-  if (el.classList.contains('correct') || el.classList.contains('wrong')) return;
-  if (selectedId !== null) {
-    returnToPool(id);
-    removeFromZone(zone, id);
-    placeCardInZone(zone, selectedId);
-    markPoolChipUsed(selectedId);
-    selectedId = null;
-    document.querySelectorAll('.karte.selected').forEach(function(c) { c.classList.remove('selected'); });
-    clearReadyZones();
-  } else {
-    returnToPool(id);
-    removeFromZone(zone, id);
-  }
-}
-
-function clearReadyZones() { document.querySelectorAll('.drop-zone').forEach(function(z) { z.classList.remove('ready'); }); }
-
-function placeCardInZone(zone, id) {
-  var existing = zone.querySelector('.placed-karte');
-  if (existing) { returnToPool(parseInt(existing.dataset.id)); zone.removeChild(existing); }
-
-  var k = karteById[id];
-  var el = document.createElement('div');
-  el.className = 'placed-karte';
-  el.textContent = k.text;
-  el.dataset.id = id;
-  el.setAttribute('draggable', 'true');
-
-  el.addEventListener('dragstart', function(e) {
-    if (el.classList.contains('correct') || el.classList.contains('wrong')) { e.preventDefault(); return; }
-    dragId = id; dragSource = el; dragFromPool = false;
-    el.classList.add('dragging');
-    e.dataTransfer.effectAllowed = 'move';
-  });
-  el.addEventListener('dragend', function() { el.classList.remove('dragging'); });
-  el.addEventListener('touchstart', function(e) {
-    if (el.classList.contains('correct') || el.classList.contains('wrong')) return;
-    MTDnD.touchStart(e, el, id, true, '.drop-zone', onDrop);
-  }, {passive: false});
-  el.addEventListener('click', function(e) { e.stopPropagation(); clickPlacedKarte(el, id, zone); });
-
-  zone.appendChild(el);
-}
-
-function removeFromZone(zone, id) {
-  var children = zone.querySelectorAll('.placed-karte');
-  for (var i = 0; i < children.length; i++) {
-    if (parseInt(children[i].dataset.id) === parseInt(id)) { zone.removeChild(children[i]); return; }
-  }
-}
-
-function findZoneForPlacedEl(el) { return el.closest('.drop-zone'); }
-
-function markPoolChipUsed(id) {
-  document.querySelectorAll('.karte').forEach(function(c) { if (parseInt(c.dataset.id) === parseInt(id)) c.classList.add('used'); });
-}
-function returnToPool(id) {
-  document.querySelectorAll('.karte').forEach(function(c) { if (parseInt(c.dataset.id) === parseInt(id)) c.classList.remove('used'); });
-}
-
-function dropOnZone(zone) {
-  if (!dragId) return;
-  if (zone.classList.contains('checked')) return;
-  if (!dragFromPool && dragSource) {
-    var srcZone = findZoneForPlacedEl(dragSource);
-    if (srcZone) srcZone.removeChild(dragSource);
-  } else if (dragFromPool) {
-    markPoolChipUsed(dragId);
-  }
-  placeCardInZone(zone, dragId);
-  dragId = dragSource = null; dragFromPool = false;
-}
-
-function setupZones() {
-  document.querySelectorAll('.drop-zone').forEach(function(zone) {
-    zone.addEventListener('dragover', function(e) { e.preventDefault(); if (!zone.classList.contains('checked')) zone.classList.add('over'); });
-    zone.addEventListener('dragleave', function() { zone.classList.remove('over'); });
-    zone.addEventListener('drop', function(e) { e.preventDefault(); zone.classList.remove('over'); dropOnZone(zone); });
-    zone.addEventListener('click', function() { clickZone(zone); });
-  });
-}
-
-function onDrop(targetZone, id, source) {
-  if (targetZone.classList.contains('checked')) return;
-  if (source.isSlot) {
-    var srcZone = findZoneForPlacedEl(source.el);
-    if (srcZone) srcZone.removeChild(source.el);
-  } else {
-    markPoolChipUsed(id);
-  }
-  placeCardInZone(targetZone, id);
+  engine.setupZones();
 }
 
 function checkEinfach() {
-  var correct = 0, total = 0;
-  document.querySelectorAll('.drop-zone').forEach(function(zone) {
-    var correctMatch = zone.dataset.match;
-    zone.classList.add('checked');
-    zone.querySelectorAll('.placed-karte').forEach(function(el) {
-      var id = parseInt(el.dataset.id);
-      var k = karteById[id];
-      total++;
-      el.classList.remove('placed-karte');
-      if (k.match === correctMatch) { el.classList.add('placed-karte', 'correct'); correct++; }
-      else { el.classList.add('placed-karte', 'wrong'); }
-      el.setAttribute('draggable', 'false');
-    });
-  });
-  showResult(correct, total, KARTEN.length);
+  var res = engine.checkEinfach();
+  showResult(res.correct, res.total, KARTEN.length);
 }
 
 /* ---------- MITTEL: pro Piktogramm anklicken (1 richtig + 2 Ablenker) ---------- */
@@ -535,25 +352,32 @@ function checkSchwer() {
   KARTEN.forEach(function(k, i) {
     var input = document.getElementById('ti-' + i), sol = document.getElementById('tisol-' + i);
     input.classList.remove('correct', 'wrong');
-    if (matchKeys(input.value, k.keys)) { input.classList.add('correct'); sol.style.display = 'none'; correct++; }
+    if (Zuordnung3.matchKeys(input.value, k.keys)) { input.classList.add('correct'); sol.style.display = 'none'; correct++; }
     else { input.classList.add('wrong'); sol.textContent = '→ ' + k.text; sol.style.display = 'block'; }
   });
   showResult(correct, total, total);
 }
 
 /* ---------- gemeinsam ---------- */
-function checkLevel() { if (level === 'einfach') checkEinfach(); else if (level === 'schwer') checkSchwer(); }
 function showResult(correct, filled, total) {
   var banner = document.getElementById('resultBanner');
   if (correct === total) {
-    banner.textContent = 'Perfekt! Alle ' + total + ' Piktogramme richtig zugeordnet.';
-    banner.className = 'result-banner show perfect';
+    Zuordnung3.showResult(banner, true, 'Perfekt! Alle ' + total + ' Piktogramme richtig zugeordnet.');
   } else {
-    banner.textContent = correct + ' von ' + (filled || total) + ' richtig. Rot markierte nochmals überprüfen.';
-    banner.className = 'result-banner show partial';
+    Zuordnung3.showResult(banner, false, correct + ' von ' + (filled || total) + ' richtig. Rot markierte nochmals überprüfen.');
   }
 }
 
+Zuordnung3.levelBar({
+  instructions: {
+    einfach: 'Ziehen Sie jede Bedeutung unter das passende Piktogramm.',
+    mittel:  'Klicken Sie pro Piktogramm die richtige Bedeutung an.',
+    schwer:  'Schreiben Sie zu jedem Piktogramm die Bedeutung auf. Es genügt der Kernbegriff.'
+  },
+  checkBtn: { einfach: '', mittel: 'none', schwer: '' },
+  build: { einfach: buildEinfach, mittel: buildMittel, schwer: buildSchwer },
+  check: { einfach: checkEinfach, schwer: checkSchwer }
+});
 setLevel('einfach');
 </script>
 </body>
