@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Challenge: Sbrinz AOP</title>
   <link rel="stylesheet" href="../style.css">
+  <script src="../assets/lernsession-engine.js"></script>
   <style>
     .back-link { display:inline-block; font-size:0.82rem; color:var(--text-muted); text-decoration:none; margin-bottom:1rem; }
     .back-link:hover { color:var(--red); }
@@ -277,9 +278,9 @@
     <div id="stage"></div>
 
     <div class="ls-nav">
-      <button class="btn btn-ghost" id="prevBtn" onclick="goPrev()">← Zurück</button>
+      <button class="btn btn-ghost" id="prevBtn" onclick="LSEngine.goPrev()">← Zurück</button>
       <span class="spacer"></span>
-      <button class="btn btn-primary" id="nextBtn" onclick="goNext()">Weiter →</button>
+      <button class="btn btn-primary" id="nextBtn" onclick="LSEngine.goNext()">Weiter →</button>
     </div>
   </div>
 </main>
@@ -289,8 +290,6 @@
 </footer>
 
 <script>
-var CHECK_SVG = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
-
 /* ============================================================
    Lernsession Sbrinz AOP, Inhalte aus b.1 Lehrmittel
    13 Stationen mit Lesetexten + Gamification (XP, Streak, Abzeichen)
@@ -545,316 +544,58 @@ var ALL = [
 
 var MODE = /[?&]mode=challenge/.test(location.search) ? 'challenge' : 'lernpfad';
 var STATIONS = ALL.filter(function(s){ return MODE === 'challenge' ? (s.type !== 'info' && s.type !== 'slides') : true; });
-(function(){
-  var t = (MODE === 'challenge') ? 'Challenge' : 'Lernpfad';
-  document.getElementById('pageTitle').textContent = t + ': Sbrinz AOP';
-  document.getElementById('subtitle').textContent = (MODE === 'challenge')
-    ? 'Prüfungsmodus – ohne Lesetexte'
-    : 'Wissensvermittlung – mit Lesetexten und Übungen';
-  document.title = t + ': Sbrinz AOP';
-  if (MODE === 'challenge') {
-    document.getElementById('lsDots').classList.add('selectable');
-    document.querySelector('.ls-select-hint').classList.add('show');
-    var hud = document.querySelector('.hud'); if (hud) hud.style.display = 'none';
+
+LSEngine.configure({
+  unitLabel: 'Station',
+  modeBanner: {
+    pageTitle: function(mode){ return (mode==='challenge'?'Challenge':'Lernpfad') + ': Sbrinz AOP'; },
+    subtitle: function(mode){ return mode==='challenge'
+      ? 'Prüfungsmodus – ohne Lesetexte'
+      : 'Wissensvermittlung – mit Lesetexten und Übungen'; },
+    docTitle: function(mode){ return (mode==='challenge'?'Challenge':'Lernpfad') + ': Sbrinz AOP'; }
+  },
+  finish: {
+    rank: function(pct){
+      if (pct >= 90)      return 'Sbrinz-Meister 🧀';
+      else if (pct >= 75) return 'Sbrinz-Affineur';
+      else if (pct >= 50) return 'Sbrinz-Geselle';
+      else                return 'Sbrinz-Lehrling';
+    },
+    badges: function(pct){
+      var pIdx = LSEngine.findIdx('pflichtenheft'), fIdx = LSEngine.findIdx('fehler'), bIdx = LSEngine.findIdx('boss');
+      return [
+        { icon: '📖', name: 'Aufmerksamer Leser', got: true },
+        { icon: '📜', name: 'Pflichtenheft-Profi', got: pIdx >= 0 && earned[pIdx] === maxPts[pIdx] },
+        { icon: '🔍', name: 'Fehlerjäger',        got: fIdx >= 0 && earned[fIdx] === maxPts[fIdx] },
+        { icon: '🔥', name: 'Serienkäser (Streak 8+)', got: bestStreak >= 8 },
+        { icon: '🎓', name: 'Meisterprüfung',     got: bIdx >= 0 && maxPts[bIdx] > 0 && earned[bIdx] === maxPts[bIdx] },
+        { icon: '🧀', name: 'Sbrinz-Meister (90%)', got: pct >= 90 }
+      ];
+    },
+    pointsWord: 'Wissenspunkte',
+    backLink: false,
+    closingHtml:
+      '<ul>' +
+        '<li><b>Rohmilch</b> im Kupferkessi, kein Thermisieren, Salzbad ≥ 15 Tage, 12 Monate im AOP-Gebiet.</li>' +
+        '<li>Kulturen <b>thermophil + homofermentativ</b>; Fett 2,9–3,0 %; kein Wasserzusatz → extraharter Teig.</li>' +
+        '<li>Brennen bei <b>55–56 °C</b> reduziert Fremdkeime, ohne die Säuerung zu stoppen.</li>' +
+        '<li>Langes Salzbad (20–22 °Bé, 12–15 °C) + hoher Salzgehalt hemmen die <b>Nachgärung</b>.</li>' +
+        '<li>Reifung <b>2–4 Jahre</b> stehend im Stotzgestell; Hauptfehler: Nachgärung / „Gläs" durch Propionsäurebakterien.</li>' +
+      '</ul>'
   }
-})();
+});
 
-var N = STATIONS.length;
-var current = 0;
-var solved  = [];
-var earned  = [];
-var maxPts  = [];
-for (var i = 0; i < N; i++) { solved[i] = false; earned[i] = 0; maxPts[i] = 0; }
-
-/* Gamification-Status */
-var xp = 0, streak = 0, bestStreak = 0;
-
-function findIdx(id) {
-  for (var i = 0; i < N; i++) { if (STATIONS[i].id === id) return i; }
-  return -1;
-}
-
-/* ---------- HUD / XP / Streak ---------- */
-function renderHud() {
-  document.getElementById('hudXp').textContent = xp;
-  var sc = 0;
-  for (var i = 0; i < N; i++) { if (solved[i]) sc++; }
-  document.getElementById('hudBar').style.width = Math.round(sc / N * 100) + '%';
-  document.getElementById('hudStreakNum').textContent = streak;
-  var onFire = streak >= 3;
-  document.getElementById('hudStreakEmoji').style.display = onFire ? 'none' : '';
-  document.getElementById('hudFireWrap').style.display = onFire ? 'inline-block' : 'none';
-  document.getElementById('hudStreakNum').className = onFire ? 'streak-num-fire' : '';
-}
-function addXp(n) {
-  xp += n;
-  var el = document.getElementById('hudXp');
-  renderHud();
-  el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop');
-}
-function showStreakPop() {
-  var el = document.createElement('span');
-  el.className = 'streak-pop';
-  el.textContent = '+1 🔥';
-  document.getElementById('hudStreak').appendChild(el);
-  setTimeout(function() { el.remove(); }, 900);
-}
-function registerAnswer(ok) {
-  if (ok) {
-    streak++;
-    if (streak > bestStreak) bestStreak = streak;
-    addXp(10 + (streak >= 3 ? 5 : 0));
-    showStreakPop();
-    var s = document.getElementById('hudStreak');
-    s.classList.remove('pulse'); void s.offsetWidth; s.classList.add('pulse');
-  } else {
-    streak = 0;
-    renderHud();
-  }
-}
+LSEngine.initState();
 
 /* ---------- Aufbau aller Stationen ---------- */
-function buildAll() {
-  var stage = document.getElementById('stage');
-  stage.innerHTML = '';
-  STATIONS.forEach(function(st, idx) {
-    var card = document.createElement('div');
-    card.className = 'station' + (st.boss ? ' boss' : '') + (idx === 0 ? '' : ' hidden');
-    card.id = 'station-' + idx;
-    card.innerHTML =
-      '<div class="station-kicker">' + st.kicker + '</div>' +
-      '<div class="station-title">' + st.title + '</div>' +
-      '<div class="station-lead">' + st.lead + '</div>' +
-      (st.media ? '<div class="station-media">' + st.media + '</div>' : '') +
-      '<div class="station-body" id="body-' + idx + '"></div>';
-    stage.appendChild(card);
-    buildBody(idx, st);
-  });
-
-  var fin = document.createElement('div');
-  fin.className = 'station hidden';
-  fin.id = 'station-finish';
-  fin.innerHTML = '<div class="finish" id="finishBody"></div>';
-  stage.appendChild(fin);
-}
-
 function buildBody(idx, st) {
   var body = document.getElementById('body-' + idx);
-  if (st.type === 'info')   buildInfo(body, idx, st);
-  if (st.type === 'slides') buildSlides(body, idx, st);
-  if (st.type === 'quiz')   buildQuiz(body, idx, st);
-  if (st.type === 'tf')     buildTF(body, idx, st);
-  if (st.type === 'gaps')   buildGaps(body, idx, st);
+  if (st.type === 'slides') LSEngine.buildSlides(idx, st);
+  if (st.type === 'quiz')   LSEngine.buildQuiz(idx, st);
+  if (st.type === 'tf')     LSEngine.buildTF(idx, st);
+  if (st.type === 'gaps')   LSEngine.buildGaps(idx, st);
   if (st.type === 'decide') buildDecide(body, idx, st);
   if (st.type === 'errors') buildErrors(body, idx, st);
-}
-
-/* ---------- Info / Lesetext ---------- */
-function buildInfo(body, idx, st) {
-  maxPts[idx] = 0;
-  body.innerHTML =
-    '<div class="read">' + st.read + '</div>' +
-    '<div class="read-btn-row"><button class="read-btn" id="readbtn-' + idx + '">' +
-    '<div class="read-btn-icon">' + CHECK_SVG + '</div>' +
-    '<span class="read-btn-text">Gelesen ✓ (+5 XP)</span></button></div>';
-  document.getElementById('readbtn-' + idx).addEventListener('click', function() {
-    if (solved[idx]) return;
-    solved[idx] = true;
-    addXp(5);
-    this.disabled = true;
-    this.classList.add('done');
-    this.querySelector('.read-btn-text').textContent = 'Gelesen ✓';
-    updateNav();
-  });
-}
-
-/* ---------- Slides ---------- */
-function buildSlides(body, idx, st) {
-  maxPts[idx] = 0;
-  var cur = 0;
-  var slides = st.slides;
-
-  var html = '<div class="slideshow" id="ssw-' + idx + '">';
-  slides.forEach(function(sl, si) {
-    html += '<div class="slide-panel' + (si === 0 ? ' active' : '') + '" id="ssp-' + idx + '-' + si + '">';
-    html += '<div class="slide-header" style="background:' + sl.bg + ';">';
-    html += '<span class="slide-icon">' + sl.icon + '</span>';
-    html += '<span class="slide-htitle" style="color:' + sl.color + ';">' + sl.title + '</span>';
-    html += '</div><div class="slide-body">' + sl.body + '</div></div>';
-  });
-  html += '</div>';
-  html += '<div class="slide-nav-row">';
-  html += '<button class="slide-nav-btn" id="sprev-' + idx + '" disabled>← Zurück</button>';
-  html += '<div style="display:flex;align-items:center;gap:8px;"><div class="slide-dots" id="sdots-' + idx + '"></div>';
-  html += '<span class="slide-counter" id="sctr-' + idx + '"></span></div>';
-  html += '<button class="slide-nav-btn" id="snext-' + idx + '">Weiter →</button>';
-  html += '</div>';
-  html += '<div class="read-btn-row" id="sbtnrow-' + idx + '" style="display:' + (slides.length <= 1 ? '' : 'none') + '">';
-  html += '<button class="read-btn" id="readbtn-' + idx + '">' +
-          '<div class="read-btn-icon">' + CHECK_SVG + '</div>' +
-          '<span class="read-btn-text">Gelesen ✓ (+5 XP)</span></button></div>';
-  body.innerHTML = html;
-
-  function renderDots() {
-    var el = document.getElementById('sdots-' + idx); el.innerHTML = '';
-    slides.forEach(function(sl, si) {
-      var d = document.createElement('span');
-      d.className = 'slide-dot' + (si === cur ? ' active' : si < cur ? ' done' : '');
-      d.addEventListener('click', function() { if (si !== cur) go(si); });
-      el.appendChild(d);
-    });
-    var ctr = document.getElementById('sctr-' + idx);
-    if (ctr) ctr.textContent = (cur + 1) + ' / ' + slides.length;
-  }
-  function renderNav() {
-    document.getElementById('sprev-' + idx).disabled = (cur === 0);
-    document.getElementById('snext-' + idx).disabled = (cur === slides.length - 1);
-    var btnRow = document.getElementById('sbtnrow-' + idx);
-    if (btnRow) btnRow.style.display = (cur === slides.length - 1) ? '' : 'none';
-  }
-  function go(newIdx) {
-    var dir = newIdx > cur ? 'right' : 'left';
-    slides.forEach(function(sl, si) { document.getElementById('ssp-' + idx + '-' + si).classList.remove('active', 'slide-in-right', 'slide-in-left'); });
-    var panel = document.getElementById('ssp-' + idx + '-' + newIdx);
-    panel.classList.add('active', dir === 'right' ? 'slide-in-right' : 'slide-in-left');
-    cur = newIdx; renderDots(); renderNav();
-  }
-  renderDots(); renderNav();
-  document.getElementById('sprev-' + idx).addEventListener('click', function() { if (cur > 0) go(cur - 1); });
-  document.getElementById('snext-' + idx).addEventListener('click', function() { if (cur < slides.length - 1) go(cur + 1); });
-
-  var tsX = 0;
-  document.getElementById('ssw-' + idx).addEventListener('touchstart', function(e) { tsX = e.touches[0].clientX; }, {passive: true});
-  document.getElementById('ssw-' + idx).addEventListener('touchend', function(e) {
-    var dx = e.changedTouches[0].clientX - tsX;
-    if (Math.abs(dx) > 42) { if (dx < 0 && cur < slides.length - 1) go(cur + 1); else if (dx > 0 && cur > 0) go(cur - 1); }
-  }, {passive: true});
-
-  document.getElementById('readbtn-' + idx).addEventListener('click', function() {
-    if (solved[idx]) return;
-    solved[idx] = true;
-    addXp(5);
-    this.disabled = true;
-    this.classList.add('done');
-    this.querySelector('.read-btn-text').textContent = 'Gelesen ✓';
-    updateNav();
-  });
-}
-
-/* ---------- Quiz ---------- */
-function buildQuiz(body, idx, st) {
-  maxPts[idx] = st.questions.length * 0.5;
-  st.questions.forEach(function(qq, qi) {
-    var block = document.createElement('div');
-    block.className = 'q-block';
-    var h = '<div class="q-text">' + (qi + 1) + '. ' + qq.q + '</div>';
-    shuffleIdx(qq.opts.length).forEach(function(oi) {
-      h += '<button class="opt" data-q="' + qi + '" data-o="' + oi + '">' + qq.opts[oi] + '</button>';
-    });
-    block.innerHTML = h;
-    body.appendChild(block);
-  });
-  body.querySelectorAll('.opt').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      var qi = +btn.dataset.q, oi = +btn.dataset.o;
-      var qq = st.questions[qi];
-      if (body.querySelector('.opt[data-q="' + qi + '"]:disabled')) return;
-      body.querySelectorAll('.opt[data-q="' + qi + '"]').forEach(function(b) {
-        b.disabled = true;
-        if (+b.dataset.o === qq.correct) b.classList.add('correct');
-      });
-      if (oi !== qq.correct) { btn.classList.add('wrong'); registerAnswer(false); }
-      else { earned[idx] += 0.5; registerAnswer(true); }
-      evalQuiz(idx, st);
-    });
-  });
-}
-function evalQuiz(idx, st) {
-  var answered = 0;
-  for (var qi = 0; qi < st.questions.length; qi++) {
-    if (document.querySelector('#body-' + idx + ' .opt[data-q="' + qi + '"]:disabled')) answered++;
-  }
-  if (answered === st.questions.length) solved[idx] = true;
-  updateNav();
-}
-
-/* ---------- Wahr / Falsch ---------- */
-function buildTF(body, idx, st) {
-  maxPts[idx] = st.items.length * 0.5;
-  st.items.forEach(function(it, ii) {
-    var item = document.createElement('div');
-    item.className = 'tf-item';
-    item.innerHTML =
-      '<div class="tf-statement">' + it.s + '</div>' +
-      '<div class="tf-btns">' +
-        '<button class="tf-btn" data-i="' + ii + '" data-v="true">Wahr</button>' +
-        '<button class="tf-btn" data-i="' + ii + '" data-v="false">Falsch</button>' +
-      '</div>' +
-      '<div class="tf-exp" id="tfexp-' + idx + '-' + ii + '">' + it.e + '</div>';
-    body.appendChild(item);
-  });
-  body.querySelectorAll('.tf-btn').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      var ii = +btn.dataset.i;
-      var pick = btn.dataset.v === 'true';
-      if (body.querySelector('.tf-btn[data-i="' + ii + '"]:disabled')) return;
-      var it = st.items[ii];
-      body.querySelectorAll('.tf-btn[data-i="' + ii + '"]').forEach(function(b) {
-        b.disabled = true;
-        if ((b.dataset.v === 'true') === it.a) b.classList.add('reveal');
-      });
-      if (pick === it.a) { btn.classList.add('sel-correct'); earned[idx] += 0.5; registerAnswer(true); }
-      else { btn.classList.add('sel-wrong'); registerAnswer(false); }
-      document.getElementById('tfexp-' + idx + '-' + ii).classList.add('show');
-      evalTF(idx, st);
-    });
-  });
-}
-function evalTF(idx, st) {
-  var answered = 0;
-  for (var ii = 0; ii < st.items.length; ii++) {
-    if (document.querySelector('#body-' + idx + ' .tf-btn[data-i="' + ii + '"]:disabled')) answered++;
-  }
-  if (answered === st.items.length) solved[idx] = true;
-  updateNav();
-}
-
-/* ---------- Lücken (Dropdown) ---------- */
-function buildGaps(body, idx, st) {
-  var gapCount = 0;
-  var html = '<div class="gap-text">';
-  st.parts.forEach(function(part) {
-    if (typeof part === 'string') {
-      html += part;
-    } else {
-      var gi = gapCount++;
-      var opts = shuffleIdx(part.opts.length);
-      html += '<select data-g="' + gi + '" data-correct="' + part.correct + '"><option value="-1">…</option>';
-      opts.forEach(function(oi) {
-        html += '<option value="' + oi + '">' + part.opts[oi] + '</option>';
-      });
-      html += '</select>';
-    }
-  });
-  html += '</div><div class="check-btn-row"><button class="btn btn-primary" id="gapcheck-' + idx + '">Prüfen</button></div>';
-  body.innerHTML = html;
-  maxPts[idx] = gapCount * 0.5;
-  document.getElementById('gapcheck-' + idx).addEventListener('click', function() {
-    var sels = body.querySelectorAll('select');
-    var ok = 0;
-    sels.forEach(function(sel) {
-      sel.classList.remove('correct', 'wrong');
-      var good = (+sel.value === +sel.dataset.correct);
-      if (good) { sel.classList.add('correct'); ok++; }
-      else sel.classList.add('wrong');
-      sel.disabled = true;
-      registerAnswer(good);
-    });
-    earned[idx] = ok * 0.5;
-    solved[idx] = true;
-    this.disabled = true;
-    updateNav();
-  });
 }
 
 /* ---------- Prozess-Entscheid ---------- */
@@ -883,13 +624,13 @@ function buildDecide(body, idx, st) {
         btn.classList.add('correct');
         body.querySelectorAll('.opt').forEach(function(b) { b.disabled = true; });
         if (!triedWrong) earned[idx] = 0.5;
-        registerAnswer(!triedWrong);
+        LSEngine.registerAnswer(!triedWrong);
         solved[idx] = true;
-        updateNav();
+        LSEngine.updateNav();
       } else {
         btn.classList.add('wrong');
         triedWrong = true;
-        registerAnswer(false);
+        LSEngine.registerAnswer(false);
       }
     });
   });
@@ -926,7 +667,7 @@ function buildErrors(body, idx, st) {
       var marked = chip.classList.contains('marked');
       chip.classList.add('locked');
       var decisionOk = (it.wrong === marked);
-      registerAnswer(decisionOk);
+      LSEngine.registerAnswer(decisionOk);
       if (it.wrong && marked) { chip.classList.remove('marked'); chip.classList.add('is-correct-mark'); document.getElementById('errcorr-' + idx + '-' + ii).classList.add('show'); score++; }
       else if (it.wrong && !marked) { chip.classList.add('missed'); document.getElementById('errcorr-' + idx + '-' + ii).classList.add('show'); }
       else if (!it.wrong && marked) { chip.classList.add('wrong'); chip.style.background = 'var(--red-light)'; chip.style.color = 'var(--red-dark)'; chip.style.borderColor = 'var(--red)'; score--; }
@@ -934,167 +675,11 @@ function buildErrors(body, idx, st) {
     earned[idx] = Math.max(0, score) * 0.5;
     solved[idx] = true;
     this.disabled = true;
-    updateNav();
+    LSEngine.updateNav();
   });
 }
 
-/* ---------- Hilfen ---------- */
-function shuffleIdx(n) {
-  var a = [];
-  for (var i = 0; i < n; i++) a.push(i);
-  for (var j = a.length - 1; j > 0; j--) {
-    var k = Math.floor(Math.random() * (j + 1));
-    var t = a[j]; a[j] = a[k]; a[k] = t;
-  }
-  return a;
-}
-
-/* ---------- Navigation & Fortschritt ---------- */
-function renderProgress() {
-  var dots = document.getElementById('lsDots');
-  dots.innerHTML = '';
-  for (var i = 0; i < N; i++) {
-    var d = document.createElement('div');
-    d.className = 'ls-dot' + (i === current ? ' active' : '') + (solved[i] ? ' done' : '');
-    d.textContent = solved[i] ? '✓' : (i + 1);
-    if (MODE === 'challenge') {
-      d.title = STATIONS[i].kicker + ' – ' + STATIONS[i].title;
-      d.addEventListener('click', (function (ii) { return function () { jumpTo(ii); }; })(i));
-    }
-    dots.appendChild(d);
-  }
-  if (current < N) {
-    document.getElementById('lsMeta').textContent = 'Station ' + (current + 1) + ' von ' + N;
-  } else {
-    document.getElementById('lsMeta').textContent = 'Auswertung';
-  }
-}
-function jumpTo(i) {
-  if (i === current) return;
-  current = i; showCard(i); updateNav();
-}
-
-function showCard(which) {
-  document.querySelectorAll('.station').forEach(function(c) { c.classList.add('hidden'); });
-  if (which === 'finish') document.getElementById('station-finish').classList.remove('hidden');
-  else document.getElementById('station-' + which).classList.remove('hidden');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function updateNav() {
-  var nextBtn = document.getElementById('nextBtn');
-  var prevBtn = document.getElementById('prevBtn');
-  prevBtn.style.visibility = (current === 0) ? 'hidden' : 'visible';
-  if (current < N) {
-    nextBtn.disabled = !solved[current];
-    nextBtn.textContent = (current === N - 1) ? 'Zur Auswertung →' : 'Weiter →';
-  }
-  renderProgress();
-  renderHud();
-}
-
-function goNext() {
-  if (current < N) {
-    if (!solved[current]) return;
-    current++;
-    if (current < N) { showCard(current); updateNav(); }
-    else { showFinish(); }
-  }
-}
-function goPrev() {
-  if (current === 0) return;
-  if (current >= N) current = N - 1;
-  else current--;
-  showCard(current);
-  document.getElementById('nextBtn').style.visibility = 'visible';
-  document.getElementById('nextBtn').disabled = false;
-  updateNav();
-}
-
-function showFinish() {
-  var total = 0, max = 0, expGood = 0, expTotal = 0;
-  for (var i = 0; i < N; i++) {
-    if (STATIONS[i].type === 'explain') { expGood += earned[i]; expTotal += maxPts[i]; }
-    else { total += earned[i]; max += maxPts[i]; }
-  }
-  var pct = max > 0 ? Math.round(total / max * 100) : 0;
-
-  var rank;
-  if (pct >= 90)      rank = 'Sbrinz-Meister 🧀';
-  else if (pct >= 75) rank = 'Sbrinz-Affineur';
-  else if (pct >= 50) rank = 'Sbrinz-Geselle';
-  else                rank = 'Sbrinz-Lehrling';
-
-  var pIdx = findIdx('pflichtenheft'), fIdx = findIdx('fehler'), bIdx = findIdx('boss');
-  var badges = [
-    { icon: '📖', name: 'Aufmerksamer Leser', got: true },
-    { icon: '📜', name: 'Pflichtenheft-Profi', got: pIdx >= 0 && earned[pIdx] === maxPts[pIdx] },
-    { icon: '🔍', name: 'Fehlerjäger',        got: fIdx >= 0 && earned[fIdx] === maxPts[fIdx] },
-    { icon: '🔥', name: 'Serienkäser (Streak 8+)', got: bestStreak >= 8 },
-    { icon: '🎓', name: 'Meisterprüfung',     got: bIdx >= 0 && maxPts[bIdx] > 0 && earned[bIdx] === maxPts[bIdx] },
-    { icon: '🧀', name: 'Sbrinz-Meister (90%)', got: pct >= 90 }
-  ];
-  var gotCount = 0;
-  var badgeHtml = '';
-  badges.forEach(function(b) {
-    if (b.got) gotCount++;
-    badgeHtml += '<span class="badge-chip' + (b.got ? ' earned' : '') + '">' +
-      (b.got ? b.icon : '<span class="lock">🔒</span>') + ' ' + b.name + '</span>';
-  });
-
-  var headline, scoreSub, explainNote = '', breakdown = '';
-  if (MODE === 'challenge') {
-    var note = max > 0 ? Math.round((1 + total / max * 5) * 10) / 10 : 1;
-    headline = '<div class="big-score">Note ' + note.toFixed(1) + '</div>';
-    scoreSub = '<div class="score-sub">' + total + ' / ' + max + ' Punkte (' + pct + ' %) · simulierte Note, keine offizielle Bewertung</div>';
-    if (expTotal > 0) explainNote = '<div class="score-sub">Erklären-Karten: ' + expGood + ' von ' + expTotal + ' selbst als «gewusst» eingeschätzt (nicht in der Note)</div>';
-    breakdown = '<ul class="score-breakdown">';
-    for (var bi = 0; bi < N; bi++) {
-      if (STATIONS[bi].type === 'explain') continue;
-      breakdown += '<li><span>' + STATIONS[bi].title + '</span><span>' + earned[bi] + ' / ' + maxPts[bi] + ' P.</span></li>';
-    }
-    breakdown += '</ul>';
-  } else {
-    headline = '<div class="rank">' + rank + '</div><div class="big-score">' + xp + ' XP</div>';
-    scoreSub = '<div class="score-sub">' + total + ' / ' + max + ' Wissenspunkte (' + pct + ' %) · längste Serie 🔥 ' + bestStreak + ' · ' + gotCount + '/' + badges.length + ' Abzeichen</div>';
-  }
-
-  document.getElementById('finishBody').innerHTML =
-    '<div class="station-kicker">' + (MODE === 'challenge' ? 'Prüfung beendet' : 'Geschafft') + '</div>' +
-    headline +
-    scoreSub +
-    explainNote +
-    breakdown +
-    '<div class="badges">' + badgeHtml + '</div>' +
-    '<ul>' +
-      '<li><b>Rohmilch</b> im Kupferkessi, kein Thermisieren, Salzbad ≥ 15 Tage, 12 Monate im AOP-Gebiet.</li>' +
-      '<li>Kulturen <b>thermophil + homofermentativ</b>; Fett 2,9–3,0 %; kein Wasserzusatz → extraharter Teig.</li>' +
-      '<li>Brennen bei <b>55–56 °C</b> reduziert Fremdkeime, ohne die Säuerung zu stoppen.</li>' +
-      '<li>Langes Salzbad (20–22 °Bé, 12–15 °C) + hoher Salzgehalt hemmen die <b>Nachgärung</b>.</li>' +
-      '<li>Reifung <b>2–4 Jahre</b> stehend im Stotzgestell; Hauptfehler: Nachgärung / „Gläs" durch Propionsäurebakterien.</li>' +
-    '</ul>' +
-    '<button class="btn btn-primary" onclick="restart()">Nochmals starten</button>';
-
-  showCard('finish');
-  document.getElementById('nextBtn').style.visibility = 'hidden';
-  document.getElementById('prevBtn').style.visibility = 'visible';
-  renderProgress();
-}
-
-function restart() {
-  current = 0;
-  xp = 0; streak = 0; bestStreak = 0;
-  for (var i = 0; i < N; i++) { solved[i] = false; earned[i] = 0; }
-  document.getElementById('nextBtn').style.visibility = 'visible';
-  buildAll();
-  showCard(0);
-  updateNav();
-}
-
-/* Init */
-buildAll();
-showCard(0);
-updateNav();
+LSEngine.buildAll(); LSEngine.showCard(0); LSEngine.updateNav();
 </script>
 </body>
 </html>
