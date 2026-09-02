@@ -75,7 +75,6 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 │   ├── tabellen-luecken-kuehlung.html
 │   ├── tabellen-luecken-kontrolle.html
 │   ├── tabellen-luecken-milchsaeuregaerung.html
-│   ├── quiz-kulturenformen.html
 │   ├── quiz-abweichungen-phagen.html
 │   ├── kreuzwortraetsel-kulturen.html
 │   ├── spiel-homofermentativ.html
