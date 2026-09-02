@@ -160,7 +160,7 @@
     </div>
 
     <div class="next-wrap" id="nextWrap" style="display:none">
-      <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()">Weiter &#8594;</button>
+      <button class="btn btn-primary" id="nextBtn" onclick="MTQuiz.nextQuestion()">Weiter &#8594;</button>
     </div>
 
     <div class="end-screen" id="endScreen">
@@ -172,7 +172,7 @@
       <div class="end-sub" id="endSub"></div>
       <div class="end-actions">
         <button class="btn btn-ghost" onclick="location.href='../index.html'">&#8592; Alle Lerntools</button>
-        <button class="btn btn-primary" onclick="restartQuiz()">Nochmals versuchen</button>
+        <button class="btn btn-primary" onclick="MTQuiz.restartQuiz()">Nochmals versuchen</button>
       </div>
     </div>
   </div>
@@ -182,6 +182,7 @@
   BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
 </footer>
 
+<script src="../assets/quiz-engine.js"></script>
 <script>
   const QUESTIONS = [
     {
@@ -293,130 +294,13 @@
     },
   ];
 
-  let currentIndex = 0;
-  let score = 0;
-  let answered = false;
-  let order = [];
-
-  function shuffle(arr) {
-    for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]];
+  MTQuiz.init({
+    questions: QUESTIONS,
+    subMessages: {
+      excellent: "Alle Fragen richtig. Sie kennen die gesetzlichen Anforderungen bestens.",
+      retry: "Wiederholen Sie die VLtH-Anforderungen und versuchen Sie es danach nochmals."
     }
-    return arr;
-  }
-
-  function startQuiz() {
-    order = shuffle([...Array(QUESTIONS.length).keys()]);
-    currentIndex = 0;
-    score = 0;
-    document.getElementById("endScreen").style.display = "none";
-    document.getElementById("quizCard").style.display = "block";
-    showQuestion();
-  }
-
-  function showQuestion() {
-    answered = false;
-    const q = QUESTIONS[order[currentIndex]];
-    const total = QUESTIONS.length;
-
-    document.getElementById("progressText").textContent = `Frage ${currentIndex + 1} von ${total}`;
-    document.getElementById("progressBar").style.width = `${((currentIndex + 1) / total) * 100}%`;
-
-    document.getElementById("questionBadge").textContent = q.badge;
-    document.getElementById("questionText").textContent = q.question;
-
-    const letters = ["A", "B", "C", "D"];
-    const container = document.getElementById("answersContainer");
-    container.innerHTML = q.answers.map((a, i) => `
-      <button class="answer-btn" onclick="selectAnswer(${i})" id="ans-${i}">
-        <span class="letter">${letters[i]}</span>
-        <span>${a}</span>
-      </button>
-    `).join("");
-
-    const fb = document.getElementById("feedback");
-    fb.className = "feedback";
-    fb.textContent = "";
-
-    document.getElementById("nextWrap").style.display = "none";
-    const nextBtn = document.getElementById("nextBtn");
-    nextBtn.textContent = currentIndex < QUESTIONS.length - 1 ? "Weiter →" : "Ergebnis anzeigen";
-  }
-
-  function selectAnswer(chosen) {
-    if (answered) return;
-    answered = true;
-
-    const q = QUESTIONS[order[currentIndex]];
-    const correct = q.correct;
-    const isCorrect = chosen === correct;
-    if (isCorrect) score++;
-
-    for (let i = 0; i < q.answers.length; i++) {
-      const btn = document.getElementById(`ans-${i}`);
-      btn.disabled = true;
-      if (i === correct && i === chosen) btn.classList.add("correct");
-      else if (i === chosen && !isCorrect) btn.classList.add("wrong");
-      else if (i === correct) btn.classList.add("reveal");
-    }
-
-    const fb = document.getElementById("feedback");
-    if (isCorrect) {
-      fb.className = "feedback correct";
-      fb.innerHTML = `<span class="feedback-icon">&#10003;</span><strong>Richtig!</strong> ${q.explanation}`;
-    } else {
-      fb.className = "feedback wrong";
-      fb.innerHTML = `<span class="feedback-icon">&#10007;</span><strong>Nicht ganz.</strong> ${q.explanation}`;
-    }
-
-    document.getElementById("nextWrap").style.display = "flex";
-  }
-
-  function nextQuestion() {
-    currentIndex++;
-    if (currentIndex >= QUESTIONS.length) {
-      showEndScreen();
-    } else {
-      showQuestion();
-    }
-  }
-
-  function showEndScreen() {
-    document.getElementById("quizCard").style.display = "none";
-    document.getElementById("nextWrap").style.display = "none";
-    document.getElementById("progressText").textContent = "";
-    document.getElementById("progressBar").style.width = "100%";
-
-    const total = QUESTIONS.length;
-    const pct = Math.round((score / total) * 100);
-
-    document.getElementById("scoreNumber").textContent = score;
-    document.getElementById("scoreTotal").textContent = `von ${total}`;
-
-    let msg, sub;
-    if (pct === 100) {
-      msg = "Ausgezeichnet!";
-      sub = "Alle Fragen richtig. Sie kennen die gesetzlichen Anforderungen bestens.";
-    } else if (pct >= 75) {
-      msg = "Sehr gut!";
-      sub = "Fast alle Fragen richtig. Wiederholen Sie die markierten Themen kurz.";
-    } else if (pct >= 50) {
-      msg = "Gut gemacht.";
-      sub = "Mehr als die Hälfte richtig. Schauen Sie die falschen Antworten nochmals an.";
-    } else {
-      msg = "Weiter üben.";
-      sub = "Wiederholen Sie die VLtH-Anforderungen und versuchen Sie es danach nochmals.";
-    }
-
-    document.getElementById("endMessage").textContent = msg;
-    document.getElementById("endSub").textContent = sub;
-    document.getElementById("endScreen").style.display = "block";
-  }
-
-  function restartQuiz() { startQuiz(); }
-
-  startQuiz();
+  });
 </script>
 </body>
 </html>
