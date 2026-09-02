@@ -19,7 +19,8 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 ├── b1-hartkaese/
 │   ├── images/
 │   │   └── aop-memory/                 ← 12 PNG/JPEG (Schweizer AOP-Käse)
-│   ├── lernsession-sbrinz.html
+│   ├── lernsession-sbrinz.html            ← Lernpfad (Standard) / Challenge (?mode=challenge)
+│   ├── lernsession-emmentaler.html        ← Lernpfad (Standard) / Challenge (?mode=challenge)
 │   ├── memory-aop-kaese.html
 │   ├── quiz-gesetzliches-kaese.html
 │   ├── tabellen-luecken-vlth-artikel.html
@@ -47,19 +48,23 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 │   ├── prozessvergleich-jogurt.html
 │   ├── prozess-entscheid-jogurt.html
 │   ├── fliessschema-stichfest.html
-│   ├── lernsession-pruefung-jogurt.html
+│   ├── lernsession-pruefung-jogurt.html   ← Lernpfad (Standard) / Challenge (?mode=challenge)
 │   └── animation-sauergerinnung.html
 ├── a1-rohstoffe/
 │   ├── images/
 │   │   ├── milchsammelwagen/           ← 2 PNG (mit/ohne Nummern)
 │   │   └── MID/                        ← 2 PNG (mit/ohne Nummern)
-│   ├── milchsammelwagen-beschriften.html
-│   ├── mid-beschriften.html
-│   └── milchinhaltsstoffe-zuordnen.html
+│   ├── milchsammelwagen-beschriften.html  ← 3-Stufen-Tool (Einfach/Mittel/Schwer)
+│   ├── mid-beschriften.html               ← 3-Stufen-Tool (Einfach/Mittel/Schwer)
+│   ├── milchinhaltsstoffe-zuordnen.html
+│   ├── baukasten-milchfett.html           ← Triglycerid aus Glycerin + 3 Fettsäuren zusammenbauen
+│   ├── zuordnung-eiweisse.html
+│   └── wahr-falsch-milchbestandteile.html
 ├── a2-rohstoffe-trennen/
 │   ├── images/
 │   │   └── trommelbestandteile/        ← 11 PNG-Bilder
-│   └── memory-trommelbestandteile.html
+│   ├── memory-trommelbestandteile.html
+│   └── zuordnung-trommelbestandteile.html
 ├── a7-technische-einrichtungen/
 │   ├── images/                         ← Ölbrenner, Dreizugdampfkessel, Warmwasseranlage (je mit/ohne Nummern)
 │   ├── tabellen-luecken-metalle.html
@@ -67,21 +72,32 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 │   ├── beschriften.html                  ← 3-Stufen-Tool; ?set=oelbrenner|dampfkessel|warmwasser
 │   ├── zuordnung-dampfkessel-gefahren.html ← 3 Stufen (Einfach/Mittel/Schwer); Gefahrenquelle → Ursache & Sofortmassnahme
 │   ├── wahr-falsch-dampfkessel.html      ← 12 Aussagen, Swipe-Karten
-│   └── lernsession-waermeerzeugung.html  ← Lernpfad (Standard) / Challenge (?mode=challenge)
+│   ├── lernsession-waermeerzeugung.html  ← Lernpfad (Standard) / Challenge (?mode=challenge)
+│   └── lernsession-kaelteanlagen.html    ← Lernpfad (Standard) / Challenge (?mode=challenge)
 ├── a8-kulturen/
 │   ├── images/
-│   │   └── a.8_Bakterienzelle_leer.png
+│   │   ├── a.8_Bakterienzelle_leer.png
+│   │   ├── a.8_Phage_unbeschriftet.png    ← Beschriften-Station in lernsession-pruefung-kulturen.html
+│   │   └── a.8_Phage_beschriftet.png      ← Lösungsbild dazu
 │   ├── hotspot-bakterienzelle.html
+│   ├── hotspot-lebensphasen.html
 │   ├── tabellen-luecken-kuehlung.html
 │   ├── tabellen-luecken-kontrolle.html
 │   ├── tabellen-luecken-milchsaeuregaerung.html
 │   ├── quiz-abweichungen-phagen.html
 │   ├── kreuzwortraetsel-kulturen.html
 │   ├── spiel-homofermentativ.html
-│   ├── begruenden-massnahmen-abweichungen.html  ← 3 Stufen (Einfach/Mittel/Schwer); Pilot für "begründen" (TS4)
-│   └── lernsession-pruefung-kulturen.html  ← Lernpfad (Standard) / Challenge (?mode=challenge)
+│   ├── zuordnung-kulturenformen.html      ← 3 Stufen (Einfach/Mittel/Schwer); Vor-/Nachteile Kulturenformen
+│   ├── sortierer-fettsirtenkultur.html    ← Herstellungsschritte Fettsirtenkultur in Reihenfolge bringen
+│   ├── begruenden-massnahmen-abweichungen.html ← 3 Stufen (Einfach/Mittel/Schwer); Begründen-Trainer-Variante (TS4) statt reinem Zuordnen, siehe Abschnitt "3-Stufen-Muster" unten
+│   └── lernsession-pruefung-kulturen.html  ← Lernpfad (Standard) / Challenge (?mode=challenge); Prüfungsumfang Lektion 1–10 (MIT25b, 14.09.2026)
 ├── d1-hygiene/
-│   └── spiel-desinfektion.html
+│   ├── images/                            ← 7 SVG-Piktogramme (Arbeitskleidung, Rauchverbot, Händewaschen, …)
+│   ├── spiel-desinfektion.html
+│   ├── sortierer-haendedesinfektion.html
+│   ├── wahr-falsch-personalhygiene.html
+│   ├── zuordnung-piktogramme.html         ← 3-Stufen-Tool (Einfach/Mittel/Schwer) — Referenzdatei fürs 3-Stufen-Muster
+│   └── zuordnung-hygienezonen.html        ← 3-Stufen-Tool (Einfach/Mittel/Schwer)
 └── tools/
     ├── einheiten-trainer.html
     ├── fachrechner-salzbad.html
@@ -157,6 +173,35 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 | `fliessschema`     | Fliessschema      | `fliessschema-stichfest.html`           | Produktionsschritte frei in leere, verkettete Kästchen eintippen |
 | `lernpfad` / `challenge` | Lernpfad / Challenge | `lernsession-sbrinz.html` | Eine Datei, zwei Modi: **Lernpfad** (Standard, mit Slides + Übungen einfach/mittel) und **Challenge** (`?mode=challenge`: ohne Slides/Info/PDF, schwerste Stufe, voll gamifiziert: XP/Streak/Abzeichen/Rang) |
 | `baukasten`        | Baukasten         | `baukasten-milchfett.html`              | Bauteile per Drag & Drop auf feste Bindungsstellen ziehen, Resultat wird berechnet/klassiert; Tabs oben für Frei-Bauen-Modus vs. gezielte Aufgaben |
+
+---
+
+### Didaktische Begründung je Tool-Typ
+
+Warum dieses Format lernwirksam ist — nicht nur was es tut. Wo ein Typ zu keinem echten lerntheoretischen Prinzip passt, steht das ehrlich so da (reine Abwechslung/Vokabeltraining ist auch ein legitimer, aber schwächerer Grund).
+
+| `data-type` | Prinzip | Begründung |
+|---|---|---|
+| `lernkaertchen` | Testing-Effekt / Retrieval Practice | Aktives Abrufen (Begriff → Erklärung) statt Wiederlesen stärkt das Behalten stärker als passives Repetieren. |
+| `quiz` | Testing-Effekt, niederschwellig | Schnelle, risikoarme Abrufübung mit Sofort-Feedback; deckt v. a. TS1/TS2 ab, keine Konstruktionsleistung. |
+| `memory` | Testing-Effekt + Dual Coding | Wiederholtes Abrufen von Bild-Begriff-Paaren, spielerisch verpackt; die Bild-Text-Kopplung unterstützt zusätzlich die Encodierung. |
+| `sortierer` | Prozedurales Sequenzverständnis | Baut ein korrektes mentales Modell eines mehrstufigen Herstellungsprozesses auf statt isolierter Einzelfakten. |
+| `zuordnung` | Diskriminationslernen mit Distraktoren | Erzwingt echtes Unterscheiden zwischen ähnlichen richtigen/falschen Optionen statt blossem Wiedererkennen — wirksamer, wenn Distraktoren plausibel falsch sind, nicht offensichtlich falsch. |
+| `beschriften` | Dual Coding / räumlich-visuelles Lernen | Kopplung von Bild/Position und Fachbegriff unterstützt reichhaltigere Encodierung als Text allein; meist als 3-Stufen-Tool ausgeführt (siehe unten). |
+| `lueckentext` | Testing-Effekt mit Kontext | Abruf im Satzkontext statt isoliert, Einfach-Stufe (Wortbank) und Schwer-Stufe (Tippen) fadenweise abgestuft. |
+| `fachrechner` | Prozedurales Üben mit Rechenweg | Übt einen konkreten Berechnungsablauf inkl. sichtbarem Rechenweg statt nur des Endresultats — wichtig für Prüfungen, die den Rechenweg mitbewerten. |
+| `trainer` | Verteiltes Üben (Spaced Practice) | Randomisierte, nie identische Aufgaben ermöglichen wiederholtes Training ohne Auswendiglernen der Aufgabenreihenfolge. |
+| `wahr-falsch` | Testing-Effekt, sehr niederschwellig | Schnellste Form der Abrufübung; gut für hohe Wiederholungsfrequenz, aber flachste Taxonomiestufe (reine Erkennung). |
+| `tabellen-luecken` | Vergleichendes Lernen | Die Tabellenform (Vergleichstabelle) macht sichtbar, was zwischen Fällen variiert und was konstant bleibt — stärker als isolierte Einzelfragen zum selben Stoff. |
+| `prozessvergleich` | Vergleichendes Lernen | Zwei Produktionswege nebeneinander, aufklappbar — gleiches Prinzip wie Tabellen-Lücken, aber für ganze Prozessabläufe statt einzelner Werte. |
+| `hotspot` | Dual Coding / räumlich-visuelles Lernen | Bild mit anklickbaren Zonen verankert Begriffe an ihrer realen räumlichen Position in Anlage/Zelle. |
+| `kreuzwortraetsel` | Reine Begriffsfestigung | Passt zu keinem starken Lernprinzip aus der Forschung — trainiert Rechtschreibung/Wiedererkennung von Fachbegriffen, nicht die im Leistungsziel geforderte Fertigkeit (nennen/erklären). Bewusst als Auflockerung/Abwechslung eingesetzt, nicht als Haupttrainingsform für ein Leistungsziel. |
+| `spiel` | Gamification/Motivation | Zeit-/Punktedruck und spielerischer Rahmen erhöhen Engagement und Wiederholungsbereitschaft, auf Kosten von Reflexionstiefe — bewusster Trade-off, nicht für TS3/TS4-Inhalte geeignet. |
+| `animation` | Direkte Instruktion (Input-Phase) | Zeigt einen Prozess schrittweise, bevor geübt wird — Input-Teil im Input→Üben→Korrigieren-Rhythmus, keine eigene Abrufleistung der Lernenden. |
+| `prozess-entscheid` | Entscheidungssimulation / Branching | Simuliert eine echte Entscheidungssituation mit Fehleranalyse/Konsequenz — erreicht höhere Taxonomiestufen (TS3 anwenden) als reine Abruf-Tools. |
+| `fliessschema` | Prozedurales Sequenzverständnis, produktiv | Wie Sortierer, aber ohne Vorgabe der Bausteine — die Lernenden füllen freie Kästchen selbst, höhere Eigenleistung als Drag-and-Drop-Sortierung. |
+| `lernpfad` / `challenge` | Fading + Testing-Effekt + Gamification | Eine Datei, zwei Stufen von Unterstützung: Lernpfad mit Lesetexten/Input (Slides-Stationen, Input→Üben→Korrigieren) für den Aufbau, Challenge ohne Hilfen als reine, gamifizierte Abrufprüfung — simuliert Prüfungsbedingungen. Siehe eigener Abschnitt unten. |
+| `baukasten` | Konstruktives Lernen | Ein Ergebnis (z. B. Triglycerid) wird aus Einzelteilen selbst zusammengebaut statt nur erkannt — baut Verständnis der Zusammensetzung auf, nicht nur des Endprodukts. |
 
 ---
 
@@ -255,6 +300,25 @@ var STATIONS = ALL.filter(function(s) {
 #### Inhaltsregeln für Slides-Stationen
 
 Siehe [Slides-Station Canonical Pattern](#slides-station-in-lernsession-canonical-pattern) weiter unten.
+
+---
+
+### 3-Stufen-Muster (Einfach / Mittel / Schwer)
+
+Referenz: `d1-hygiene/zuordnung-piktogramme.html` (auch `a7-technische-einrichtungen/zuordnung-dampfkessel-gefahren.html`) ← **immer von hier kopieren**.
+
+Verwendet in: `milchsammelwagen-beschriften.html`, `mid-beschriften.html`, `beschriften.html`, `zuordnung-dampfkessel-gefahren.html`, `zuordnung-piktogramme.html`, `zuordnung-hygienezonen.html`, `zuordnung-kulturenformen.html`, `begruenden-massnahmen-abweichungen.html`.
+
+**Aufbau:** ein `level-bar` mit drei Buttons (`setLevel('einfach'|'mittel'|'schwer')`), pro Stufe ein eigener `resetLevel()`-Aufbau und eine eigene `checkEinfach()`/`checkMittel()`/`checkSchwer()`-Auswertung im selben `<script>`-Block. Einfach nutzt HTML5-Drag-and-Drop + Touch-Events (Desktop und Mobil), Mittel meist Anklicken aus einer kurzen Optionsliste, Schwer ein Texteingabefeld.
+
+**Didaktische Begründung (Fading):** dieselbe Inhaltsmenge bedient sowohl schwächere als auch fortgeschrittene Lernende, indem die Unterstützung stufenweise abgebaut wird — von geführter Zuordnung über Auswahl bis zur freien Eingabe. Das folgt dem Prinzip des "Fading" aus der Forschung zu Worked Examples: Gerüst schrittweise entfernen, sobald Kompetenz wächst.
+
+**Variante "Begründen-Trainer"** (`begruenden-massnahmen-abweichungen.html`, Pilot seit 2026-09, Ziel a.8.7.2 TS4 "begründen"): dieselbe 3-Stufen-Engine, aber inhaltlich nicht auf reines Zuordnen (TS1) ausgelegt, sondern auf den Aufbau einer vollständigen Begründungskette (Ursache → Massnahme → Wirkung):
+- **Einfach:** Ursache-/Massnahme-/Wirkung-Fragmente per Drag & Drop zu einem vollständigen Begründungssatz zusammensetzen.
+- **Mittel:** pro Situation 3 vollständige Kandidatensätze zur Auswahl (richtig begründet / nur Massnahme genannt, nicht begründet / falsche Ursache) — trainiert das *Erkennen* einer echten Begründung.
+- **Schwer:** freie Texteingabe der eigenen Begründung, danach Musterantwort + kurze Selbstcheck-Checkliste einblenden (keine automatische Bewertung möglich ohne Backend — bewusste Grenze der statischen Seite, siehe Elaborative-Interrogation-Prinzip).
+
+Dieses Muster eignet sich für jedes Leistungsziel mit Taxonomiestufe TS2 ("erklären") oder TS4 ("begründen"), bei dem die bisherigen Tools nur Auswahl/Erkennung statt eigener Konstruktion verlangen — vor einer Ausweitung auf weitere Module den Piloten zuerst mit Lernenden testen.
 
 ---
 
