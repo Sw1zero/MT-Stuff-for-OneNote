@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kulturen zubereiten – Prüfungsvorbereitung (a.8)</title>
+  <title>Kulturen – Challenge (a.8)</title>
   <link rel="stylesheet" href="../style.css">
   <script src="../assets/dnd.js"></script>
   <style>
@@ -213,8 +213,8 @@
 <header class="bzwu-header">
   <div class="header-text">
   <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · a.8</span>
-  <h1 id="pageTitle">Kulturen zubereiten & einsetzen</h1>
-  <p id="subtitle">Kühlung bis Milchsäuregärung – Prüfungsvorbereitung</p>
+  <h1 id="pageTitle">Kulturen – Challenge</h1>
+  <p id="subtitle">Kühlung bis Milchsäuregärung</p>
   </div>
   <div class="header-logos">
     <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
@@ -243,7 +243,7 @@
       </div>
     </div>
     <div class="ls-meta" id="lsMeta"></div>
-    <div class="ls-select-hint"><span class="ls-select-badge">👆 Posten antippen – frei wählbar, keine feste Reihenfolge</span></div>
+    <div class="ls-select-hint"><span class="ls-select-badge">👆 Posten antippen. Frei wählbar, keine feste Reihenfolge.</span></div>
     <div class="ls-dots" id="lsDots"></div>
     <div id="stage"></div>
     <div class="ls-nav">
@@ -275,21 +275,21 @@ var ALL = [
     slides:[
       { icon:'🧊', color:'#1e4e8c', bg:'#dbeeff',
         title:'Drei Methoden im Vergleich',
-        body:'<p><b>Kühlung (1–5 °C)</b>: vermindert die Aktivität der meisten Mikroorganismen deutlich. Ausnahme: psychrotrophe (kältetolerante) Mikroorganismen betreiben auch unter 7 °C noch Stoffwechsel und vermehren sich langsam weiter.</p><p><b>Tiefkühlung (-18 °C)</b>: hemmt das Wachstum aller Mikroorganismen vollständig. Wirkung durch Temperaturabsenkung und Wasserentzug infolge der Eisbildung – die Eiskristalle können die Mikroorganismenzelle sogar beschädigen.</p><p><b>Schnellgefrierung (-30 bis -40 °C)</b>: blockiert die Enzymaktivität vollständig. Leicht verderbliche Lebensmittel bleiben dadurch länger haltbar als durch blosse Tiefkühlung.</p>'
+        body:'<p><b>Kühlung (1–5 °C)</b>: vermindert die Aktivität der meisten Mikroorganismen deutlich. Ausnahme: psychrotrophe (kältetolerante) Mikroorganismen betreiben auch unter 7 °C noch Stoffwechsel und vermehren sich langsam weiter.</p><p><b>Tiefkühlung (-18 °C)</b>: hemmt das Wachstum aller Mikroorganismen vollständig. Wirkung durch Temperaturabsenkung und Wasserentzug infolge der Eisbildung. Die Eiskristalle können die Mikroorganismenzelle sogar beschädigen.</p><p><b>Schnellgefrierung (-30 bis -40 °C)</b>: blockiert die Enzymaktivität vollständig. Leicht verderbliche Lebensmittel bleiben dadurch länger haltbar als durch blosse Tiefkühlung.</p>'
       },
       { icon:'🌡️', color:'#15803d', bg:'#dcfce7',
         title:'Verknüpfung mit den Temperaturklassen',
-        body:'<ul><li><b>Psychrotroph</b> (kältetolerant): bleibt bei Kühlung noch aktiv. Beispiele: Pseudomonas, Proteus, viele Schimmel, z. T. Hefen.</li><li><b>Mesophil</b> (mittlere Temperatur liebend): z. B. Laktokokkus lactis, Propionsäurebakterien (wichtig für Emmentaler).</li><li><b>Thermophil</b> (wärmeliebend): z. B. Streptococcus salivarius subsp. thermophilus, Lactobacillus delbrueckii subsp. lactis (Joghurt).</li></ul><div class="factbox">Die meisten psychrotrophen Mikroorganismen sind eigentlich mesophil – sie können aber auch bei tiefer Temperatur noch wachsen. Deshalb reicht Kühlung allein nicht, um alle Mikroorganismen zu stoppen.</div>'
+        body:'<ul><li><b>Psychrotroph</b> (kältetolerant): bleibt bei Kühlung noch aktiv. Beispiele: Pseudomonas, Proteus, viele Schimmel, z. T. Hefen.</li><li><b>Mesophil</b> (mittlere Temperatur liebend): z. B. Laktokokkus lactis, Propionsäurebakterien (wichtig für Emmentaler).</li><li><b>Thermophil</b> (wärmeliebend): z. B. Streptococcus salivarius subsp. thermophilus, Lactobacillus delbrueckii subsp. lactis (Joghurt).</li></ul><div class="factbox">Die meisten psychrotrophen Mikroorganismen sind eigentlich mesophil. Sie können aber auch bei tiefer Temperatur noch wachsen. Deshalb reicht Kühlung allein nicht, um alle Mikroorganismen zu stoppen.</div>'
       }
     ] },
   { kicker:'Wahr oder Falsch', title:'Kühlung, Tiefkühlung, Schnellgefrierung', id:'kuehlung_tf', type:'tf',
     lead:'Stimmt die Aussage?',
     items:[
-      { s:'Die Kühlung (1–5 °C) hemmt das Wachstum aller Mikroorganismen vollständig.', a:false, e:'Nur die Aktivität wird deutlich vermindert – psychrotrophe Mikroorganismen bleiben aktiv.' },
+      { s:'Die Kühlung (1–5 °C) hemmt das Wachstum aller Mikroorganismen vollständig.', a:false, e:'Nur die Aktivität wird deutlich vermindert. Psychrotrophe Mikroorganismen bleiben aktiv.' },
       { s:'Tiefkühlung wirkt durch Temperaturabsenkung und Wasserentzug infolge Eisbildung.', a:true, e:'Beide Effekte zusammen hemmen das Wachstum vollständig.' },
       { s:'Schnellgefrierung blockiert die Enzymaktivität vollständig.', a:true, e:'Deshalb bleiben leicht verderbliche Produkte länger haltbar.' },
       { s:'Psychrotrophe Mikroorganismen können auch unter 7 °C noch Stoffwechsel betreiben.', a:true, e:'Das macht Kühlung allein unzuverlässig.' },
-      { s:'Schnellgefrierung macht leicht verderbliche Lebensmittel weniger haltbar als blosse Tiefkühlung.', a:false, e:'Im Gegenteil – durch die vollständige Enzymblockade länger haltbar.' },
+      { s:'Schnellgefrierung macht leicht verderbliche Lebensmittel weniger haltbar als blosse Tiefkühlung.', a:false, e:'Im Gegenteil: durch die vollständige Enzymblockade länger haltbar.' },
       { s:'Propionsäurebakterien, wichtig für den Emmentaler, sind mesophil.', a:true, e:'Mesophil = mittlere Temperatur liebend.' }
     ] },
   { kicker:'Folien · Lebensabschnitte', title:'Lebensabschnitte der Mikroorganismen', type:'slides',
@@ -297,7 +297,7 @@ var ALL = [
     slides:[
       { icon:'🌱', color:'#6b21a8', bg:'#f3e8ff',
         title:'Die vier Phasen einer Kultur',
-        body:'<p><b>Anpassungsphase</b>: Die Bakterien passen sich der neuen Umwelt an, es findet praktisch keine Vermehrung statt, der Stoffwechsel ist schwach.</p><p><b>Vermehrungsphase</b>: sehr starke und sehr schnelle Vermehrung, kürzeste Generationszeit, intensivster Stoffwechsel – die Keimzahl nimmt schnell zu.</p><p><b>Stationäre Phase</b>: Nährstoffmangel und ungünstige Bedingungen (Säure) bremsen Vermehrung und Stoffwechsel. Die Keimzahl bleibt konstant – Gleichgewicht zwischen neu entstehenden und sterbenden Zellen.</p><p><b>Absterbephase</b>: Nährstoffmangel und Umweltbedingungen werden sehr ungünstig, die Keimzahl sinkt, ein hoher Anteil der Zellen stirbt ab.</p>'
+        body:'<p><b>Anpassungsphase</b>: Die Bakterien passen sich der neuen Umwelt an, es findet praktisch keine Vermehrung statt, der Stoffwechsel ist schwach.</p><p><b>Vermehrungsphase</b>: sehr starke und sehr schnelle Vermehrung, kürzeste Generationszeit, intensivster Stoffwechsel. Die Keimzahl nimmt schnell zu.</p><p><b>Stationäre Phase</b>: Nährstoffmangel und ungünstige Bedingungen (Säure) bremsen Vermehrung und Stoffwechsel. Die Keimzahl bleibt konstant, weil sich neu entstehende und sterbende Zellen die Waage halten.</p><p><b>Absterbephase</b>: Nährstoffmangel und Umweltbedingungen werden sehr ungünstig, die Keimzahl sinkt, ein hoher Anteil der Zellen stirbt ab.</p>'
       },
       { icon:'🏖️', color:'#92400e', bg:'#fff7ed',
         title:'Merkhilfe: wie im Ferien-Vergleich',
@@ -318,40 +318,48 @@ var ALL = [
       ' sinkt die Keimzahl, weil ein hoher Anteil der Zellen abstirbt.'
     ] },
   { kicker:'Folien · Kulturenformen', title:'Kulturenformen im Vergleich', type:'slides',
-    lead:'Flüssig, lyophilisiert oder gefroren – je mit eigenen Vor- und Nachteilen.',
+    lead:'Flüssig, lyophilisiert oder gefroren, je mit eigenen Vor- und Nachteilen.',
     slides:[
       { icon:'💧', color:'#1e4e8c', bg:'#dbeeff',
         title:'Flüssigkulturen',
-        body:'<p><b>Vorteile</b>: sehr gute Aktivitätsbereitschaft – die Vermehrung beginnt sofort nach der Beimpfung; keine Artenverarmung durch Gefriertrocknung.</p><p><b>Nachteile</b>: empfindlich gegenüber Temperaturschwankungen bei Transport/Lagerung; kurze Vorratshaltung (bei &lt;5 °C nur 7–10 Tage bei MSB-Kulturen, Oberflächenreifungskulturen bis 12 Wochen).</p>'
+        body:'<p><b>Vorteile</b>: sehr gute Aktivitätsbereitschaft, die Vermehrung beginnt sofort nach der Beimpfung; keine Artenverarmung durch Gefriertrocknung.</p><p><b>Nachteile</b>: empfindlich gegenüber Temperaturschwankungen bei Transport/Lagerung; kurze Vorratshaltung (bei &lt;5 °C nur 7–10 Tage bei MSB-Kulturen, Oberflächenreifungskulturen bis 12 Wochen).</p>'
       },
       { icon:'❄️', color:'#6b21a8', bg:'#f3e8ff',
         title:'Lyophilisiert (gefriergetrocknet)',
-        body:'<p><b>Vorteile</b>: weniger empfindlich bei Temperaturschwankungen (Postversand möglich); Vorratshaltung bei -18 °C mindestens 3 Monate; jederzeit verfügbar, unabhängig von eigener Herstellung; grosse Auswahl, hohe Flexibilität.</p><p><b>Nachteile</b>: verzögerte Anfangsaktivität – die Zellen müssen zuerst wieder Wasser aufnehmen, um sich zu reaktivieren; Selektion/Verarmung der Flora-Vielfalt (v. a. Laktobazillen werden reduziert); ohne eigene Nachzucht keine ständige Aktivitätskontrolle, grössere Abhängigkeit von Lieferanten.</p>'
+        body:'<p><b>Vorteile</b>: weniger empfindlich bei Temperaturschwankungen (Postversand möglich); Vorratshaltung bei -18 °C mindestens 3 Monate; jederzeit verfügbar, unabhängig von eigener Herstellung; grosse Auswahl, hohe Flexibilität.</p><p><b>Nachteile</b>: verzögerte Anfangsaktivität, weil die Zellen zuerst wieder Wasser aufnehmen müssen, um sich zu reaktivieren; Selektion/Verarmung der Flora-Vielfalt (v. a. Laktobazillen werden reduziert); ohne eigene Nachzucht keine ständige Aktivitätskontrolle, grössere Abhängigkeit von Lieferanten.</p>'
       },
       { icon:'🧊', color:'#15803d', bg:'#dcfce7',
         title:'Gefroren & Lagerung',
-        body:'<p><b>Gefrorene Kulturen</b>: normale Aktivität durch Restflüssigkeit in den Zellen. Haltbarkeit je nach Lagertemperatur: -20 °C mind. 2 Wochen, -45 °C mind. 3 Monate, -196 °C (Flüssigstickstoff) bis zu einem Jahr. Braucht aber ununterbrochene Kühlhaltung.</p><p><b>Lagerung allgemein</b>: einwandfreie Hygiene der Lagerräume ist zwingend – Verschmutzung birgt Infektionsgefahr beim Impfen. Lagertemperaturen kontrollieren und immer einhalten.</p>'
+        body:'<p><b>Gefrorene Kulturen</b>: normale Aktivität durch Restflüssigkeit in den Zellen. Haltbarkeit je nach Lagertemperatur: -20 °C mind. 2 Wochen, -45 °C mind. 3 Monate, -196 °C (Flüssigstickstoff) bis zu einem Jahr. Braucht aber ununterbrochene Kühlhaltung.</p><p><b>Lagerung allgemein</b>: einwandfreie Hygiene der Lagerräume ist zwingend, denn Verschmutzung birgt Infektionsgefahr beim Impfen. Lagertemperaturen kontrollieren und immer einhalten.</p>'
       }
     ] },
-  { kicker:'Quiz', title:'Kulturenformen', id:'kulturenformen_quiz', type:'quiz',
-    lead:'Fünf Fragen.',
-    questions:[
-      { q:'Welche Kulturenform kann per Post zugestellt werden?', opts:['Lyophilisierte (gefriergetrocknete) Kultur','Flüssigkultur','Gefrorene Kultur'], correct:0 },
-      { q:'Warum haben lyophilisierte Kulturen eine verzögerte Anfangsaktivität?', opts:['Die Zellen müssen zuerst wieder Wasser aufnehmen, um sich zu reaktivieren','Sie enthalten zu wenig Bakterien','Sie müssen zuerst aufgetaut werden'], correct:0 },
-      { q:'Welcher Nachteil trifft auf Flüssigkulturen zu?', opts:['Kurze Vorratshaltung, nur wenige Tage bei &lt;5 °C','Verzögerte Anfangsaktivität','Ununterbrochene Kühlhaltung nötig'], correct:0 },
-      { q:'Wie lange sind gefrorene Kulturen bei -196 °C (Flüssigstickstoff) haltbar?', opts:['Bis zu einem Jahr','Nur zwei Wochen','Unbegrenzt'], correct:0 },
-      { q:'Was ist ein Nachteil des Gefriertrocknungs-Verfahrens selbst?', opts:['Selektion/Verarmung der Flora-Vielfalt, vor allem bei Laktobazillen','Zu hohe Aktivität','Zu kurze Haltbarkeit'], correct:0 }
+  { kicker:'Zuordnung', title:'Kulturenformen: Vor- und Nachteile zuordnen', id:'kulturenformen_gaps', type:'gaps',
+    lead:'Welche Kulturenform passt? Vorsicht, es gibt auch falsche Optionen.',
+    parts:[
+      'Die ',
+      { opts:['Flüssigkultur','lyophilisierte Kultur','gefrorene Kultur'], correct:0 },
+      ' beginnt ihre Vermehrung sofort nach dem Beimpfen, weil sie sofort aktivitätsbereit ist. Weil sie weniger empfindlich auf Temperaturschwankungen reagiert, kann die ',
+      { opts:['lyophilisierte Kultur','Flüssigkultur','gefrorene Kultur'], correct:0 },
+      ' problemlos per Post verschickt werden. Bei der ',
+      { opts:['Flüssigkultur','lyophilisierten Kultur','gefrorenen Kultur'], correct:0 },
+      ' ist die Vorratshaltung bei unter 5 °C auf nur 7 bis 10 Tage beschränkt. Die ',
+      { opts:['lyophilisierte Kultur','Flüssigkultur','gefrorene Kultur'], correct:0 },
+      ' zeigt eine verzögerte Anfangsaktivität, weil die Zellen zuerst wieder Wasser aufnehmen müssen. Ein Nachteil der ',
+      { opts:['lyophilisierten Kultur','Flüssigkultur','gefrorenen Kultur'], correct:0 },
+      ' ist die Verarmung der Artenvielfalt, vor allem bei den Laktobazillen. Weil sie keinen Gefriertrocknungsvorgang durchläuft, zeigt die ',
+      { opts:['Flüssigkultur','lyophilisierte Kultur','gefrorene Kultur'], correct:0 },
+      ' keine solche Verarmung der Artenvielfalt.'
     ] },
   { kicker:'Folien · Kontrolle', title:'Kontrolle der Kulturenaktivität', type:'slides',
     lead:'Fünf Methoden, um eine Kultur vor dem Einsatz zu prüfen.',
     slides:[
       { icon:'👁️', color:'#92400e', bg:'#fff7ed',
         title:'Visuelle & organoleptische Kontrolle',
-        body:'<p><b>Visuelle Kontrolle</b>: schon vor der Impfung – Farbe der sterilisierten Magermilch beurteilen, soll leicht bräunlich/karamellfarbig sein. Weiss = zu wenig gekocht/sterilisiert, nicht keimfrei. Dunkelbraun = zu starke Wärmeeinwirkung, optimale Vermehrung nicht gewährleistet.</p><p><b>Organoleptische Kontrolle</b>: Degustation – eine einwandfreie Kultur hat einen angenehmen, reinen säuerlichen Geschmack.</p>'
+        body:'<p><b>Visuelle Kontrolle</b>: schon vor der Impfung. Farbe der sterilisierten Magermilch beurteilen, soll leicht bräunlich/karamellfarbig sein. Weiss = zu wenig gekocht/sterilisiert, nicht keimfrei. Dunkelbraun = zu starke Wärmeeinwirkung, optimale Vermehrung nicht gewährleistet.</p><p><b>Organoleptische Kontrolle</b>: Degustation. Eine einwandfreie Kultur hat einen angenehmen, reinen säuerlichen Geschmack.</p>'
       },
       { icon:'🧪', color:'#1e4e8c', bg:'#dbeeff',
         title:'Säuregrad, pH-Wert und Mikroskop',
-        body:'<p><b>Säuregradkontrolle (°SH)</b>: &lt;28 °SH = zu wenig fortgeschritten (zu tiefe Bebrütungstemperatur/-zeit oder Hemmstoff); ca. 35 °SH = «junge» Kultur mit hohem Kokkenanteil für die Anfangssäuerung; &gt;40 °SH = «alte» Kultur mit vielen Stäbchen für die Endsäuerung.</p><p><b>pH-Kontrolle</b>: misst die aktive Säure (H⁺-Konzentration) – Ursachen und Auswirkungen analog zur °SH-Bestimmung.</p><p><b>Mikroskop-Kontrolle</b>: lange, unförmige Stäbchen deuten auf eine zu lange Bebrütung hin; zeigt auch das Verhältnis Kokken/Stäbchen.</p><div class="factbox">5 Methoden zu unterschiedlichem Zeitpunkt – visuell schon vor der Impfung, organoleptisch erst beim Einsatz.</div>'
+        body:'<p><b>Säuregradkontrolle (°SH)</b>: &lt;28 °SH = zu wenig fortgeschritten (zu tiefe Bebrütungstemperatur/-zeit oder Hemmstoff); ca. 35 °SH = «junge» Kultur mit hohem Kokkenanteil für die Anfangssäuerung; &gt;40 °SH = «alte» Kultur mit vielen Stäbchen für die Endsäuerung.</p><p><b>pH-Kontrolle</b>: misst die aktive Säure (H⁺-Konzentration). Ursachen und Auswirkungen sind analog zur °SH-Bestimmung.</p><p><b>Mikroskop-Kontrolle</b>: lange, unförmige Stäbchen deuten auf eine zu lange Bebrütung hin; zeigt auch das Verhältnis Kokken/Stäbchen.</p><div class="factbox">5 Methoden zu unterschiedlichem Zeitpunkt: visuell schon vor der Impfung, organoleptisch erst beim Einsatz.</div>'
       }
     ] },
   { kicker:'Lückentext', title:'Kontrolle zuordnen', id:'kontrolle_gaps', type:'gaps',
@@ -395,7 +403,7 @@ var ALL = [
       },
       { icon:'🔁', color:'#92400e', bg:'#fff7ed',
         title:'Lytischer vs. lysogener Zyklus',
-        body:'<p><b>Lytischer Zyklus</b>: Die Phagen-Erbmasse übernimmt sofort das Kommando. Die Bakterienzelle bildet in 20–80 Minuten 50–300 neue Phagen, danach wird die Zellwand aufgelöst (Lyse) – das Bakterium ist zerstört, Kettenreaktion. <b>Folge: Säuerungsstörung.</b></p><p><b>Lysogener Zyklus</b>: Phagen-Erbsubstanz und Bakterien-Erbsubstanz bilden eine Einheit (Prophage) und vermehren sich gemeinsam bei der Zellteilung. Das Bakterium arbeitet normal weiter – keine Säuerungsstörung. Ein späterer Wechsel in den lytischen Zyklus ist möglich (ausgelöst z. B. durch veränderte Bedingungen, chemische Substanzen, UV-Strahlen).</p>'
+        body:'<p><b>Lytischer Zyklus</b>: Die Phagen-Erbmasse übernimmt sofort das Kommando. Die Bakterienzelle bildet in 20–80 Minuten 50–300 neue Phagen, danach wird die Zellwand aufgelöst (Lyse). Das Bakterium ist zerstört, es folgt eine Kettenreaktion. <b>Folge: Säuerungsstörung.</b></p><p><b>Lysogener Zyklus</b>: Phagen-Erbsubstanz und Bakterien-Erbsubstanz bilden eine Einheit (Prophage) und vermehren sich gemeinsam bei der Zellteilung. Das Bakterium arbeitet normal weiter, es kommt zu keiner Säuerungsstörung. Ein späterer Wechsel in den lytischen Zyklus ist möglich (ausgelöst z. B. durch veränderte Bedingungen, chemische Substanzen, UV-Strahlen).</p>'
       }
     ] },
   { kicker:'Beschriften', title:'Bakteriophage beschriften', id:'phagen_label', type:'label',
@@ -420,7 +428,7 @@ var ALL = [
     lead:'Stimmt die Aussage?',
     items:[
       { s:'Kulturen sollten in einem separaten, trockenen Raum zubereitet werden, nicht im Fabrikationsraum.', a:true, e:'So bleiben sie von Phagen aus der Fabrikationsluft geschützt.' },
-      { s:'Molke- und Milchproduktespritzer sind unbedenklich, da sie keine Phagen enthalten.', a:false, e:'Sie können grosse Mengen Phagen enthalten – unbedingt vermeiden.' },
+      { s:'Molke- und Milchproduktespritzer sind unbedenklich, da sie keine Phagen enthalten.', a:false, e:'Sie können grosse Mengen Phagen enthalten. Unbedingt vermeiden.' },
       { s:'Kulturenrotation (Wechsel alle 2 bis 3 Tage) hilft, weil nicht alle Kulturen gleich empfindlich auf Phagen reagieren.', a:true, e:'Trotz gleicher Eigenschaften unterschiedlich sensibel.' },
       { s:'Bei anhaltenden Problemen sollte man die Kulturen erneuern.', a:true, e:'Letzte Massnahme bei hartnäckigem Phagenbefall.' },
       { s:'Konstante Bebrütungsbedingungen spielen bei der Phagen-Bekämpfung keine Rolle.', a:false, e:'Konstante Temperatur und Dauer gehören zu den Massnahmen.' },
@@ -431,11 +439,11 @@ var ALL = [
     slides:[
       { icon:'⚗️', color:'#1e4e8c', bg:'#dbeeff',
         title:'Homofermentativ vs. heterofermentativ',
-        body:'<p><b>Homofermentative Gärung</b>: Milchzucker wird zu über 90 % zu Milchsäure vergoren.</p><p><b>Heterofermentative Gärung</b>: Milchzucker wird zu 50–90 % zu Milchsäure vergoren, zusätzlich entstehen Essigsäure, CO2 und teilweise Alkohol – bei einigen Produkten erwünscht wegen des Aromastoffs <b>Diacetyl</b>.</p><p><b>Endoenzyme</b>: wirken in der Bakterienzelle selbst, spalten Nährstoffe (v. a. Proteine) – wichtig für die Käsereifung, vor allem bei den Laktobazillen.</p>'
+        body:'<p><b>Homofermentative Gärung</b>: Milchzucker wird zu über 90 % zu Milchsäure vergoren.</p><p><b>Heterofermentative Gärung</b>: Milchzucker wird zu 50–90 % zu Milchsäure vergoren, zusätzlich entstehen Essigsäure, CO2 und teilweise Alkohol. Bei einigen Produkten ist das sogar erwünscht wegen des Aromastoffs <b>Diacetyl</b>.</p><p><b>Endoenzyme</b>: wirken in der Bakterienzelle selbst, spalten Nährstoffe (v. a. Proteine). Wichtig für die Käsereifung, vor allem bei den Laktobazillen.</p>'
       },
       { icon:'🎯', color:'#15803d', bg:'#dcfce7',
         title:'Die fünf Hauptaufgaben der Milchsäure',
-        body:'<ul><li><b>Säuregerinnung</b>: die Milch gerinnt, verantwortlich auch für den sauren Geschmack.</li><li><b>Konservierung</b>: hemmt Colibakterien und eiweisszersetzende Bakterien – ausser Hefen und Schimmel.</li><li><b>Griffbildung/Synärese</b>: rasche Milchsäurebildung = grössere Molkenausscheidung = besserer Griff.</li><li><b>Teigbeschaffenheit</b>: zu viel Milchsäure = Calciumverlust, kurzer Teig; zu wenig = langer, zäher Teig.</li><li><b>Substrat</b> für weitere Gärungen, z. B. Propionsäuregärung, Buttersäuregärung.</li></ul>'
+        body:'<ul><li><b>Säuregerinnung</b>: die Milch gerinnt, verantwortlich auch für den sauren Geschmack.</li><li><b>Konservierung</b>: hemmt Colibakterien und eiweisszersetzende Bakterien, nicht aber Hefen und Schimmel.</li><li><b>Griffbildung/Synärese</b>: rasche Milchsäurebildung = grössere Molkenausscheidung = besserer Griff.</li><li><b>Teigbeschaffenheit</b>: zu viel Milchsäure = Calciumverlust, kurzer Teig; zu wenig = langer, zäher Teig.</li><li><b>Substrat</b> für weitere Gärungen, z. B. Propionsäuregärung, Buttersäuregärung.</li></ul>'
       }
     ] },
   { kicker:'Lückentext', title:'Milchsäuregärung zuordnen', id:'msg_gaps', type:'gaps',
@@ -445,7 +453,7 @@ var ALL = [
       { opts:['homofermentativen','heterofermentativen'], correct:0 },
       ' Milchsäuregärung entsteht zu über 90 % Milchsäure. Bei der ',
       { opts:['heterofermentativen','homofermentativen'], correct:0 },
-      ' Gärung entstehen zusätzlich Essigsäure, CO2 und teilweise Alkohol – erwünscht wegen des Aromastoffs ',
+      ' Gärung entstehen zusätzlich Essigsäure, CO2 und teilweise Alkohol. Das ist bei einigen Produkten sogar erwünscht wegen des Aromastoffs ',
       { opts:['Diacetyl','Ethanol','Laktose'], correct:0 },
       '. Wird zu viel Milchsäure gebildet, verliert der Käseteig zu viel Calcium und wird ',
       { opts:['kurz','lang und zäh'], correct:0 },
@@ -459,9 +467,9 @@ var ALL = [
       { q:'Erklären Sie, weshalb die Kühlung (1–5 °C) das Wachstum der Mikroorganismen nicht vollständig stoppt.', a:'Nur die Aktivität der meisten Mikroorganismen wird deutlich vermindert. Psychrotrophe (kältetolerante) Mikroorganismen können auch bei diesen Temperaturen noch Stoffwechsel betreiben und sich langsam vermehren.' },
       { q:'Erklären Sie den Unterschied zwischen der Vermehrungsphase und der stationären Phase einer Kultur.', a:'In der Vermehrungsphase vermehren sich die Bakterien sehr stark und schnell (kürzeste Generationszeit, intensivster Stoffwechsel). In der stationären Phase herrscht Nährstoffmangel, Vermehrung und Stoffwechsel sind gebremst, die Keimzahl bleibt konstant, weil sich neu entstehende und sterbende Zellen die Waage halten.' },
       { q:'Erklären Sie, weshalb lyophilisierte Kulturen eine verzögerte Anfangsaktivität haben.', a:'Die durch die Gefriertrocknung haltbar gemachten Bakterienzellen müssen zuerst wieder Wasser aufnehmen, damit sie sich reaktivieren können.' },
-      { q:'Erklären Sie, was ein zu hoher Säuregrad (über 40 °SH) über eine Kultur aussagt.', a:'Das deutet auf eine «alte» Kultur hin, die länger bebrütet wurde. Sie enthält viele Stäbchen und mehr Milchsäure und dient vor allem der Endsäuerung.' },
-      { q:'Erklären Sie den Unterschied zwischen lytischem und lysogenem Zyklus bei Bakteriophagen.', a:'Beim lytischen Zyklus übernimmt die Phagen-Erbmasse sofort das Kommando, die Bakterienzelle bildet neue Phagen und wird dabei zerstört (Säuerungsstörung). Beim lysogenen Zyklus wird die Phagen-Erbsubstanz als Prophage ins Bakteriengenom eingebaut, das Bakterium arbeitet normal weiter – keine Säuerungsstörung, aber ein späterer Wechsel in den lytischen Zyklus ist möglich.' },
-      { q:'Nennen Sie 3 Massnahmen zur Bekämpfung von Bakteriophagen.', a:'Z. B. Kulturen in separatem, trockenem Raum zubereiten; aseptisch arbeiten; regelmässige Reinigung/Entkeimung der Anlagen; Kulturenrotation alle 2–3 Tage; Molke-/Milchproduktespritzer vermeiden; bei anhaltenden Problemen die Kulturen erneuern.' },
+      { q:'Sie messen bei einer Kultur einen Säuregrad von 42 °SH. Was sagt Ihnen das über die Kultur, und wofür eignet sie sich eher?', a:'42 °SH liegt über 40 °SH, das deutet auf eine «alte» Kultur hin, die länger bebrütet wurde. Sie enthält viele Stäbchen und eignet sich eher für die Endsäuerung als für die Anfangssäuerung.' },
+      { q:'Was passiert innerhalb von 20 bis 80 Minuten, wenn ein Bakteriophage den lytischen Zyklus durchläuft, und weshalb bleibt die Bakterienzelle beim lysogenen Zyklus davon verschont?', a:'Beim lytischen Zyklus übernimmt die Phagen-Erbmasse sofort das Kommando, die Bakterienzelle bildet 50 bis 300 neue Phagen und wird dabei zerstört (Säuerungsstörung). Beim lysogenen Zyklus wird die Phagen-Erbsubstanz stattdessen als Prophage ins Bakteriengenom eingebaut, das Bakterium arbeitet normal weiter und es kommt zu keiner Säuerungsstörung. Ein späterer Wechsel in den lytischen Zyklus ist aber möglich.' },
+      { q:'In Ihrem Betrieb tauchen wiederholt Probleme mit Bakteriophagen auf. Beschreiben Sie 2 Massnahmen, mit denen Sie das Risiko systematisch senken.', a:'Z. B. Kulturenrotation: die Kulturen alle 2 bis 3 Tage wechseln, weil nicht alle Kulturen gleich phagenempfindlich sind. Oder: konstante Bebrütungsbedingungen (Temperatur, Dauer) einhalten und Molke-/Milchproduktespritzer konsequent vermeiden, da diese grosse Mengen Phagen enthalten können.' },
       { q:'Erklären Sie, weshalb die heterofermentative Milchsäuregärung bei einigen Produkten erwünscht ist.', a:'Weil dabei der Aromastoff Diacetyl entsteht, der für den charakteristischen Geschmack gewünscht wird, z. B. bei Rahmsäurewecker-Kulturen.' },
       { q:'Nennen Sie 2 der 5 Hauptaufgaben der Milchsäure und beschreiben Sie eine davon.', a:'Z. B. Säuregerinnung (Milch gerinnt durch die gebildete Milchsäure), Konservierung (hemmt Colibakterien und eiweisszersetzende Bakterien), Griffbildung/Synärese, Teigbeschaffenheit, Substrat für weitere Gärungen.' }
     ] },
@@ -483,11 +491,11 @@ var STATIONS = ALL.filter(function(s){ return MODE === 'challenge' ? (s.type !==
 
 (function(){
   var t = (MODE === 'challenge') ? 'Challenge' : 'Lernpfad';
-  document.getElementById('pageTitle').textContent = t + ': Kulturen zubereiten';
+  document.getElementById('pageTitle').textContent = 'Kulturen – ' + t;
   document.getElementById('subtitle').textContent = (MODE === 'challenge')
-    ? 'Prüfungsmodus – ohne Hilfen, direkt auf den Punkt'
-    : 'Wissensvermittlung – mit Lesetexten und Übungen';
-  document.title = t + ': Kulturen zubereiten (a.8)';
+    ? 'Prüfungsmodus, ohne Hilfen, direkt auf den Punkt'
+    : 'Wissensvermittlung mit Lesetexten und Übungen';
+  document.title = 'Kulturen – ' + t + ' (a.8)';
   if(MODE==='challenge'){
     document.getElementById('lsDots').classList.add('selectable');
     document.querySelector('.ls-select-hint').classList.add('show');
