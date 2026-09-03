@@ -91,6 +91,7 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 │   ├── hotspot-lebensphasen.html          ← trotz Namen: Zuordnung (Drag & Drop), 2 Stufen: Einfach (Phasen an Wachstumskurve) / Schwer (Merkmale an Phase)
 │   ├── tabellen-luecken-kuehlung.html
 │   ├── tabellen-luecken-kontrolle.html
+│   ├── zuordnung-hauptaufgaben-milchsaeure.html ← 3-Stufen-Tool (Zuordnung3.karten): Einfach=5 Definitionen zuordnen (Ziele kennen), Mittel=9 Beispiele zuordnen, Schwer=Freitext + Musterantwort; deckt Lernziel + Prüfungsaufgabe 13/14 ab
 │   ├── tabellen-luecken-milchsaeuregaerung.html
 │   ├── quiz-abweichungen-phagen.html
 │   ├── zuordnung-vermehrungszyklus.html   ← 3 Stufen (Einfach=Wahr/Falsch, Mittel=Diagramm beschriften mit exakten %-Zonen über den Ellipsen, Schwer=lytisch/lysogen sortieren)

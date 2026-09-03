@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hauptaufgaben der Milchsäure</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="../assets/dnd.js"></script>
+  <script src="../assets/zuordnung3.js"></script>
+  <style>
+    .back-link { display: inline-block; font-size: 0.82rem; color: var(--text-muted); text-decoration: none; margin-bottom: 1rem; }
+    .back-link:hover { color: var(--red); }
+
+    .level-bar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:1.25rem; }
+    .level-btn { font-family:var(--font); font-size:0.82rem; font-weight:600; padding:7px 16px; border-radius:20px; border:1.5px solid var(--border); background:var(--surface); color:var(--text-muted); cursor:pointer; transition:all 0.15s; }
+    .level-btn:hover { border-color:var(--blue); color:var(--blue-dark); }
+    .level-btn.active { background:var(--blue-dark); border-color:var(--blue-dark); color:#fff; }
+
+    .instruction { font-size: 0.84rem; color: var(--text-muted); margin-bottom: 1.25rem; text-align: center; line-height: 1.5; }
+
+    /* Einfach & Mittel: Karten-Pool + Zonen (Zuordnung3.karten) */
+    .card-pool {
+      display: flex; flex-wrap: wrap; gap: 0.5rem;
+      background: var(--blue-light); border-radius: var(--radius-md);
+      padding: 0.9rem 1rem; margin-bottom: 1.5rem; min-height: 60px;
+    }
+    .karte {
+      font-family: var(--font); font-size: 0.78rem; font-weight: 500;
+      background: var(--surface); border: 2px solid var(--border); border-radius: var(--radius-sm);
+      padding: 0.36rem 0.7rem; cursor: grab; color: var(--text); line-height: 1.4;
+      user-select: none; touch-action: none; max-width: 280px;
+      transition: border-color 0.15s, box-shadow 0.15s, opacity 0.15s;
+    }
+    .karte:hover { border-color: var(--blue); }
+    .karte.dragging { opacity: 0.3; }
+    .karte.used { opacity: 0.18; pointer-events: none; }
+    .karte.selected { background: var(--blue); border-color: var(--blue); color: #fff; }
+
+    .spalten-wrap { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.75rem; margin-bottom: 1.5rem; }
+    @media (max-width: 900px) { .spalten-wrap { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 520px) { .spalten-wrap { grid-template-columns: 1fr; } }
+    .spalte { background: var(--surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); overflow: hidden; }
+    .spalte-header { background: var(--blue-dark); color: #fff; text-align: center; font-size: 0.76rem; font-weight: 700; padding: 0.6rem 0.4rem; line-height: 1.3; }
+
+    .drop-zone {
+      min-height: 200px; border: 2px dashed var(--border); border-radius: var(--radius-sm);
+      margin: 0.5rem; padding: 0.3rem; display: flex; flex-direction: column; gap: 0.3rem;
+      background: #fafbfc; transition: all 0.15s;
+    }
+    .drop-zone.over  { border-color: var(--blue); border-style: solid; background: #e8f4ff; }
+    .drop-zone.ready { border-color: var(--blue); border-style: solid; background: #f0f7ff; }
+
+    .placed-karte {
+      font-family: var(--font); font-size: 0.72rem; font-weight: 500;
+      background: var(--surface); border: 2px solid var(--blue); border-radius: var(--radius-sm);
+      padding: 0.28rem 0.5rem; color: var(--text); cursor: grab; user-select: none; touch-action: none;
+      line-height: 1.3; transition: border-color 0.15s, background 0.15s;
+    }
+    .placed-karte:hover { border-color: var(--blue-dark); }
+    .placed-karte.dragging { opacity: 0.3; }
+    .placed-karte.correct { border-color: #16a34a !important; background: #f0fdf4 !important; color: #15803d !important; cursor: default; pointer-events: none; }
+    .placed-karte.wrong   { border-color: var(--red) !important; background: var(--red-light, #fff0f0) !important; color: var(--red) !important; cursor: default; pointer-events: none; }
+
+    /* Schwer: Freitext + Musterantwort */
+    .type-textarea {
+      width: 100%; min-height: 80px; font-family: var(--font); font-size: 0.82rem;
+      padding: 0.55rem 0.7rem; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+      background: #f8fafc; color: var(--text); resize: vertical; line-height: 1.45; transition: border-color 0.15s;
+    }
+    .type-textarea:focus { outline: none; border-color: var(--blue); background: #fff; }
+    .reveal-box { margin-top: 0.6rem; display: none; }
+    .reveal-box.show { display: block; }
+    .reveal-answer {
+      background: #f0fdf4; border-left: 3px solid #16a34a; border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 0.6rem 0.8rem; font-size: 0.8rem; color: var(--text); line-height: 1.5; margin-bottom: 0.5rem;
+    }
+    .checklist { display: flex; flex-direction: column; gap: 0.3rem; }
+    .checklist label { display: flex; align-items: flex-start; gap: 0.4rem; font-size: 0.78rem; color: var(--text-muted); cursor: pointer; }
+    .checklist input[type="checkbox"] { margin-top: 2px; }
+
+    .btn-row { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+    .result-banner {
+      margin-top: 1.25rem; padding: 0.9rem 1rem; border-radius: var(--radius-md);
+      font-weight: 600; font-size: 0.92rem; text-align: center; display: none;
+    }
+    .result-banner.show    { display: block; }
+    .result-banner.perfect { background: #f0fdf4; color: #15803d; border: 1.5px solid #bbf7d0; }
+    .result-banner.partial { background: #fff7ed; color: #c2410c; border: 1.5px solid #fed7aa; }
+  </style>
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · a.8</span>
+    <h1>Hauptaufgaben der Milchsäure</h1>
+    <p>Erst die Ziele kennen, dann Beispiele zuordnen, zum Schluss selbst erklären</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+  <a class="back-link" href="../index.html">← Alle Lerntools</a>
+
+  <div class="level-bar">
+    <button class="level-btn active" id="lvl-einfach" onclick="setLevel('einfach')">Einfach – Ziele kennen</button>
+    <button class="level-btn"        id="lvl-mittel"  onclick="setLevel('mittel')">Mittel – Beispiele zuordnen</button>
+    <button class="level-btn"        id="lvl-schwer"  onclick="setLevel('schwer')">Schwer – selbst erklären</button>
+  </div>
+
+  <p class="instruction" id="instruction"></p>
+
+  <div id="modeBody"></div>
+
+  <div class="btn-row" id="btnRow">
+    <button type="button" class="btn btn-primary" id="checkBtn" onclick="checkLevel()">Überprüfen</button>
+    <button type="button" class="btn btn-ghost"   onclick="resetLevel()">Neu mischen</button>
+  </div>
+
+  <div class="result-banner" id="resultBanner"></div>
+
+</main>
+
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+
+<script>
+/* Einfach: 5 Definitionen -> 5 Hauptaufgaben (singleSlot, 1:1) */
+var ZIELE_KARTEN = [
+  { id: 1, text: 'Die Milchsäurebakterien wandeln den Milchzucker um, wodurch die Milch gerinnt und einen sauren Geschmack erhält.', match: 'gerinnung' },
+  { id: 2, text: 'Sie hemmt Colibakterien und andere Verderbniserreger im Produkt.', match: 'konservierung' },
+  { id: 3, text: 'Eine rasche Säurebildung fördert die Molkenausscheidung und damit den «Griff» des Käses.', match: 'griff' },
+  { id: 4, text: 'Die Säuremenge beeinflusst über den Calciumgehalt, ob der Käseteig kurz oder lang/zäh wird.', match: 'teig' },
+  { id: 5, text: 'Sie dient als Ausgangsstoff für weitere Gärungen, z.B. die Propionsäure- oder Buttersäuregärung.', match: 'substrat' }
+];
+
+/* Mittel: 9 konkrete Beispiele/Auswirkungen -> 5 Hauptaufgaben (mehrere Karten pro Zone) */
+var BEISPIEL_KARTEN = [
+  { id: 1, text: 'Die Milchsäurebakterien wandeln den Milchzucker um, wodurch die Milch gerinnt.', match: 'gerinnung' },
+  { id: 2, text: 'Die Milchsäure ist für den sauren Geschmack verantwortlich, den man bei der Degustation feststellt.', match: 'gerinnung' },
+  { id: 3, text: 'Im Käse werden Colibakterien (Verursacher der Frühblähung) gehemmt.', match: 'konservierung' },
+  { id: 4, text: 'In Sauermilchprodukten werden Verderbniserreger gehemmt – ausser Hefen und Schimmel, die sehr pH-tolerant sind.', match: 'konservierung' },
+  { id: 5, text: 'Eine rasche Milchsäurebildung führt zu grösserer Molkenausscheidung und damit zu besserem «Griff».', match: 'griff' },
+  { id: 6, text: 'Zu viel Milchsäure führt zu vermehrtem Calciumverlust und einem kurzen Teig.', match: 'teig' },
+  { id: 7, text: 'Zu wenig Milchsäure führt zu einem langen, zähen Teig.', match: 'teig' },
+  { id: 8, text: 'Die Milchsäure ist Ausgangsstoff für die Propionsäuregärung.', match: 'substrat' },
+  { id: 9, text: 'Die Milchsäure ist Ausgangsstoff für die Buttersäuregärung.', match: 'substrat' }
+];
+
+var ZONEN = [
+  { match: 'gerinnung',      label: 'Säuregerinnung' },
+  { match: 'konservierung',  label: 'Konservierung' },
+  { match: 'griff',          label: 'Griffbildung / Synärese' },
+  { match: 'teig',           label: 'Teigbeschaffenheit' },
+  { match: 'substrat',       label: 'Substrat für weitere Gärungen' }
+];
+
+var SCHWER_ITEMS = [
+  { label: 'Säuregerinnung',
+    frage: 'Was bewirkt die Milchsäure bei der Säuregerinnung, und warum ist das wichtig?',
+    antwort: 'Die Milchsäurebakterien wandeln den Milchzucker in Milchsäure um. Dadurch gerinnt die Milch – das ist die Grundlage der Käse- und Joghurtherstellung. Zusätzlich ist die Milchsäure für den sauren Geschmack verantwortlich.' },
+  { label: 'Konservierung',
+    frage: 'Wie trägt die Milchsäure zur Konservierung bei?',
+    antwort: 'Die Milchsäure senkt den pH-Wert und hemmt dadurch säureempfindliche Verderbniserreger wie Colibakterien (Frühblähung) und eiweisszersetzende Bakterien. Hefen und Schimmel sind davon ausgenommen, da sie sehr pH-tolerant sind.' },
+  { label: 'Griffbildung / Synärese',
+    frage: 'Wie hängen Milchsäurebildung und «Griff» des Käses zusammen?',
+    antwort: 'Eine rasche Milchsäurebildung führt zu grösserer Molkenausscheidung (Synärese). Je mehr Molke austritt, desto besser die Griffbildung des Käseteigs.' },
+  { label: 'Teigbeschaffenheit',
+    frage: 'Wie wirkt sich die Säuremenge auf die Teigbeschaffenheit aus?',
+    antwort: 'Zu viel Milchsäure führt zu vermehrtem Calciumverlust und damit zu einem kurzen (bröckeligen) Teig. Zu wenig Milchsäure ergibt einen langen, zähen Teig.' },
+  { label: 'Substrat für weitere Gärungen',
+    frage: 'Wofür dient die Milchsäure als Substrat?',
+    antwort: 'Die gebildete Milchsäure ist Ausgangsstoff für spätere Gärungen, z.B. die Propionsäuregärung (Emmentaler-Löcher, Aroma) oder die Buttersäuregärung.' }
+];
+
+/* ---------- Einfach & Mittel: Zuordnung3.karten ---------- */
+var engineEinfach = Zuordnung3.karten.createEngine(ZIELE_KARTEN, 'match', { singleSlot: true });
+var engineMittel  = Zuordnung3.karten.createEngine(BEISPIEL_KARTEN, 'match', { singleSlot: false });
+
+function buildZonenMarkup() {
+  return '<div class="spalten-wrap">' + ZONEN.map(function(z) {
+    return '<div class="spalte"><div class="spalte-header">' + z.label + '</div>' +
+      '<div class="drop-zone" data-match="' + z.match + '"></div></div>';
+  }).join('') + '</div>';
+}
+
+function buildEinfach(body) {
+  body.innerHTML = '<div class="card-pool" id="cardPool"></div>' + buildZonenMarkup();
+  engineEinfach.renderPool(document.getElementById('cardPool'));
+  engineEinfach.setupZones();
+}
+function checkEinfach() {
+  var res = engineEinfach.checkEinfach();
+  showResult(res.correct, res.total, ZIELE_KARTEN.length);
+}
+
+function buildMittel(body) {
+  body.innerHTML = '<div class="card-pool" id="cardPool"></div>' + buildZonenMarkup();
+  engineMittel.renderPool(document.getElementById('cardPool'));
+  engineMittel.setupZones();
+}
+function checkMittel() {
+  var res = engineMittel.checkEinfach();
+  showResult(res.correct, res.total, BEISPIEL_KARTEN.length);
+}
+
+/* ---------- Schwer: Freitext + Musterantwort ---------- */
+function buildSchwer(body) {
+  SCHWER_ITEMS.forEach(function(item, i) {
+    var box = document.createElement('div');
+    box.style.marginBottom = '1.5rem';
+    box.innerHTML =
+      '<p style="font-size:0.86rem;font-weight:700;color:var(--blue-dark);margin-bottom:0.2rem;">' + item.label + '</p>' +
+      '<p style="font-size:0.86rem;color:var(--text);margin-bottom:0.5rem;">' + item.frage + '</p>' +
+      '<textarea class="type-textarea" placeholder="Ihre Erklärung in eigenen Worten …"></textarea>' +
+      '<div class="btn-row" style="margin-top:0.5rem;">' +
+      '<button type="button" class="btn btn-ghost" onclick="revealModel(' + i + ')">Musterantwort anzeigen</button>' +
+      '</div>' +
+      '<div class="reveal-box" id="reveal-' + i + '">' +
+      '<div class="reveal-answer"><strong>Musterantwort:</strong> ' + item.antwort + '</div>' +
+      '<div class="checklist">' +
+      '<label><input type="checkbox"> Habe ich beschrieben, WAS die Milchsäure hier bewirkt?</label>' +
+      '<label><input type="checkbox"> Habe ich erklärt, WARUM das für das Produkt wichtig ist?</label>' +
+      '<label><input type="checkbox"> Habe ich ein Beispiel genannt?</label>' +
+      '</div></div>';
+    body.appendChild(box);
+  });
+}
+function revealModel(i) { document.getElementById('reveal-' + i).classList.add('show'); }
+
+/* ---------- gemeinsam ---------- */
+function showResult(correct, total, expected) {
+  var banner = document.getElementById('resultBanner');
+  if (correct === expected && total === expected) {
+    Zuordnung3.showResult(banner, true, 'Perfekt! Alle ' + expected + ' Karten richtig zugeordnet.');
+  } else {
+    Zuordnung3.showResult(banner, false, correct + ' von ' + total + ' korrekt platziert. Rot markierte Karten nochmals überprüfen.');
+  }
+}
+
+Zuordnung3.levelBar({
+  instructions: {
+    einfach: 'Ordnen Sie jede Definition der richtigen Hauptaufgabe zu (1 Karte pro Feld).',
+    mittel:  'Ordnen Sie die 9 konkreten Beispiele den 5 Hauptaufgaben zu (mehrere Karten pro Feld).',
+    schwer:  'Erklären Sie zu jeder Hauptaufgabe in eigenen Worten, was die Milchsäure bewirkt. Vergleichen Sie danach mit der Musterantwort.'
+  },
+  checkBtn: { einfach: '', mittel: '', schwer: 'none' },
+  build: { einfach: buildEinfach, mittel: buildMittel, schwer: buildSchwer },
+  check: { einfach: checkEinfach, mittel: checkMittel }
+});
+setLevel('einfach');
+</script>
+</body>
+</html>
