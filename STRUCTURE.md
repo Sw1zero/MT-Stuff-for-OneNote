@@ -88,7 +88,7 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 │   │   ├── a.8_Phage_unbeschriftet.png    ← Beschriften-Station in lernsession-pruefung-kulturen.html
 │   │   └── a.8_Phage_beschriftet.png      ← Lösungsbild dazu
 │   ├── hotspot-bakterienzelle.html
-│   ├── hotspot-lebensphasen.html
+│   ├── hotspot-lebensphasen.html          ← trotz Namen: Zuordnung (Drag & Drop), 2 Stufen: Einfach (Phasen an Wachstumskurve) / Schwer (Merkmale an Phase)
 │   ├── tabellen-luecken-kuehlung.html
 │   ├── tabellen-luecken-kontrolle.html
 │   ├── tabellen-luecken-milchsaeuregaerung.html

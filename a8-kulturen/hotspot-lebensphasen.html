@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hotspot – Lebensphasen der Mikroorganismen</title>
+  <title>Lebensphasen der Mikroorganismen</title>
   <link rel="stylesheet" href="../style.css">
+  <script src="../assets/dnd.js"></script>
   <style>
     .page-main {
       display: flex;
@@ -23,52 +24,25 @@
     }
     .back-link:hover { color: var(--red); }
 
+    .level-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.25rem; align-self: flex-start; }
+    .level-btn { font-family: var(--font); font-size: 0.82rem; font-weight: 600; padding: 7px 16px; border-radius: 20px; border: 1.5px solid var(--border); background: var(--surface); color: var(--text-muted); cursor: pointer; transition: all 0.15s; }
+    .level-btn:hover { border-color: var(--blue); color: var(--blue-dark); }
+    .level-btn.active { background: var(--blue-dark); border-color: var(--blue-dark); color: #fff; }
+
     .game-wrap {
       width: 760px;
       max-width: 96vw;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 10px;
     }
 
-    .question-card {
-      background: var(--surface);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-sm);
-      padding: 20px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      min-height: 68px;
+    .instruction {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      text-align: center;
+      margin: 0 0 6px;
     }
-    .question-text { font-size: 1.05rem; font-weight: 600; color: var(--text); }
-    .question-text span { color: var(--blue-dark); }
-    .progress-badge {
-      font-size: 0.78rem;
-      font-weight: 700;
-      color: var(--text-subtle);
-      background: #f1f5f9;
-      border-radius: 20px;
-      padding: 4px 12px;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-
-    .feedback-bar {
-      border-radius: var(--radius-sm);
-      padding: 12px 16px;
-      font-size: 0.88rem;
-      font-weight: 600;
-      opacity: 0;
-      max-height: 0;
-      overflow: hidden;
-      transition: opacity 0.2s;
-    }
-    .feedback-bar.visible { opacity: 1; max-height: 200px; }
-    .feedback-bar.correct-fb { background: #dcfce7; color: #166534; }
-    .feedback-bar.wrong-fb   { background: var(--red-light); color: #991b1b; }
-    .feedback-detail { font-weight: 400; margin-top: 6px; line-height: 1.4; }
 
     .diagram-wrap {
       position: relative;
@@ -80,27 +54,142 @@
       padding: 12px;
     }
     .diagram-wrap svg { display: block; width: 100%; height: auto; }
-    .zone { cursor: pointer; transition: opacity 0.15s; }
-    .zone:hover { opacity: 0.75; }
-    .zone.locked { cursor: default; pointer-events: none; }
 
-    .end-screen {
+    /* Drop row: padded to line up with the SVG curve's x-range (AX..AX_END inside a 720-wide viewBox) */
+    .drop-row-outer {
+      padding: 0 2.78% 0 8.89%;
+    }
+    .drop-row {
+      display: grid;
+      grid-template-columns: 166fr 170fr 160fr 140fr;
+      gap: 8px;
+      margin-bottom: 1rem;
+    }
+
+    .drop-zone {
+      min-height: 150px;
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      background: #fafbfc;
+      transition: all 0.15s;
+    }
+    .drop-zone.over {
+      border-color: var(--blue);
+      border-style: solid;
+      background: #e8f4ff;
+    }
+    .drop-zone.ready {
+      border-color: var(--blue);
+      border-style: solid;
+      background: #f0f7ff;
+    }
+    .drop-zone-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--blue-dark);
+      text-align: center;
+      margin-bottom: 2px;
+    }
+    .drop-zone-label.hidden { display: none; }
+
+    /* Card pool */
+    .card-pool {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      background: var(--blue-light);
+      border-radius: var(--radius-md);
+      padding: 0.9rem 1rem;
+      margin-bottom: 1.25rem;
+      min-height: 60px;
+    }
+
+    .karte {
+      font-family: var(--font);
+      font-size: 0.78rem;
+      font-weight: 500;
       background: var(--surface);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-sm);
-      padding: 40px 32px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.36rem 0.7rem;
+      cursor: grab;
+      color: var(--text);
+      line-height: 1.4;
+      user-select: none;
+      touch-action: none;
+      max-width: 320px;
+      transition: border-color 0.15s, box-shadow 0.15s, opacity 0.15s;
+    }
+    .karte:hover { border-color: var(--blue); }
+    .karte.dragging { opacity: 0.3; }
+    .karte.used { opacity: 0.18; pointer-events: none; }
+    .karte.selected {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: #fff;
+    }
+
+    .placed-karte {
+      font-family: var(--font);
+      font-size: 0.75rem;
+      font-weight: 500;
+      background: var(--surface);
+      border: 2px solid var(--blue);
+      border-radius: var(--radius-sm);
+      padding: 0.3rem 0.55rem;
+      color: var(--text);
+      cursor: grab;
+      user-select: none;
+      touch-action: none;
+      line-height: 1.35;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .placed-karte:hover { border-color: var(--blue-dark); }
+    .placed-karte.dragging { opacity: 0.3; }
+    .placed-karte.correct {
+      border-color: #16a34a !important;
+      background: #f0fdf4 !important;
+      color: #15803d !important;
+      cursor: default;
+      pointer-events: none;
+    }
+    .placed-karte.wrong {
+      border-color: var(--red) !important;
+      background: var(--red-light, #fff0f0) !important;
+      color: var(--red) !important;
+      cursor: default;
+      pointer-events: none;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.5rem;
+    }
+
+    .result-banner {
+      margin-top: 1.25rem;
+      padding: 0.9rem 1rem;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.92rem;
       text-align: center;
       display: none;
     }
-    .end-screen.visible { display: block; }
-    .end-score { font-size: 2.8rem; font-weight: 800; color: var(--blue-dark); margin-bottom: 4px; }
-    .end-label { font-size: 0.88rem; color: var(--text-subtle); margin-bottom: 28px; }
+    .result-banner.show   { display: block; }
+    .result-banner.perfect { background: #f0fdf4; color: #15803d; border: 1.5px solid #bbf7d0; }
+    .result-banner.partial { background: #fff7ed; color: #c2410c; border: 1.5px solid #fed7aa; }
 
     .recap {
       display: none;
       grid-template-columns: repeat(2, 1fr);
       gap: 14px;
-      margin-top: 8px;
+      margin-top: 1.25rem;
     }
     .recap.visible { display: grid; }
     .recap-card {
@@ -121,18 +210,6 @@
       padding: 8px 10px;
     }
     .recap-ferien b { color: var(--blue-dark); font-style: normal; }
-
-    .start-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(255,255,255,0.82);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: var(--radius-lg);
-      backdrop-filter: blur(2px);
-    }
-    .start-overlay.hidden { display: none; }
   </style>
 </head>
 <body>
@@ -141,7 +218,7 @@
   <div class="header-text">
     <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · a.8</span>
     <h1>Lebensphasen der Mikroorganismen</h1>
-    <p>Klick auf den richtigen Abschnitt der Wachstumskurve.</p>
+    <p id="subtitle">Ziehen Sie jede Phase an die richtige Stelle der Wachstumskurve.</p>
   </div>
   <div class="header-logos">
     <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
@@ -152,30 +229,32 @@
 <main class="page-main">
   <a class="back-link" href="../index.html">← Alle Lerntools</a>
 
-<div class="game-wrap">
-
-  <div class="question-card" id="questionCard">
-    <div class="question-text" id="questionText">–</div>
-    <div class="progress-badge" id="progressBadge">0 / 4</div>
+  <div class="level-bar">
+    <button class="level-btn active" id="lvl-einfach" onclick="setLevel('einfach')">Einfach – Phasen zuordnen</button>
+    <button class="level-btn"        id="lvl-schwer"  onclick="setLevel('schwer')">Schwer – Merkmale zuordnen</button>
   </div>
 
-  <div class="feedback-bar" id="feedbackBar"></div>
+<div class="game-wrap">
+
+  <p class="instruction" id="instruction">Ziehen Sie die vier Phasen an die richtige Stelle der Wachstumskurve.</p>
 
   <div class="diagram-wrap" id="diagramWrap">
     <svg id="curveSvg" viewBox="0 0 720 360" preserveAspectRatio="xMidYMid meet"></svg>
-    <div class="start-overlay" id="startOverlay">
-      <button class="btn btn-primary" onclick="startGame()" style="font-size:1rem;padding:12px 32px;">
-        Starten
-      </button>
-    </div>
   </div>
 
-  <div class="end-screen" id="endScreen">
-    <div class="end-score" id="endScore">–</div>
-    <div class="end-label">von 4 Phasen beim ersten Versuch gefunden</div>
-    <button class="btn btn-primary" onclick="startGame()" style="margin-right:10px">Nochmals</button>
-    <button class="btn btn-ghost" onclick="showRecap()">Alle Phasen im Detail</button>
+  <div class="drop-row-outer">
+    <div class="drop-row" id="dropRow"></div>
   </div>
+
+  <div class="card-pool" id="cardPool"></div>
+
+  <div class="btn-row">
+    <button type="button" class="btn btn-primary" onclick="checkAll()">Überprüfen</button>
+    <button type="button" class="btn btn-ghost" onclick="resetAll()">Neu mischen</button>
+    <button type="button" class="btn btn-ghost" onclick="showRecap()">Alle Phasen im Detail</button>
+  </div>
+
+  <div class="result-banner" id="resultBanner"></div>
 
   <div class="recap" id="recap"></div>
 
@@ -233,16 +312,32 @@
     {x: 620, y: 110}, {x: AX_END, y: 190}
   ];
 
-  var questions = [], current = 0, score = 0, locked = false;
+  function phaseById(id) { return PHASES.filter(function(p) { return p.id === id; })[0]; }
 
-  function shuffle(arr) {
-    var a = arr.slice();
-    for (var i = a.length - 1; i > 0; i--) {
-      var j = Math.floor(Math.random() * (i + 1));
-      var t = a[i]; a[i] = a[j]; a[j] = t;
+  // ---- Card sets per level ----
+  function cardsForLevel(lv) {
+    if (lv === 'einfach') {
+      return PHASES.map(function(p, i) { return {id: i + 1, text: p.name, phase: p.id}; });
     }
-    return a;
+    var cards = [];
+    PHASES.forEach(function(p) {
+      p.points.forEach(function(pt) { cards.push({text: pt, phase: p.id}); });
+    });
+    cards.forEach(function(c, i) { c.id = i + 1; });
+    return cards;
   }
+
+  var level = 'einfach';
+  var KARTEN = [];
+  var karteById = {};
+
+  // --- Drag state ---
+  var dragId       = null;
+  var dragSource   = null;
+  var dragFromPool = false;
+
+  // --- Click-to-place state ---
+  var selectedId = null;
 
   function svgEl(tag, attrs) {
     var el = document.createElementNS('http://www.w3.org/2000/svg', tag);
@@ -253,7 +348,6 @@
   function drawBase(svg, revealAll) {
     svg.innerHTML = '';
 
-    /* Achsen */
     svg.appendChild(svgEl('line', {x1: AX, y1: AY_TOP, x2: AX, y2: AY_BASE, stroke: '#cbd5e1', 'stroke-width': 2}));
     svg.appendChild(svgEl('line', {x1: AX, y1: AY_BASE, x2: AX_END, y2: AY_BASE, stroke: '#cbd5e1', 'stroke-width': 2}));
     var yLabel = svgEl('text', {x: 18, y: AY_TOP + 30, 'font-size': 12, fill: '#94a3b8', 'font-family': 'system-ui,sans-serif', transform: 'rotate(-90 18 ' + (AY_TOP + 30) + ')'});
@@ -263,12 +357,10 @@
     xLabel.textContent = 'Zeit';
     svg.appendChild(xLabel);
 
-    /* Phasen-Zonen (Hintergrund) */
     PHASES.forEach(function(p) {
       var rect = svgEl('rect', {
         x: p.x1, y: AY_TOP, width: p.x2 - p.x1, height: AY_BASE - AY_TOP,
-        fill: p.color, 'fill-opacity': revealAll ? 0.22 : 0.001,
-        class: 'zone', 'data-id': p.id
+        fill: p.color, 'fill-opacity': revealAll ? 0.22 : 0.001
       });
       svg.appendChild(rect);
       if (p.x1 !== AX) {
@@ -276,7 +368,6 @@
       }
     });
 
-    /* Kurve */
     var d = 'M ' + CURVE_PTS[0].x + ' ' + CURVE_PTS[0].y;
     for (var i = 1; i < CURVE_PTS.length; i++) d += ' L ' + CURVE_PTS[i].x + ' ' + CURVE_PTS[i].y;
     svg.appendChild(svgEl('path', {d: d, fill: 'none', stroke: 'var(--blue-dark)', 'stroke-width': 3, 'stroke-linejoin': 'round'}));
@@ -291,67 +382,276 @@
     }
   }
 
-  function startGame() {
-    document.getElementById('startOverlay').classList.add('hidden');
-    document.getElementById('endScreen').classList.remove('visible');
-    document.getElementById('recap').classList.remove('visible');
-    document.getElementById('diagramWrap').style.display = 'block';
-    document.getElementById('questionCard').style.display = 'flex';
-    document.getElementById('feedbackBar').className = 'feedback-bar';
-    questions = shuffle(PHASES.map(function(_, i) { return i; }));
-    current = 0; score = 0; locked = false;
-    var svg = document.getElementById('curveSvg');
-    drawBase(svg, false);
-    attachZoneClicks();
-    showQuestion();
+  // ---- Level switching ----
+  function setLevel(lv) {
+    level = lv;
+    document.getElementById('lvl-einfach').classList.toggle('active', lv === 'einfach');
+    document.getElementById('lvl-schwer').classList.toggle('active', lv === 'schwer');
+    document.getElementById('subtitle').textContent = lv === 'einfach'
+      ? 'Ziehen Sie jede Phase an die richtige Stelle der Wachstumskurve.'
+      : 'Ziehen Sie jedes Merkmal zur richtigen Phase.';
+    document.getElementById('instruction').textContent = lv === 'einfach'
+      ? 'Ziehen Sie die vier Phasen an die richtige Stelle der Wachstumskurve.'
+      : 'Ziehen Sie alle Merkmale zur passenden Phase. Achtung: Stationäre Phase und Absterbephase haben beide mit Nährstoffmangel zu tun.';
+    buildDropRow();
+    init();
   }
 
-  function attachZoneClicks() {
-    var zones = document.querySelectorAll('#curveSvg .zone');
-    zones.forEach(function(z) {
-      z.addEventListener('click', function() { onZoneClick(z.getAttribute('data-id')); });
+  // ---- Drop row (built per level: unlabeled for einfach, phase-labeled for schwer) ----
+  function buildDropRow() {
+    var row = document.getElementById('dropRow');
+    row.innerHTML = '';
+    PHASES.forEach(function(p) {
+      var zone = document.createElement('div');
+      zone.className = 'drop-zone';
+      zone.dataset.phase = p.id;
+      var label = document.createElement('div');
+      label.className = 'drop-zone-label' + (level === 'einfach' ? ' hidden' : '');
+      label.textContent = p.name;
+      zone.appendChild(label);
+      row.appendChild(zone);
+    });
+    setupZones();
+  }
+
+  // ---- Init ----
+  function init() {
+    dragId = dragSource = null;
+    selectedId = null;
+    KARTEN = cardsForLevel(level);
+    karteById = {};
+    KARTEN.forEach(function(k) { karteById[k.id] = k; });
+    buildPool();
+    clearAllZones();
+    document.getElementById('resultBanner').className = 'result-banner';
+    document.getElementById('recap').classList.remove('visible');
+    drawBase(document.getElementById('curveSvg'), false);
+  }
+
+  // ---- Card pool ----
+  function buildPool() {
+    var pool = document.getElementById('cardPool');
+    pool.innerHTML = '';
+    var shuffled = MTDnD.shuffle(KARTEN.slice());
+    shuffled.forEach(function(k) { pool.appendChild(makePoolChip(k)); });
+  }
+
+  function makePoolChip(k) {
+    var chip = document.createElement('span');
+    chip.className = 'karte';
+    chip.textContent = k.text;
+    chip.dataset.id = k.id;
+    chip.setAttribute('draggable', 'true');
+
+    chip.addEventListener('dragstart', function(e) {
+      dragId = k.id;
+      dragSource = chip;
+      dragFromPool = true;
+      chip.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    chip.addEventListener('dragend', function() { chip.classList.remove('dragging'); });
+
+    chip.addEventListener('touchstart', function(e) {
+      MTDnD.touchStart(e, chip, k.id, false, '.drop-zone', onDrop);
+    }, {passive: false});
+
+    chip.addEventListener('click', function() { selectPoolChip(chip, k.id); });
+
+    return chip;
+  }
+
+  // ---- Click-to-place ----
+  function selectPoolChip(chip, id) {
+    if (chip.classList.contains('used')) return;
+    if (selectedId === id) {
+      chip.classList.remove('selected');
+      selectedId = null;
+      clearReadyZones();
+      return;
+    }
+    document.querySelectorAll('.karte.selected').forEach(function(c) { c.classList.remove('selected'); });
+    chip.classList.add('selected');
+    selectedId = id;
+    document.querySelectorAll('.drop-zone').forEach(function(z) {
+      z.classList.remove('ready');
+      if (!z.classList.contains('checked')) z.classList.add('ready');
     });
   }
 
-  function showQuestion() {
-    if (current >= questions.length) { showEndScreen(); return; }
-    var phase = PHASES[questions[current]];
-    document.getElementById('questionText').innerHTML = 'Klick auf: <span>' + phase.name + '</span>';
-    document.getElementById('progressBadge').textContent = (current + 1) + ' / ' + questions.length;
-    document.getElementById('feedbackBar').className = 'feedback-bar';
-    locked = false;
+  function clickZone(zone) {
+    if (zone.classList.contains('checked')) return;
+    if (selectedId === null) return;
+    placeCardInZone(zone, selectedId);
+    markPoolChipUsed(selectedId);
+    selectedId = null;
+    document.querySelectorAll('.karte.selected').forEach(function(c) { c.classList.remove('selected'); });
+    clearReadyZones();
   }
 
-  function onZoneClick(id) {
-    if (locked) return;
-    locked = true;
-    var target = PHASES[questions[current]];
-    var correct = id === target.id;
-    var clicked = PHASES.filter(function(p) { return p.id === id; })[0];
-
-    var bar = document.getElementById('feedbackBar');
-    if (correct) {
-      score++;
-      bar.className = 'feedback-bar visible correct-fb';
-      bar.innerHTML = '✓  ' + target.name + ' – Richtig!<div class="feedback-detail">' + target.points[0] + '</div>';
-      setTimeout(function() { current++; showQuestion(); }, 1800);
+  function clickPlacedKarte(el, id, zone) {
+    if (el.classList.contains('correct') || el.classList.contains('wrong')) return;
+    if (selectedId !== null) {
+      returnToPool(id);
+      removeFromZone(zone, id);
+      placeCardInZone(zone, selectedId);
+      markPoolChipUsed(selectedId);
+      selectedId = null;
+      document.querySelectorAll('.karte.selected').forEach(function(c) { c.classList.remove('selected'); });
+      clearReadyZones();
     } else {
-      bar.className = 'feedback-bar visible wrong-fb';
-      bar.innerHTML = '✗  Das war die ' + clicked.name + '. Gesucht war: ' + target.name + '.';
-      setTimeout(function() { current++; showQuestion(); }, 2200);
+      returnToPool(id);
+      removeFromZone(zone, id);
     }
   }
 
-  function showEndScreen() {
-    document.getElementById('diagramWrap').style.display = 'none';
-    document.getElementById('questionCard').style.display = 'none';
-    document.getElementById('feedbackBar').className = 'feedback-bar';
-    document.getElementById('endScore').textContent = score + ' / ' + questions.length;
-    document.getElementById('endScreen').classList.add('visible');
+  function clearReadyZones() {
+    document.querySelectorAll('.drop-zone').forEach(function(z) { z.classList.remove('ready'); });
   }
 
+  // ---- Zone management ----
+  function clearAllZones() {
+    document.querySelectorAll('.drop-zone').forEach(function(z) {
+      z.querySelectorAll('.placed-karte').forEach(function(el) { z.removeChild(el); });
+      z.classList.remove('checked', 'over', 'ready');
+    });
+  }
+
+  function placeCardInZone(zone, id) {
+    var k = karteById[id];
+    var el = document.createElement('div');
+    el.className = 'placed-karte';
+    el.textContent = k.text;
+    el.dataset.id = id;
+    el.setAttribute('draggable', 'true');
+
+    el.addEventListener('dragstart', function(e) {
+      if (el.classList.contains('correct') || el.classList.contains('wrong')) { e.preventDefault(); return; }
+      dragId = id;
+      dragSource = el;
+      dragFromPool = false;
+      el.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    el.addEventListener('dragend', function() { el.classList.remove('dragging'); });
+
+    el.addEventListener('touchstart', function(e) {
+      if (el.classList.contains('correct') || el.classList.contains('wrong')) return;
+      MTDnD.touchStart(e, el, id, true, '.drop-zone', onDrop);
+    }, {passive: false});
+
+    el.addEventListener('click', function(e) {
+      e.stopPropagation();
+      clickPlacedKarte(el, id, zone);
+    });
+
+    zone.appendChild(el);
+  }
+
+  function removeFromZone(zone, id) {
+    var children = zone.querySelectorAll('.placed-karte');
+    for (var i = 0; i < children.length; i++) {
+      if (parseInt(children[i].dataset.id) === parseInt(id)) {
+        zone.removeChild(children[i]);
+        return;
+      }
+    }
+  }
+
+  function findZoneForPlacedEl(el) { return el.closest('.drop-zone'); }
+
+  function markPoolChipUsed(id) {
+    document.querySelectorAll('.karte').forEach(function(c) {
+      if (parseInt(c.dataset.id) === parseInt(id)) c.classList.add('used');
+    });
+  }
+
+  function returnToPool(id) {
+    document.querySelectorAll('.karte').forEach(function(c) {
+      if (parseInt(c.dataset.id) === parseInt(id)) c.classList.remove('used');
+    });
+  }
+
+  // ---- Drop logic (drag & drop) ----
+  function dropOnZone(zone) {
+    if (!dragId) return;
+    if (zone.classList.contains('checked')) return;
+
+    if (!dragFromPool && dragSource) {
+      var srcZone = findZoneForPlacedEl(dragSource);
+      if (srcZone) srcZone.removeChild(dragSource);
+    } else if (dragFromPool) {
+      markPoolChipUsed(dragId);
+    }
+
+    placeCardInZone(zone, dragId);
+    dragId = dragSource = null;
+    dragFromPool = false;
+  }
+
+  function setupZones() {
+    document.querySelectorAll('.drop-zone').forEach(function(zone) {
+      zone.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        if (!zone.classList.contains('checked')) zone.classList.add('over');
+      });
+      zone.addEventListener('dragleave', function() { zone.classList.remove('over'); });
+      zone.addEventListener('drop', function(e) {
+        e.preventDefault();
+        zone.classList.remove('over');
+        dropOnZone(zone);
+      });
+      zone.addEventListener('click', function() { clickZone(zone); });
+    });
+  }
+
+  function onDrop(targetZone, id, source) {
+    if (targetZone.classList.contains('checked')) return;
+    if (source.isSlot) {
+      var srcZone = findZoneForPlacedEl(source.el);
+      if (srcZone) srcZone.removeChild(source.el);
+    } else {
+      markPoolChipUsed(id);
+    }
+    placeCardInZone(targetZone, id);
+  }
+
+  // ---- Check & Reset ----
+  function checkAll() {
+    var correct = 0, total = 0;
+
+    document.querySelectorAll('.drop-zone').forEach(function(zone) {
+      var correctPhase = zone.dataset.phase;
+      zone.classList.add('checked');
+
+      zone.querySelectorAll('.placed-karte').forEach(function(el) {
+        var id = parseInt(el.dataset.id);
+        var k = karteById[id];
+        total++;
+        el.classList.remove('placed-karte');
+        if (k.phase === correctPhase) {
+          el.classList.add('placed-karte', 'correct');
+          correct++;
+        } else {
+          el.classList.add('placed-karte', 'wrong');
+        }
+        el.setAttribute('draggable', 'false');
+      });
+    });
+
+    var banner = document.getElementById('resultBanner');
+    if (correct === KARTEN.length && total === KARTEN.length) {
+      banner.textContent = 'Perfekt! Alle ' + KARTEN.length + ' Karten richtig zugeordnet.';
+      banner.className = 'result-banner show perfect';
+    } else {
+      banner.textContent = correct + ' von ' + total + ' Karten korrekt platziert. Rot markierte Karten nochmals überprüfen.';
+      banner.className = 'result-banner show partial';
+    }
+  }
+
+  function resetAll() { init(); }
+
   function showRecap() {
-    document.getElementById('endScreen').classList.remove('visible');
     var recap = document.getElementById('recap');
     recap.innerHTML = '';
     PHASES.forEach(function(p) {
@@ -364,11 +664,11 @@
       recap.appendChild(card);
     });
     recap.classList.add('visible');
-
-    var diagramWrap = document.getElementById('diagramWrap');
-    diagramWrap.style.display = 'block';
     drawBase(document.getElementById('curveSvg'), true);
   }
+
+  buildDropRow();
+  init();
 </script>
 </body>
 </html>
