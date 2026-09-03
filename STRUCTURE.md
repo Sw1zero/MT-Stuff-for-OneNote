@@ -93,6 +93,7 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 │   ├── tabellen-luecken-kontrolle.html
 │   ├── tabellen-luecken-milchsaeuregaerung.html
 │   ├── quiz-abweichungen-phagen.html
+│   ├── zuordnung-vermehrungszyklus.html   ← 3 Stufen (Einfach=Wahr/Falsch, Mittel=Diagramm beschriften mit exakten %-Zonen über den Ellipsen, Schwer=lytisch/lysogen sortieren)
 │   ├── kreuzwortraetsel-kulturen.html
 │   ├── spiel-homofermentativ.html
 │   ├── zuordnung-kulturenformen.html      ← 3 Stufen (Einfach/Mittel/Schwer); Vor-/Nachteile Kulturenformen
