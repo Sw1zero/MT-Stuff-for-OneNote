@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zuordnung – Prozessparameter Emmentaler / Gruyère</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="../assets/dnd.js"></script>
+  <script src="../assets/zellen-zuordnung.js"></script>
+  <style>
+    .back-link {
+      display: inline-block;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      margin-bottom: 1.5rem;
+      transition: color 0.15s;
+    }
+    .back-link:hover { color: var(--red); }
+
+    .instruction {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      margin-bottom: 1.25rem;
+      text-align: center;
+    }
+
+    .word-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      background: var(--blue-light);
+      border-radius: var(--radius-md);
+      padding: 0.9rem 1rem;
+      margin-bottom: 1.5rem;
+      min-height: 52px;
+    }
+    .word-chip {
+      font-family: var(--font);
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 20px;
+      padding: 0.3rem 0.85rem;
+      cursor: pointer;
+      color: var(--text);
+      transition: all 0.15s;
+      line-height: 1.4;
+    }
+    .word-chip:hover   { border-color: var(--blue); }
+    .word-chip.selected { background: var(--blue); border-color: var(--blue); color: #fff; }
+    .word-chip.used     { opacity: 0.22; pointer-events: none; }
+    .word-chip.dragging { opacity: 0.4; }
+
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.5rem;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+    .compare-table th,
+    .compare-table td {
+      padding: 0.7rem 0.9rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.86rem;
+      vertical-align: middle;
+    }
+    .compare-table tr:last-child td { border-bottom: none; }
+    .compare-table thead th {
+      background: var(--red);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+    .compare-table thead th:first-child { background: #c40027; }
+    .compare-table td.prop-label {
+      font-weight: 600;
+      color: var(--text);
+      background: #f8f9fb;
+      width: 22%;
+      line-height: 1.4;
+    }
+
+    .blank-cell {
+      min-width: 200px;
+      min-height: 36px;
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.3rem 0.65rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-subtle);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      transition: all 0.15s;
+    }
+    .blank-cell.ready  { border-color: var(--blue); border-style: solid; background: #f0f7ff; }
+    .blank-cell.filled { border-style: solid; border-color: var(--blue); color: var(--text); }
+    .blank-cell.correct { border-color: #16a34a !important; background: #f0fdf4 !important; color: #15803d !important; }
+    .blank-cell.wrong   { border-color: var(--red) !important; background: var(--red-light) !important; color: var(--red) !important; }
+    .blank-cell.over    { border-color: var(--blue); border-style: solid; background: #e0f2fe; }
+
+    .info-box {
+      background: #f0f7ff;
+      border-left: 3px solid var(--blue);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 0.75rem 1rem;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+    .info-box strong { color: var(--text); }
+
+    .btn-row { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+    .result-banner {
+      margin-top: 1.25rem;
+      padding: 0.9rem 1rem;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.92rem;
+      text-align: center;
+      display: none;
+    }
+    .result-banner.show    { display: block; }
+    .result-banner.perfect { background: #f0fdf4; color: #15803d; border: 1.5px solid #bbf7d0; }
+    .result-banner.partial { background: #fff7ed; color: #c2410c; border: 1.5px solid #fed7aa; }
+
+    @media (max-width: 560px) {
+      .compare-table th,
+      .compare-table td { padding: 0.5rem 0.5rem; font-size: 0.74rem; }
+      .blank-cell { min-width: 120px; font-size: 0.72rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+  <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · b.1</span>
+  <h1>Prozessparameter zuordnen</h1>
+  <p>Emmentaler AOP oder Gruyère AOP – welcher Wert gehört zu welcher Sorte?</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+  <a class="back-link" href="../index.html">← Alle Lerntools</a>
+
+  <p class="instruction">Ordnen Sie jeden Prozessparameter der richtigen Käsesorte zu – jede Zelle bekommt einen eigenen Wert.</p>
+
+  <div class="word-bank" id="wordBank"></div>
+
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th>Prozessparameter</th>
+        <th>Emmentaler AOP</th>
+        <th>Gruyère AOP</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="prop-label">Brenntemperatur</td>
+        <td><span class="blank-cell" data-answer="ca. 52–53 °C">—</span></td>
+        <td><span class="blank-cell" data-answer="ca. 56–58 °C">—</span></td>
+      </tr>
+      <tr>
+        <td class="prop-label">Kulturen</td>
+        <td><span class="blank-cell" data-answer="mit Propionibacterium freudenreichii">—</span></td>
+        <td><span class="blank-cell" data-answer="ohne ausgeprägte Propionibacterium freudenreichii">—</span></td>
+      </tr>
+      <tr>
+        <td class="prop-label">Laibgrösse</td>
+        <td><span class="blank-cell" data-answer="sehr grosse Laibe (75–120 kg)">—</span></td>
+        <td><span class="blank-cell" data-answer="grosse Laibe (25–40 kg)">—</span></td>
+      </tr>
+      <tr>
+        <td class="prop-label">Reifung / Gärung</td>
+        <td><span class="blank-cell" data-answer="lange Gärphase im Gärkeller für die Lochbildung">—</span></td>
+        <td><span class="blank-cell" data-answer="Reifung in feuchten Naturkellern">—</span></td>
+      </tr>
+      <tr>
+        <td class="prop-label">Bruchgrösse</td>
+        <td><span class="blank-cell" data-answer="4–6 mm (Weizen- bis Maiskorngrösse)">—</span></td>
+        <td><span class="blank-cell" data-answer="etwa Weizenkorngrösse">—</span></td>
+      </tr>
+      <tr>
+        <td class="prop-label">Salzbad</td>
+        <td><span class="blank-cell" data-answer="bis 48h (ca. 2 Tage)">—</span></td>
+        <td><span class="blank-cell" data-answer="24–36h (ca. 1–1.5 Tage)">—</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="info-box">
+    <strong>Merke:</strong> Emmentaler AOP bildet grosse Löcher dank langer Propionsäuregärung im Gärkeller –
+    Gruyère AOP wird ohne ausgeprägte Propionibacterium-Kulturen hergestellt und bleibt darum praktisch lochfrei.
+  </div>
+
+  <div class="btn-row">
+    <button type="button" class="btn btn-primary" onclick="ZellenZuordnung.checkAll()">Überprüfen</button>
+    <button type="button" class="btn btn-ghost"   onclick="ZellenZuordnung.resetAll()">Zurücksetzen</button>
+  </div>
+
+  <div class="result-banner" id="resultBanner"></div>
+
+</main>
+
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+
+<script>
+ZellenZuordnung.init({
+  answers: [
+    'ca. 52–53 °C', 'ca. 56–58 °C',
+    'mit Propionibacterium freudenreichii', 'ohne ausgeprägte Propionibacterium freudenreichii',
+    'sehr grosse Laibe (75–120 kg)', 'grosse Laibe (25–40 kg)',
+    'lange Gärphase im Gärkeller für die Lochbildung', 'Reifung in feuchten Naturkellern',
+    '4–6 mm (Weizen- bis Maiskorngrösse)', 'etwa Weizenkorngrösse',
+    'bis 48h (ca. 2 Tage)', '24–36h (ca. 1–1.5 Tage)'
+  ]
+});
+</script>
+
+</body>
+</html>
