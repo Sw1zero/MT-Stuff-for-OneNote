@@ -227,9 +227,10 @@
       toast.classList.add('show', correct ? 'correct' : 'wrong');
     });
 
+    var readMs = Math.min(7000, Math.max(2800, text.length * 55));
     toastTimer = setTimeout(function () {
       toast.classList.remove('show');
-    }, 2800);
+    }, readMs);
   }
 
   function showEnd() {
