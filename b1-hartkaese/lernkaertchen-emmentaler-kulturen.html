@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lernkärtchen b.1 – Emmentaler-Kulturen</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .page-main { display: flex; flex-direction: column; align-items: center; }
+
+    .back-link {
+      font-size: 0.78rem;
+      color: var(--text-subtle);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 20px;
+      align-self: flex-start;
+    }
+    .back-link:hover { color: var(--red); }
+
+    .filter-wrap    { max-width: 500px; margin-bottom: 24px; }
+    .progress-text  { margin-bottom: 10px; }
+
+    .progress-bar-wrap {
+      width: 440px;
+      max-width: 90vw;
+      margin-bottom: 28px;
+    }
+
+    .scene {
+      width: 460px;
+      max-width: 92vw;
+      height: 310px;
+      perspective: 900px;
+      cursor: pointer;
+      margin-bottom: 32px;
+    }
+
+    .card {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .card.flipped { transform: rotateY(180deg); }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: var(--radius-lg);
+      padding: 32px 36px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      box-shadow: var(--shadow-md);
+    }
+    .card-front { background: var(--surface); }
+    .card-back  { background: var(--blue-light); transform: rotateY(180deg); }
+
+    .card-category-badge {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-bottom: 14px;
+      align-self: flex-start;
+    }
+
+    .card-term { font-size: 1.28rem; font-weight: 700; color: var(--text); line-height: 1.35; }
+    .card-hint { margin-top: 14px; font-size: 0.74rem; color: var(--text-subtle); }
+    .card-explanation { font-size: 0.98rem; color: var(--text); line-height: 1.58; }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+
+    .rating-row { display: flex; gap: 10px; justify-content: center; margin-bottom: 12px; }
+
+    .btn-danger { background: var(--red); color: #fff; box-shadow: 0 2px 8px rgba(204,51,51,0.25); }
+    .btn-danger:hover { background: var(--red-dark); }
+
+    .complete-panel {
+      width: 460px;
+      max-width: 92vw;
+      padding: 40px 36px;
+      text-align: center;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      margin-bottom: 32px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+  </style>
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+  <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · b.1</span>
+  <h1>Emmentaler AOP – Kulturen</h1>
+  <p>Klicken oder <kbd>Leertaste</kbd> zum Umdrehen</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+  <a class="back-link" href="../index.html">← Alle Lerntools</a>
+
+  <div class="filter-wrap" id="filterWrap"></div>
+
+  <div class="progress-text" id="progressText"></div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progressBar"></div>
+  </div>
+
+  <div class="scene" id="scene">
+    <div class="card" id="card">
+      <div class="card-face card-front">
+        <span class="card-category-badge" id="frontLabel"></span>
+        <div class="card-term" id="frontTerm"></div>
+        <div class="card-hint">Karte umdrehen für die Erklärung</div>
+      </div>
+      <div class="card-face card-back">
+        <span class="card-category-badge" id="backLabel"></span>
+        <div class="card-explanation" id="backExplanation"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="complete-panel" id="completePanel" hidden>
+    <p id="completeText">Alle Karten gewusst.</p>
+  </div>
+
+  <div class="rating-row" id="ratingRow" hidden>
+    <button class="btn btn-danger" id="unknownBtn">Wusste ich nicht</button>
+    <button class="btn btn-success" id="knownBtn">Wusste ich</button>
+  </div>
+
+  <div class="controls" id="controlsNav">
+    <button class="btn btn-ghost" id="prevBtn">&#8592; Zurück</button>
+    <button class="btn btn-success" id="flipBtn">Umdrehen</button>
+    <button class="btn btn-ghost" id="nextBtn">Weiter &#8594;</button>
+  </div>
+  <div class="controls">
+    <button class="btn btn-primary" id="shuffleBtn">&#x21C4; Mischen</button>
+  </div>
+
+  <p class="keyboard-hint" style="margin-top:12px;">
+    <kbd>&#8592;</kbd> <kbd>&#8594;</kbd> navigieren &nbsp;|&nbsp;
+    <kbd>Leertaste</kbd> umdrehen &nbsp;|&nbsp;
+    <kbd>S</kbd> mischen
+  </p>
+
+</main>
+
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+
+  <script>
+    var ALL_CARDS = [
+      {
+        term: "Thermophile, homofermentative Rohmischkultur (RMK)",
+        explanation: "Wirkt bei hoher Reife- und Brenntemperatur (bis 53 °C) und sorgt für die schnelle Anfangssäuerung – wandelt Laktose fast ausschliesslich zu Milchsäure um (homofermentativ, kein unerwünschtes Nebenprodukt). Die Säureproduktion fördert zudem die Synärese (Entwässerung) des Bruchkorns.",
+        category: "Mikrobiologie"
+      },
+      {
+        term: "Fakultativ heterofermentative Laktobazillenkultur",
+        explanation: "Übernimmt nach der RMK den vollständigen Abbau der restlichen Laktose – wichtig für den laktosefreien Käse vor Beginn der Propionsäuregärung. Ihre Hauptfunktion ist die Proteolyse: sie spaltet Kasein in Peptide und Aminosäuren, die Bausteine für das spätere Aroma und die geschmeidig-feste Textur.",
+        category: "Mikrobiologie"
+      },
+      {
+        term: "Propionsäurebakterienkultur (Propionibacterium freudenreichii)",
+        explanation: "Vergärt im warmen Gärkeller (ca. 20–24 °C) die von den Milchsäurebakterien gebildete Milchsäure zu Propionsäure, Essigsäure und CO₂. Das CO₂ bildet die grossen, typischen Löcher; die Propionsäure gibt das süsslich-nussige Aroma. Verstoffwechselt zusätzlich freie Aminosäuren (z. B. Aspartat) aus der Proteolyse der Laktobazillen.",
+        category: "Mikrobiologie"
+      }
+    ];
+
+    var CATEGORY_COLORS = {
+      "Mikrobiologie": { bg: "#f3e8ff", fg: "#6b21a8" }
+    };
+  </script>
+  <script src="../assets/lernkaertchen-engine.js"></script>
+  <script>
+    MTFlashcards.init({ cards: ALL_CARDS, categoryColors: CATEGORY_COLORS });
+  </script>
+</body>
+</html>

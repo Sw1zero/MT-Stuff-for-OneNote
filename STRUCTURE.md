@@ -35,6 +35,9 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 │   ├── zuordnung-verordnungen.html
 │   ├── sortierer-reifungsschritte-emmentaler.html
 │   ├── zuordnung-prozessparameter.html
+│   ├── wahr-falsch-emmentaler-pflichtenheft.html
+│   ├── lernkaertchen-emmentaler-kulturen.html
+│   ├── lueckentext-propionsaeuregaerung.html
 │   └── animation-wasserzusatz-teigelastizitaet.html
 ├── b5-quark/
 │   └── animation-labgerinnung.html
