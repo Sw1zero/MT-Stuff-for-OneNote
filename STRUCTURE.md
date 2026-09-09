@@ -38,6 +38,8 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 │   ├── wahr-falsch-emmentaler-pflichtenheft.html
 │   ├── lernkaertchen-emmentaler-kulturen.html
 │   ├── lueckentext-propionsaeuregaerung.html
+│   ├── wahr-falsch-gruyere-mechanismus.html
+│   ├── wahr-falsch-sbrinz-signatur.html
 │   └── animation-wasserzusatz-teigelastizitaet.html
 ├── b5-quark/
 │   └── animation-labgerinnung.html
