@@ -263,6 +263,15 @@
       });
     }
 
+    /* ponytail: k[fieldName] darf auch ein Array sein (Karte passt in mehrere
+       Zonen, z.B. eine Kultur, die bei mehreren Kaesesorten eingesetzt wird) --
+       einzelne Karten-Instanzen bleiben trotzdem je einmal platzierbar, nur
+       die Zonen-Zugehoerigkeit ist nicht mehr 1:1. Upgrade: echte Mehrfach-
+       Platzierung DERSELBEN Karte in mehrere Zonen gleichzeitig, falls noetig. */
+    function fieldMatches(val, correctVal) {
+      return Array.isArray(val) ? val.indexOf(correctVal) !== -1 : val === correctVal;
+    }
+
     function checkEinfach(selector) {
       var correct = 0, total = 0;
       document.querySelectorAll(selector || '.drop-zone').forEach(function(zone) {
@@ -273,7 +282,7 @@
           var k = karteById[id];
           total++;
           el.classList.remove('placed-karte');
-          if (k[fieldName] === correctVal) { el.classList.add('placed-karte', 'correct'); correct++; }
+          if (fieldMatches(k[fieldName], correctVal)) { el.classList.add('placed-karte', 'correct'); correct++; }
           else { el.classList.add('placed-karte', 'wrong'); }
           el.setAttribute('draggable', 'false');
         });

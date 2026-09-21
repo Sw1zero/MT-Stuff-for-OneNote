@@ -31,6 +31,7 @@
       line-height: 1.5;
     }
 
+    /* ---------- Einfach: Karten-Pool ---------- */
     .card-pool {
       display: flex;
       flex-wrap: wrap;
@@ -45,18 +46,18 @@
 
     .karte {
       font-family: var(--font);
-      font-size: 0.80rem;
+      font-size: 0.78rem;
       font-weight: 500;
       background: var(--surface);
       border: 2px solid var(--border);
       border-radius: var(--radius-sm);
-      padding: 0.38rem 0.75rem;
+      padding: 0.35rem 0.7rem;
       cursor: grab;
       color: var(--text);
-      line-height: 1.45;
+      line-height: 1.4;
       user-select: none;
       touch-action: none;
-      max-width: 280px;
+      max-width: 240px;
       transition: border-color 0.15s, box-shadow 0.15s, opacity 0.15s;
     }
     .karte:hover { border-color: var(--blue); }
@@ -68,32 +69,18 @@
       color: #fff;
     }
 
-    .sorte-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-    }
-    @media (max-width: 700px) {
-      .sorte-grid { grid-template-columns: repeat(1, 1fr); }
-    }
-
-    .sorte-card {
+    .sorte-row {
       background: var(--surface);
       border-radius: var(--radius-lg);
       box-shadow: var(--shadow-sm);
-      padding: 0.9rem 0.8rem;
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      gap: 0.6rem;
+      padding: 0.85rem 1rem;
+      margin-bottom: 0.85rem;
     }
     .sorte-name {
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: 700;
       color: var(--blue-dark);
-      text-align: center;
-      line-height: 1.3;
+      margin-bottom: 0.55rem;
     }
 
     .drop-zone {
@@ -101,10 +88,11 @@
       min-height: 44px;
       border: 2px dashed var(--border);
       border-radius: var(--radius-sm);
-      padding: 0.3rem 0.4rem;
+      padding: 0.4rem;
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
-      justify-content: center;
+      gap: 0.35rem;
       background: #fafbfc;
       transition: all 0.15s;
     }
@@ -121,18 +109,17 @@
 
     .placed-karte {
       font-family: var(--font);
-      font-size: 0.76rem;
+      font-size: 0.74rem;
       font-weight: 500;
       background: var(--surface);
       border: 2px solid var(--blue);
       border-radius: var(--radius-sm);
-      padding: 0.28rem 0.5rem;
+      padding: 0.26rem 0.5rem;
       color: var(--text);
       cursor: grab;
       user-select: none;
       touch-action: none;
-      line-height: 1.35;
-      text-align: center;
+      line-height: 1.3;
       transition: border-color 0.15s, background 0.15s;
     }
     .placed-karte:hover { border-color: var(--blue-dark); }
@@ -152,44 +139,74 @@
       pointer-events: none;
     }
 
-    /* Mittel: Multiple-Choice-Buttons pro Sorte */
-    .mc-cell { display: flex; flex-direction: column; gap: 0.35rem; width: 100%; }
-    .mc-btn {
-      font-family: var(--font);
-      font-size: 0.74rem;
-      text-align: left;
+    /* ---------- Mittel: Matrix zum Anklicken ---------- */
+    .table-scroll { overflow-x: auto; margin-bottom: 1rem; }
+    .matrix-table {
+      border-collapse: collapse;
       background: var(--surface);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      min-width: 720px;
+    }
+    .matrix-table th, .matrix-table td {
+      padding: 0.5rem 0.4rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.72rem;
+      text-align: center;
+      vertical-align: middle;
+    }
+    .matrix-table thead th {
+      background: var(--red);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.68rem;
+      line-height: 1.25;
+      padding: 0.6rem 0.4rem;
+    }
+    .matrix-table thead th:first-child { background: #c40027; }
+    .matrix-table tr:last-child td { border-bottom: none; }
+    .matrix-table td.sorte-label {
+      font-weight: 600;
+      color: var(--text);
+      background: #f8f9fb;
+      text-align: left;
+      white-space: nowrap;
+      padding-left: 0.75rem;
+    }
+    .cell-toggle {
+      font-size: 1rem;
+      width: 34px;
+      height: 34px;
       border: 1.5px solid var(--border);
       border-radius: var(--radius-sm);
-      padding: 0.35rem 0.5rem;
+      background: var(--surface);
       cursor: pointer;
-      color: var(--text);
-      line-height: 1.3;
+      color: var(--text-muted);
       transition: all 0.15s;
     }
-    .mc-btn:hover { border-color: var(--blue); background: #f0f7ff; }
-    .mc-btn.correct { border-color: #16a34a; background: #f0fdf4; color: #15803d; cursor: default; }
-    .mc-btn.wrong   { border-color: var(--red); background: var(--red-light); color: var(--red); cursor: default; }
-    .mc-btn.locked  { pointer-events: none; opacity: 0.55; }
-    .mc-btn.locked.correct, .mc-btn.locked.wrong { opacity: 1; }
+    .cell-toggle:hover { border-color: var(--blue); }
+    .cell-toggle.checked { background: var(--blue); border-color: var(--blue); color: #fff; }
+    .cell-toggle.correct { background: #f0fdf4 !important; border-color: #16a34a !important; color: #15803d !important; cursor: default; }
+    .cell-toggle.wrong   { background: var(--red-light) !important; border-color: var(--red) !important; color: var(--red) !important; cursor: default; }
+    .cell-toggle.locked  { pointer-events: none; }
 
-    /* Schwer: Freitext-Eingabe */
+    /* ---------- Schwer: Freitext pro Sorte ---------- */
     .type-input {
       width: 100%;
       font-family: var(--font);
       font-size: 0.8rem;
-      padding: 0.4rem 0.5rem;
+      padding: 0.45rem 0.6rem;
       border: 1.5px solid var(--border);
       border-radius: var(--radius-sm);
       background: #f8fafc;
       color: var(--text);
       transition: border-color 0.15s;
-      text-align: center;
     }
     .type-input:focus { outline: none; border-color: var(--blue); background: #fff; }
     .type-input.correct { border-color: #16a34a; background: #f0fdf4; }
     .type-input.wrong { border-color: var(--red); background: var(--red-light); }
-    .type-sol { font-size: 0.68rem; color: #15803d; margin-top: 3px; display: none; text-align: center; }
+    .type-sol { font-size: 0.7rem; color: #15803d; margin-top: 5px; display: none; }
 
     .btn-row {
       display: flex;
@@ -219,7 +236,7 @@
   <div class="header-text">
     <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · b.2</span>
     <h1>Kulturen zuordnen</h1>
-    <p>Welche Kultur passt zu welcher Halbhartkäse-Sorte?</p>
+    <p>Welche Kultur(en) passen zu welcher Halbhartkäse-Sorte? Mehrfachzuweisung möglich.</p>
   </div>
   <div class="header-logos">
     <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
@@ -255,31 +272,69 @@
 </footer>
 
 <script>
-var KARTEN = [
-  { id: 1, sorte: "Tilsiter",                          match: "tilsiter",    text: "Rohmischkultur (RMK) + Lochbildner",                            keys: ["rmk", "rohmischkultur", "lochbildner"] },
-  { id: 2, sorte: "Appenzeller",                        match: "appenzeller", text: "Rohmischkultur (RMK) + Lochbildner + Herkunftsnachweiskultur", keys: ["rmk", "rohmischkultur", "herkunftsnachweis"] },
-  { id: 3, sorte: "Past. Halbhartkäse (z.B. Raclette)", match: "raclette",    text: "Mesophile Starterkultur (pasteurisiert)",            keys: ["mesophil", "starterkultur", "saeurewecker", "direktkultur"] },
-  { id: 4, sorte: "Tête de Moine AOP",                  match: "tetedemoine", text: "Rohmischkultur (RMK), ohne Lochbildner",             keys: ["rmk", "rohmischkultur"] },
-  { id: 5, sorte: "Vacherin Fribourgeois AOP",          match: "vacherin",    text: "Mesophile, heterofermentative Starterkultur",        keys: ["mesophil", "starterkultur", "saeurewecker", "heterofermentativ"] }
+/* Datengrundlage: Lehrmittel b.2 (S. 26/30/38-39/47) + LS_b.2_start-halbhartkaese-kulturen.md
+   Aufgabe 4 -- dieselben 8 Kulturtypen-Spalten wie im Arbeitsblatt. */
+var KULTUR_TYPEN = [
+  "Mesophile Starterkulturen",
+  "Gefriergetrocknete Direktkulturen",
+  "Thermophile Sc und Lb",
+  "Joghurtkultur",
+  "RMK «jung» (z.B. RMK 280)",
+  "RMK «alt» (z.B. RMK 291)",
+  "FSML",
+  "Lochbildner"
+];
+/* Schwer-Stufe: groebere Kernbegriffe, RMK jung/alt zu einem Begriff zusammengefasst
+   (Freitext-Erkennung fuer "jung" vs "alt" waere nicht robust genug). */
+var KULTUR_KEYS = [
+  ["mesophil", "starterkultur", "saeurewecker"],
+  ["direktkultur", "gefriergetrocknet"],
+  ["thermophil"],
+  ["joghurt", "jogurt"],
+  ["rmk", "rohmischkultur"],
+  ["rmk", "rohmischkultur"],
+  ["fsml"],
+  ["lochbildner"]
 ];
 
-var engine = Zuordnung3.karten.createEngine(KARTEN, 'match', { singleSlot: true });
+var SORTEN = [
+  { slug: "tilsiter",    name: "Tilsiter",                          correct: [3, 4, 5, 6, 7] },
+  { slug: "appenzeller", name: "Appenzeller",                       correct: [3, 4, 5, 6, 7] },
+  { slug: "raclette",    name: "Past. Halbhartkäse (z.B. Raclette)", correct: [0, 1, 2] },
+  { slug: "tetedemoine", name: "Tête de Moine AOP",                 correct: [3, 4, 5] },
+  { slug: "vacherin",    name: "Vacherin Fribourgeois AOP",         correct: [0] }
+];
 
-var mcScore = 0, mcTotal = 0;
+/* ---------- KARTEN fuer Einfach: eine Karten-Instanz pro (Sorte, Kulturtyp)-Paar,
+   Instanzen desselben Kulturtyps teilen dasselbe match-Array -- damit ist es
+   egal, WELCHE der gleichlautenden Karten in welche der zulaessigen Zonen
+   gezogen wird (kein "falsches" Los unter gleichaussehenden Karten). ---------- */
+var KARTEN = [];
+(function buildKarten() {
+  var nextId = 1;
+  KULTUR_TYPEN.forEach(function(text, kIdx) {
+    var validZones = SORTEN.filter(function(s) { return s.correct.indexOf(kIdx) !== -1; }).map(function(s) { return s.slug; });
+    validZones.forEach(function() {
+      KARTEN.push({ id: nextId++, text: text, match: validZones });
+    });
+  });
+})();
 
-/* ---------- EINFACH: Drag & Drop aus Wortbank ---------- */
+var engine = Zuordnung3.karten.createEngine(KARTEN, 'match', { singleSlot: false });
+
+/* ---------- EINFACH: Drag & Drop, mehrere Karten pro Zone ---------- */
 function buildEinfach(body) {
-  body.innerHTML = '<div class="card-pool" id="cardPool"></div><div class="sorte-grid" id="sorteGrid"></div>';
+  body.innerHTML = '<div class="card-pool" id="cardPool"></div><div id="sorteList"></div>';
 
   engine.renderPool(document.getElementById('cardPool'));
 
-  var grid = document.getElementById('sorteGrid');
-  KARTEN.forEach(function(k) {
-    var card = document.createElement('div');
-    card.className = 'sorte-card';
-    card.innerHTML = '<div class="sorte-name">' + k.sorte + '</div>' +
-      '<div class="drop-zone" data-match="' + k.match + '" id="zone-' + k.match + '"></div>';
-    grid.appendChild(card);
+  var list = document.getElementById('sorteList');
+  SORTEN.forEach(function(s) {
+    var row = document.createElement('div');
+    row.className = 'sorte-row';
+    row.innerHTML = '<div class="sorte-name">' + s.name + '</div>' +
+      '<div class="drop-zone" data-match="' + s.slug + '" id="zone-' + s.slug + '"></div>';
+    list.appendChild(row);
   });
 
   engine.setupZones();
@@ -287,86 +342,85 @@ function buildEinfach(body) {
 
 function checkEinfach() {
   var res = engine.checkEinfach();
-  showResult(res.correct, res.total, KARTEN.length);
+  showResult(res.correct, res.total, res.total);
 }
 
-/* ---------- MITTEL: pro Sorte anklicken (1 richtig + 2 Ablenker) ---------- */
+/* ---------- MITTEL: Matrix zum Anklicken (wie die Arbeitsblatt-Tabelle) ---------- */
 function buildMittel(body) {
-  mcScore = 0; mcTotal = 0;
-  var grid = document.createElement('div');
-  grid.className = 'sorte-grid';
-  KARTEN.forEach(function(k) {
-    var card = document.createElement('div');
-    card.className = 'sorte-card';
-    var name = document.createElement('div');
-    name.className = 'sorte-name';
-    name.textContent = k.sorte;
-    card.appendChild(name);
-    card.appendChild(buildMcCell(k));
-    grid.appendChild(card);
-  });
-  body.appendChild(grid);
-}
-function otherTexts(id) {
-  var out = [];
-  KARTEN.forEach(function(k) { if (k.id !== id) out.push(k.text); });
-  return out;
-}
-function buildMcCell(k) {
   var wrap = document.createElement('div');
-  wrap.className = 'mc-cell';
-  var options = MTDnD.shuffle([k.text].concat(MTDnD.shuffle(otherTexts(k.id)).slice(0, 2)));
-  options.forEach(function(opt) {
-    var btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'mc-btn';
-    btn.textContent = opt;
-    btn.onclick = function() {
-      var cellBtns = wrap.querySelectorAll('.mc-btn');
-      cellBtns.forEach(function(b) { b.classList.add('locked'); });
-      mcTotal++;
-      if (opt === k.text) { btn.classList.add('correct'); mcScore++; }
-      else {
-        btn.classList.add('wrong');
-        cellBtns.forEach(function(b) { if (b.textContent === k.text) b.classList.add('correct'); });
-      }
-      if (mcTotal === KARTEN.length) showResult(mcScore, mcTotal, KARTEN.length);
-    };
-    wrap.appendChild(btn);
-  });
-  return wrap;
-}
+  wrap.className = 'table-scroll';
+  var table = document.createElement('table');
+  table.className = 'matrix-table';
 
-/* ---------- SCHWER: Freitext eintippen ---------- */
-function buildSchwer(body) {
-  var grid = document.createElement('div');
-  grid.className = 'sorte-grid';
-  KARTEN.forEach(function(k, i) {
-    var card = document.createElement('div');
-    card.className = 'sorte-card';
-    card.innerHTML = '<div class="sorte-name">' + k.sorte + '</div>' +
-      '<input class="type-input" id="ti-' + i + '" type="text" autocomplete="off" placeholder="Kulturart …">' +
-      '<div class="type-sol" id="tisol-' + i + '"></div>';
-    grid.appendChild(card);
-  });
-  body.appendChild(grid);
+  var thead = '<thead><tr><th></th>' + KULTUR_TYPEN.map(function(t) { return '<th>' + t + '</th>'; }).join('') + '</tr></thead>';
+  var tbody = '<tbody>' + SORTEN.map(function(s, si) {
+    var cells = KULTUR_TYPEN.map(function(t, ki) {
+      return '<td><button type="button" class="cell-toggle" id="cell-' + si + '-' + ki + '" onclick="toggleCell(' + si + ',' + ki + ')">☐</button></td>';
+    }).join('');
+    return '<tr><td class="sorte-label">' + s.name + '</td>' + cells + '</tr>';
+  }).join('') + '</tbody>';
+
+  table.innerHTML = thead + tbody;
+  wrap.appendChild(table);
+  body.appendChild(wrap);
 }
-function checkSchwer() {
-  var correct = 0, total = KARTEN.length;
-  KARTEN.forEach(function(k, i) {
-    var input = document.getElementById('ti-' + i), sol = document.getElementById('tisol-' + i);
-    input.classList.remove('correct', 'wrong');
-    if (Zuordnung3.matchKeys(input.value, k.keys)) { input.classList.add('correct'); sol.style.display = 'none'; correct++; }
-    else { input.classList.add('wrong'); sol.textContent = '→ ' + k.text; sol.style.display = 'block'; }
+function toggleCell(si, ki) {
+  var btn = document.getElementById('cell-' + si + '-' + ki);
+  if (btn.classList.contains('locked')) return;
+  var on = btn.classList.toggle('checked');
+  btn.textContent = on ? '☑' : '☐';
+}
+function checkMittel() {
+  var correct = 0, total = SORTEN.length * KULTUR_TYPEN.length;
+  SORTEN.forEach(function(s, si) {
+    KULTUR_TYPEN.forEach(function(t, ki) {
+      var btn = document.getElementById('cell-' + si + '-' + ki);
+      var shouldCheck = s.correct.indexOf(ki) !== -1;
+      var isChecked = btn.classList.contains('checked');
+      btn.classList.add('locked');
+      if (shouldCheck === isChecked) { btn.classList.add('correct'); correct++; }
+      else { btn.classList.add('wrong'); btn.textContent = shouldCheck ? '☑' : '☐'; }
+    });
   });
   showResult(correct, total, total);
+}
+
+/* ---------- SCHWER: Freitext pro Sorte, alle Kernbegriffe muessen vorkommen ---------- */
+function buildSchwer(body) {
+  SORTEN.forEach(function(s, i) {
+    var row = document.createElement('div');
+    row.className = 'sorte-row';
+    row.innerHTML = '<div class="sorte-name">' + s.name + '</div>' +
+      '<input class="type-input" id="ti-' + i + '" type="text" autocomplete="off" placeholder="Alle zutreffenden Kulturarten, mit Komma getrennt …">' +
+      '<div class="type-sol" id="tisol-' + i + '"></div>';
+    body.appendChild(row);
+  });
+}
+function checkSchwer() {
+  var correctSorten = 0;
+  SORTEN.forEach(function(s, i) {
+    var input = document.getElementById('ti-' + i), sol = document.getElementById('tisol-' + i);
+    input.classList.remove('correct', 'wrong');
+    var missing = [];
+    s.correct.forEach(function(ki) {
+      if (!Zuordnung3.matchKeys(input.value, KULTUR_KEYS[ki])) missing.push(KULTUR_TYPEN[ki]);
+    });
+    if (missing.length === 0) {
+      input.classList.add('correct'); sol.style.display = 'none'; correctSorten++;
+    } else {
+      input.classList.add('wrong');
+      sol.textContent = '→ ' + s.correct.map(function(ki) { return KULTUR_TYPEN[ki]; }).join(', ');
+      sol.style.display = 'block';
+    }
+  });
+  showResult(correctSorten, SORTEN.length, SORTEN.length);
 }
 
 /* ---------- gemeinsam ---------- */
 function showResult(correct, filled, total) {
   var banner = document.getElementById('resultBanner');
   if (correct === total) {
-    Zuordnung3.showResult(banner, true, 'Perfekt! Alle ' + total + ' Sorten richtig zugeordnet.');
+    Zuordnung3.showResult(banner, true, 'Perfekt! Alle ' + total + ' Felder richtig.');
   } else {
     Zuordnung3.showResult(banner, false, correct + ' von ' + (filled || total) + ' richtig. Rot markierte nochmals überprüfen.');
   }
@@ -374,13 +428,13 @@ function showResult(correct, filled, total) {
 
 Zuordnung3.levelBar({
   instructions: {
-    einfach: 'Ziehen Sie jede Kultur-Beschreibung zur passenden Käsesorte.',
-    mittel:  'Klicken Sie pro Sorte die passende Kultur-Beschreibung an.',
-    schwer:  'Schreiben Sie zu jeder Sorte den Kernbegriff der eingesetzten Kultur auf.'
+    einfach: 'Ziehen Sie jede Kultur-Karte zu allen passenden Sorten. Manche Kultur wird mehrfach gebraucht.',
+    mittel:  'Klicken Sie in der Tabelle alle Kulturen an, die bei der jeweiligen Sorte eingesetzt werden.',
+    schwer:  'Schreiben Sie zu jeder Sorte alle zutreffenden Kulturarten auf (mit Komma getrennt).'
   },
-  checkBtn: { einfach: '', mittel: 'none', schwer: '' },
+  checkBtn: { einfach: '', mittel: '', schwer: '' },
   build: { einfach: buildEinfach, mittel: buildMittel, schwer: buildSchwer },
-  check: { einfach: checkEinfach, schwer: checkSchwer }
+  check: { einfach: checkEinfach, mittel: checkMittel, schwer: checkSchwer }
 });
 setLevel('einfach');
 </script>
