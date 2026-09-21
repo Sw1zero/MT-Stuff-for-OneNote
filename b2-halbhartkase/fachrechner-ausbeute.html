@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fachrechner b.2 – Käseausbeute</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .page-main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .back-link {
+      font-size: 0.78rem;
+      color: var(--text-subtle);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 20px;
+      align-self: flex-start;
+    }
+    .back-link:hover { color: var(--red); }
+
+    /* ---- Formel-Referenz ---- */
+    .ref-card {
+      width: 680px;
+      max-width: 92vw;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: 20px 24px;
+      margin-bottom: 24px;
+    }
+    .ref-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-subtle);
+      margin-bottom: 12px;
+    }
+    .ref-list { display: flex; flex-direction: column; gap: 8px; }
+    .ref-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 0.85rem;
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .ref-row span:first-child { color: var(--text-muted); }
+    .ref-row code {
+      background: #f1f5f9;
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-family: var(--font);
+      color: var(--blue-dark);
+      white-space: nowrap;
+    }
+
+    /* ---- Übungsaufgaben ---- */
+    .quiz-section {
+      width: 680px;
+      max-width: 92vw;
+    }
+    .quiz-type-btns {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 1.25rem;
+    }
+    .quiz-type-btn {
+      font-family: var(--font);
+      font-size: 0.78rem;
+      font-weight: 500;
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .quiz-type-btn:hover  { border-color: var(--blue-dark); color: var(--blue-dark); }
+    .quiz-type-btn.active { background: var(--blue-dark); border-color: var(--blue-dark); color: #fff; }
+    .quiz-card-sb {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: 24px;
+    }
+    .quiz-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .quiz-card-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-subtle);
+    }
+    .quiz-new-btn {
+      font-family: var(--font);
+      font-size: 0.75rem;
+      font-weight: 500;
+      padding: 5px 12px;
+      border-radius: 20px;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .quiz-new-btn:hover { border-color: var(--blue-dark); color: var(--blue-dark); }
+    .quiz-question-sb {
+      font-size: 0.9rem;
+      color: var(--text);
+      line-height: 1.65;
+      margin-bottom: 1.25rem;
+    }
+    .quiz-question-sb strong { color: var(--blue-dark); }
+    .quiz-ans-row {
+      display: grid;
+      grid-template-columns: 1fr 120px 44px;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .quiz-ans-label { font-size: 0.83rem; color: var(--text-muted); font-weight: 500; }
+    .quiz-ans-input {
+      font-family: var(--font);
+      font-size: 0.92rem;
+      padding: 8px 11px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #f8fafc;
+      color: var(--text);
+      text-align: right;
+      width: 100%;
+      transition: border-color 0.15s;
+    }
+    .quiz-ans-input:focus { outline: none; border-color: var(--blue-dark); background: #fff; }
+    .quiz-ans-input.correct { border-color: #16a34a; background: #f0fff4; }
+    .quiz-ans-input.wrong   { border-color: var(--red); background: var(--red-light); }
+    .quiz-ans-unit { font-size: 0.82rem; color: var(--text-muted); }
+    .quiz-feedback-sb {
+      margin-top: 14px;
+      padding: 11px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      line-height: 1.55;
+      display: none;
+    }
+    .quiz-feedback-sb.visible  { display: block; }
+    .quiz-feedback-sb.correct-fb { background: #f0fff4; border: 1px solid #9ae6b4; color: #166534; }
+    .quiz-feedback-sb.wrong-fb   { background: var(--red-light); border: 1px solid #fca5a5; color: #991b1b; }
+    .quiz-empty-sb { text-align: center; padding: 2rem 1rem; color: var(--text-subtle); font-size: 0.88rem; }
+  </style>
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+  <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · b.2</span>
+  <h1>Käseausbeute – Rechnen</h1>
+  <p>Ausbeute, Leichtung und Wirtschaftlichkeit üben – immer mit neuen Zahlen.</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+  <a class="back-link" href="../index.html">← Alle Lerntools</a>
+
+  <div class="ref-card">
+    <div class="ref-title">Formeln zum Nachschlagen</div>
+    <div class="ref-list">
+      <div class="ref-row"><span>Ausbeute in %</span><code>Produkt (kg) ÷ Milch (kg) × 100</code></div>
+      <div class="ref-row"><span>Produktmenge aus Ausbeute</span><code>Milch (kg) × Ausbeute (%) ÷ 100</code></div>
+      <div class="ref-row"><span>Handelsreif nach Leichtung</span><code>ab Presse (kg) × (100 % − Leichtung %)</code></div>
+      <div class="ref-row"><span>Gewicht vor Leichtung</span><code>handelsreif (kg) ÷ (100 % − Leichtung %) × 100</code></div>
+      <div class="ref-row"><span>Ausgangsvollmilch</span><code>Gewicht ab Presse ÷ Ausbeute ab Presse (%) × 100</code></div>
+    </div>
+  </div>
+
+  <div class="quiz-section">
+    <div class="quiz-type-btns">
+      <button class="quiz-type-btn active" onclick="setQuizType('ausbeute')">Ausbeute (%)</button>
+      <button class="quiz-type-btn"        onclick="setQuizType('menge')">Menge (kg)</button>
+      <button class="quiz-type-btn"        onclick="setQuizType('leichtung')">Leichtung</button>
+      <button class="quiz-type-btn"        onclick="setQuizType('handelsreif')">Ausbeute handelsreif</button>
+      <button class="quiz-type-btn"        onclick="setQuizType('ausgangsmilch')">Ausgangsvollmilch</button>
+      <button class="quiz-type-btn"        onclick="setQuizType('wirtschaft')">Wirtschaftlichkeit</button>
+    </div>
+    <div class="quiz-card-sb">
+      <div class="quiz-card-header">
+        <span class="quiz-card-title" id="quizCardTitle">Ausbeute (%)</span>
+        <button class="quiz-new-btn" onclick="newQuizTask()">Neue Aufgabe</button>
+      </div>
+      <div id="quizBody">
+        <div class="quiz-empty-sb">Klicken Sie auf «Neue Aufgabe», um zu starten.</div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+
+  <script>
+    var quizType = 'ausbeute';
+    var quizAnswers = null;
+
+    function qpick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+    function r(n, dec) { return parseFloat(n.toFixed(dec !== undefined ? dec : 2)); }
+    function qparse(s) { return parseFloat(String(s).replace(',', '.')); }
+    function fmtKg(n) { return Math.round(n).toLocaleString('de-CH'); }
+    function tolPct(v) { return Math.max(0.1, Math.abs(v) * 0.01); }
+    function tolKg(v)  { return Math.max(0.5, Math.abs(v) * 0.01); }
+    function tolChf(v) { return Math.max(0.05, Math.abs(v) * 0.02); }
+
+    var TITLES = {
+      ausbeute: 'Ausbeute (%)',
+      menge: 'Menge (kg)',
+      leichtung: 'Leichtung',
+      handelsreif: 'Ausbeute handelsreif',
+      ausgangsmilch: 'Ausgangsvollmilch',
+      wirtschaft: 'Wirtschaftlichkeit'
+    };
+
+    function setQuizType(t) {
+      quizType = t;
+      document.querySelectorAll('.quiz-type-btn').forEach(function(b) { b.classList.remove('active'); });
+      if (typeof event !== 'undefined' && event.currentTarget) event.currentTarget.classList.add('active');
+      document.getElementById('quizCardTitle').textContent = TITLES[t];
+      document.getElementById('quizBody').innerHTML = '<div class="quiz-empty-sb">Klicken Sie auf «Neue Aufgabe», um zu starten.</div>';
+      quizAnswers = null;
+    }
+
+    function newQuizTask() {
+      if      (quizType === 'ausbeute')      genAusbeute();
+      else if (quizType === 'menge')         genMenge();
+      else if (quizType === 'leichtung')     genLeichtung();
+      else if (quizType === 'handelsreif')   genHandelsreif();
+      else if (quizType === 'ausgangsmilch') genAusgangsmilch();
+      else                                   genWirtschaft();
+    }
+
+    var Q_MILCH   = [2000, 3300, 5000, 8000, 10000, 15000, 20000, 25000, 50000, 75000, 100000, 110500];
+    var Q_KAESE_PCT  = [7.8, 8.35, 8.5, 8.75, 9.0, 9.25, 9.5, 10.0, 10.25, 10.5];
+    var Q_BUTTER_PCT = [0.9, 1.0, 1.05, 1.1, 1.2, 1.35, 1.4];
+    var Q_LEICHTUNG  = [0.4, 0.5, 0.75, 0.9, 1.05, 1.2, 1.5, 1.8, 2.0];
+    var Q_ABPRESSE_KG = [500, 800, 1000, 1325, 1500, 2000, 2500, 3000];
+    var Q_HANDELSREIF_KG = [250, 364, 500, 1000, 2000, 4500, 7500];
+    var Q_MENGE_CHF = [1000, 10000, 150000, 835000, 5000000];
+    var Q_PREIS = [6.20, 7.00, 7.50, 8.00, 9.50];
+    var Q_AENDERUNG = [0.1, 0.25, 0.5, 0.75, 1.0];
+
+    /* ---- Typ 1: Ausbeute berechnen ---- */
+    function genAusbeute() {
+      var milch = qpick(Q_MILCH);
+      var kPct = qpick(Q_KAESE_PCT), bPct = qpick(Q_BUTTER_PCT);
+      var kaese = r(milch * kPct / 100, 0);
+      var butter = r(milch * bPct / 100, 0);
+      var ansK = kaese / milch * 100, ansB = butter / milch * 100;
+      renderQuizTask(
+        'In einer Käserei werden aus <strong>' + fmtKg(milch) + ' kg</strong> Milch <strong>' + fmtKg(kaese) +
+        ' kg</strong> Käse und <strong>' + fmtKg(butter) + ' kg</strong> Käsereibutter fabriziert.<br>' +
+        'Wie gross sind die Ausbeuten von Käse und Butter in %?',
+        [
+          { label: 'Ausbeute Käse',   unit: '%', val: ansK, tol: tolPct(ansK) },
+          { label: 'Ausbeute Butter', unit: '%', val: ansB, tol: tolPct(ansB) }
+        ]
+      );
+    }
+
+    /* ---- Typ 2: Menge berechnen ---- */
+    function genMenge() {
+      var milch = qpick(Q_MILCH);
+      var kPct = qpick(Q_KAESE_PCT), bPct = qpick(Q_BUTTER_PCT);
+      var kaese = milch * kPct / 100, butter = milch * bPct / 100;
+      renderQuizTask(
+        'Es wurden <strong>' + fmtKg(milch) + ' kg</strong> Milch verarbeitet. Die Käseausbeute betrug ' +
+        '<strong>' + kPct + ' %</strong>, die Buttermenge <strong>' + bPct + ' %</strong>.<br>' +
+        'Berechnen Sie die Käsemenge ab Presse und die Buttermenge in kg.',
+        [
+          { label: 'Käsemenge',  unit: 'kg', val: kaese,  tol: tolKg(kaese) },
+          { label: 'Buttermenge', unit: 'kg', val: butter, tol: tolKg(butter) }
+        ]
+      );
+    }
+
+    /* ---- Typ 3: Leichtung → handelsreifes Gewicht ---- */
+    function genLeichtung() {
+      var abPresse = qpick(Q_ABPRESSE_KG);
+      var leichtung = qpick(Q_LEICHTUNG);
+      var handelsreif = abPresse * (1 - leichtung / 100);
+      renderQuizTask(
+        'Der Gewichtsverlust im Reifekeller (Leichtung) betrug <strong>' + leichtung + ' %</strong>. ' +
+        'Die Käse wogen ab Presse <strong>' + fmtKg(abPresse) + ' kg</strong>.<br>' +
+        'Wie gross ist das handelsreife Gewicht?',
+        [ { label: 'Gewicht handelsreif', unit: 'kg', val: handelsreif, tol: tolKg(handelsreif) } ]
+      );
+    }
+
+    /* ---- Typ 4: Ausbeute handelsreif (%) ---- */
+    function genHandelsreif() {
+      var abPressePct = qpick(Q_KAESE_PCT);
+      var leichtung = qpick(Q_LEICHTUNG);
+      var handelsreifPct = abPressePct * (1 - leichtung / 100);
+      renderQuizTask(
+        'Die Leichtung der Käse im Reifekeller war <strong>' + leichtung + ' %</strong>. Die Ausbeute ab Presse ' +
+        'betrug <strong>' + abPressePct + ' %</strong>.<br>' +
+        'Wie gross war die Ausbeute handelsreif in %?',
+        [ { label: 'Ausbeute handelsreif', unit: '%', val: handelsreifPct, tol: tolPct(handelsreifPct) } ]
+      );
+    }
+
+    /* ---- Typ 5: Ausgangsvollmilch (zweistufig) ---- */
+    function genAusgangsmilch() {
+      var abPressePct = qpick(Q_KAESE_PCT);
+      var leichtung = qpick(Q_LEICHTUNG);
+      var handelsreif = qpick(Q_HANDELSREIF_KG);
+      var abPresseKg = handelsreif / (1 - leichtung / 100);
+      var ausgangsmilch = abPresseKg / (abPressePct / 100);
+      renderQuizTask(
+        'Ausbeute ab Presse: <strong>' + abPressePct + ' %</strong>. Leichtung im Reifekeller: <strong>' + leichtung +
+        ' %</strong>. Ausbeute handelsreif: <strong>' + fmtKg(handelsreif) + ' kg</strong>.<br>' +
+        'Berechnen Sie zuerst das Gewicht ab Presse (vor Leichtung), danach die Ausgangsvollmilchmenge.',
+        [
+          { label: 'Gewicht ab Presse',  unit: 'kg', val: abPresseKg,    tol: tolKg(abPresseKg) },
+          { label: 'Ausgangsvollmilch',  unit: 'kg', val: ausgangsmilch, tol: tolKg(ausgangsmilch) }
+        ]
+      );
+    }
+
+    /* ---- Typ 6: Wirtschaftlichkeit (CHF) ---- */
+    function genWirtschaft() {
+      var preis = qpick(Q_PREIS), aenderung = qpick(Q_AENDERUNG), menge = qpick(Q_MENGE_CHF);
+      var betrag = menge * (aenderung / 100) * preis;
+      if (Math.random() < 0.5) {
+        renderQuizTask(
+          'Handelsreife Produktmenge: <strong>' + fmtKg(menge) + ' kg</strong>, Preis <strong>CHF ' + preis.toFixed(2) +
+          '</strong> pro kg. Die Leichtung im Reifekeller ist um <strong>' + aenderung + ' %</strong> höher als normal.<br>' +
+          'Wie gross ist der Verlust in CHF?',
+          [ { label: 'Verlust', unit: 'CHF', val: betrag, tol: tolChf(betrag) } ]
+        );
+      } else {
+        renderQuizTask(
+          'Ausgangsmilchmenge: <strong>' + fmtKg(menge) + ' kg</strong>, Preis <strong>CHF ' + preis.toFixed(2) +
+          '</strong> pro kg handelsreifes Produkt. Die Ausbeute ändert sich um <strong>' + aenderung + ' %</strong>.<br>' +
+          'Wie gross ist der Mehr- bzw. Minderertrag in CHF?',
+          [ { label: 'Betrag', unit: 'CHF', val: betrag, tol: tolChf(betrag) } ]
+        );
+      }
+    }
+
+    /* ---- Aufgabe rendern ---- */
+    function renderQuizTask(questionHtml, answers) {
+      quizAnswers = answers;
+      var rows = '';
+      answers.forEach(function(an, i) {
+        rows += '<div class="quiz-ans-row">' +
+          '<span class="quiz-ans-label">' + an.label + '</span>' +
+          '<input type="text" inputmode="decimal" class="quiz-ans-input" id="qa' + i + '" placeholder="0.0">' +
+          '<span class="quiz-ans-unit">' + an.unit + '</span>' +
+        '</div>';
+      });
+      document.getElementById('quizBody').innerHTML =
+        '<div class="quiz-question-sb">' + questionHtml + '</div>' + rows +
+        '<button class="btn btn-primary" onclick="checkQuizTask()" style="width:100%;margin-top:4px">Überprüfen</button>' +
+        '<div class="quiz-feedback-sb" id="quizFeedback"></div>';
+    }
+
+    function solutionText() {
+      return 'Lösung: ' + quizAnswers.map(function(an) {
+        var dec = an.unit === 'kg' ? 2 : (an.unit === 'CHF' ? 2 : 2);
+        return an.label + ' = <strong>' + qFmtNum(an.val, dec) + ' ' + an.unit + '</strong>';
+      }).join(' · ');
+    }
+
+    function qFmtNum(n, dec) { return parseFloat(n.toFixed(dec)).toLocaleString('de-CH'); }
+
+    /* ---- Lösung prüfen ---- */
+    function checkQuizTask() {
+      if (!quizAnswers) return;
+      var fb = document.getElementById('quizFeedback');
+      var anyEmpty = false, allOk = true;
+      quizAnswers.forEach(function(an, i) {
+        var fld = document.getElementById('qa' + i);
+        var v = qparse(fld.value);
+        if (isNaN(v)) { anyEmpty = true; allOk = false; fld.className = 'quiz-ans-input wrong'; return; }
+        var ok = Math.abs(v - an.val) <= an.tol;
+        if (!ok) allOk = false;
+        fld.className = 'quiz-ans-input ' + (ok ? 'correct' : 'wrong');
+      });
+      if (anyEmpty) {
+        fb.className = 'quiz-feedback-sb visible wrong-fb';
+        fb.innerHTML = 'Bitte alle Felder ausfüllen.';
+        return;
+      }
+      if (allOk) {
+        fb.className = 'quiz-feedback-sb visible correct-fb';
+        fb.innerHTML = '<strong>Richtig!</strong> ' + solutionText();
+      } else {
+        fb.className = 'quiz-feedback-sb visible wrong-fb';
+        fb.innerHTML = '<strong>Nicht ganz.</strong> ' + solutionText();
+      }
+    }
+  </script>
+</body>
+</html>
