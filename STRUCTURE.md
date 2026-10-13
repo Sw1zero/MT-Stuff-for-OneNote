@@ -41,8 +41,6 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 │   ├── wahr-falsch-gruyere-mechanismus.html
 │   ├── wahr-falsch-sbrinz-signatur.html
 │   └── animation-wasserzusatz-teigelastizitaet.html
-├── b5-quark/
-│   └── animation-labgerinnung.html
 ├── b7-sauermilch/
 │   ├── images/
 │   │   ├── b.7_Anlage_stichfest_Nummern.png
@@ -141,7 +139,7 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 | `b2`          | b.2   | b.2 – Halbhartkäse herstellen              | `b2-halbhartkase/`              | ✅     |
 | `b3`          | b.3   | b.3 – Weichkäse herstellen                 | `b3-weichkaese/`                | 🔲     |
 | `b4`          | b.4   | b.4 – Mozzarella herstellen                | `b4-mozzarella/`                | 🔲     |
-| `b5`          | b.5   | b.5 – Quark herstellen                     | `b5-quark/`                     | ↗ Anim |
+| `b5`          | b.5   | b.5 – Quark herstellen                     | `b5-quark/`                     | 🔲     |
 | `b6`          | b.6   | b.6 – Konsummilch herstellen               | `b6-konsummilch/`               | 🔲     |
 | `b7`          | b.7   | b.7 – Sauermilchprodukte herstellen        | `b7-sauermilch/`                | ✅     |
 | `b8`          | b.8   | b.8 – Speiseeis herstellen                 | `b8-speiseeis/`                 | 🔲     |
@@ -158,8 +156,8 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 
 > **Animationen** ist eine eigenständige Rubrik (kein Modul). Tools vom Typ `animation` werden
 > mit `data-module="animationen"` ausgezeichnet und in der Sektion `#section-animationen` gesammelt.
-> Die Datei bleibt physisch im Themen-Modulordner (z. B. `b5-quark/`, `b7-sauermilch/`); das
-> Modul-Badge auf der Kachel zeigt weiterhin das Thema (b.5, b.7 …). `↗ Anim` in der Status-Spalte
+> Die Datei bleibt physisch im Themen-Modulordner (z. B. `b1-hartkaese/`, `b7-sauermilch/`); das
+> Modul-Badge auf der Kachel zeigt weiterhin das Thema (b.1, b.7 …). `↗ Anim` in der Status-Spalte
 > oben heisst: Modul hat (nur) Tools, die unter der Rubrik Animationen gelistet sind.
 
 ---
@@ -185,7 +183,7 @@ Diese Datei definiert die kanonischen Namen für Module, Tool-Typen und Ordner.
 | `hotspot`          | Hotspot           | `hotspot-bakterienzelle.html`           | Bild mit anklickbaren Zonen (Polygon/Kreis/Polylinie)   |
 | `kreuzwortraetsel` | Kreuzworträtsel   | `kreuzwortraetsel-kulturen.html`        | Auto-Gitter aus Fachbegriffen, Hinweise waagrecht/senkrecht |
 | `spiel`            | Spiel             | `spiel-homofermentativ.html`            | Geschicklichkeitsspiel (Canvas), Maus/Touch/Tasten, 3 Leben |
-| `animation`        | Animation         | `animation-labgerinnung.html`           | Schrittweise SVG-Animation eines Prozesses mit Nav      |
+| `animation`        | Animation         | `animation-sauergerinnung.html`          | Schrittweise SVG-Animation eines Prozesses mit Nav      |
 | `prozess-entscheid`| Prozess-Entscheid | `prozess-entscheid-jogurt.html`         | Entscheidung pro Prozessschritt mit Fehleranalyse       |
 | `fliessschema`     | Fliessschema      | `fliessschema-stichfest.html`           | Produktionsschritte frei in leere, verkettete Kästchen eintippen |
 | `lernpfad` / `challenge` | Lernpfad / Challenge | `lernsession-sbrinz.html` | Eine Datei, zwei Modi: **Lernpfad** (Standard, mit Slides + Übungen einfach/mittel) und **Challenge** (`?mode=challenge`: ohne Slides/Info/PDF, schwerste Stufe, voll gamifiziert: XP/Streak/Abzeichen/Rang) |
