@@ -168,10 +168,10 @@ function startState() {
       { name: 'PO Berg (silofrei)', base: 100, cost: 88 }
     ],
     processors: [
-      { name: 'Käserei Appenzeller', cap: 150, aAbsatz: 120, valA: 1.05, valB: 0.75, kaeserei: true },
-      { name: 'Käserei Bergkäse',    cap: 120, aAbsatz: 100, valA: 1.05, valB: 0.75, kaeserei: true },
-      { name: 'Molkerei Konsummilch/Joghurt', cap: 400, aAbsatz: 250, valA: 0.98, valB: 0.68, kaeserei: false },
-      { name: 'Industrie Butter/Pulver', cap: 350, aAbsatz: 100, valA: 0.95, valB: 0.66, kaeserei: false }
+      { name: 'Käserei Appenzeller', cap: 150, aAbsatz: 120, valA: 1.05, valB: 0.75, fix: 8, kaeserei: true },
+      { name: 'Käserei Bergkäse',    cap: 120, aAbsatz: 100, valA: 1.05, valB: 0.75, fix: 8, kaeserei: true },
+      { name: 'Molkerei Konsummilch/Joghurt', cap: 400, aAbsatz: 250, valA: 0.98, valB: 0.68, fix: 8, kaeserei: false },
+      { name: 'Industrie Butter/Pulver', cap: 350, aAbsatz: 100, valA: 0.95, valB: 0.66, fix: 8, kaeserei: false }
     ],
     rounds: [
       { name: 'Frühling 2026', prog: 3, real: 7, kaeseB: 0, richt: 78,
@@ -221,8 +221,10 @@ function abrechnen(s, r) {
     // A-Milch über dem Inlandabsatz lässt sich nur zum B-Wert verwerten
     var aInland = Math.min(vv.a, v.aAbsatz);
     var verwertung = (aInland * v.valA + (vv.a - aInland + vv.b) * valB) * 1000;
-    return { erhalten: vv.a + vv.b, verwertung: verwertung, milchkosten: vv.milchkosten,
-             gewinn: verwertung - vv.milchkosten };
+    // Fixkosten fallen auf die ganze Kapazität an, auch wenn Milch fehlt
+    var fixkosten = v.cap * v.fix * 10;
+    return { erhalten: vv.a + vv.b, verwertung: verwertung, milchkosten: vv.milchkosten, fixkosten: fixkosten,
+             gewinn: verwertung - vv.milchkosten - fixkosten };
   });
   return { prod: prod, proc: proc, richt: rd.richt };
 }
@@ -232,6 +234,7 @@ var KEY = 'milchmarkt-boerse-v1';
 var S;
 try { S = JSON.parse(localStorage.getItem(KEY)); } catch (e) { S = null; }
 if (!S || !S.rounds) S = startState();
+S.processors.forEach(function (v) { if (v.fix == null) v.fix = 8; });   // Stand von vor den Fixkosten
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
 
 function $(id) { return document.getElementById(id); }
@@ -275,12 +278,12 @@ function render() {
   });
   $('tblP').innerHTML = h;
 
-  h = '<tr><th>Team</th><th>Kapazität</th><th>unter Vertrag</th><th>A-Absatz</th><th>A unter Vertrag</th><th>Verwertung A / B</th></tr>';
+  h = '<tr><th>Team</th><th>Kapazität</th><th>unter Vertrag</th><th>A-Absatz</th><th>A unter Vertrag</th><th>Verwertung A / B</th><th>Fixkosten</th></tr>';
   S.processors.forEach(function (v, i) {
     var valB = v.valB + (v.kaeserei ? rd.kaeseB / 100 : 0);
     h += '<tr><td>' + esc(v.name) + '</td><td>' + t(v.cap) + '</td><td>' + t(sumBy(S.contracts, 'v', i, 'menge')) +
          '</td><td>' + t(v.aAbsatz) + '</td><td>' + t(sumBy(S.contracts, 'v', i, 'a')) +
-         '</td><td>' + v.valA.toFixed(2) + ' / ' + valB.toFixed(2) + ' Fr.</td></tr>';
+         '</td><td>' + v.valA.toFixed(2) + ' / ' + valB.toFixed(2) + ' Fr.</td><td>' + fr(v.cap * v.fix * 10) + '</td></tr>';
   });
   $('tblV').innerHTML = h;
 
@@ -305,10 +308,10 @@ function render() {
            '</td><td>' + x.mischpreis.toFixed(1) + ' Rp.</td><td class="' + (x.gewinn < 0 ? 'neg' : '') + '">' + fr(x.gewinn) + '</td></tr>';
     });
     $('tblRP').innerHTML = h;
-    h = '<tr><th>Verarbeiter</th><th>erhalten</th><th>Verwertung</th><th>Milchkosten</th><th>Gewinn</th></tr>';
+    h = '<tr><th>Verarbeiter</th><th>erhalten</th><th>Verwertung</th><th>Milchkosten</th><th>Fixkosten</th><th>Gewinn</th></tr>';
     res.proc.forEach(function (x, i) {
       h += '<tr><td>' + esc(S.processors[i].name) + '</td><td>' + t(x.erhalten) + '</td><td>' + fr(x.verwertung) +
-           '</td><td>' + fr(x.milchkosten) + '</td><td class="' + (x.gewinn < 0 ? 'neg' : '') + '">' + fr(x.gewinn) + '</td></tr>';
+           '</td><td>' + fr(x.milchkosten) + '</td><td>' + fr(x.fixkosten) + '</td><td class="' + (x.gewinn < 0 ? 'neg' : '') + '">' + fr(x.gewinn) + '</td></tr>';
     });
     $('tblRV').innerHTML = h;
   }
@@ -362,11 +365,11 @@ function renderSettings() {
          numCell('producers.' + i + '.base', p.base, 10) + numCell('producers.' + i + '.cost', p.cost, 0.5) + '</tr>';
   });
   $('setP').innerHTML = h;
-  h = '<tr><th>Team</th><th>Kapazität t</th><th>A-Absatz t</th><th>Verwertung A</th><th>Verwertung B</th></tr>';
+  h = '<tr><th>Team</th><th>Kapazität t</th><th>A-Absatz t</th><th>Verwertung A</th><th>Verwertung B</th><th>Fixkosten Rp./kg Kap.</th></tr>';
   S.processors.forEach(function (v, i) {
     h += '<tr><td><input type="text" data-path="processors.' + i + '.name" value="' + esc(v.name) + '"></td>' +
          numCell('processors.' + i + '.cap', v.cap, 10) + numCell('processors.' + i + '.aAbsatz', v.aAbsatz, 10) +
-         numCell('processors.' + i + '.valA', v.valA, 0.01) + numCell('processors.' + i + '.valB', v.valB, 0.01) + '</tr>';
+         numCell('processors.' + i + '.valA', v.valA, 0.01) + numCell('processors.' + i + '.valB', v.valB, 0.01) + numCell('processors.' + i + '.fix', v.fix, 0.5) + '</tr>';
   });
   $('setV').innerHTML = h;
   h = '<tr><th>Runde</th><th>Prognose %</th><th>Tatsächlich %</th><th>Käsereien B-Verwertung Rp.</th></tr>';
