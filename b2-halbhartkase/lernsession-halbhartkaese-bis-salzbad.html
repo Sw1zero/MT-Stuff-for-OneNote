@@ -251,6 +251,7 @@
     .rs-model-text { font-size:0.86rem; line-height:1.55; background:var(--blue-tint); border-left:4px solid var(--blue-light); border-radius:var(--radius-sm); padding:10px 14px; margin-bottom:8px; }
     .rs-check { display:flex; gap:8px; align-items:flex-start; font-size:0.86rem; margin-bottom:6px; cursor:pointer; }
     .rs-check input { margin-top:3px; }
+    .ls-video { width:100%; display:block; border-radius:var(--radius-md); box-shadow:var(--shadow-sm); background:#000; }
   </style>
 </head>
 <body>
@@ -321,7 +322,7 @@ var ALL = [
     slides: [
       { icon: '🥛', color: '#0f766e', bg: '#f0fdfa',
         title: 'Weshalb so gute Milch?',
-        body: '<p>Appenzeller und Tilsiter haben einen <b>weichschnittigen, langen, speckigen Teig</b>. Dazu braucht es einen <b>höheren Wassergehalt</b> als beim Hartkäse. Diesen erreichen Sie mit <b>tieferen Bruchwärmtemperaturen</b>.</p>' +
+        body: '<p>Appenzeller und Tilsiter haben einen <b>langen, speckigen Teig</b>. Dazu braucht es einen <b>höheren Wassergehalt</b> als beim Hartkäse. Diesen erreichen Sie unter anderem mit <b>tieferen Bruchwärmtemperaturen</b>.</p>' +
               '<p>Die Folge: Die <b>Fremdkeime aus der Rohmilch werden kaum reduziert</b>. Darum braucht es eine sehr gute Milchqualität.</p>' +
               '<div class="factbox">Für Rohmilchkäse verwenden Sie nur <b>silofreie Milch</b>, also Milch von Kühen ohne Silagefütterung.</div>'
       },
@@ -372,9 +373,9 @@ var ALL = [
           'Deshalb braucht es sehr gute Milch und meist eine Thermisation.'
         ] },
       { kind: 'free',
-        q: 'Erklären Sie 1 Grund, weshalb Appenzeller und Tilsiter einen weichschnittigen, speckigen Teig haben.',
-        model: 'Der Bruch wird bei tieferen Temperaturen gewärmt als beim Hartkäse. Darum bleibt mehr Wasser im Käse. Dieser höhere Wassergehalt ist die Voraussetzung für den weichschnittigen, langen, speckigen Teig.',
-        checks: ['Ich nenne die tiefere Bruchwärmtemperatur.', 'Ich nenne den höheren Wassergehalt als Folge.', 'Ich verbinde den Wassergehalt mit dem weichschnittigen Teig.'] }
+        q: 'Erklären Sie 1 Grund, weshalb Appenzeller und Tilsiter einen langen, speckigen Teig haben.',
+        model: 'Der lange, speckige Teig braucht einen höheren Wassergehalt als beim Hartkäse. Diesen erreichen Sie unter anderem mit tieferen Bruchwärmtemperaturen. Dann bleibt mehr Wasser im Käse.',
+        checks: ['Ich nenne die tiefere Bruchwärmtemperatur.', 'Ich nenne den höheren Wassergehalt als Folge.', 'Ich verbinde den Wassergehalt mit dem langen, speckigen Teig.'] }
     ]
   },
 
@@ -500,8 +501,13 @@ var ALL = [
   /* ---------- 4 Wasserzusatz ---------- */
   {
     kicker: 'Folien · Wasserzusatz', title: 'Wasser in die Milch geben',
-    lead: 'Lesen Sie alle Folien, danach prüfen Sie sich.',
+    lead: 'Schauen Sie das Video und lesen Sie alle Folien, danach prüfen Sie sich.',
     type: 'slides',
+    media:
+      '<figure class="media-figure">' +
+        '<video class="ls-video" controls preload="metadata" playsinline><source src="../b1-hartkaese/videos/wasserzusatz.mp4" type="video/mp4">Ihr Browser kann dieses Video nicht abspielen.</video>' +
+        '<figcaption>Erklärvideo: Wasserzusatz bei Halbhartkäse (ca. 2 Minuten)</figcaption>' +
+      '</figure>',
     slides: [
       { icon: '💧', color: '#0369a1', bg: '#f0f9ff',
         title: 'Weshalb Wasser?',
@@ -570,7 +576,7 @@ var ALL = [
         title: 'Temperatur, Zeit, Korngrösse',
         body: '<ul><li><b>Labungstemperatur 30,5 bis 32 °C.</b> Höhere Temperaturen verstärken die Griffbildung, der Bruch <b>schiesst über</b>.</li>' +
               '<li><b>Labungszeit 30 bis 40 min.</b> Flockungszeit × <b>2 bis 2,5</b> ergibt immer den <b>gleichen Ausdickungsgrad</b>. Etwas mehr ausdicken als beim Hartkäse.</li>' +
-              '<li><b>Bruchkorn Maiskorn bis Haselnuss.</b> Diese Grösse ist die Voraussetzung für den gewünschten <b>Wassergehalt</b> im weichschnittigen Teig.</li></ul>'
+              '<li><b>Bruchkorn Maiskorn bis Haselnuss.</b> Diese Grösse ist die Voraussetzung für den gewünschten <b>Wassergehalt</b> im Käse.</li></ul>'
       }
     ]
   },
@@ -676,8 +682,13 @@ var ALL = [
   /* ---------- 7 Milchzuckerabbau und Salzbad ---------- */
   {
     kicker: 'Folien · Milchzuckerabbau', title: 'Milchzucker abbauen, Salzbad',
-    lead: 'Lesen Sie alle Folien, danach prüfen Sie sich.',
+    lead: 'Schauen Sie das Video und lesen Sie alle Folien, danach prüfen Sie sich.',
     type: 'slides',
+    media:
+      '<figure class="media-figure">' +
+        '<video class="ls-video" controls preload="metadata" playsinline><source src="videos/milchsaeuregaerung.mp4" type="video/mp4">Ihr Browser kann dieses Video nicht abspielen.</video>' +
+        '<figcaption>Erklärvideo: Milchsäuregärung im Halbhartkäse</figcaption>' +
+      '</figure>',
     slides: [
       { icon: '🌡️', color: '#c2410c', bg: '#fff7ed',
         title: 'Die Temperatur steuert die Gärung',
