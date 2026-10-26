@@ -101,11 +101,6 @@
       <input type="range" id="kasein" min="2.2" max="3" step="0.05">
       <div class="slider-hint">Hängt von Fütterung, Laktation und Vererbung ab.</div>
     </div>
-    <div class="slider-row" id="row-verlust">
-      <label>Fettverlust in der Sirte <b id="out-verlust"></b></label>
-      <input type="range" id="verlust" min="4" max="20" step="1">
-      <div class="slider-hint">Mehr Käsestaub (schlechte Labfähigkeit, falsche Bruchbereitung) = mehr Fettverlust.</div>
-    </div>
     <div class="slider-row" id="row-wasser">
       <label>Wassergehalt im Käse <b id="out-wasser"></b></label>
       <input type="range" id="wasser" min="300" max="600" step="5">
@@ -152,12 +147,12 @@
 </footer>
 
 <script>
-// Pro 100 kg Kesselmilch. ponytail: vereinfachtes Modell, Kasein geht ganz in den Käse,
-// Mineralstoffe/Salz = 12 % vom Kasein (so trifft 3,1–3,4 % Fett bei 2,6 % Kasein den Appenzeller-FIT)
-var REST_FAKTOR = 0.12;
+// Pro 100 kg Kesselmilch. ponytail: vereinfachtes Modell, Fett und Kasein gehen ganz in den Käse,
+// Mineralstoffe/Salz = 20 % vom Kasein (so trifft 3,1–3,4 % Fett bei 2,6 % Kasein den Appenzeller-FIT)
+var REST_FAKTOR = 0.2;
 
 function berechne(s) {
-  var fett = s.fett * (1 - s.verlust / 100);
+  var fett = s.fett;
   var eiweiss = s.kasein;
   var rest = s.kasein * REST_FAKTOR;
   var tm = fett + eiweiss + rest;
@@ -199,26 +194,26 @@ function zufall(min, max, step) { return Math.round((min + Math.random() * (max 
 var LEVELS = {
   frei: function() {
     return { text: '<strong>Frei spielen:</strong> Verändern Sie die Regler. Beobachten Sie, welcher Wert FIT verändert und welcher WFF.',
-      start: { fett: 3.25, kasein: 2.6, verlust: 8, wasser: 375 }, locked: [], ziel: null };
+      start: { fett: 3.25, kasein: 2.6, wasser: 375 }, locked: [], ziel: null };
   },
   einfach: function() {
-    return { text: '<strong>Auftrag:</strong> Stellen Sie einen Appenzeller ein. Kasein und Fettverlust sind fix.',
-      start: { fett: 3.8, kasein: 2.6, verlust: 8, wasser: 420 }, locked: ['kasein', 'verlust'], ziel: SORTEN.appenzeller };
+    return { text: '<strong>Auftrag:</strong> Stellen Sie einen Appenzeller ein. Der Kaseingehalt ist fix.',
+      start: { fett: 3.8, kasein: 2.6, wasser: 420 }, locked: ['kasein'], ziel: SORTEN.appenzeller };
   },
   mittel: function() {
     return { text: '<strong>Auftrag:</strong> Die Milch hat diese Woche einen anderen Kaseingehalt. Stellen Sie einen Tilsiter ein.',
-      start: { fett: 3.6, kasein: zufall(2.3, 2.9, 0.05), verlust: 8, wasser: 360 }, locked: ['kasein', 'verlust'], ziel: SORTEN.tilsiter };
+      start: { fett: 3.6, kasein: zufall(2.3, 2.9, 0.05), wasser: 360 }, locked: ['kasein'], ziel: SORTEN.tilsiter };
   },
   schwer: function() {
     var z = Math.random() < 0.5 ? SORTEN.appenzeller : SORTEN.tilsiter;
-    return { text: '<strong>Auftrag:</strong> Kaseingehalt und Fettverlust sind unbekannt hoch. Stellen Sie einen ' + z.name + ' ein. ' +
+    return { text: '<strong>Auftrag:</strong> Der Kaseingehalt ist unbekannt. Stellen Sie einen ' + z.name + ' ein. ' +
       'FIT und WFF sehen Sie erst nach dem Prüfen. Schaffen Sie es in höchstens 3 Versuchen?',
-      start: { fett: zufall(2.4, 4.2, 0.05), kasein: zufall(2.3, 2.9, 0.05), verlust: zufall(5, 15, 1), wasser: zufall(320, 450, 5) },
-      locked: ['kasein', 'verlust'], ziel: z, verdeckt: true };
+      start: { fett: zufall(2.4, 4.2, 0.05), kasein: zufall(2.3, 2.9, 0.05), wasser: zufall(320, 450, 5) },
+      locked: ['kasein'], ziel: z, verdeckt: true };
   }
 };
 
-var IDS = ['fett', 'kasein', 'verlust', 'wasser'];
+var IDS = ['fett', 'kasein', 'wasser'];
 var aktuell, versuche;
 
 function zustand() {
@@ -243,7 +238,6 @@ function render() {
   var s = zustand(), r = berechne(s), z = aktuell.ziel;
   document.getElementById('out-fett').textContent = fmt(s.fett, 2) + ' %';
   document.getElementById('out-kasein').textContent = aktuell.verdeckt ? '?' : fmt(s.kasein, 2) + ' %';
-  document.getElementById('out-verlust').textContent = aktuell.verdeckt ? '?' : s.verlust + ' %';
   document.getElementById('out-wasser').textContent = s.wasser + ' g/kg';
   document.getElementById('ratio').innerHTML = aktuell.verdeckt
     ? 'Fett-Kasein-Verhältnis der Milch: <b>?</b>'
@@ -327,7 +321,7 @@ function pruefen() {
   if (!okW) tipps.push(s.wasser < z.wasser[0] ? 'Zu wenig Wasser im Käse.' : 'Zu viel Wasser im Käse.');
   if (!okWff) tipps.push('WFF zu tief für Halbhartkäse: etwas mehr Wasser im Käse.');
   if (aktuell.verdeckt) {
-    tipps.push('Kasein ' + fmt(s.kasein, 2) + ' %, Fettverlust ' + s.verlust + ' %.');
+    tipps.push('Kasein ' + fmt(s.kasein, 2) + ' %.');
     if (versuche >= 3) tipps.push('3 Versuche gebraucht, versuchen Sie es nochmals mit neuer Milch.');
   }
   banner.textContent = tipps.join(' ');
