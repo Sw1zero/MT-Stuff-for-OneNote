@@ -1238,7 +1238,7 @@
         </div>
       </a>
 
-      <a class="tool-card" href="b1-hartkaese/animation-wasserzusatz-teigelastizitaet.html" data-module="animationen" data-type="animation">
+      <a class="tool-card" href="b1-hartkaese/animation-wasserzusatz-teigelastizitaet.html" data-module="animationen b2" data-type="animation">
         <div class="card-top">
           <span class="badge" style="background:#dcfce7;color:#15803d;">b.2</span>
           <span class="badge badge-type">Animation</span>
@@ -1357,7 +1357,7 @@ document.querySelectorAll('.filter-btn').forEach(function(btn) {
 function applyFilter() {
   // Show/hide individual cards
   document.querySelectorAll('.tool-card:not(.disabled)').forEach(function(card) {
-    var moduleMatch = activeModule === 'all' || card.dataset.module === activeModule;
+    var moduleMatch = activeModule === 'all' || card.dataset.module.split(' ').indexOf(activeModule) !== -1; // data-module darf mehrere Module enthalten, leerzeichengetrennt
     var typeMatch   = activeType   === 'all' || card.dataset.type   === activeType;
     card.style.display = (moduleMatch && typeMatch) ? '' : 'none';
   });
