@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulator b.2 – FIT und WFF</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .page-main { max-width: 760px; margin: 0 auto; }
+    .back-link { display:inline-block; font-size:0.82rem; color:var(--text-muted); text-decoration:none; margin-bottom:1.5rem; }
+    .back-link:hover { color: var(--red); }
+
+    .level-bar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:1rem; }
+    .level-btn { font-family:var(--font); font-size:0.82rem; font-weight:600; padding:7px 16px; border-radius:20px; border:1.5px solid var(--border); background:var(--surface); color:var(--text-muted); cursor:pointer; transition:all 0.15s; }
+    .level-btn:hover { border-color:var(--blue); color:var(--blue-dark); }
+    .level-btn.active { background:var(--blue-dark); border-color:var(--blue-dark); color:#fff; }
+
+    .mission { background:var(--surface); border-radius:var(--radius-md); box-shadow:var(--shadow-sm); padding:0.9rem 1rem; margin-bottom:1rem; font-size:0.88rem; line-height:1.5; }
+    .mission ul { margin:0.4rem 0 0 1.1rem; padding:0; }
+    .mission li.ok { color:#15803d; font-weight:600; }
+    .mission li.ok::after { content:' ✓'; }
+
+    .card { background:var(--surface); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); padding:1.1rem 1.25rem; margin-bottom:1rem; }
+    .card-title { font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-subtle); margin-bottom:0.75rem; }
+
+    .slider-row { margin-bottom:0.9rem; }
+    .slider-row label { display:flex; justify-content:space-between; font-size:0.86rem; margin-bottom:0.25rem; }
+    .slider-row label b { color:var(--blue-dark); }
+    .slider-row input[type=range] { width:100%; accent-color:var(--blue-dark); }
+    .slider-row.locked { opacity:0.45; }
+    .slider-hint { font-size:0.74rem; color:var(--text-muted); }
+
+    .ratio { font-size:0.86rem; padding:0.5rem 0.75rem; background:var(--blue-tint); border-radius:var(--radius-sm); }
+
+    .kpis { display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:1rem; }
+    .kpi { border:1.5px solid var(--border); border-radius:var(--radius-md); padding:0.7rem 0.8rem; text-align:center; }
+    .kpi .lbl { font-size:0.74rem; color:var(--text-muted); }
+    .kpi .val { font-size:1.6rem; font-weight:700; color:var(--blue-dark); }
+    .kpi .grp { font-size:0.8rem; font-weight:600; }
+    .kpi.hit { border-color:#16a34a; background:#f0fdf4; }
+
+    .bar-row { margin-bottom:0.8rem; }
+    .bar-lbl { font-size:0.8rem; color:var(--text-muted); margin-bottom:0.2rem; }
+    .bar { display:flex; height:30px; border-radius:var(--radius-sm); overflow:hidden; font-size:0.72rem; font-weight:600; color:#fff; }
+    .bar div { display:flex; align-items:center; justify-content:center; white-space:nowrap; overflow:hidden; transition:flex-basis 0.2s; }
+    .seg-w { background:#69A9C9; } .seg-f { background:#e0a526; } .seg-p { background:#134061; } .seg-r { background:#a0aec0; }
+    .seg-off { background:repeating-linear-gradient(45deg,#edf2f7,#edf2f7 6px,#f7fafc 6px,#f7fafc 12px); color:var(--text-subtle) !important; }
+    .legend { display:flex; gap:0.9rem; flex-wrap:wrap; font-size:0.74rem; color:var(--text-muted); }
+    .legend span::before { content:''; display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:4px; vertical-align:-1px; background:var(--c); }
+
+    .hidden-res { text-align:center; font-size:0.88rem; color:var(--text-muted); padding:1.5rem 0; }
+
+    .info-box { background:#f0f7ff; border-left:3px solid var(--blue); border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:0.75rem 1rem; font-size:0.82rem; color:var(--text-muted); margin-bottom:1rem; line-height:1.55; }
+    .info-box strong { color:var(--text); }
+    .info-box ul { margin:0.3rem 0 0 1.1rem; padding:0; }
+
+    .btn-row { display:flex; gap:0.75rem; flex-wrap:wrap; margin-bottom:1rem; }
+    .result-banner { display:none; padding:0.9rem 1rem; border-radius:var(--radius-md); font-weight:600; font-size:0.92rem; text-align:center; margin-bottom:1rem; }
+    .result-banner.show { display:block; }
+    .result-banner.perfect { background:#f0fdf4; color:#15803d; border:1.5px solid #bbf7d0; }
+    .result-banner.partial { background:#fff7ed; color:#c2410c; border:1.5px solid #fed7aa; }
+
+    @media (max-width: 600px) { .kpi .val { font-size:1.3rem; } }
+  </style>
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+  <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · b.2</span>
+  <h1>FIT und WFF – Simulator</h1>
+  <p>Stellen Sie die Kesselmilch ein und sehen Sie, welchen Käse Sie bekommen.</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+  <a class="back-link" href="../index.html">← Alle Lerntools</a>
+
+  <div class="level-bar">
+    <button class="level-btn active" id="lvl-frei"    onclick="setLevel('frei')">Frei spielen</button>
+    <button class="level-btn"        id="lvl-einfach" onclick="setLevel('einfach')">Einfach</button>
+    <button class="level-btn"        id="lvl-mittel"  onclick="setLevel('mittel')">Mittel</button>
+    <button class="level-btn"        id="lvl-schwer"  onclick="setLevel('schwer')">Schwer</button>
+  </div>
+
+  <div class="mission" id="mission"></div>
+
+  <div class="card">
+    <div class="card-title">Kesselmilch und Käse einstellen</div>
+    <div class="slider-row" id="row-fett">
+      <label>Fettgehalt Kesselmilch <b id="out-fett"></b></label>
+      <input type="range" id="fett" min="1" max="5" step="0.05">
+      <div class="slider-hint">Standardisieren: Fett entziehen (Separation) oder auffetten (Sirtenrahm).</div>
+    </div>
+    <div class="slider-row" id="row-kasein">
+      <label>Kaseingehalt Milch <b id="out-kasein"></b></label>
+      <input type="range" id="kasein" min="2.2" max="3" step="0.05">
+      <div class="slider-hint">Hängt von Fütterung, Laktation und Vererbung ab.</div>
+    </div>
+    <div class="slider-row" id="row-verlust">
+      <label>Fettverlust in der Sirte <b id="out-verlust"></b></label>
+      <input type="range" id="verlust" min="4" max="20" step="1">
+      <div class="slider-hint">Mehr Käsestaub (schlechte Labfähigkeit, falsche Bruchbereitung) = mehr Fettverlust.</div>
+    </div>
+    <div class="slider-row" id="row-wasser">
+      <label>Wassergehalt im Käse <b id="out-wasser"></b></label>
+      <input type="range" id="wasser" min="300" max="600" step="5">
+      <div class="slider-hint">Wird über Bruchkorngrösse, Bruchwärmen und Pressen gesteuert.</div>
+    </div>
+    <div class="ratio" id="ratio"></div>
+  </div>
+
+  <div class="btn-row" id="checkRow">
+    <button type="button" class="btn btn-primary" onclick="pruefen()">Prüfen</button>
+  </div>
+  <div class="result-banner" id="resultBanner"></div>
+
+  <div class="card" id="resCard">
+    <div class="card-title">Ihr Käse</div>
+    <div id="resBody">
+      <div class="kpis">
+        <div class="kpi" id="kpi-fit"><div class="lbl">Fett in der Trockenmasse (FIT)</div><div class="val" id="val-fit"></div><div class="grp" id="grp-fit"></div></div>
+        <div class="kpi" id="kpi-wff"><div class="lbl">Wasser im fettfreien Käse (WFF)</div><div class="val" id="val-wff"></div><div class="grp" id="grp-wff"></div></div>
+      </div>
+      <div class="bar-row"><div class="bar-lbl">1 kg Käse</div><div class="bar" id="bar-all"></div></div>
+      <div class="bar-row"><div class="bar-lbl">Wasser abgedeckt: nur Trockenmasse → <b>FIT</b> = Anteil Fett</div><div class="bar" id="bar-tm"></div></div>
+      <div class="bar-row"><div class="bar-lbl">Fett abgedeckt: nur fettfreie Käsemasse → <b>WFF</b> = Anteil Wasser</div><div class="bar" id="bar-ff"></div></div>
+      <div class="legend">
+        <span style="--c:#69A9C9">Wasser</span><span style="--c:#e0a526">Fett</span><span style="--c:#134061">Eiweiss (Kasein)</span><span style="--c:#a0aec0">Mineralstoffe, Salz</span>
+      </div>
+    </div>
+    <div class="hidden-res" id="resHidden">Die Werte sehen Sie erst nach dem Prüfen.</div>
+  </div>
+
+  <div class="info-box">
+    <strong>Merke:</strong>
+    <ul>
+      <li><strong>FIT</strong> zeigt das Verhältnis von Fett zu Eiweiss. Sie stellen ihn mit dem Fettgehalt der Kesselmilch ein. Mehr Wasser im Käse ändert den FIT nicht.</li>
+      <li>Ein <strong>hoher Kaseingehalt</strong> verlangt mehr Fett in der Kesselmilch. Sonst ist das Fett-Eiweiss-Verhältnis im Käse zu tief.</li>
+      <li><strong>WFF</strong> zeigt das Verhältnis von Wasser zu Eiweiss. Er bestimmt die Festigkeit: Hartkäse 500–540, Halbhartkäse 540–650, Weichkäse über 650 g/kg.</li>
+      <li>Wasser und Fett sind die «Weichmacher» im Käseteig.</li>
+    </ul>
+  </div>
+</main>
+
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+
+<script>
+// Pro 100 kg Kesselmilch. ponytail: vereinfachtes Modell, Kasein geht ganz in den Käse,
+// Mineralstoffe/Salz = 12 % vom Kasein (so trifft 3,1–3,4 % Fett bei 2,6 % Kasein den Appenzeller-FIT)
+var REST_FAKTOR = 0.12;
+
+function berechne(s) {
+  var fett = s.fett * (1 - s.verlust / 100);
+  var eiweiss = s.kasein;
+  var rest = s.kasein * REST_FAKTOR;
+  var tm = fett + eiweiss + rest;
+  var w = s.wasser / 1000;
+  var fit = fett / tm;
+  var f = (1 - w) * fit;             // Fettanteil im Käse
+  return {
+    fit: Math.round(fit * 1000),
+    wff: Math.round(w / (1 - f) * 1000),
+    wasser: w, fett: f, eiweiss: (1 - w) * eiweiss / tm, rest: (1 - w) * rest / tm
+  };
+}
+
+function fettStufe(fit) {
+  if (fit >= 650) return 'Doppelrahmkäse';
+  if (fit >= 550) return 'Rahmkäse';
+  if (fit >= 450) return 'Vollfettkäse';
+  if (fit >= 350) return '¾-Fettkäse';
+  if (fit >= 250) return '½-Fettkäse';
+  if (fit >= 150) return '¼-Fettkäse';
+  return 'Magerkäse';
+}
+
+function festigkeit(wff) {
+  if (wff <= 500) return 'Extrahartkäse';
+  if (wff <= 540) return 'Hartkäse';
+  if (wff <= 650) return 'Halbhartkäse';
+  return 'Weichkäse';
+}
+
+// Sortenziele aus Lehrmittel b.2 S. 6 (f.i.T., Wassergehalt im reifen Käse)
+var SORTEN = {
+  appenzeller: { name: 'Appenzeller', fit: [500, 520], wasser: [370, 380] },
+  tilsiter:    { name: 'Tilsiter (thermisierte Milch)', fit: [480, 505], wasser: [380, 390] }
+};
+
+function zufall(min, max, step) { return Math.round((min + Math.random() * (max - min)) / step) * step; }
+
+var LEVELS = {
+  frei: function() {
+    return { text: '<strong>Frei spielen:</strong> Verändern Sie die Regler. Beobachten Sie, welcher Wert FIT verändert und welcher WFF.',
+      start: { fett: 3.25, kasein: 2.6, verlust: 8, wasser: 375 }, locked: [], ziel: null };
+  },
+  einfach: function() {
+    return { text: '<strong>Auftrag:</strong> Stellen Sie einen Appenzeller ein. Kasein und Fettverlust sind fix.',
+      start: { fett: 3.8, kasein: 2.6, verlust: 8, wasser: 420 }, locked: ['kasein', 'verlust'], ziel: SORTEN.appenzeller };
+  },
+  mittel: function() {
+    return { text: '<strong>Auftrag:</strong> Die Milch hat diese Woche einen anderen Kaseingehalt. Stellen Sie einen Tilsiter ein.',
+      start: { fett: 3.6, kasein: zufall(2.3, 2.9, 0.05), verlust: 8, wasser: 360 }, locked: ['kasein', 'verlust'], ziel: SORTEN.tilsiter };
+  },
+  schwer: function() {
+    var z = Math.random() < 0.5 ? SORTEN.appenzeller : SORTEN.tilsiter;
+    return { text: '<strong>Auftrag:</strong> Kaseingehalt und Fettverlust sind unbekannt hoch. Stellen Sie einen ' + z.name + ' ein. ' +
+      'FIT und WFF sehen Sie erst nach dem Prüfen. Schaffen Sie es in höchstens 3 Versuchen?',
+      start: { fett: zufall(2.4, 4.2, 0.05), kasein: zufall(2.3, 2.9, 0.05), verlust: zufall(5, 15, 1), wasser: zufall(320, 450, 5) },
+      locked: ['kasein', 'verlust'], ziel: z, verdeckt: true };
+  }
+};
+
+var IDS = ['fett', 'kasein', 'verlust', 'wasser'];
+var aktuell, versuche;
+
+function zustand() {
+  var s = {};
+  IDS.forEach(function(id) { s[id] = parseFloat(document.getElementById(id).value); });
+  return s;
+}
+
+function fmt(x, d) { return x.toFixed(d).replace('.', ','); }
+
+function imZiel(wert, bereich) { return wert >= bereich[0] && wert <= bereich[1]; }
+
+function balken(el, teile) {
+  var summe = teile.reduce(function(a, t) { return a + t[1]; }, 0);
+  el.innerHTML = teile.map(function(t) {
+    var p = t[1] / summe * 100;
+    return '<div class="' + t[0] + '" style="flex-basis:' + p + '%">' + (p >= 9 ? t[2] + ' ' + Math.round(p) + ' %' : '') + '</div>';
+  }).join('');
+}
+
+function render() {
+  var s = zustand(), r = berechne(s), z = aktuell.ziel;
+  document.getElementById('out-fett').textContent = fmt(s.fett, 2) + ' %';
+  document.getElementById('out-kasein').textContent = aktuell.verdeckt ? '?' : fmt(s.kasein, 2) + ' %';
+  document.getElementById('out-verlust').textContent = aktuell.verdeckt ? '?' : s.verlust + ' %';
+  document.getElementById('out-wasser').textContent = s.wasser + ' g/kg';
+  document.getElementById('ratio').innerHTML = aktuell.verdeckt
+    ? 'Fett-Kasein-Verhältnis der Milch: <b>?</b>'
+    : 'Fett-Kasein-Verhältnis der Milch: <b>' + fmt(s.fett / s.kasein, 2) + '</b> (auf 1 g Kasein kommen ' + fmt(s.fett / s.kasein, 2) + ' g Fett)';
+
+  document.getElementById('val-fit').textContent = r.fit + ' g/kg';
+  document.getElementById('val-wff').textContent = r.wff + ' g/kg';
+  document.getElementById('grp-fit').textContent = fettStufe(r.fit);
+  document.getElementById('grp-wff').textContent = festigkeit(r.wff);
+  document.getElementById('kpi-fit').classList.toggle('hit', !!z && imZiel(r.fit, z.fit));
+  document.getElementById('kpi-wff').classList.toggle('hit', !!z && festigkeit(r.wff) === 'Halbhartkäse');
+
+  balken(document.getElementById('bar-all'), [['seg-w', r.wasser, 'Wasser'], ['seg-f', r.fett, 'Fett'], ['seg-p', r.eiweiss, 'Eiweiss'], ['seg-r', r.rest, '']]);
+  balken(document.getElementById('bar-tm'),  [['seg-off', r.wasser, ''], ['seg-f', r.fett, 'Fett'], ['seg-p', r.eiweiss, 'Eiweiss'], ['seg-r', r.rest, '']]);
+  balken(document.getElementById('bar-ff'),  [['seg-w', r.wasser, 'Wasser'], ['seg-off', r.fett, ''], ['seg-p', r.eiweiss, 'Eiweiss'], ['seg-r', r.rest, '']]);
+  // Abgedeckte Teile nur andeuten, Prozent bezieht sich auf die sichtbare Masse
+  beschrifteAbgedeckt('bar-tm', r.fett + r.eiweiss + r.rest, [r.fett, r.eiweiss, r.rest], ['Fett', 'Eiweiss', '']);
+  beschrifteAbgedeckt('bar-ff', r.wasser + r.eiweiss + r.rest, [r.wasser, r.eiweiss, r.rest], ['Wasser', 'Eiweiss', '']);
+
+  if (z) {
+    var li = document.querySelectorAll('#mission li');
+    li[0].classList.toggle('ok', !aktuell.verdeckt && imZiel(r.fit, z.fit));
+    li[1].classList.toggle('ok', imZiel(s.wasser, z.wasser));
+    li[2].classList.toggle('ok', !aktuell.verdeckt && festigkeit(r.wff) === 'Halbhartkäse');
+  }
+}
+
+function beschrifteAbgedeckt(id, sichtbar, teile, namen) {
+  var kinder = document.getElementById(id).children, k = 0;
+  for (var i = 0; i < kinder.length; i++) {
+    if (kinder[i].classList.contains('seg-off')) { kinder[i].textContent = 'abgedeckt'; continue; }
+    var p = teile[k] / sichtbar * 100;
+    kinder[i].textContent = p >= 9 && namen[k] ? namen[k] + ' ' + Math.round(p) + ' %' : '';
+    k++;
+  }
+}
+
+function zeigeWerte(sichtbar) {
+  document.getElementById('resBody').style.display = sichtbar ? '' : 'none';
+  document.getElementById('resHidden').style.display = sichtbar ? 'none' : '';
+}
+
+function setLevel(l) {
+  ['frei', 'einfach', 'mittel', 'schwer'].forEach(function(k) {
+    document.getElementById('lvl-' + k).classList.toggle('active', k === l);
+  });
+  aktuell = LEVELS[l]();
+  versuche = 0;
+  IDS.forEach(function(id) {
+    var el = document.getElementById(id);
+    el.value = aktuell.start[id];
+    el.disabled = aktuell.locked.indexOf(id) !== -1;
+    document.getElementById('row-' + id).classList.toggle('locked', el.disabled);
+  });
+  var z = aktuell.ziel, html = aktuell.text;
+  if (z) {
+    html += '<ul><li>FIT ' + z.fit[0] + '–' + z.fit[1] + ' g/kg</li>' +
+            '<li>Wassergehalt ' + z.wasser[0] + '–' + z.wasser[1] + ' g/kg</li>' +
+            '<li>WFF im Bereich Halbhartkäse (540–650 g/kg)</li></ul>';
+  }
+  document.getElementById('mission').innerHTML = html;
+  document.getElementById('checkRow').style.display = z ? '' : 'none';
+  document.getElementById('resultBanner').className = 'result-banner';
+  zeigeWerte(!aktuell.verdeckt);
+  render();
+}
+
+function pruefen() {
+  var s = zustand(), r = berechne(s), z = aktuell.ziel;
+  var okFit = imZiel(r.fit, z.fit), okW = imZiel(s.wasser, z.wasser), okWff = festigkeit(r.wff) === 'Halbhartkäse';
+  var banner = document.getElementById('resultBanner');
+  versuche++;
+  if (aktuell.verdeckt) zeigeWerte(true);
+  if (okFit && okW && okWff) {
+    banner.textContent = 'Super, das ist ein ' + z.name + '!' + (aktuell.verdeckt ? ' (' + versuche + ' Versuch' + (versuche > 1 ? 'e' : '') + ')' : '');
+    banner.className = 'result-banner show perfect';
+    return;
+  }
+  var tipps = [];
+  if (!okFit) tipps.push(r.fit < z.fit[0] ? 'FIT zu tief: mehr Fett in die Kesselmilch.' : 'FIT zu hoch: weniger Fett in die Kesselmilch.');
+  if (!okW) tipps.push(s.wasser < z.wasser[0] ? 'Zu wenig Wasser im Käse.' : 'Zu viel Wasser im Käse.');
+  if (!okWff) tipps.push('WFF zu tief für Halbhartkäse: etwas mehr Wasser im Käse.');
+  if (aktuell.verdeckt) {
+    tipps.push('Kasein ' + fmt(s.kasein, 2) + ' %, Fettverlust ' + s.verlust + ' %.');
+    if (versuche >= 3) tipps.push('3 Versuche gebraucht, versuchen Sie es nochmals mit neuer Milch.');
+  }
+  banner.textContent = tipps.join(' ');
+  banner.className = 'result-banner show partial';
+}
+
+IDS.forEach(function(id) {
+  document.getElementById(id).addEventListener('input', function() {
+    if (aktuell.verdeckt) zeigeWerte(false);
+    document.getElementById('resultBanner').className = 'result-banner';
+    render();
+  });
+});
+
+setLevel('frei');
+</script>
+
+</body>
+</html>
