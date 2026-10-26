@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lernpfad: Halbhartkäse</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="../assets/lernsession-engine.js"></script>
+  <style>
+    .back-link { display:inline-block; font-size:0.82rem; color:var(--text-muted); text-decoration:none; margin-bottom:1rem; }
+    .back-link:hover { color:var(--red); }
+
+    .ls-wrap { max-width: 640px; margin: 0 auto; }
+
+    /* Gamification-HUD */
+    .hud { display:flex; align-items:center; justify-content:space-between; gap:12px; background:var(--blue-dark); color:#fff; border-radius:var(--radius-md); padding:10px 14px; margin-bottom:14px; box-shadow:var(--shadow-sm); }
+    .hud-xp { display:flex; align-items:baseline; gap:5px; flex-shrink:0; }
+    .hud-label { font-size:0.6rem; font-weight:700; letter-spacing:0.1em; opacity:0.8; }
+    .hud-val { font-size:1.15rem; font-weight:800; display:inline-block; }
+    .hud-val.pop { animation:xppop 0.4s ease; }
+    @keyframes xppop { 0%{transform:scale(1);} 40%{transform:scale(1.45); color:#9ad1e8;} 100%{transform:scale(1);} }
+    .hud-bar { flex:1; height:8px; background:rgba(255,255,255,0.2); border-radius:4px; overflow:hidden; }
+    .hud-bar-fill { height:100%; width:0%; background:linear-gradient(90deg,#69A9C9,#9ad1e8); border-radius:4px; transition:width 0.4s ease; }
+    .hud-streak { position:relative; display:flex; align-items:center; gap:8px; font-size:0.84rem; font-weight:700; background:rgba(255,255,255,0.14); padding:3px 9px; border-radius:12px; white-space:nowrap; flex-shrink:0; transition:transform 0.15s, background 0.3s; }
+    .streak-num-fire { color:#ff8c00; text-shadow:0 0 6px rgba(255,100,0,0.8); }
+    .hud-streak.pulse { transform:scale(1.25); }
+    .streak-pop { position:absolute; top:-4px; right:-4px; font-size:0.72rem; font-weight:800; color:#ffa040; pointer-events:none; white-space:nowrap; animation:streakPopAnim 0.9s ease-out forwards; }
+    @keyframes streakPopAnim { 0%{opacity:1;transform:translateY(0) scale(1);} 70%{opacity:1;} 100%{opacity:0;transform:translateY(-20px) scale(0.75);} }
+    .hud-fire-wrap { display:inline-block; position:relative; width:22px; height:22px; vertical-align:middle; overflow:visible; flex-shrink:0; }
+    .hud-fire-wrap .fire { position:absolute; width:100px; height:100px; top:50%; left:50%; transform:translate(-50%,-50%) scale(0.22); transform-origin:center center; background:transparent; }
+    @keyframes scaleUpDown { 0%,100%{transform:scaleY(1) scaleX(1);} 50%,90%{transform:scaleY(1.1);} 75%{transform:scaleY(0.95);} 80%{transform:scaleX(0.95);} }
+    @keyframes shake { 0%,100%{transform:skewX(0) scale(1);} 50%{transform:skewX(5deg) scale(0.9);} }
+    @keyframes particleUp { 0%{opacity:0;} 20%{opacity:1;} 80%{opacity:1;} 100%{opacity:0;top:-100%;transform:scale(0.5);} }
+    @keyframes glow { 0%,100%{background-color:#ef5a00;} 50%{background-color:#ff7800;} }
+    .hud-fire-wrap .fire-center { position:absolute; height:100%; width:100%; animation:scaleUpDown 3s ease-out infinite both; }
+    .hud-fire-wrap .fire-center .main-fire { position:absolute; width:100%; height:100%; background-image:radial-gradient(farthest-corner at 10px 0,#d43300 0%,#ef5a00 95%); transform:scaleX(0.8) rotate(45deg); border-radius:0 40% 60% 40%; filter:drop-shadow(0 0 10px #d43322); }
+    .hud-fire-wrap .fire-center .particle-fire { position:absolute; top:60%; left:45%; width:10px; height:10px; background:#ef5a00; border-radius:50%; filter:drop-shadow(0 0 10px #d43322); animation:particleUp 2s ease-out infinite both; }
+    .hud-fire-wrap .fire-right { height:100%; width:100%; position:absolute; animation:shake 2s ease-out infinite both; }
+    .hud-fire-wrap .fire-right .main-fire { position:absolute; top:15%; right:-25%; width:80%; height:80%; background:#ef5a00; transform:scaleX(0.8) rotate(45deg); border-radius:0 40% 60% 40%; filter:drop-shadow(0 0 10px #d43322); }
+    .hud-fire-wrap .fire-right .particle-fire { position:absolute; top:45%; left:50%; width:15px; height:15px; background:#ef5a00; transform:scaleX(0.8) rotate(45deg); border-radius:50%; filter:drop-shadow(0 0 10px #d43322); animation:particleUp 2s ease-out infinite both; }
+    .hud-fire-wrap .fire-left { position:absolute; height:100%; width:100%; animation:shake 3s ease-out infinite both; }
+    .hud-fire-wrap .fire-left .main-fire { position:absolute; top:15%; left:-20%; width:80%; height:80%; background:#ef5a00; transform:scaleX(0.8) rotate(45deg); border-radius:0 40% 60% 40%; filter:drop-shadow(0 0 10px #d43322); }
+    .hud-fire-wrap .fire-left .particle-fire { position:absolute; top:10%; left:20%; width:10%; height:10%; background:#ef5a00; border-radius:50%; filter:drop-shadow(0 0 10px #d43322); animation:particleUp 3s ease-out infinite both; }
+    .hud-fire-wrap .fire-bottom .main-fire { position:absolute; top:30%; left:20%; width:75%; height:75%; background:#ff7800; transform:scaleX(0.8) rotate(45deg); border-radius:0 40% 100% 40%; filter:blur(10px); animation:glow 2s ease-out infinite both; }
+
+    /* Fortschritt */
+    .ls-meta { font-size:0.8rem; font-weight:600; color:var(--text-muted); text-align:center; margin-bottom:6px; }
+    .ls-select-hint { display:none; text-align:center; margin-bottom:12px; }
+    .ls-select-hint.show { display:block; }
+    .ls-select-badge { display:inline-block; font-size:0.78rem; font-weight:700; color:var(--blue-dark); background:var(--blue-tint); border-radius:20px; padding:6px 16px; }
+    @keyframes lsAttract { 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.06); } }
+    .ls-dots { display:flex; gap:5px; justify-content:center; margin-bottom:20px; flex-wrap:wrap; }
+    .ls-dots.selectable { gap:8px; animation:lsAttract 0.8s ease-in-out 2; }
+    .ls-dot {
+      width:26px; height:26px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      font-size:0.72rem; font-weight:700;
+      background:#edf2f7; color:var(--text-subtle); border:2px solid transparent;
+    }
+    .ls-dot.active { border-color:var(--blue-dark); color:var(--blue-dark); }
+    .ls-dot.done   { background:#38a169; color:#fff; }
+    /* Challenge only: Posten frei wählbar, sehen wie Buttons aus */
+    .ls-dots.selectable .ls-dot { width:auto; min-width:34px; height:34px; padding:0 5px; border-radius:10px; font-size:0.78rem; font-weight:800; background:var(--blue-tint); color:var(--blue-dark); box-shadow:0 1px 3px rgba(0,0,0,0.16); cursor:pointer; transition:transform 0.15s, box-shadow 0.15s; }
+    .ls-dots.selectable .ls-dot:hover { transform:scale(1.14) translateY(-2px); box-shadow:0 4px 10px rgba(0,0,0,0.26); }
+    .ls-dots.selectable .ls-dot:active { transform:scale(0.94); }
+    .ls-dots.selectable .ls-dot.active { background:var(--blue-dark); color:#fff; border-color:transparent; box-shadow:0 0 0 3px var(--blue-tint), 0 2px 6px rgba(0,0,0,0.22); }
+    .ls-dots.selectable .ls-dot.done { background:#38a169; color:#fff; }
+
+    /* Station */
+    .station {
+      background:var(--surface); border-radius:var(--radius-lg);
+      box-shadow:var(--shadow-sm); padding:24px; margin-bottom:18px;
+    }
+    .station.hidden { display:none; }
+    .station-kicker { font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--blue-light); margin-bottom:4px; }
+    .station-title { font-size:1.15rem; font-weight:700; color:var(--blue-dark); margin-bottom:10px; }
+    .station-lead { font-size:0.9rem; color:var(--text); line-height:1.6; margin-bottom:18px; }
+    .station-lead b { color:var(--blue-dark); }
+    .station.boss { border:2px solid #f0c36d; box-shadow:0 0 0 4px #fff7e6; }
+    .station.boss .station-kicker { color:#d97706; }
+
+    /* Lese-/Info-Inhalte */
+    .read { font-size:0.9rem; line-height:1.65; color:var(--text); }
+    .read p { margin-bottom:12px; }
+    .read h4 { font-size:0.92rem; color:var(--blue-dark); margin:14px 0 6px; }
+    .read ul { margin:0 0 12px 1.15rem; }
+    .read li { margin-bottom:5px; }
+    .read b { color:var(--blue-dark); }
+    .read .factbox { background:var(--blue-tint); border-left:4px solid var(--blue-light); border-radius:var(--radius-sm); padding:10px 14px; margin:12px 0; font-size:0.86rem; line-height:1.55; }
+    .read-btn-row { margin-top:16px; }
+    .read-btn { width:210px; height:42px; border-radius:40px; border:1px solid rgba(255,255,255,0.25); background-color:var(--blue-dark); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:transform 0.3s; overflow:hidden; font-family:var(--font); padding:0 6px; }
+    .read-btn-icon { width:32px; height:32px; background:linear-gradient(to bottom,var(--blue-light),#2a6fa8); border-radius:50px; display:flex; align-items:center; justify-content:center; overflow:hidden; z-index:2; transition:width 0.3s; flex-shrink:0; }
+    .read-btn-text { flex:1; display:flex; align-items:center; justify-content:center; color:#fff; font-size:0.88rem; font-weight:600; white-space:nowrap; overflow:hidden; transition:all 0.3s; }
+    .read-btn:hover:not(:disabled) .read-btn-icon { width:190px; }
+    .read-btn:hover:not(:disabled) .read-btn-text { width:0; font-size:0; opacity:0; }
+    .read-btn:active:not(:disabled) { transform:scale(0.95); }
+    .read-btn:disabled { cursor:default; }
+    .read-btn.done .read-btn-icon { background:linear-gradient(to bottom,#48bb78,#38a169); }
+
+    /* Medien (Bilder / Video / PDF) */
+    .station-media { margin-bottom:18px; }
+    .media-grid { display:flex; gap:10px; flex-wrap:wrap; }
+    .media-grid .media-figure { flex:1; min-width:180px; }
+    .media-figure { margin:0; }
+    .media-figure img {
+      width:100%; height:auto; display:block;
+      border-radius:var(--radius-md); border:1px solid var(--border); box-shadow:var(--shadow-sm);
+    }
+    .media-figure figcaption { font-size:0.74rem; color:var(--text-subtle); margin-top:5px; text-align:center; line-height:1.4; }
+    .video-wrap {
+      position:relative; padding-bottom:56.25%; height:0; overflow:hidden;
+      border-radius:var(--radius-md); box-shadow:var(--shadow-sm);
+    }
+    .video-wrap iframe { position:absolute; top:0; left:0; width:100%; height:100%; border:0; }
+    .pdf-link {
+      display:inline-flex; align-items:center; gap:8px;
+      font-size:0.85rem; font-weight:600; color:var(--blue-dark);
+      background:var(--blue-tint); border:1.5px solid var(--blue-light);
+      border-radius:var(--radius-md); padding:10px 16px; text-decoration:none; transition:all 0.15s;
+    }
+    .pdf-link:hover { background:var(--blue-light); color:#fff; }
+
+    /* Fragen / Optionen (Quiz + Decide) */
+    .q-block { margin-bottom:18px; }
+    .q-block:last-child { margin-bottom:0; }
+    .q-text { font-size:0.92rem; font-weight:600; margin-bottom:10px; }
+    .opt {
+      display:block; width:100%; text-align:left;
+      font-family:var(--font); font-size:0.88rem; color:var(--text);
+      background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius-md);
+      padding:11px 14px; margin-bottom:8px; cursor:pointer; transition:all 0.15s; line-height:1.4;
+    }
+    .opt:hover:not(:disabled) { border-color:var(--blue-light); }
+    .opt:disabled { cursor:default; }
+    .opt.correct { border-color:#38a169; background:#f0fff4; }
+    .opt.wrong   { border-color:var(--red); background:var(--red-light); }
+    .fb { font-size:0.82rem; line-height:1.5; margin-top:8px; padding:10px 12px; border-radius:var(--radius-sm); display:none; }
+    .fb.show { display:block; }
+    .fb.ok  { background:#f0fff4; color:#276749; }
+    .fb.no  { background:var(--red-light); color:var(--red-dark); }
+
+    /* Wahr/Falsch */
+    .tf-item { padding:12px 0; border-bottom:1px solid var(--border); }
+    .tf-item:last-child { border-bottom:none; }
+    .tf-statement { font-size:0.9rem; margin-bottom:8px; }
+    .tf-btns { display:flex; gap:8px; }
+    .tf-btn {
+      font-family:var(--font); font-size:0.82rem; font-weight:600;
+      padding:7px 18px; border-radius:20px; border:1.5px solid var(--border);
+      background:var(--surface); color:var(--text-muted); cursor:pointer; transition:all 0.15s;
+    }
+    .tf-btn:hover:not(:disabled) { border-color:var(--blue-light); }
+    .tf-btn:disabled { cursor:default; }
+    .tf-btn.sel-correct { background:#38a169; border-color:#38a169; color:#fff; }
+    .tf-btn.sel-wrong   { background:var(--red); border-color:var(--red); color:#fff; }
+    .tf-btn.reveal      { border-color:#38a169; color:#276749; }
+    .tf-exp { font-size:0.78rem; color:var(--text-muted); margin-top:8px; display:none; }
+    .tf-exp.show { display:block; }
+
+    /* Lücken */
+    .gap-text { font-size:0.95rem; line-height:2.1; }
+    .gap-text select {
+      font-family:var(--font); font-size:0.85rem; font-weight:600;
+      border:1.5px solid var(--blue-light); border-radius:var(--radius-sm);
+      padding:3px 6px; background:var(--blue-tint); color:var(--blue-dark);
+    }
+    .gap-text select.correct { border-color:#38a169; background:#f0fff4; color:#276749; }
+    .gap-text select.wrong   { border-color:var(--red); background:var(--red-light); color:var(--red-dark); }
+
+    /* Fehlersuche */
+    .err-intro { font-size:0.84rem; color:var(--text-muted); margin-bottom:12px; }
+    .err-line {
+      display:flex; flex-wrap:wrap; align-items:center; gap:6px;
+      padding:9px 0; border-bottom:1px solid var(--border); font-size:0.9rem;
+    }
+    .err-line:last-child { border-bottom:none; }
+    .err-chip {
+      font-weight:700; padding:3px 10px; border-radius:14px;
+      border:1.5px dashed var(--blue-light); background:var(--blue-tint); color:var(--blue-dark);
+      cursor:pointer; transition:all 0.12s;
+    }
+    .err-chip:hover:not(.locked) { border-style:solid; }
+    .err-chip.marked { background:var(--red); border-color:var(--red); border-style:solid; color:#fff; }
+    .err-chip.locked { cursor:default; }
+    .err-chip.is-correct-mark { background:#38a169; border-color:#38a169; color:#fff; }
+    .err-chip.missed { background:#fff3cd; border-color:#d97706; color:#92400e; border-style:solid; }
+    .err-corr { font-size:0.76rem; color:var(--red-dark); width:100%; display:none; }
+    .err-corr.show { display:block; }
+
+    .check-btn-row { margin-top:16px; }
+
+    /* Slides */
+    .slideshow { border-radius:10px; overflow:hidden; box-shadow:0 6px 28px rgba(0,0,0,0.13),0 1px 4px rgba(0,0,0,0.07); border:1px solid rgba(0,0,0,0.08); }
+    .slide-panel { display:none; }
+    .slide-panel.active { display:block; }
+    .slide-panel.slide-in-right { animation:slideInRight 0.3s cubic-bezier(0.22,0.61,0.36,1) both; }
+    .slide-panel.slide-in-left  { animation:slideInLeft  0.3s cubic-bezier(0.22,0.61,0.36,1) both; }
+    @keyframes slideInRight { from{transform:translateX(44px);opacity:0} to{transform:translateX(0);opacity:1} }
+    @keyframes slideInLeft  { from{transform:translateX(-44px);opacity:0} to{transform:translateX(0);opacity:1} }
+    .slide-header { padding:20px 22px 16px; display:flex; align-items:center; gap:16px; border-bottom:1px solid rgba(0,0,0,0.09); }
+    .slide-icon { font-size:2.5rem; line-height:1; flex-shrink:0; width:56px; height:56px; display:flex; align-items:center; justify-content:center; border-radius:10px; background:rgba(255,255,255,0.52); box-shadow:0 1px 5px rgba(0,0,0,0.12); }
+    .slide-htitle { font-size:1.05rem; font-weight:700; line-height:1.3; }
+    .slide-body { padding:16px 22px 14px; font-size:0.9rem; line-height:1.65; color:var(--text); background:var(--surface); }
+    .slide-body p { margin-bottom:10px; }
+    .slide-body ul,.slide-body ol { margin:0 0 10px 1.2rem; }
+    .slide-body li { margin-bottom:6px; }
+    .slide-body b { color:var(--blue-dark); }
+    .slide-body .factbox { background:var(--blue-tint); border-left:4px solid var(--blue-light); border-radius:var(--radius-sm); padding:9px 13px; margin:10px 0 2px; font-size:0.84rem; line-height:1.55; }
+    .slide-nav-row { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:16px; }
+    .slide-dots { display:flex; gap:6px; align-items:center; }
+    .slide-dot { width:8px; height:8px; border-radius:50%; background:var(--border); transition:background 0.2s,transform 0.2s; cursor:pointer; }
+    .slide-dot.active { background:var(--blue-dark); transform:scale(1.35); }
+    .slide-dot.done { background:var(--blue-light); }
+    .slide-nav-btn { font-family:var(--font); font-size:0.82rem; font-weight:600; padding:7px 14px; border-radius:20px; border:1.5px solid var(--border); background:var(--surface); color:var(--text-muted); cursor:pointer; transition:all 0.15s; }
+    .slide-nav-btn:hover:not(:disabled) { border-color:var(--blue-light); color:var(--blue-dark); }
+    .slide-nav-btn:disabled { opacity:0.32; cursor:default; }
+    .slide-counter { font-size:0.76rem; color:var(--text-subtle); font-weight:600; white-space:nowrap; }
+
+    /* Auswertung */
+    .finish { text-align:center; }
+    .finish .rank { font-size:1.25rem; font-weight:800; color:var(--blue-dark); margin:4px 0 2px; }
+    .finish .big-score { font-size:2.4rem; font-weight:800; color:var(--blue-dark); margin:6px 0 2px; }
+    .finish .score-sub { font-size:0.86rem; color:var(--text-muted); margin-bottom:16px; }
+    .badges { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin:0 auto 18px; max-width:500px; }
+    .badge-chip { display:inline-flex; align-items:center; gap:5px; font-size:0.76rem; font-weight:600; padding:6px 12px; border-radius:20px; border:1.5px solid var(--border); background:#f8fafc; color:var(--text-subtle); }
+    .badge-chip.earned { background:#fff7e6; border-color:#f0c36d; color:#92400e; }
+    .badge-chip .lock { opacity:0.6; }
+    .finish ul { text-align:left; max-width:480px; margin:0 auto 20px; font-size:0.86rem; color:var(--text); line-height:1.6; }
+    .finish li { margin-bottom:6px; }
+    .score-breakdown { list-style:none; text-align:left; max-width:420px; margin:0 auto 18px; font-size:0.84rem; color:var(--text); padding:0; }
+    .score-breakdown li { display:flex; justify-content:space-between; gap:12px; padding:5px 0; border-bottom:1px solid var(--border); }
+    .score-breakdown li:last-child { border-bottom:none; }
+
+    /* Navigation */
+    .ls-nav { display:flex; justify-content:space-between; gap:10px; }
+    .ls-nav .spacer { flex:1; }
+
+    /* Begründen-Station */
+    .rs-task { padding-bottom:18px; border-bottom:1px solid var(--border); }
+    .rs-task:last-child { border-bottom:none; padding-bottom:0; }
+    .rs-hint { font-size:0.8rem; color:var(--text-muted); margin:6px 0 8px; }
+    .rs-chain { margin:0 0 10px 1.2rem; min-height:12px; }
+    .rs-pool { display:flex; flex-direction:column; gap:6px; }
+    .rs-frag { display:block; width:100%; text-align:left; font-family:var(--font); font-size:0.86rem; line-height:1.4; color:var(--text); background:var(--blue-tint); border:1.5px dashed var(--blue-light); border-radius:var(--radius-md); padding:9px 12px; cursor:pointer; }
+    .rs-frag.in-chain { background:var(--surface); border-style:solid; margin-bottom:6px; }
+    .rs-frag.correct { border-color:#38a169; background:#f0fff4; }
+    .rs-frag.wrong { border-color:var(--red); background:var(--red-light); }
+    .rs-text { width:100%; min-height:96px; font-family:var(--font); font-size:0.88rem; line-height:1.5; border:1.5px solid var(--border); border-radius:var(--radius-md); padding:10px 12px; resize:vertical; }
+    .rs-text:focus { outline:none; border-color:var(--blue-light); }
+    .rs-model { margin-top:12px; }
+    .rs-model-text { font-size:0.86rem; line-height:1.55; background:var(--blue-tint); border-left:4px solid var(--blue-light); border-radius:var(--radius-sm); padding:10px 14px; margin-bottom:8px; }
+    .rs-check { display:flex; gap:8px; align-items:flex-start; font-size:0.86rem; margin-bottom:6px; cursor:pointer; }
+    .rs-check input { margin-top:3px; }
+  </style>
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+  <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · b.2</span>
+  <h1 id="pageTitle">Halbhartkäse bis Salzbad</h1>
+  <p id="subtitle">Prüfungsvorbereitung Appenzeller und Tilsiter</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+  <a class="back-link" href="../index.html">← Alle Lerntools</a>
+
+  <div class="ls-wrap">
+    <div class="hud">
+      <div class="hud-xp"><span class="hud-label">XP</span><span class="hud-val" id="hudXp">0</span></div>
+      <div class="hud-bar"><div class="hud-bar-fill" id="hudBar"></div></div>
+      <div class="hud-streak" id="hudStreak">
+        <span id="hudStreakEmoji">🔥</span>
+        <div class="hud-fire-wrap" id="hudFireWrap" style="display:none">
+          <div class="fire">
+            <div class="fire-bottom"><div class="main-fire"></div></div>
+            <div class="fire-center"><div class="main-fire"></div><div class="particle-fire"></div></div>
+            <div class="fire-right"><div class="main-fire"></div><div class="particle-fire"></div></div>
+            <div class="fire-left"><div class="main-fire"></div><div class="particle-fire"></div></div>
+          </div>
+        </div>
+        <span id="hudStreakNum">0</span>
+      </div>
+    </div>
+
+    <div class="ls-meta" id="lsMeta"></div>
+    <div class="ls-select-hint"><span class="ls-select-badge">👆 Posten antippen – frei wählbar, keine feste Reihenfolge</span></div>
+    <div class="ls-dots" id="lsDots"></div>
+
+    <div id="stage"></div>
+
+    <div class="ls-nav">
+      <button class="btn btn-ghost" id="prevBtn" onclick="LSEngine.goPrev()">← Zurück</button>
+      <span class="spacer"></span>
+      <button class="btn btn-primary" id="nextBtn" onclick="LSEngine.goNext()">Weiter →</button>
+    </div>
+  </div>
+</main>
+
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+
+<script>
+/* ============================================================
+   Lernsession Halbhartkäse (Appenzeller, Tilsiter), b.2 Lehrmittel S. 7–15
+   Prüfungsvorbereitung: Milch behandeln bis Salzbad.
+   Pro Thema: Folien, Fakten-Übung, Begründen (Satzkette, besten Satz wählen, Freitext mit Selbstcheck)
+   ============================================================ */
+var ALL = [
+  /* ---------- 1 Milch behandeln ---------- */
+  {
+    kicker: 'Folien · Milch behandeln', title: 'Milchqualität und Thermisation',
+    lead: 'Lesen Sie alle Folien, danach prüfen Sie sich.',
+    type: 'slides',
+    slides: [
+      { icon: '🥛', color: '#0f766e', bg: '#f0fdfa',
+        title: 'Weshalb so gute Milch?',
+        body: '<p>Appenzeller und Tilsiter haben einen <b>weichschnittigen, langen, speckigen Teig</b>. Dazu braucht es einen <b>höheren Wassergehalt</b> als beim Hartkäse. Diesen erreichen Sie mit <b>tieferen Bruchwärmtemperaturen</b>.</p>' +
+              '<p>Die Folge: Die <b>Fremdkeime aus der Rohmilch werden kaum reduziert</b>. Darum braucht es eine sehr gute Milchqualität.</p>' +
+              '<div class="factbox">Für Rohmilchkäse verwenden Sie nur <b>silofreie Milch</b>, also Milch von Kühen ohne Silagefütterung.</div>'
+      },
+      { icon: '🌡️', color: '#b45309', bg: '#fffbeb',
+        title: 'Thermisation',
+        body: '<p>Heute ist die Thermisation der Rohmilch üblich: ca. <b>60 bis 68 °C während 20 s</b> im Wärmetauscher.</p>' +
+              '<p>Sie reduziert vor allem:</p><ul><li><b>Mikrokokken</b></li><li><b>Staphylokokken</b></li><li><b>Propionsäurebakterien</b></li></ul>' +
+              '<div class="factbox">Diese Keime können eine <b>Nachgärung</b> mit grossen Löchern oder braunen Tupfen im Teig und einen abweichenden Geschmack verursachen.</div>'
+      },
+      { icon: '⚖️', color: '#1e40af', bg: '#eff6ff',
+        title: 'Halbhartkäse und Hartkäse im Vergleich',
+        body: '<ul><li>Bruchwärmtemperatur: <b>39 bis 45 °C</b> (Hartkäse 52 bis 57 °C)</li><li>Ausrührzeit: <b>5 bis 15 min</b> (Hartkäse 10 bis 60 min)</li><li>Abfülltemperatur: <b>38 bis 44 °C</b> (Hartkäse 51 bis 56 °C)</li><li>Warmhaltezeit in der Form: <b>wesentlich kürzer</b></li><li>Wassergehalt vor dem Salzbad: <b>400 bis 425 g/kg</b> (Hartkäse 370 bis 380 g/kg)</li></ul>' +
+              '<div class="factbox">Beim Hartkäse reduzieren die hohe Bruchwärmtemperatur und die lange Warmhaltung die Fremdkeime. Beim Halbhartkäse übernimmt das die <b>Thermisation der Milch</b>.</div>'
+      }
+    ]
+  },
+  {
+    kicker: 'Lückentext', title: 'Halbhartkäse und Hartkäse',
+    lead: 'Wählen Sie in jeder Lücke den richtigen Wert.',
+    type: 'gaps',
+    parts: [
+      'Beim Halbhartkäse wärmen Sie den Bruch auf ',
+      { opts: ['39–45 °C', '52–57 °C', '30–32 °C'], correct: 0 },
+      ', beim Hartkäse auf ',
+      { opts: ['52–57 °C', '39–45 °C', '60–68 °C'], correct: 0 },
+      '. Die Ausrührzeit beim Halbhartkäse beträgt ',
+      { opts: ['5–15 min', '10–60 min', '30–40 min'], correct: 0 },
+      '. Vor dem Salzbad streben Sie einen Wassergehalt von ',
+      { opts: ['400–425 g/kg', '370–380 g/kg', '330 g/kg'], correct: 0 },
+      ' an. Die fremdkeimreduzierende Wirkung der Bruchwärmung ist beim Halbhartkäse ',
+      { opts: ['sehr gering', 'gross', 'gleich wie beim Hartkäse'], correct: 0 },
+      '. Deshalb thermisieren Sie die Milch bei ca. ',
+      { opts: ['60–68 °C, 20 s', '72 °C, 15 s', '85 °C, 5 min'], correct: 0 },
+      '.'
+    ]
+  },
+  {
+    kicker: 'Begründen', title: 'Milch behandeln',
+    lead: 'Trainieren Sie die Erklär-Fragen: <b>Ursache → Wirkung</b>.',
+    type: 'reason',
+    tasks: [
+      { kind: 'chain',
+        q: 'Bringen Sie die Sätze in die richtige Reihenfolge: Weshalb braucht Halbhartkäse eine sehr gute Milchqualität?',
+        frags: [
+          'Der Bruch wird nur auf 39 bis 45 °C gewärmt.',
+          'Dadurch werden die Fremdkeime aus der Rohmilch kaum reduziert.',
+          'Die Keime bleiben im Käse und können eine Nachgärung verursachen.',
+          'Deshalb braucht es sehr gute Milch und meist eine Thermisation.'
+        ] },
+      { kind: 'free',
+        q: 'Erklären Sie 1 Grund, weshalb Appenzeller und Tilsiter einen weichschnittigen, speckigen Teig haben.',
+        model: 'Der Bruch wird bei tieferen Temperaturen gewärmt als beim Hartkäse. Darum bleibt mehr Wasser im Käse. Dieser höhere Wassergehalt ist die Voraussetzung für den weichschnittigen, langen, speckigen Teig.',
+        checks: ['Ich nenne die tiefere Bruchwärmtemperatur.', 'Ich nenne den höheren Wassergehalt als Folge.', 'Ich verbinde den Wassergehalt mit dem weichschnittigen Teig.'] }
+    ]
+  },
+
+  /* ---------- 2 Kulturen ---------- */
+  {
+    kicker: 'Folien · Kulturen', title: 'Kulturen zugeben',
+    lead: 'Lesen Sie alle Folien, danach prüfen Sie sich.',
+    type: 'slides',
+    slides: [
+      { icon: '🦠', color: '#7c3aed', bg: '#f5f3ff',
+        title: 'Die vier Kulturen',
+        body: '<ul><li><b>Rohmischkulturen (RMK):</b> wie beim Hartkäse, Sc thermophilus und Lb delbrückii ssp. lactis. Bauen den Milchzucker <b>homofermentativ</b> ab und helfen mit ihren Enzymen bei der Reifung.</li>' +
+              '<li><b>Joghurt:</b> Sc thermophilus und Lb bulgaricus. <b>Sehr säuerungsaktiv</b>, unterstützen die Milchsäuregärung und den Eiweissabbau.</li>' +
+              '<li><b>Lochbildungskultur:</b> heterofermentativ, <b>gasbildend</b>, für die Lochbildung.</li>' +
+              '<li><b>Herkunftsnachweis-Kultur:</b> kein Gärungseinfluss, dient nur zur <b>Identifizierung der Echtheit</b>.</li></ul>'
+      },
+      { icon: '🌾', color: '#166534', bg: '#f0fdf4',
+        title: 'Heublumenpulver und Vorreifung',
+        body: '<p>Die Milch wird oft mehrfach filtriert. Dabei gehen die üblichen <b>Staubteilchen</b> verloren. Diese fehlen dann als <b>Lochansatzstellen</b>.</p>' +
+              '<p>Darum können Sie auf 1000 l Milch ca. <b>0,02 g Heublumenpulver</b> zugeben. Die Staubpartikel ersetzen die fehlenden Teilchen.</p>' +
+              '<div class="factbox">Vorreifung der Milch: <b>30 bis 32 °C während 15 bis 60 min</b>. Massgebend ist der pH-Verlauf im Käse, gemessen 2 h und 4 h nach dem Abfüllen sowie vor dem Salzbad.</div>'
+      }
+    ]
+  },
+  {
+    kicker: 'Quiz', title: 'Kulturen',
+    lead: 'Fünf Fragen zu den Kulturen.',
+    type: 'quiz',
+    questions: [
+      { q: 'Welche Kultur bildet Gas für die Lochbildung?',
+        opts: ['Lochbildungskultur', 'Rohmischkultur (RMK)', 'Herkunftsnachweis-Kultur'], correct: 0 },
+      { q: 'Welche Kultur hat keinen Einfluss auf die Gärung?',
+        opts: ['Herkunftsnachweis-Kultur', 'Joghurt', 'Lochbildungskultur'], correct: 0 },
+      { q: 'Welche Kultur ist sehr säuerungsaktiv und unterstützt den Eiweissabbau?',
+        opts: ['Joghurt', 'Herkunftsnachweis-Kultur', 'Lochbildungskultur'], correct: 0 },
+      { q: 'Wie bauen die RMK den Milchzucker ab?',
+        opts: ['homofermentativ', 'heterofermentativ, mit Gasbildung', 'gar nicht'], correct: 0 },
+      { q: 'Wie viel Heublumenpulver geben Sie auf 1000 l Milch?',
+        opts: ['ca. 0,02 g', 'ca. 2 g', 'ca. 20 g'], correct: 0 }
+    ]
+  },
+  {
+    kicker: 'Begründen', title: 'Kulturen',
+    lead: 'Trainieren Sie die Erklär-Fragen: <b>Ursache → Wirkung</b>.',
+    type: 'reason',
+    tasks: [
+      { kind: 'choose',
+        q: 'Welcher Satz erklärt richtig, weshalb Sie Heublumenpulver zugeben?',
+        opts: [
+          'Die Filtration entfernt die Staubteilchen. Die Partikel aus dem Heublumenpulver ersetzen sie als Lochansatzstellen.',
+          'Das Heublumenpulver gibt dem Käse ein würziges Heuaroma.',
+          'Man gibt Heublumenpulver zu, damit es Löcher gibt.'
+        ],
+        fb: 'Für den vollen Punkt braucht es die Ursache (Staubteilchen fehlen nach der Filtration) und die Wirkung (Ersatz als Lochansatzstellen). «Damit es Löcher gibt» nennt nur das Ziel, nicht den Grund.' },
+      { kind: 'free',
+        q: 'Erklären Sie 1 Grund, weshalb Sie bei Appenzeller und Tilsiter Joghurtkultur einsetzen.',
+        model: 'Die Joghurtkultur besteht aus Sc thermophilus und Lb bulgaricus. Diese Bakterien sind sehr säuerungsaktiv. Sie unterstützen die homofermentative Milchsäuregärung und im reifenden Käse den Eiweissabbau.',
+        checks: ['Ich nenne «sehr säuerungsaktiv».', 'Ich nenne die Unterstützung der Milchsäuregärung.', 'Ich nenne den Eiweissabbau in der Reifung.'] }
+    ]
+  },
+
+  /* ---------- 3 FSK / FSML ---------- */
+  {
+    kicker: 'Folien · FSK und FSML', title: 'Fettsirtenkultur und Fettsirtenmagenlab',
+    lead: 'Lesen Sie alle Folien, danach prüfen Sie sich.',
+    type: 'slides',
+    slides: [
+      { icon: '🧪', color: '#1d4ed8', bg: '#eff6ff',
+        title: 'Herstellung',
+        body: '<ol><li>Fettsirte <b>vor dem Bruchabfüllen</b> aus dem Fertiger entnehmen</li><li>Auf ca. <b>60 °C erhitzen</b>, um Fremdkeime zu reduzieren</li><li>Abkühlen auf die Impftemperatur von ca. <b>40 bis 45 °C</b></li><li>Mit ca. <b>1 ‰ RMK</b> oder Mischkulturen beimpfen</li><li>Bebrüten</li></ol>' +
+              '<div class="factbox"><b>FSK:</b> 38 °C, ca. 5 bis 10 h, bis ca. 25 bis 30 °SH<br><b>FSML:</b> 32 bis 35 °C, ca. 18 bis 24 h, bis ca. 55 bis 70 °SH</div>'
+      },
+      { icon: '🐄', color: '#92400e', bg: '#fff7ed',
+        title: 'Wirkung',
+        body: '<p>Mit FSK und FSML erreichen Sie <b>etwas mehr Löcher und Aroma</b> im Käse.</p>' +
+              '<p>Für das FSML kommen kleine Mengen <b>Kälbermagen</b> in die Fettsirte. Die Mägen werden vorher mit heisser Sirte von <b>mindestens 60 °C abgebrüht</b>, um Fremdkeime zu reduzieren.</p>' +
+              '<p>Der Kälbermagen begünstigt das Wachstum von <b>eiweissabbauenden Bakterien</b>. Diese grössere Vielfalt unterstützt die Geschmacksbildung.</p>' +
+              '<div class="factbox">In der Mundart heisst das FSML oft «Lab». Seine Labwirkung ist aber <b>unbedeutend</b>.</div>'
+      }
+    ]
+  },
+  {
+    kicker: 'Lückentext', title: 'FSK und FSML',
+    lead: 'Wählen Sie in jeder Lücke den richtigen Wert.',
+    type: 'gaps',
+    parts: [
+      'Die Fettsirte erhitzen Sie auf ca. ',
+      { opts: ['60 °C', '38 °C', '85 °C'], correct: 0 },
+      ' und kühlen sie danach auf ',
+      { opts: ['40–45 °C', '20–25 °C', '60–65 °C'], correct: 0 },
+      ' ab. Die FSK bebrüten Sie bei ',
+      { opts: ['38 °C', '32–35 °C', '13–16 °C'], correct: 0 },
+      ' bis ca. ',
+      { opts: ['25–30 °SH', '55–70 °SH', '5–10 °SH'], correct: 0 },
+      '. Das FSML bebrüten Sie ca. ',
+      { opts: ['18–24 h', '5–10 h', '2–4 h'], correct: 0 },
+      ' bis ca. ',
+      { opts: ['55–70 °SH', '25–30 °SH', '100 °SH'], correct: 0 },
+      '.'
+    ]
+  },
+  {
+    kicker: 'Begründen', title: 'FSK und FSML',
+    lead: 'Trainieren Sie Reihenfolge und Begründung.',
+    type: 'reason',
+    tasks: [
+      { kind: 'chain',
+        q: 'Bringen Sie die Herstellung der FSK in die richtige Reihenfolge.',
+        frags: [
+          'Fettsirte vor dem Bruchabfüllen aus dem Fertiger entnehmen.',
+          'Fettsirte auf ca. 60 °C erhitzen.',
+          'Auf ca. 40 bis 45 °C abkühlen.',
+          'Mit ca. 1 ‰ RMK oder Mischkultur beimpfen.',
+          'Bei 38 °C während ca. 5 bis 10 h bebrüten.'
+        ] },
+      { kind: 'free',
+        q: 'Erklären Sie 2 Gründe, weshalb ein Betrieb FSML einsetzt.',
+        model: 'Mit den betriebseigenen Kulturen erreichen Sie etwas mehr Löcher und Aroma im Käse. Der Kälbermagen in der Fettsirte begünstigt das Wachstum von eiweissabbauenden Bakterien. Diese grössere bakteriologische Vielfalt unterstützt die Geschmacksbildung.',
+        checks: ['Ich nenne mehr Löcher und Aroma.', 'Ich nenne die eiweissabbauenden Bakterien aus dem Kälbermagen.', 'Ich verbinde diese Bakterien mit der Geschmacksbildung.'] }
+    ]
+  },
+
+  /* ---------- 4 Wasserzusatz ---------- */
+  {
+    kicker: 'Folien · Wasserzusatz', title: 'Wasser in die Milch geben',
+    lead: 'Lesen Sie alle Folien, danach prüfen Sie sich.',
+    type: 'slides',
+    slides: [
+      { icon: '💧', color: '#0369a1', bg: '#f0f9ff',
+        title: 'Weshalb Wasser?',
+        body: '<p>Der gesamte Wasserzusatz beträgt ca. <b>20 bis 25 %</b> der Milchmenge.</p>' +
+              '<ul><li>Das Wasser <b>verdünnt den Milchzucker</b>.</li><li>Die Milchsäurebakterien haben weniger Gärmaterial.</li><li>Der pH-Wert im jungen Käse <b>sinkt weniger tief</b>, gewünscht sind ca. <b>5,1 bis 5,2</b> vor dem Salzbad.</li><li>Weniger Milchsäure löst <b>weniger Kalzium</b> aus dem Kasein-Kalziumgerüst.</li><li>Der Teig bleibt <b>elastisch, speckig, lang</b>.</li></ul>'
+      },
+      { icon: '⚠️', color: '#b91c1c', bg: '#fef2f2',
+        title: 'In die Milch höchstens 10 %',
+        body: '<p>Wasser in der Milch verdünnt <b>alle</b> Inhaltsstoffe. Die Folgen:</p>' +
+              '<ul><li>Grösserer Labverbrauch</li><li>Langsamere Griffzunahme, weniger Risiko für Überschiessen</li><li>Weichere Gallerte, dadurch mehr Staubbildung</li><li>Weniger Milch pro Fertigerfüllung</li><li>Grösserer Wasserverbrauch für die gleiche Wirkung</li><li>Mehr Sirte mit tieferer Trockenmasse, unwirtschaftlich</li></ul>' +
+              '<div class="factbox">Für den Milchzucker ist es egal, ob das Wasser in die Milch oder in den Bruch kommt. Wegen der Nebenwirkungen ist das <b>Bruchwaschen</b> aber vorteilhafter. Vorher kann ein Teil der Sirte abgepumpt werden.</div>'
+      }
+    ]
+  },
+  {
+    kicker: 'Wahr oder Falsch', title: 'Wasserzusatz',
+    lead: 'Entscheiden Sie bei jeder Aussage: <b>wahr</b> oder <b>falsch</b>?',
+    type: 'tf',
+    items: [
+      { s: 'Der gesamte Wasserzusatz beträgt ca. 20 bis 25 % der Milchmenge.', a: true, e: 'So steht es im Lehrmittel S. 10.' },
+      { s: 'In die Milch geben Sie höchstens 10 % Wasser.', a: true, e: 'Wegen der Nebenwirkungen ist der Wasserzusatz in die Milch auf 10 % begrenzt.' },
+      { s: 'Wasser in der Milch senkt den Labverbrauch.', a: false, e: 'Der Labverbrauch steigt, proportional zum Wasserzusatz.' },
+      { s: 'Für die Verdünnung des Milchzuckers ist es egal, ob das Wasser in die Milch oder in den Bruch kommt.', a: true, e: 'Richtig. Der Unterschied liegt nur bei den Nebenwirkungen.' },
+      { s: 'Mehr Wasser in der Milch erhöht die Verarbeitungskapazität pro Fertigerfüllung.', a: false, e: 'Die Kapazität sinkt, weil das Wasser Platz im Fertiger braucht.' },
+      { s: 'Wasser in der Milch macht die Gallerte fester.', a: false, e: 'Die Gallerte wird weicher. Das kann mehr Staub geben.' }
+    ]
+  },
+  {
+    kicker: 'Begründen', title: 'Wasserzusatz',
+    lead: 'Trainieren Sie die Erklär-Fragen: <b>Ursache → Wirkung</b>.',
+    type: 'reason',
+    tasks: [
+      { kind: 'chain',
+        q: 'Bringen Sie die Wirkungskette in die richtige Reihenfolge: Wie wirkt der Wasserzusatz auf den Käse?',
+        frags: [
+          'Das Wasser verdünnt den Milchzucker.',
+          'Die Milchsäurebakterien bilden weniger Milchsäure.',
+          'Der pH-Wert im jungen Käse sinkt weniger tief, auf ca. 5,1 bis 5,2.',
+          'Die Milchsäure löst weniger Kalzium aus dem Kasein-Kalziumgerüst.',
+          'Der Teig bleibt elastisch, speckig und lang.'
+        ] },
+      { kind: 'choose',
+        q: 'Welcher Satz begründet richtig, weshalb das Wasser besser in den Bruch kommt?',
+        opts: [
+          'Vor dem Bruchwaschen pumpen Sie einen Teil der Sirte ab. So müssen Sie weniger Volumen verdünnen, und die Nebenwirkungen in der Milch fallen weg.',
+          'Im Bruch wird der Milchzucker stärker verdünnt als in der Milch.',
+          'Das Wasser kommt in den Bruch, weil man das so macht.'
+        ],
+        fb: 'Für den Milchzucker ist es egal, wo das Wasser hinkommt. Der Vorteil des Bruchwaschens liegt bei den Nebenwirkungen und beim kleineren Volumen.' }
+    ]
+  },
+
+  /* ---------- 5 Gerinnung ---------- */
+  {
+    kicker: 'Folien · Gerinnung', title: 'Milch gerinnen, Bruch herstellen',
+    lead: 'Lesen Sie alle Folien, danach prüfen Sie sich.',
+    type: 'slides',
+    slides: [
+      { icon: '🧫', color: '#1d4ed8', bg: '#eff6ff',
+        title: 'Labstoffe',
+        body: '<p>Sie verwenden in der Regel <b>tierische Gerinnungsenzyme</b>.</p>' +
+              '<p>Einzelne <b>mikrobielle Labstoffe</b> sind nicht geeignet. Die tiefen Brenntemperaturen <b>inaktivieren sie nicht genügend</b>. Das kann in der Reifung zu <b>Bitterkeit</b> führen.</p>' +
+              '<div class="factbox">Auf Lab aus gentechnisch veränderten Mikroorganismen wird grundsätzlich verzichtet.</div>'
+      },
+      { icon: '⏱️', color: '#0f766e', bg: '#f0fdfa',
+        title: 'Temperatur, Zeit, Korngrösse',
+        body: '<ul><li><b>Labungstemperatur 30,5 bis 32 °C.</b> Höhere Temperaturen verstärken die Griffbildung, der Bruch <b>schiesst über</b>.</li>' +
+              '<li><b>Labungszeit 30 bis 40 min.</b> Flockungszeit × <b>2 bis 2,5</b> ergibt immer den <b>gleichen Ausdickungsgrad</b>. Etwas mehr ausdicken als beim Hartkäse.</li>' +
+              '<li><b>Bruchkorn Maiskorn bis Haselnuss.</b> Diese Grösse ist die Voraussetzung für den gewünschten <b>Wassergehalt</b> im weichschnittigen Teig.</li></ul>'
+      }
+    ]
+  },
+  {
+    kicker: 'Lückentext', title: 'Gerinnung',
+    lead: 'Wählen Sie in jeder Lücke den richtigen Begriff.',
+    type: 'gaps',
+    parts: [
+      'Sie laben bei ',
+      { opts: ['30,5–32 °C', '38–40 °C', '25–27 °C'], correct: 0 },
+      ' ein. Die Labungszeit beträgt ',
+      { opts: ['30–40 min', '5–10 min', '60–90 min'], correct: 0 },
+      '. Die Flockungszeit multiplizieren Sie mit dem Faktor ',
+      { opts: ['2–2,5', '1–1,5', '4–5'], correct: 0 },
+      '. Die Gallerte lassen Sie ',
+      { opts: ['etwas mehr', 'etwas weniger', 'gleich viel'], correct: 0 },
+      ' ausdicken als beim Hartkäse. Das Bruchkorn soll ',
+      { opts: ['mais- bis haselnussgross', 'reiskorngross', 'baumnussgross'], correct: 0 },
+      ' sein.'
+    ]
+  },
+  {
+    kicker: 'Begründen', title: 'Gerinnung',
+    lead: 'Trainieren Sie die Erklär-Fragen: <b>Ursache → Wirkung</b>.',
+    type: 'reason',
+    tasks: [
+      { kind: 'choose',
+        q: 'Welcher Satz erklärt richtig, weshalb einzelne mikrobielle Labstoffe nicht geeignet sind?',
+        opts: [
+          'Die tiefen Brenntemperaturen inaktivieren sie nicht genügend. Sie wirken im Käse weiter und können in der Reifung Bitterkeit verursachen.',
+          'Mikrobielle Labstoffe bringen Fremdkeime in die Milch.',
+          'Mikrobielle Labstoffe sind beim Halbhartkäse verboten.'
+        ],
+        fb: 'Die Ursache ist die ungenügende Inaktivierung bei tiefen Temperaturen, die Wirkung ist Bitterkeit in der Reifung.' },
+      { kind: 'free',
+        q: 'Erklären Sie 1 Grund, weshalb Sie die Flockungszeit mit einem Faktor von 2 bis 2,5 multiplizieren.',
+        model: 'Die Flockungszeit zeigt, wie schnell die Milch an diesem Tag gerinnt. Mit dem Faktor berechnen Sie daraus die Labungszeit. So erhalten Sie immer den gleichen Ausdickungsgrad der Gallerte.',
+        checks: ['Ich nenne, dass daraus die Labungszeit berechnet wird.', 'Ich nenne den gleichen Ausdickungsgrad als Ziel.'] }
+    ]
+  },
+
+  /* ---------- 6 Bruch behandeln, abfüllen, wenden ---------- */
+  {
+    kicker: 'Folien · Bruch', title: 'Bruch behandeln, abfüllen, wenden',
+    lead: 'Lesen Sie alle Folien, danach prüfen Sie sich.',
+    type: 'slides',
+    slides: [
+      { icon: '🔄', color: '#1e40af', bg: '#eff6ff',
+        title: 'Sirte abpumpen, Bruch waschen',
+        body: '<ul><li>Möglichst viel <b>Sirte abpumpen</b>, um Wasser und Wärmeenergie zu sparen.</li><li>Rührwerk höchstens <b>5 min</b> anhalten. Sonst setzt sich der Bruch ab und <b>verklebt</b>. Knollen führen zu Teig- und Lochungsfehlern.</li><li>Bruchwaschen mit ca. <b>20 bis 25 % Warmwasser</b> von <b>65 bis 75 °C</b>, dosiert zugeben.</li></ul>' +
+              '<div class="factbox">Bruchwärmtemperatur: Appenzeller <b>40 bis 45 °C</b> (max. 400 g/kg Wasser im reifen Käse), Tilsiter <b>39 bis 42 °C</b> (max. 425 g/kg). Tiefer gewärmt = mehr Wasser im Käse.</div>'
+      },
+      { icon: '🚿', color: '#0f766e', bg: '#f0fdfa',
+        title: 'Das Bruchwaschwasser',
+        body: '<p>Das Wasser muss wie die Milch <b>möglichst keimarm</b> sein.</p>' +
+              '<ul><li><b>Pasteurisieren</b> reduziert die Keime, ausser die Sporenbildner.</li><li><b>Erwärmen in drucklosen Behältern</b> entgast das Wasser. Leitungswasser enthält feine Luftblasen. Diese führen sonst zu ungleichmässiger, <b>nestiger Lochung</b>.</li></ul>' +
+              '<div class="factbox">Gegen Sporen von Buttersäure- und Putrifikuserregern kann zusätzlich eine Mikrofiltration oder UV-Bestrahlung nötig sein.</div>'
+      },
+      { icon: '🧀', color: '#92400e', bg: '#fffbeb',
+        title: 'Abfüllen, pressen, wenden',
+        body: '<ul><li>Der Bruch muss beim Abfüllen <b>in die Sirte eintauchen</b>. So wird die Luft nach oben abgedrängt. Sirtenspiegel ca. <b>18 bis 20 cm</b>.</li><li>Pressen: ca. <b>20 min mit 40 bis 60 kg</b> bis zum ersten Wenden, dann ca. <b>50 min mit 40 bis 80 kg</b> pro Käse.</li><li>Bis zum Salzbad <b>2 bis 4 Mal wenden</b>. Dabei die äusseren Reihen nach innen legen.</li></ul>' +
+              '<div class="factbox">Käse am Wannenrand kühlen schneller ab. Das Umplatzieren sorgt für eine <b>ausgeglichene Temperaturabsenkung</b>.</div>'
+      }
+    ]
+  },
+  {
+    kicker: 'Wahr oder Falsch', title: 'Bruch behandeln, abfüllen, wenden',
+    lead: 'Entscheiden Sie bei jeder Aussage: <b>wahr</b> oder <b>falsch</b>?',
+    type: 'tf',
+    items: [
+      { s: 'Beim Sirtenabpumpen darf das Rührwerk höchstens 5 Minuten stillstehen.', a: true, e: 'Sonst setzt sich der Bruch ab und verklebt.' },
+      { s: 'Das Bruchwaschwasser hat eine Einsatztemperatur von 65 bis 75 °C.', a: true, e: 'Dosiert zugeben, damit die Bruchkörner nicht örtlich überhitzen.' },
+      { s: 'Das Pasteurisieren des Bruchwaschwassers tötet auch die Sporenbildner ab.', a: false, e: 'Sporenbildner überleben. Dagegen helfen Mikrofiltration oder UV-Bestrahlung.' },
+      { s: 'Tilsiter wird tiefer gewärmt als Appenzeller, weil er mehr Wasser enthalten soll.', a: true, e: 'Tilsiter max. 425 g/kg, Appenzeller max. 400 g/kg.' },
+      { s: 'Beim Abfüllen soll der Bruch möglichst ohne Sirte in die Formen fallen.', a: false, e: 'Der Bruch muss in die Sirte eintauchen, damit die Luft nach oben abgedrängt wird.' },
+      { s: 'Bis zur Salzbehandlung wenden Sie die Käse 2 bis 4 Mal.', a: true, e: 'Dabei die äusseren Reihen nach innen legen.' }
+    ]
+  },
+  {
+    kicker: 'Begründen', title: 'Bruch behandeln, abfüllen, wenden',
+    lead: 'Trainieren Sie die Erklär-Fragen: <b>Ursache → Wirkung</b>.',
+    type: 'reason',
+    tasks: [
+      { kind: 'chain',
+        q: 'Bringen Sie die Sätze in die richtige Reihenfolge: Weshalb erwärmen Sie das Bruchwaschwasser in drucklosen Behältern?',
+        frags: [
+          'Wasser aus dem Leitungsnetz enthält feine Luftblasen.',
+          'Diese Luftblasen können zu ungleichmässiger, nestiger Lochung führen.',
+          'Darum erwärmen Sie das Wasser in drucklosen Behältern.',
+          'Dabei wird das Wasser entgast.'
+        ] },
+      { kind: 'free',
+        q: 'Erklären Sie 1 Grund, weshalb das Rührwerk beim Sirtenabpumpen höchstens 5 Minuten stillstehen darf.',
+        model: 'Ohne Rühren setzt sich der Bruch ab. Er verklebt durch sein Eigengewicht zu Knollen. Verbleibende Knollen führen zu Teig- und Lochungsfehlern.',
+        checks: ['Ich nenne, dass der Bruch sich absetzt und verklebt.', 'Ich nenne die Teig- und Lochungsfehler als Folge.'] },
+      { kind: 'free',
+        q: 'Erklären Sie 1 Grund, weshalb Sie beim Wenden die äusseren Formen nach innen legen.',
+        model: 'Käse am Wannenrand kühlen schneller ab als Käse in der Mitte. Durch das Umplatzieren erreichen Sie eine möglichst ausgeglichene Temperaturabsenkung in allen Käsen.',
+        checks: ['Ich nenne, dass Käse am Rand schneller abkühlen.', 'Ich nenne die ausgeglichene Temperaturabsenkung als Ziel.'] }
+    ]
+  },
+
+  /* ---------- 7 Milchzuckerabbau und Salzbad ---------- */
+  {
+    kicker: 'Folien · Milchzuckerabbau', title: 'Milchzucker abbauen, Salzbad',
+    lead: 'Lesen Sie alle Folien, danach prüfen Sie sich.',
+    type: 'slides',
+    slides: [
+      { icon: '🌡️', color: '#c2410c', bg: '#fff7ed',
+        title: 'Die Temperatur steuert die Gärung',
+        body: '<p>Mit der Temperatur im Abtropfbereich steuern Sie die Milchsäuregärung. Je näher am Optimum der Milchsäurebakterien, desto <b>rascher</b> der Abbau.</p>' +
+              '<ul><li><b>Zu rasch:</b> Die Synärese ist zu intensiv, der Käse verliert zu viel Sirte. Mit der Sirte geht Milchzucker weg. Der End-pH geht <b>weniger tief</b>, der Teig wird <b>fest</b>.</li>' +
+              '<li><b>Verlangsamt:</b> Mehr Sirte bleibt im Käse. Der End-pH geht etwas tiefer. Ideal: <b>pH 5,10 bis 5,20</b>.</li></ul>'
+      },
+      { icon: '❄️', color: '#0369a1', bg: '#f0f9ff',
+        title: 'Zu kalt und zu trocken',
+        body: '<p><b>Zu rascher Temperaturabfall:</b> Der Milchzucker wird nicht vollständig abgebaut. Der Rest wird erst in der Reifung abgebaut. Die neue Milchsäure verstärkt die Synärese. Die Käse bleiben <b>glänzend, salzig, nass</b> und neigen zu <b>Weiss-Schmierigkeit</b>.</p>' +
+              '<p><b>Zu trockene Luft:</b> Der Käsenarben vertrocknet und kann <b>Fett schwitzen</b>. Das behindert im Salzbad den Sirtenentzug und die Salzaufnahme. Die fettige Oberfläche lässt sich schlecht benetzen, die <b>Schmierebildung</b> leidet.</p>'
+      },
+      { icon: '🧂', color: '#1e3a5f', bg: '#f0f8ff',
+        title: 'Salzbadbehandlung',
+        body: '<p>Eine <b>gleichmässige Sirtenabgabe</b> und gleichzeitige <b>Salzaufnahme</b> ist wichtig für die <b>Schmierebildung</b>.</p>' +
+              '<ul><li>Salzbadezeit Appenzeller: <b>36 bis 48 h</b></li><li>Salzbadezeit Tilsiter: <b>24 bis 36 h</b></li><li>Salzbadstärke Tilsiter: <b>21 bis 23 °Bé</b></li><li>Salzbadtemperatur Tilsiter: <b>13 bis 16 °C</b></li></ul>'
+      }
+    ]
+  },
+  {
+    kicker: 'Lückentext', title: 'Milchzuckerabbau und Salzbad',
+    lead: 'Wählen Sie in jeder Lücke den richtigen Begriff.',
+    type: 'gaps',
+    parts: [
+      'Verläuft die Milchsäuregärung zu rasch, geht der End-pH-Wert ',
+      { opts: ['weniger tief', 'tiefer', 'gar nicht'], correct: 0 },
+      ' und der Teig wird ',
+      { opts: ['fest', 'weich', 'klebrig'], correct: 0 },
+      '. Der ideale pH-Wert liegt bei ',
+      { opts: ['5,10–5,20', '4,60–4,80', '6,50–6,70'], correct: 0 },
+      '. Bei unvollständigem Milchzuckerabbau neigen die Käse zu ',
+      { opts: ['Weiss-Schmierigkeit', 'Nachgärung mit Rissen', 'Bitterkeit'], correct: 0 },
+      '. Der Appenzeller bleibt ',
+      { opts: ['36–48 h', '24–36 h', '15 Tage'], correct: 0 },
+      ' im Salzbad, der Tilsiter ',
+      { opts: ['24–36 h', '36–48 h', '5–10 h'], correct: 0 },
+      '.'
+    ]
+  },
+  {
+    kicker: 'Begründen', title: 'Milchzuckerabbau und Salzbad',
+    lead: 'Trainieren Sie die Erklär-Fragen: <b>Ursache → Wirkung</b>.',
+    type: 'reason',
+    tasks: [
+      { kind: 'chain',
+        q: 'Bringen Sie die Wirkungskette in die richtige Reihenfolge: Was passiert bei zu rascher Milchsäuregärung?',
+        frags: [
+          'Die Temperatur im Käse liegt nahe am Optimum der Milchsäurebakterien.',
+          'Die Milchsäuregärung verläuft zu rasch.',
+          'Die Synärese ist zu intensiv, mit der Sirte tropft auch Milchzucker ab.',
+          'Der End-pH-Wert geht weniger tief, und der Teig wird fest.'
+        ] },
+      { kind: 'free',
+        q: 'Erklären Sie 1 Grund, weshalb die Luftfeuchtigkeit während der Milchsäuregärung hoch sein soll.',
+        model: 'Ist die Luft zu trocken, vertrocknet der Käsenarben und kann Fett schwitzen. Diese verfettete Oberfläche behindert im Salzbad den Sirtenentzug und die Salzaufnahme. Sie lässt sich auch schlecht benetzen und behindert die Schmierebildung.',
+        checks: ['Ich nenne den vertrockneten Narben oder das Fettschwitzen.', 'Ich nenne eine Folge: Salzbad behindert oder Schmierebildung behindert.'] },
+      { kind: 'choose',
+        q: 'Welcher Satz begründet richtig, weshalb im Salzbad eine gleichmässige Sirtenabgabe und Salzaufnahme wichtig ist?',
+        opts: [
+          'Sie ist wichtig für die Schmierebildung. Nur so kann sich in der Reifung eine gute Schmiere bilden.',
+          'Sie verhindert, dass der Käse im Salzbad schwimmt.',
+          'Sie ist wichtig, damit der Käse möglichst viel Salz aufnimmt.'
+        ],
+        fb: 'Das Lehrmittel nennt die Schmierebildung als Grund (S. 15).' }
+    ]
+  },
+
+  /* ---------- Schlussrunde ---------- */
+  {
+    kicker: 'Meisterprüfung', title: 'Halbhartkäse-Meisterprüfung', id: 'boss', boss: true,
+    lead: 'Die Schlussrunde quer durch alle Themen.',
+    type: 'quiz',
+    questions: [
+      { q: 'Welche Keime reduziert die Thermisation vor allem?',
+        opts: ['Mikrokokken, Staphylokokken, Propionsäurebakterien', 'Buttersäure-Sporen', 'Joghurtbakterien'], correct: 0 },
+      { q: 'Weshalb bleibt der Teig mit Wasserzusatz lang und speckig?',
+        opts: ['Weniger Milchsäure löst weniger Kalzium aus dem Kasein', 'Das Wasser macht den Teig direkt weicher', 'Das Wasser verdünnt das Fett'], correct: 0 },
+      { q: 'Was passiert bei einer Labungstemperatur über 32 °C?',
+        opts: ['Der Griff nimmt stärker zu, der Bruch schiesst über', 'Die Gallerte wird zu weich', 'Das Lab wird inaktiviert'], correct: 0 },
+      { q: 'Weshalb wird das Bruchwaschwasser drucklos erwärmt?',
+        opts: ['Zur Entgasung, gegen nestige Lochung', 'Damit es schneller heiss wird', 'Damit die Sporen absterben'], correct: 0 },
+      { q: 'Weshalb muss der Bruch beim Abfüllen in die Sirte eintauchen?',
+        opts: ['Die Luft wird nach oben abgedrängt, gegen Lochungsfehler', 'Damit der Bruch schneller abkühlt', 'Damit mehr Salz in den Käse kommt'], correct: 0 },
+      { q: 'Was ist die Folge eines zu raschen Temperaturabfalls im jungen Käse?',
+        opts: ['Restzucker, nasse Käse, Weiss-Schmierigkeit', 'Zu fester Teig mit tiefem pH', 'Mehr Löcher und Aroma'], correct: 0 }
+    ]
+  }
+];
+
+var MODE = /[?&]mode=challenge/.test(location.search) ? 'challenge' : 'lernpfad';
+var STATIONS = ALL.filter(function(s){ return MODE === 'challenge' ? (s.type !== 'info' && s.type !== 'slides') : true; });
+
+LSEngine.configure({
+  unitLabel: 'Station',
+  modeBanner: {
+    pageTitle: function(mode){ return (mode==='challenge'?'Challenge':'Lernpfad') + ': Halbhartkäse bis Salzbad'; },
+    subtitle: function(mode){ return mode==='challenge'
+      ? 'Prüfungsmodus – ohne Folien'
+      : 'Prüfungsvorbereitung – Folien, Übungen und Begründen'; },
+    docTitle: function(mode){ return (mode==='challenge'?'Challenge':'Lernpfad') + ': Halbhartkäse'; }
+  },
+  finish: {
+    rank: function(pct){
+      if (pct >= 90)      return 'Halbhartkäse-Meister 🧀';
+      else if (pct >= 75) return 'Käser';
+      else if (pct >= 50) return 'Käser in Ausbildung';
+      else                return 'Lehrling';
+    },
+    badges: function(pct){
+      var bIdx = LSEngine.findIdx('boss');
+      var reasonFull = true;
+      for (var i = 0; i < N; i++) { if (STATIONS[i].type === 'reason' && earned[i] < maxPts[i]) reasonFull = false; }
+      return [
+        { icon: '📖', name: 'Aufmerksamer Leser', got: true },
+        { icon: '🧠', name: 'Begründungs-Profi', got: reasonFull },
+        { icon: '🔥', name: 'Serienkäser (Streak 8+)', got: bestStreak >= 8 },
+        { icon: '🎓', name: 'Meisterprüfung', got: bIdx >= 0 && maxPts[bIdx] > 0 && earned[bIdx] === maxPts[bIdx] },
+        { icon: '🧀', name: 'Prüfungsbereit (90%)', got: pct >= 90 }
+      ];
+    },
+    pointsWord: 'Wissenspunkte',
+    backLink: false,
+    closingHtml:
+      '<ul>' +
+        '<li>Tiefe Bruchwärmtemperatur → mehr Wasser, weicher Teig, aber kaum Keimreduktion → <b>sehr gute Milch, Thermisation</b>.</li>' +
+        '<li>Wasserzusatz → weniger Milchsäure → <b>weniger Kalzium gelöst</b> → langer, speckiger Teig.</li>' +
+        '<li>Labung 30,5–32 °C, Flockungszeit × 2–2,5, Bruchkorn mais- bis haselnussgross.</li>' +
+        '<li>Bruchwaschwasser pasteurisiert und <b>entgast</b>, Bruch taucht beim Abfüllen in die Sirte.</li>' +
+        '<li>Milchsäuregärung steuern: ideal <b>pH 5,10–5,20</b>, feuchte Luft, gleichmässiges Salzbad für die Schmiere.</li>' +
+      '</ul>' +
+      '<p style="font-size:0.84rem;color:var(--text-muted);">Bei den Erklär-Fragen in der Prüfung zählt immer die ganze Kette: <b>was passiert</b> und <b>weshalb</b>.</p>'
+  }
+});
+
+LSEngine.initState();
+
+/* ---------- Aufbau aller Stationen ---------- */
+function buildBody(idx, st) {
+  var body = document.getElementById('body-' + idx);
+  if (st.type === 'slides') LSEngine.buildSlides(idx, st);
+  if (st.type === 'quiz')   LSEngine.buildQuiz(idx, st);
+  if (st.type === 'tf')     LSEngine.buildTF(idx, st);
+  if (st.type === 'gaps')   LSEngine.buildGaps(idx, st);
+  if (st.type === 'reason') buildReason(body, idx, st);
+}
+
+/* ---------- Begründen: Satzkette, besten Satz wählen, Freitext mit Selbstcheck ----------
+   Jede Teilaufgabe gibt 1 Punkt. Station gilt als gelöst, wenn alle Teilaufgaben fertig sind. */
+function buildReason(body, idx, st) {
+  maxPts[idx] = st.tasks.length;
+  earned[idx] = 0;
+  var done = 0;
+  function finishTask(pts, ok) {
+    earned[idx] += pts;
+    LSEngine.registerAnswer(ok);
+    done++;
+    if (done === st.tasks.length) solved[idx] = true;
+    LSEngine.updateNav();
+  }
+  st.tasks.forEach(function(t, ti) {
+    var block = document.createElement('div');
+    block.className = 'q-block rs-task';
+    block.innerHTML = '<div class="q-text">' + (ti + 1) + '. ' + t.q + '</div>';
+    body.appendChild(block);
+    if (t.kind === 'chain')  buildChain(block, t, finishTask);
+    if (t.kind === 'choose') buildChoose(block, t, finishTask);
+    if (t.kind === 'free')   buildFree(block, t, finishTask);
+  });
+}
+
+/* Satzkette: Bausteine antippen, um sie der Reihe nach anzuhängen; in der Kette antippen = zurücklegen */
+function buildChain(block, t, finishTask) {
+  var picked = [];
+  var order = LSEngine.shuffleIdx(t.frags.length);
+  var wrap = document.createElement('div');
+  wrap.innerHTML = '<div class="rs-hint">Tippen Sie die Sätze in der richtigen Reihenfolge an.</div>' +
+    '<ol class="rs-chain"></ol><div class="rs-pool"></div>' +
+    '<div class="check-btn-row"><button class="btn btn-primary" disabled>Prüfen</button></div><div class="fb"></div>';
+  block.appendChild(wrap);
+  var chainEl = wrap.querySelector('.rs-chain'), poolEl = wrap.querySelector('.rs-pool');
+  var btn = wrap.querySelector('button'), fb = wrap.querySelector('.fb');
+  var locked = false;
+  function render() {
+    chainEl.innerHTML = ''; poolEl.innerHTML = '';
+    picked.forEach(function(fi, pos) {
+      var li = document.createElement('li');
+      li.className = 'rs-frag in-chain';
+      li.textContent = t.frags[fi];
+      li.addEventListener('click', function() { if (locked) return; picked.splice(pos, 1); render(); });
+      chainEl.appendChild(li);
+    });
+    order.forEach(function(fi) {
+      if (picked.indexOf(fi) !== -1) return;
+      var b = document.createElement('button');
+      b.className = 'rs-frag';
+      b.textContent = t.frags[fi];
+      b.addEventListener('click', function() { if (locked) return; picked.push(fi); render(); });
+      poolEl.appendChild(b);
+    });
+    btn.disabled = locked || picked.length !== t.frags.length;
+  }
+  btn.addEventListener('click', function() {
+    locked = true;
+    var ok = picked.every(function(fi, pos) { return fi === pos; });
+    chainEl.querySelectorAll('.rs-frag').forEach(function(li, pos) { li.classList.add(picked[pos] === pos ? 'correct' : 'wrong'); });
+    fb.className = 'fb show ' + (ok ? 'ok' : 'no');
+    fb.innerHTML = ok ? 'Richtig! Die Kette stimmt.' :
+      '<b>Richtige Reihenfolge:</b><ol style="margin:6px 0 0 1.1rem;">' + t.frags.map(function(f) { return '<li>' + f + '</li>'; }).join('') + '</ol>';
+    btn.disabled = true;
+    finishTask(ok ? 1 : 0, ok);
+  });
+  render();
+}
+
+/* Besten Satz wählen: Punkt nur beim ersten Versuch */
+function buildChoose(block, t, finishTask) {
+  var triedWrong = false, finished = false;
+  var html = '';
+  LSEngine.shuffleIdx(t.opts.length).forEach(function(oi) { html += '<button class="opt" data-o="' + oi + '">' + t.opts[oi] + '</button>'; });
+  html += '<div class="fb"></div>';
+  var wrap = document.createElement('div');
+  wrap.innerHTML = html;
+  block.appendChild(wrap);
+  var fb = wrap.querySelector('.fb');
+  wrap.querySelectorAll('.opt').forEach(function(b) {
+    b.addEventListener('click', function() {
+      if (finished) return;
+      var ok = +b.dataset.o === 0;
+      b.classList.add(ok ? 'correct' : 'wrong');
+      fb.className = 'fb show ' + (ok ? 'ok' : 'no');
+      fb.innerHTML = (ok ? 'Richtig! ' : 'Noch nicht. ') + t.fb;
+      if (ok) {
+        finished = true;
+        wrap.querySelectorAll('.opt').forEach(function(x) { x.disabled = true; });
+        finishTask(triedWrong ? 0 : 1, !triedWrong);
+      } else {
+        triedWrong = true;
+        b.disabled = true;
+      }
+    });
+  });
+}
+
+/* Freitext: eigene Antwort schreiben, Musterantwort aufdecken, Selbstcheck ankreuzen */
+function buildFree(block, t, finishTask) {
+  var wrap = document.createElement('div');
+  var checks = t.checks.map(function(c, ci) {
+    return '<label class="rs-check"><input type="checkbox" data-c="' + ci + '"> ' + c + '</label>';
+  }).join('');
+  wrap.innerHTML =
+    '<textarea class="rs-text" placeholder="Ihre Erklärung in ganzen Sätzen: was passiert und weshalb …"></textarea>' +
+    '<div class="check-btn-row"><button class="btn btn-primary rs-show">Musterantwort zeigen</button></div>' +
+    '<div class="rs-model" style="display:none;">' +
+      '<div class="rs-model-text"><b>Musterantwort:</b> ' + t.model + '</div>' +
+      '<div class="rs-hint">Selbstcheck: Was steht auch in Ihrer Antwort?</div>' + checks +
+      '<div class="check-btn-row"><button class="btn btn-success rs-done">Selbstcheck abschliessen</button></div>' +
+    '</div>';
+  block.appendChild(wrap);
+  var ta = wrap.querySelector('.rs-text');
+  wrap.querySelector('.rs-show').addEventListener('click', function() {
+    if (!ta.value.trim()) { ta.focus(); ta.placeholder = 'Schreiben Sie zuerst Ihre eigene Erklärung.'; return; }
+    ta.readOnly = true;
+    this.disabled = true;
+    wrap.querySelector('.rs-model').style.display = 'block';
+  });
+  wrap.querySelector('.rs-done').addEventListener('click', function() {
+    var boxes = wrap.querySelectorAll('.rs-check input');
+    var hit = 0;
+    boxes.forEach(function(b) { if (b.checked) hit++; b.disabled = true; });
+    this.disabled = true;
+    finishTask(Math.round(hit / boxes.length * 2) / 2, hit === boxes.length);
+  });
+}
+
+LSEngine.buildAll(); LSEngine.showCard(0); LSEngine.updateNav();
+</script>
+</body>
+</html>
