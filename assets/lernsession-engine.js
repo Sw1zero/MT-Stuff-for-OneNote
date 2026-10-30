@@ -1,4 +1,4 @@
-/* assets/lernsession-engine.js – gemeinsame Engine der MT-Lernsession-Tools
+/* assets/lernsession-engine.js – gemeinsame Engine der MT-Lernsession-Tools (Quelle: bzwu/.claude/skills/lerntool/basis/lernsession-engine.js, verteilt mit sync_basis.py)
    ---------------------------------------------------------------
    HUD (XP/Streak), Posten-Navigation und Auswertung sowie die häufig
    wiederkehrenden Posten-Typen (PDF, Video, Folien, Wahr/Falsch,
@@ -552,6 +552,20 @@
     document.getElementById('nextBtn').style.visibility='visible';
     buildAll(); showCard(0); updateNav();
   }
+
+  /* ---------- Testschnittstelle für pruefe_tools.js ----------
+     posten(i) liefert die Daten des Postens (Lösungen inkl.), damit das Prüfskript
+     die Engine-Typen richtig lösen kann. ueberspringen(i) nur für seiteneigene Typen. */
+  win.LerntoolTest = {
+    typ: 'lernpfad',
+    modus: function(){ return MODE; },
+    typen: function(){ return STATIONS.map(function(s){ return s.type; }); },
+    posten: function(i){ return STATIONS[i]; },
+    aktuell: function(){ return current; },
+    geloest: function(i){ return solved[i]; },
+    punkte: function(i){ return [earned[i], maxPts[i]]; },
+    ueberspringen: function(i){ solved[i]=true; updateNav(); }
+  };
 
   win.LSEngine = {
     configure: configure,
