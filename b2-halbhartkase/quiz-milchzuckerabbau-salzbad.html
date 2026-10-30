@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz b.2 – Milchzuckerabbau und Salzbad</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .back-link {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 20px;
+    }
+    .back-link:hover { color: var(--red); }
+
+    .quiz-center { display: flex; flex-direction: column; align-items: center; }
+
+    .progress-text  { margin-bottom: 10px; }
+    .progress-bar-wrap { width: 480px; max-width: 92vw; margin-bottom: 28px; }
+
+    .quiz-card {
+      width: 480px;
+      max-width: 92vw;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      padding: 32px 32px 28px;
+      margin-bottom: 16px;
+    }
+
+    .question-badge {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--red);
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .question-text {
+      font-size: 1.02rem;
+      font-weight: 600;
+      line-height: 1.5;
+      color: var(--text);
+      margin-bottom: 24px;
+    }
+
+    .answers { display: flex; flex-direction: column; gap: 10px; }
+
+    .answer-btn {
+      font-family: var(--font);
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-align: left;
+      background: #f8fafc;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s, transform 0.1s;
+      line-height: 1.4;
+      color: var(--text);
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .answer-btn:hover:not(:disabled) { border-color: var(--red); background: var(--red-light); }
+    .answer-btn:active:not(:disabled) { transform: scale(0.99); }
+
+    .answer-btn .letter {
+      font-weight: 700;
+      font-size: 0.78rem;
+      background: var(--border);
+      color: var(--text-muted);
+      border-radius: 6px;
+      padding: 2px 7px;
+      flex-shrink: 0;
+      margin-top: 1px;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .answer-btn.correct { border-color: #38a169; background: #f0fff4; }
+    .answer-btn.correct .letter { background: #38a169; color: #fff; }
+    .answer-btn.wrong { border-color: var(--red); background: var(--red-light); }
+    .answer-btn.wrong .letter { background: var(--red); color: #fff; }
+    .answer-btn.reveal { border-color: #38a169; background: #f0fff4; opacity: 0.8; }
+    .answer-btn.reveal .letter { background: #38a169; color: #fff; }
+    .answer-btn:disabled { cursor: default; }
+
+    .feedback {
+      margin-top: 18px;
+      padding: 14px 16px;
+      border-radius: var(--radius-md);
+      font-size: 0.88rem;
+      line-height: 1.5;
+      display: none;
+    }
+    .feedback.correct { background: #f0fff4; border: 1px solid #9ae6b4; color: #276749; display: block; }
+    .feedback.wrong { background: var(--red-light); border: 1px solid #fca5a5; color: var(--red-dark); display: block; }
+    .feedback-icon { font-size: 1rem; margin-right: 6px; }
+
+    .next-wrap { width: 480px; max-width: 92vw; display: flex; justify-content: flex-end; }
+
+    .end-screen {
+      width: 480px;
+      max-width: 92vw;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      padding: 40px 36px;
+      text-align: center;
+      display: none;
+    }
+    .score-circle {
+      width: 100px; height: 100px; border-radius: 50%;
+      border: 5px solid var(--red);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      margin: 0 auto 24px;
+    }
+    .score-number { font-size: 2rem; font-weight: 700; color: var(--red); line-height: 1; }
+    .score-total { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+    .end-message { font-size: 1.05rem; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+    .end-sub { font-size: 0.86rem; color: var(--text-muted); margin-bottom: 28px; }
+    .end-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · b.2</span>
+    <h1>Milchzuckerabbau und Salzbad</h1>
+    <p>pH-Verlauf, Salzbad Appenzeller/Tilsiter, Repetition Salzbad b.1</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+
+  <div class="quiz-center">
+    <div class="progress-text" id="progressText"></div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+
+    <div class="quiz-card" id="quizCard">
+      <span class="question-badge" id="questionBadge"></span>
+      <div class="question-text" id="questionText"></div>
+      <div class="answers" id="answersContainer"></div>
+      <div class="feedback" id="feedback"></div>
+    </div>
+
+    <div class="next-wrap" id="nextWrap" style="display:none">
+      <button class="btn btn-primary" id="nextBtn" onclick="MTQuiz.nextQuestion()">Weiter &#8594;</button>
+    </div>
+
+    <div class="end-screen" id="endScreen">
+      <div class="score-circle">
+        <div class="score-number" id="scoreNumber"></div>
+        <div class="score-total" id="scoreTotal"></div>
+      </div>
+      <div class="end-message" id="endMessage"></div>
+      <div class="end-sub" id="endSub"></div>
+      <div class="end-actions">
+        <button class="btn btn-ghost" onclick="location.href='../index.html'">&#8592; Alle Lerntools</button>
+        <button class="btn btn-primary" onclick="MTQuiz.restartQuiz()">Nochmals versuchen</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+
+<script src="../assets/quiz-engine.js"></script>
+<script>
+  const QUESTIONS = [
+    {"badge": "Milchzuckerabbau", "question": "Halbhartkäse wird mit ca. 44 °C abgefüllt. Was bedeutet das für den Milchzuckerabbau?", "answers": ["Er startet erst nach dem Salzbad.", "Er startet sofort, weil 44 °C im Optimum der thermophilen Milchsäurebakterien liegt.", "Die Bakterien sind gehemmt, bis der Käse abkühlt.", "Er findet erst in der Reifung statt."], "correct": 1, "explanation": "44 °C liegt direkt im Temperatur-Optimum. Hartkäse wird über 50 °C abgefüllt, dort sind die Bakterien zuerst gehemmt."},
+    {"badge": "Milchzuckerabbau", "question": "Wie lange bleibt der Hartkäse ungefähr im Temperatur-Optimum, verglichen mit dem Halbhartkäse?", "answers": ["Halbhartkäse länger als Hartkäse", "Beide gleich lang", "Hartkäse gar nicht", "Hartkäse bis ca. 12 bis 15 h, Halbhartkäse nur ca. 3 bis 7 h"], "correct": 3, "explanation": "Der Hartkäse bleibt viel länger im Optimum. So wird der Milchzucker trotz Start über dem Optimum vollständig abgebaut."},
+    {"badge": "pH-Wert", "question": "Weshalb steigt der pH-Wert im Emmentaler während der Reifung?", "answers": ["Das Salz neutralisiert die Säure.", "Der Käse nimmt Wasser auf.", "Propionsäurebakterien bauen Milchsäure ab.", "Hefen bilden Milchsäure."], "correct": 2, "explanation": "Die Propionsäurebakterien bauen Milchsäure zu Propion-, Essigsäure und CO₂ ab. Die Milchsäure nimmt ab, der pH steigt."},
+    {"badge": "pH-Wert", "question": "Weshalb steigt der pH-Wert im geschmierten Halbhartkäse während der Reifung?", "answers": ["Das Salzbad entzieht die Säure.", "Der Käse wird gewendet.", "Hefen in der Schmiere vergären Milchsäure an der Oberfläche.", "Propionsäurebakterien bilden Löcher."], "correct": 2, "explanation": "Die Hefen bauen Milchsäure an der Oberfläche ab. Milchsäure wandert von innen nach aussen, so steigt der pH im ganzen Käse."},
+    {"badge": "Salzbad", "question": "Welchen pH-Wert hat der junge Halbhartkäse ca. vor dem Salzbad?", "answers": ["5,1 bis 5,2", "4,6 bis 4,7", "6,6 bis 6,7", "5,8 bis 6,0"], "correct": 0, "explanation": "Vor dem Salzbad liegt der pH-Wert bei ca. 5,1 bis 5,2."},
+    {"badge": "Salzbad", "question": "Wie lange bleibt der Tilsiter im Salzbad?", "answers": ["24 bis 36 h", "mindestens 15 Tage", "36 bis 48 h", "6 bis 12 h"], "correct": 0, "explanation": "Tilsiter 24 bis 36 h, Appenzeller 36 bis 48 h. Beide bei 21 bis 23 °Bé und 13 bis 16 °C."},
+    {"badge": "Salzbad", "question": "Ihr Kollege nimmt die Tilsiter schon nach 18 h aus dem Salzbad. Welchen Teigfehler riskiert er?", "answers": ["Zu viele Löcher", "Weicher, pappiger Teig, der zum Verlaufen neigt", "Harter, bröckeliger Teig", "Bitterer Geschmack"], "correct": 1, "explanation": "18 h sind zu kurz. Eine zu kurze Salzbaddauer kann einen weichen Teig verursachen."},
+    {"badge": "Salzbad", "question": "Wahr oder falsch? Ein zu kaltes Salzbad entzieht dem Käse mehr Sirte.", "answers": ["Wahr", "Falsch"], "correct": 1, "explanation": "Falsch. Ein zu kaltes Salzbad entsirtet ungenügend. Der Narben kann schrumpfig werden (krötenhäutig)."},
+    {"badge": "Fettschwitzen", "question": "Der Käsenarben vertrocknet vor dem Salzbad und schwitzt Fett. Welche Folge hat das?", "answers": ["Der Fettfilm behindert Sirtenentzug und Salzaufnahme, die Schmiere bildet sich schlecht.", "Die Schmiere wächst schneller.", "Der Käse nimmt mehr Salz auf.", "Keine Folge."], "correct": 0, "explanation": "Der Fettfilm behindert Sirtenentzug und Salzaufnahme. Die verfettete Oberfläche lässt sich schlecht benetzen, darum bildet sich die Schmiere schlecht."},
+    {"badge": "Fettschwitzen", "question": "Wie verhindern Sie das Fettschwitzen vor dem Salzbad?", "answers": ["Luftfeuchtigkeit während der Milchsäuregärung möglichst hoch halten", "Käse mit warmer Luft trocknen", "Mehr Lab zugeben", "Käse länger pressen"], "correct": 0, "explanation": "Hohe Luftfeuchtigkeit verhindert, dass der Narben vertrocknet. Dann schwitzt der Käse kein Fett."},
+    {"badge": "Repetition b.1", "question": "Welche Eigenschaft beschleunigt die Salzaufnahme?", "answers": ["Grosser Laib", "Hoher Wassergehalt im Käse", "Hoher Fettgehalt im Käse", "Stark gepresste, trockene Oberfläche"], "correct": 1, "explanation": "Das Wasser transportiert das Salz. Auch ein kleiner Laib, wenig Fett und eine feuchte Oberfläche beschleunigen die Salzaufnahme."},
+    {"badge": "Repetition b.1", "question": "Weshalb nimmt ein kleiner Laib schneller Salz auf als ein grosser?", "answers": ["Er hat mehr Fett.", "Er ist kälter.", "Er schwimmt besser.", "Er hat im Verhältnis zur Masse mehr Oberfläche."], "correct": 3, "explanation": "Mehr Oberfläche im Verhältnis zur Masse, also mehr Fläche für die Salzaufnahme."},
+    {"badge": "Repetition b.1", "question": "Was passiert, wenn die Salzbadtemperatur über 16 °C liegt?", "answers": ["Weiche Käse verformen sich, die Bakterien entwickeln sich stärker.", "Nichts, wärmer ist besser.", "Das Salz kristallisiert aus.", "Der Käse nimmt kein Salz mehr auf."], "correct": 0, "explanation": "Zu weiche Käse verformen sich. Die Wärme fördert die Bakterienentwicklung, das gibt Geschmacksfehler und Verfärbungen."},
+    {"badge": "Repetition b.1", "question": "Welche Massnahme gehört zur Pflege des Salzbads?", "answers": ["Das Salzbad auf 25 °C erwärmen", "Salz täglich nachdosieren und die Stärke wöchentlich in °Bé kontrollieren", "Zucker zugeben", "Das Salzbad jeden Tag ganz ersetzen"], "correct": 1, "explanation": "Dazu kommen Käsereste absieben und entschlammen, auch Keimreduktion durch Hitze oder Mikrofiltration."},
+    {"badge": "Repetition b.1", "question": "Was ist keine Auswirkung der Salzbehandlung?", "answers": ["Bildung der Löcher", "Sirtenentzug und Rindenbildung", "Übertragung der Reifungsflora", "Teigverfestigung"], "correct": 0, "explanation": "Die Salzbehandlung bewirkt Sirtenentzug (Rinde), Salzaufnahme, Teigverfestigung und Übertragung der Reifungsflora. Die Löcher entstehen in der Reifung."},
+    {"badge": "Repetition b.1", "question": "Wie lange bleibt Sbrinz AOP im Salzbad?", "answers": ["mindestens 15 Tage", "24 bis 36 h", "36 bis 48 h", "2 h"], "correct": 0, "explanation": "Sbrinz mindestens 15 Tage, Emmentaler 36 bis 48 h, Gruyère 24 bis 36 h."}
+  ];
+
+  MTQuiz.init({
+    questions: QUESTIONS,
+    subMessages: {
+      excellent: "Alle Fragen richtig. Sie sind bereit für die Prüfung zum Salzbad.",
+      retry: "Lesen Sie Lehrmittel b.2 S. 14, 15, 23, 24 und b.1 S. 38 bis 40 nochmals."
+    }
+  });
+</script>
+</body>
+</html>

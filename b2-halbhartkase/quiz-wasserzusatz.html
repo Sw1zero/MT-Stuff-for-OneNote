@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz b.2 – Wasserzusatz</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .back-link {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 20px;
+    }
+    .back-link:hover { color: var(--red); }
+
+    .quiz-center { display: flex; flex-direction: column; align-items: center; }
+
+    .progress-text  { margin-bottom: 10px; }
+    .progress-bar-wrap { width: 480px; max-width: 92vw; margin-bottom: 28px; }
+
+    .quiz-card {
+      width: 480px;
+      max-width: 92vw;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      padding: 32px 32px 28px;
+      margin-bottom: 16px;
+    }
+
+    .question-badge {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--red);
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .question-text {
+      font-size: 1.02rem;
+      font-weight: 600;
+      line-height: 1.5;
+      color: var(--text);
+      margin-bottom: 24px;
+    }
+
+    .answers { display: flex; flex-direction: column; gap: 10px; }
+
+    .answer-btn {
+      font-family: var(--font);
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-align: left;
+      background: #f8fafc;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s, transform 0.1s;
+      line-height: 1.4;
+      color: var(--text);
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .answer-btn:hover:not(:disabled) { border-color: var(--red); background: var(--red-light); }
+    .answer-btn:active:not(:disabled) { transform: scale(0.99); }
+
+    .answer-btn .letter {
+      font-weight: 700;
+      font-size: 0.78rem;
+      background: var(--border);
+      color: var(--text-muted);
+      border-radius: 6px;
+      padding: 2px 7px;
+      flex-shrink: 0;
+      margin-top: 1px;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .answer-btn.correct { border-color: #38a169; background: #f0fff4; }
+    .answer-btn.correct .letter { background: #38a169; color: #fff; }
+    .answer-btn.wrong { border-color: var(--red); background: var(--red-light); }
+    .answer-btn.wrong .letter { background: var(--red); color: #fff; }
+    .answer-btn.reveal { border-color: #38a169; background: #f0fff4; opacity: 0.8; }
+    .answer-btn.reveal .letter { background: #38a169; color: #fff; }
+    .answer-btn:disabled { cursor: default; }
+
+    .feedback {
+      margin-top: 18px;
+      padding: 14px 16px;
+      border-radius: var(--radius-md);
+      font-size: 0.88rem;
+      line-height: 1.5;
+      display: none;
+    }
+    .feedback.correct { background: #f0fff4; border: 1px solid #9ae6b4; color: #276749; display: block; }
+    .feedback.wrong { background: var(--red-light); border: 1px solid #fca5a5; color: var(--red-dark); display: block; }
+    .feedback-icon { font-size: 1rem; margin-right: 6px; }
+
+    .next-wrap { width: 480px; max-width: 92vw; display: flex; justify-content: flex-end; }
+
+    .end-screen {
+      width: 480px;
+      max-width: 92vw;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      padding: 40px 36px;
+      text-align: center;
+      display: none;
+    }
+    .score-circle {
+      width: 100px; height: 100px; border-radius: 50%;
+      border: 5px solid var(--red);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      margin: 0 auto 24px;
+    }
+    .score-number { font-size: 2rem; font-weight: 700; color: var(--red); line-height: 1; }
+    .score-total { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+    .end-message { font-size: 1.05rem; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+    .end-sub { font-size: 0.86rem; color: var(--text-muted); margin-bottom: 28px; }
+    .end-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · b.2</span>
+    <h1>Wasserzusatz</h1>
+    <p>Appenzeller und Tilsiter: Wirkung, Höchstwerte, Milch oder Bruch</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+
+  <div class="quiz-center">
+    <div class="progress-text" id="progressText"></div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+
+    <div class="quiz-card" id="quizCard">
+      <span class="question-badge" id="questionBadge"></span>
+      <div class="question-text" id="questionText"></div>
+      <div class="answers" id="answersContainer"></div>
+      <div class="feedback" id="feedback"></div>
+    </div>
+
+    <div class="next-wrap" id="nextWrap" style="display:none">
+      <button class="btn btn-primary" id="nextBtn" onclick="MTQuiz.nextQuestion()">Weiter &#8594;</button>
+    </div>
+
+    <div class="end-screen" id="endScreen">
+      <div class="score-circle">
+        <div class="score-number" id="scoreNumber"></div>
+        <div class="score-total" id="scoreTotal"></div>
+      </div>
+      <div class="end-message" id="endMessage"></div>
+      <div class="end-sub" id="endSub"></div>
+      <div class="end-actions">
+        <button class="btn btn-ghost" onclick="location.href='../index.html'">&#8592; Alle Lerntools</button>
+        <button class="btn btn-primary" onclick="MTQuiz.restartQuiz()">Nochmals versuchen</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+
+<script src="../assets/quiz-engine.js"></script>
+<script>
+  const QUESTIONS = [
+    {"badge": "Höchstwerte", "question": "Wie viel Wasser geben Sie bei Appenzeller und Tilsiter insgesamt höchstens zu?", "answers": ["15 %", "10 %", "25 %", "40 %"], "correct": 2, "explanation": "Der gesamte Wasserzusatz beträgt höchstens 25 % (20 bis 25 %)."},
+    {"badge": "Höchstwerte", "question": "Wie viel Wasser dürfen Sie höchstens in die Milch geben?", "answers": ["10 %", "5 %", "15 %", "25 %"], "correct": 0, "explanation": "In die Milch geben Sie höchstens 10 %. Der Rest, bis 15 %, kommt in den Bruch."},
+    {"badge": "Wirkung", "question": "Welche Wirkung hat der Wasserzusatz bei der Gärung?", "answers": ["Das Wasser hat keinen Einfluss auf die Gärung.", "Das Wasser verdünnt den Milchzucker. Es entsteht weniger Milchsäure.", "Das Wasser liefert zusätzlichen Milchzucker. Es entsteht mehr Milchsäure.", "Das Wasser tötet die Milchsäurebakterien ab."], "correct": 1, "explanation": "Wasser verdünnt den Milchzucker. Die Milchsäurebakterien haben weniger Gärmaterial und bilden weniger Milchsäure. Der pH-Wert vor dem Salzbad liegt bei ca. 5,1 bis 5,2."},
+    {"badge": "Wirkung", "question": "Weshalb bleibt der Käseteig durch den Wasserzusatz elastisch, speckig und lang?", "answers": ["Mehr Milchsäure löst mehr Kalzium aus dem Gerüst.", "Weniger Milchsäure löst weniger Kalzium aus dem Kasein-Kalzium-Gerüst.", "Das Wasser macht den Teig nass und dadurch weich.", "Das Wasser erhöht den Fettgehalt im Käse."], "correct": 1, "explanation": "Weniger Milchsäure löst weniger Kalzium aus dem Kasein-Kalzium-Gerüst. Das Gerüst bleibt erhalten, der Teig bleibt elastisch und lang."},
+    {"badge": "Wirkung", "question": "Wie verändert sich der pH-Wert im Käse durch den Wasserzusatz?", "answers": ["Er sinkt tiefer.", "Er schwankt stark.", "Er steigt (sinkt weniger tief).", "Er bleibt gleich."], "correct": 2, "explanation": "Es entsteht weniger Milchsäure. Darum sinkt der pH-Wert weniger tief, er ist also höher."},
+    {"badge": "Wirkung", "question": "Wie verändert sich die Menge Kalzium im Kasein-Kalzium-Gerüst durch den Wasserzusatz?", "answers": ["Mehr Kalzium bleibt im Gerüst.", "Weniger Kalzium bleibt im Gerüst.", "Es bleibt gleich.", "Das Kalzium geht ganz verloren."], "correct": 0, "explanation": "Weniger Milchsäure löst weniger Kalzium heraus. Darum bleibt mehr Kalzium im Gerüst."},
+    {"badge": "Bruchkorn", "question": "Ein Bruchkorn liegt in verdünnter Sirte. Was passiert mit Wasser und Milchzucker?", "answers": ["Wasser geht ins Korn hinein, Milchzucker geht aus dem Korn hinaus.", "Beides geht ins Korn hinein.", "Nichts, das Korn ist dicht.", "Wasser geht aus dem Korn hinaus, Milchzucker geht ins Korn hinein."], "correct": 0, "explanation": "Wasser aus der Sirte geht ins Korn, Milchzucker geht hinaus in die Sirte. So wird der Milchzucker auch im Korninneren verdünnt (osmotischer Ausgleich)."},
+    {"badge": "Milch oder Bruch", "question": "Wahr oder falsch? Für die Verdünnung des Milchzuckers ist es egal, ob das Wasser in die Milch oder in den Bruch kommt.", "answers": ["Wahr", "Falsch"], "correct": 0, "explanation": "Wahr. Der Unterschied liegt in den Nebenwirkungen. Darum kommt der grössere Teil in den Bruch."},
+    {"badge": "Milch oder Bruch", "question": "Sie geben Wasser in die Milch statt in den Bruch. Welcher Nachteil entsteht?", "answers": ["Sie brauchen weniger Lab.", "Die Gallerte wird fester.", "Sie können mehr Milch pro Fertiger verarbeiten.", "Sie brauchen mehr Lab."], "correct": 3, "explanation": "Alle Milchinhaltsstoffe werden verdünnt. Darum brauchen Sie mehr Lab, im gleichen Verhältnis wie der Wasserzusatz."},
+    {"badge": "Milch oder Bruch", "question": "Weshalb brauchen Sie mit Wasser in der Milch mehr Wasser für die gleiche Wirkung?", "answers": ["Das Wasser verdunstet im Fertiger.", "Die Kulturen verbrauchen das Wasser.", "Sie müssen das ganze Milchvolumen verdünnen.", "Das Lab bindet das Wasser."], "correct": 2, "explanation": "Im Bruch verdünnen Sie nur den Milchzucker im Korn. In der Milch müssen Sie das ganze Volumen verdünnen."},
+    {"badge": "Milch oder Bruch", "question": "Welche Folge hat Wasser in der Milch für die Gallerte?", "answers": ["Keine Folge.", "Sie wird schneller fest.", "Sie ist fester und schneidet sich besser.", "Sie ist weniger fest, es gibt leichter Staub."], "correct": 3, "explanation": "Die Gallerte ist weniger fest. Ohne angepasste Bruchbereitung entsteht mehr Staub. Auch der Griff nimmt langsamer zu."},
+    {"badge": "Milch oder Bruch", "question": "Welche Folge hat Wasser in der Milch für die Sirte?", "answers": ["Keine Folge.", "Mehr Sirte mit tieferer Trockenmasse", "Weniger Sirte mit höherer Trockenmasse", "Die Sirte wird saurer."], "correct": 1, "explanation": "Es entsteht mehr Sirte mit tieferer Trockenmasse. Transport und Verwertung werden unwirtschaftlich."}
+  ];
+
+  MTQuiz.init({
+    questions: QUESTIONS,
+    subMessages: {
+      excellent: "Alle Fragen richtig. Sie können den Wasserzusatz erklären.",
+      retry: "Lesen Sie Lehrmittel b.2 S. 10 nochmals und versuchen Sie es erneut."
+    }
+  });
+</script>
+</body>
+</html>

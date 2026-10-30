@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz b.2 – Bruch behandeln bis Wenden</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .back-link {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 20px;
+    }
+    .back-link:hover { color: var(--red); }
+
+    .quiz-center { display: flex; flex-direction: column; align-items: center; }
+
+    .progress-text  { margin-bottom: 10px; }
+    .progress-bar-wrap { width: 480px; max-width: 92vw; margin-bottom: 28px; }
+
+    .quiz-card {
+      width: 480px;
+      max-width: 92vw;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      padding: 32px 32px 28px;
+      margin-bottom: 16px;
+    }
+
+    .question-badge {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--red);
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .question-text {
+      font-size: 1.02rem;
+      font-weight: 600;
+      line-height: 1.5;
+      color: var(--text);
+      margin-bottom: 24px;
+    }
+
+    .answers { display: flex; flex-direction: column; gap: 10px; }
+
+    .answer-btn {
+      font-family: var(--font);
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-align: left;
+      background: #f8fafc;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s, transform 0.1s;
+      line-height: 1.4;
+      color: var(--text);
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .answer-btn:hover:not(:disabled) { border-color: var(--red); background: var(--red-light); }
+    .answer-btn:active:not(:disabled) { transform: scale(0.99); }
+
+    .answer-btn .letter {
+      font-weight: 700;
+      font-size: 0.78rem;
+      background: var(--border);
+      color: var(--text-muted);
+      border-radius: 6px;
+      padding: 2px 7px;
+      flex-shrink: 0;
+      margin-top: 1px;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .answer-btn.correct { border-color: #38a169; background: #f0fff4; }
+    .answer-btn.correct .letter { background: #38a169; color: #fff; }
+    .answer-btn.wrong { border-color: var(--red); background: var(--red-light); }
+    .answer-btn.wrong .letter { background: var(--red); color: #fff; }
+    .answer-btn.reveal { border-color: #38a169; background: #f0fff4; opacity: 0.8; }
+    .answer-btn.reveal .letter { background: #38a169; color: #fff; }
+    .answer-btn:disabled { cursor: default; }
+
+    .feedback {
+      margin-top: 18px;
+      padding: 14px 16px;
+      border-radius: var(--radius-md);
+      font-size: 0.88rem;
+      line-height: 1.5;
+      display: none;
+    }
+    .feedback.correct { background: #f0fff4; border: 1px solid #9ae6b4; color: #276749; display: block; }
+    .feedback.wrong { background: var(--red-light); border: 1px solid #fca5a5; color: var(--red-dark); display: block; }
+    .feedback-icon { font-size: 1rem; margin-right: 6px; }
+
+    .next-wrap { width: 480px; max-width: 92vw; display: flex; justify-content: flex-end; }
+
+    .end-screen {
+      width: 480px;
+      max-width: 92vw;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      padding: 40px 36px;
+      text-align: center;
+      display: none;
+    }
+    .score-circle {
+      width: 100px; height: 100px; border-radius: 50%;
+      border: 5px solid var(--red);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      margin: 0 auto 24px;
+    }
+    .score-number { font-size: 2rem; font-weight: 700; color: var(--red); line-height: 1; }
+    .score-total { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+    .end-message { font-size: 1.05rem; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+    .end-sub { font-size: 0.86rem; color: var(--text-muted); margin-bottom: 28px; }
+    .end-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · b.2</span>
+    <h1>Bruch behandeln bis Wenden</h1>
+    <p>Sirte abpumpen, Bruchwaschwasser, Wasseraufbereitung, Abfüllen, Pressen, Wenden</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+
+  <div class="quiz-center">
+    <div class="progress-text" id="progressText"></div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+
+    <div class="quiz-card" id="quizCard">
+      <span class="question-badge" id="questionBadge"></span>
+      <div class="question-text" id="questionText"></div>
+      <div class="answers" id="answersContainer"></div>
+      <div class="feedback" id="feedback"></div>
+    </div>
+
+    <div class="next-wrap" id="nextWrap" style="display:none">
+      <button class="btn btn-primary" id="nextBtn" onclick="MTQuiz.nextQuestion()">Weiter &#8594;</button>
+    </div>
+
+    <div class="end-screen" id="endScreen">
+      <div class="score-circle">
+        <div class="score-number" id="scoreNumber"></div>
+        <div class="score-total" id="scoreTotal"></div>
+      </div>
+      <div class="end-message" id="endMessage"></div>
+      <div class="end-sub" id="endSub"></div>
+      <div class="end-actions">
+        <button class="btn btn-ghost" onclick="location.href='../index.html'">&#8592; Alle Lerntools</button>
+        <button class="btn btn-primary" onclick="MTQuiz.restartQuiz()">Nochmals versuchen</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+
+<script src="../assets/quiz-engine.js"></script>
+<script>
+  const QUESTIONS = [
+    {"badge": "Sirte abpumpen", "question": "Welchen Vorteil hat es, möglichst viel Sirte abzupumpen?", "answers": ["Sie brauchen weniger Bruchwaschwasser und müssen weniger Masse erwärmen.", "Sie brauchen weniger Lab.", "Der Käse wird fetter.", "Der Bruch wird schneller sauer."], "correct": 0, "explanation": "Weniger Masse im Fertiger: weniger Bruchwaschwasser, weniger Wärmeenergie."},
+    {"badge": "Sirte abpumpen", "question": "Weshalb darf das Rührwerk beim Sirteabpumpen höchstens 5 min stillstehen?", "answers": ["Der Motor überhitzt.", "Das Bruchwaschwasser kühlt ab.", "Der Bruch setzt sich und verklebt zu Knollen, das gibt Lochungsfehler.", "Die Sirte wird sonst sauer."], "correct": 2, "explanation": "Der Bruch verklebt durch sein Eigengewicht zu Knollen. Grosse Knollen lassen sich nicht mehr ausrühren und führen zu Lochungsfehlern."},
+    {"badge": "Bruchwaschwasser", "question": "Was beachten Sie bei der Zugabe vom heissen Bruchwaschwasser (65 bis 75 °C)?", "answers": ["Sie stellen das Rührwerk ab.", "Sie geben alles auf einmal zu.", "Sie geben es dosiert zu, sonst werden die Körner örtlich überhitzt.", "Sie kühlen es vorher auf 20 °C ab."], "correct": 2, "explanation": "Dosiert zugeben, sonst werden die Bruchkörner örtlich überhitzt."},
+    {"badge": "Bruchwaschwasser", "question": "Welche Bakteriengruppe eliminieren Sie mit der Pasteurisation vom Bruchwaschwasser nicht?", "answers": ["Hefen", "Coli-Bakterien", "Sporenbildner", "Milchsäurebakterien"], "correct": 2, "explanation": "Sporenbildner überleben die Pasteurisation."},
+    {"badge": "Bruchwaschwasser", "question": "Welchen Vorteil hat es, das Bruchwaschwasser in einem drucklosen Behälter zu erwärmen?", "answers": ["Das Wasser bleibt kälter.", "Das Wasser wird entgast, so gibt es keine nestige Lochung.", "Das Wasser wird steril.", "Das Wasser wird salziger."], "correct": 1, "explanation": "Leitungswasser enthält kleine Luftblasen. Im drucklosen Behälter entweichen sie. Sonst gibt es eine ungleichmässige, nestige Lochung."},
+    {"badge": "Wasseraufbereitung", "question": "Wozu setzen Sie eine UV-Lampe beim Bruchwaschwasser ein?", "answers": ["Um die Sporen von Buttersäure- und Putrifikuserregern zu reduzieren", "Um das Wasser zu entkalken", "Um das Wasser zu entgasen", "Um das Wasser zu erwärmen"], "correct": 0, "explanation": "Die UV-Lampe reduziert den Sporengehalt von Buttersäure- und Putrifikuserregern im Bruchwaschwasser."},
+    {"badge": "Wasseraufbereitung", "question": "Welche Methode hat die gleiche Wirkung auf das Wasser wie die UV-Lampe?", "answers": ["Entgasung", "Kühlung", "Enthärtung", "Mikrofiltration"], "correct": 3, "explanation": "Mikrofiltration (oder Pasteurisation) reduziert ebenfalls die Keime im Wasser."},
+    {"badge": "Bruch wärmen", "question": "Weshalb wärmt man den Tilsiter-Bruch tiefer (39 bis 42 °C) als den Appenzeller (40 bis 45 °C)?", "answers": ["Der Tilsiter soll mehr Löcher haben.", "Der Tilsiter hat mehr Fett.", "Der Tilsiter wird nicht gesalzen.", "Der Tilsiter soll mehr Wasser enthalten (max. 425 statt 400 g/kg)."], "correct": 3, "explanation": "Tiefere Bruchwärmtemperatur, mehr Wasser bleibt im Korn. Tilsiter: max. 425 g/kg Wasser, Appenzeller max. 400 g/kg."},
+    {"badge": "Abfüllen", "question": "Weshalb muss der Bruch beim Abfüllen in die Sirte eintauchen?", "answers": ["So kühlt der Bruch schneller ab.", "So geht weniger Fett verloren.", "So wird der Bruch salziger.", "So wird die Luft nach oben abgedrängt."], "correct": 3, "explanation": "Der Bruch taucht in die Sirte ein, die Luft wird nach oben abgedrängt. Der Sirtenspiegel beträgt ca. 18 bis 20 cm."},
+    {"badge": "Pressen", "question": "Wahr oder falsch? Beim Bruchkuchenabfüllen pressen Sie den Bruch als ganzes Stück vor und schneiden danach Blöcke für die Pressformen.", "answers": ["Wahr", "Falsch"], "correct": 0, "explanation": "Wahr. Der Bruchkuchen wird vorgepresst und danach in Blöcke für die Formen geschnitten."},
+    {"badge": "Pressen", "question": "Wie lange pressen Sie nach der Direktabfüllung bis zum ersten Wenden?", "answers": ["ca. 50 min", "ca. 5 min", "ca. 3 h", "ca. 20 min"], "correct": 3, "explanation": "Bis zum ersten Wenden ca. 20 min mit 40 bis 60 kg pro Käse, danach ca. 50 min mit 40 bis 80 kg."},
+    {"badge": "Wenden", "question": "Weshalb lagern Sie beim Wenden die äusseren Formen nach innen?", "answers": ["Alle Käse kühlen gleich ab, so läuft der Milchzuckerabbau überall gleich.", "Damit die Rinde dicker wird.", "Damit die Käse gleich viel Salz aufnehmen.", "Damit Sie die Formen besser zählen können."], "correct": 0, "explanation": "Käse am Wannenrand kühlen schneller ab. Die Temperatur steuert die Milchsäuregärung. Kühlt ein Käse zu rasch ab, bleibt Restmilchzucker, und der Käse neigt zu Weiss-Schmierigkeit."}
+  ];
+
+  MTQuiz.init({
+    questions: QUESTIONS,
+    subMessages: {
+      excellent: "Alle Fragen richtig. Sie kennen die Schritte vom Bruch bis zum Wenden.",
+      retry: "Lesen Sie Lehrmittel b.2 S. 12 bis 14 nochmals und versuchen Sie es erneut."
+    }
+  });
+</script>
+</body>
+</html>

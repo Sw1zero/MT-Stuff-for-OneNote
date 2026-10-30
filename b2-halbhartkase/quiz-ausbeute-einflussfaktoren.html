@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz b.2 – Ausbeute: Einflussfaktoren</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .back-link {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 20px;
+    }
+    .back-link:hover { color: var(--red); }
+
+    .quiz-center { display: flex; flex-direction: column; align-items: center; }
+
+    .progress-text  { margin-bottom: 10px; }
+    .progress-bar-wrap { width: 480px; max-width: 92vw; margin-bottom: 28px; }
+
+    .quiz-card {
+      width: 480px;
+      max-width: 92vw;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      padding: 32px 32px 28px;
+      margin-bottom: 16px;
+    }
+
+    .question-badge {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--red);
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .question-text {
+      font-size: 1.02rem;
+      font-weight: 600;
+      line-height: 1.5;
+      color: var(--text);
+      margin-bottom: 24px;
+    }
+
+    .answers { display: flex; flex-direction: column; gap: 10px; }
+
+    .answer-btn {
+      font-family: var(--font);
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-align: left;
+      background: #f8fafc;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s, transform 0.1s;
+      line-height: 1.4;
+      color: var(--text);
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .answer-btn:hover:not(:disabled) { border-color: var(--red); background: var(--red-light); }
+    .answer-btn:active:not(:disabled) { transform: scale(0.99); }
+
+    .answer-btn .letter {
+      font-weight: 700;
+      font-size: 0.78rem;
+      background: var(--border);
+      color: var(--text-muted);
+      border-radius: 6px;
+      padding: 2px 7px;
+      flex-shrink: 0;
+      margin-top: 1px;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .answer-btn.correct { border-color: #38a169; background: #f0fff4; }
+    .answer-btn.correct .letter { background: #38a169; color: #fff; }
+    .answer-btn.wrong { border-color: var(--red); background: var(--red-light); }
+    .answer-btn.wrong .letter { background: var(--red); color: #fff; }
+    .answer-btn.reveal { border-color: #38a169; background: #f0fff4; opacity: 0.8; }
+    .answer-btn.reveal .letter { background: #38a169; color: #fff; }
+    .answer-btn:disabled { cursor: default; }
+
+    .feedback {
+      margin-top: 18px;
+      padding: 14px 16px;
+      border-radius: var(--radius-md);
+      font-size: 0.88rem;
+      line-height: 1.5;
+      display: none;
+    }
+    .feedback.correct { background: #f0fff4; border: 1px solid #9ae6b4; color: #276749; display: block; }
+    .feedback.wrong { background: var(--red-light); border: 1px solid #fca5a5; color: var(--red-dark); display: block; }
+    .feedback-icon { font-size: 1rem; margin-right: 6px; }
+
+    .next-wrap { width: 480px; max-width: 92vw; display: flex; justify-content: flex-end; }
+
+    .end-screen {
+      width: 480px;
+      max-width: 92vw;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      padding: 40px 36px;
+      text-align: center;
+      display: none;
+    }
+    .score-circle {
+      width: 100px; height: 100px; border-radius: 50%;
+      border: 5px solid var(--red);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      margin: 0 auto 24px;
+    }
+    .score-number { font-size: 2rem; font-weight: 700; color: var(--red); line-height: 1; }
+    .score-total { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+    .end-message { font-size: 1.05rem; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+    .end-sub { font-size: 0.86rem; color: var(--text-muted); margin-bottom: 28px; }
+    .end-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · b.2</span>
+    <h1>Ausbeute: Einflussfaktoren</h1>
+    <p>Massnahmen im Betrieb und Faktoren bei der Milch</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+
+  <div class="quiz-center">
+    <div class="progress-text" id="progressText"></div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progressBar"></div>
+    </div>
+
+    <div class="quiz-card" id="quizCard">
+      <span class="question-badge" id="questionBadge"></span>
+      <div class="question-text" id="questionText"></div>
+      <div class="answers" id="answersContainer"></div>
+      <div class="feedback" id="feedback"></div>
+    </div>
+
+    <div class="next-wrap" id="nextWrap" style="display:none">
+      <button class="btn btn-primary" id="nextBtn" onclick="MTQuiz.nextQuestion()">Weiter &#8594;</button>
+    </div>
+
+    <div class="end-screen" id="endScreen">
+      <div class="score-circle">
+        <div class="score-number" id="scoreNumber"></div>
+        <div class="score-total" id="scoreTotal"></div>
+      </div>
+      <div class="end-message" id="endMessage"></div>
+      <div class="end-sub" id="endSub"></div>
+      <div class="end-actions">
+        <button class="btn btn-ghost" onclick="location.href='../index.html'">&#8592; Alle Lerntools</button>
+        <button class="btn btn-primary" onclick="MTQuiz.restartQuiz()">Nochmals versuchen</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+
+<script src="../assets/quiz-engine.js"></script>
+<script>
+  const QUESTIONS = [
+    {"badge": "Massnahmen", "question": "Zu welchem Faktor gehört die Massnahme «Labmenge korrekt abmessen»?", "answers": ["Genaue Laborproben", "Technologie ausschöpfen", "Optimale Lagerung", "Genaues Messen"], "correct": 3, "explanation": "Genaues Messen: z. B. die Labmenge korrekt abmessen."},
+    {"badge": "Massnahmen", "question": "Zu welchem Faktor gehört «Rohrleitungen auf Dichtigkeit prüfen»?", "answers": ["Genaues Messen", "Installationsfehler vermeiden", "Fabrikationsvorschriften einhalten", "Optimale Arbeitsweise des Personals"], "correct": 1, "explanation": "Undichte Leitungen kosten Produkt: Installationsfehler vermeiden."},
+    {"badge": "Massnahmen", "question": "Zu welchem Faktor gehört «Drahtharfe durch Messerharfe ersetzen»?", "answers": ["Technologie ausschöpfen", "Korrekte Wartung", "Genaue Laborproben", "Genaues Messen"], "correct": 0, "explanation": "Bessere Technik schneidet schonender und erhöht die Ausbeute: Technologie ausschöpfen."},
+    {"badge": "Massnahmen", "question": "Zu welchem Faktor gehört «Temperaturen einhalten»?", "answers": ["Fabrikationsvorschriften einhalten", "Installationsfehler vermeiden", "Technologie ausschöpfen", "Optimale Lagerung und Transport"], "correct": 0, "explanation": "Temperaturen stehen in den Fabrikationsvorschriften."},
+    {"badge": "Massnahmen", "question": "Zu welchem Faktor gehört «Nur geschultes Personal einsetzen»?", "answers": ["Genaues Messen", "Korrekte Wartung und Bedienung der Anlagen", "Genaue Laborproben", "Fabrikationsmenge kontrollieren"], "correct": 1, "explanation": "Anlagen richtig bedienen und warten braucht geschultes Personal."},
+    {"badge": "Massnahmen", "question": "Zu welchem Faktor gehören «genaue Gehaltsanalysen und bakteriologische Werte»?", "answers": ["Genaues Messen", "Genaue Laborproben", "Technologie ausschöpfen", "Optimale Arbeitsweise"], "correct": 1, "explanation": "Genaue Laborproben liefern die Werte für eine korrekte Fabrikation."},
+    {"badge": "Milch", "question": "Welcher Faktor bei der Milch beeinflusst die Ausbeute?", "answers": ["Uhrzeit der Ablieferung", "Eiweissgehalt", "Name des Lieferanten", "Farbe der Milch"], "correct": 1, "explanation": "Faktoren bei der Milch: Eiweissgehalt, Fettgehalt, Wassergehalt, Vorgaben der VHyMP, Lagerverlust."},
+    {"badge": "Milch", "question": "Welche Gruppe nennt nur Faktoren bei der Milch, die Ausbeute und Verluste beeinflussen?", "answers": ["Wassergehalt, Laborproben, Messerharfe, Transport", "Eiweissgehalt, Fettgehalt, Wassergehalt, Lagerverlust", "Eiweissgehalt, Fettgehalt, Drahtharfe, Labmenge", "Fettgehalt, Personal, Rohrleitungen, Temperatur"], "correct": 1, "explanation": "Bei der Milch: Eiweissgehalt, Fettgehalt, Wassergehalt, Lagerverlust und die Vorgaben der VHyMP."},
+    {"badge": "Milch", "question": "Welcher dieser Faktoren gehört nicht zu den Faktoren bei der Milch?", "answers": ["Lagerverlust", "Fettgehalt", "Drahtharfe", "Wassergehalt"], "correct": 2, "explanation": "Die Harfe ist Technologie. Fett, Wasser und Lagerverlust sind Faktoren bei der Milch."}
+  ];
+
+  MTQuiz.init({
+    questions: QUESTIONS,
+    subMessages: {
+      excellent: "Alle Fragen richtig. Sie wissen, wie Sie die Ausbeute sichern.",
+      retry: "Schauen Sie das Blatt Ausbeute generell nochmals an."
+    }
+  });
+</script>
+</body>
+</html>
