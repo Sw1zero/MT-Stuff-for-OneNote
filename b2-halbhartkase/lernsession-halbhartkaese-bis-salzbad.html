@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lernpfad: Halbhartkäse</title>
-  <link rel="stylesheet" href="../style.css?v=a43de43a">
-  <script src="../assets/lernsession-engine.js?v=a822aef3"></script>
+  <link rel="stylesheet" href="../style.css?v=888806ed">
+  <script src="../assets/lernsession-engine.js?v=1bb6119e"></script>
 </head>
 <body>
 
@@ -545,140 +545,15 @@ LSEngine.initState();
 
 /* ---------- Aufbau aller Stationen ---------- */
 function buildBody(idx, st) {
-  var body = document.getElementById('body-' + idx);
   if (st.type === 'slides') LSEngine.buildSlides(idx, st);
   if (st.type === 'quiz')   LSEngine.buildQuiz(idx, st);
   if (st.type === 'tf')     LSEngine.buildTF(idx, st);
   if (st.type === 'gaps')   LSEngine.buildGaps(idx, st);
-  if (st.type === 'reason') buildReason(body, idx, st);
+  if (st.type === 'reason') LSEngine.buildReason(idx, st);
 }
 
 /* ---------- Begründen: Satzkette, besten Satz wählen, Freitext mit Selbstcheck ----------
    Jede Teilaufgabe gibt 1 Punkt. Station gilt als gelöst, wenn alle Teilaufgaben fertig sind. */
-function buildReason(body, idx, st) {
-  maxPts[idx] = st.tasks.length;
-  earned[idx] = 0;
-  var done = 0;
-  function finishTask(pts, ok) {
-    earned[idx] += pts;
-    done++;
-    if (done === st.tasks.length) solved[idx] = true;
-    LSEngine.updateNav();
-  }
-  st.tasks.forEach(function(t, ti) {
-    var block = document.createElement('div');
-    block.className = 'q-block rs-task';
-    block.innerHTML = '<div class="q-text">' + (ti + 1) + '. ' + t.q + '</div>';
-    body.appendChild(block);
-    if (t.kind === 'chain')  buildChain(block, t, finishTask);
-    if (t.kind === 'choose') buildChoose(block, t, finishTask);
-    if (t.kind === 'free')   buildFree(block, t, finishTask);
-  });
-}
-
-/* Satzkette: Bausteine antippen, um sie der Reihe nach anzuhängen; in der Kette antippen = zurücklegen */
-function buildChain(block, t, finishTask) {
-  var picked = [];
-  var order = LSEngine.shuffleIdx(t.frags.length);
-  var wrap = document.createElement('div');
-  wrap.innerHTML = '<div class="rs-hint">Tippen Sie die Sätze in der richtigen Reihenfolge an.</div>' +
-    '<ol class="rs-chain"></ol><div class="rs-pool"></div>' +
-    '<div class="check-btn-row"><button class="btn btn-primary" disabled>Prüfen</button></div><div class="fb"></div>';
-  block.appendChild(wrap);
-  var chainEl = wrap.querySelector('.rs-chain'), poolEl = wrap.querySelector('.rs-pool');
-  var btn = wrap.querySelector('button'), fb = wrap.querySelector('.fb');
-  var locked = false;
-  function render() {
-    chainEl.innerHTML = ''; poolEl.innerHTML = '';
-    picked.forEach(function(fi, pos) {
-      var li = document.createElement('li');
-      li.className = 'rs-frag in-chain';
-      li.textContent = t.frags[fi];
-      li.addEventListener('click', function() { if (locked) return; picked.splice(pos, 1); render(); });
-      chainEl.appendChild(li);
-    });
-    order.forEach(function(fi) {
-      if (picked.indexOf(fi) !== -1) return;
-      var b = document.createElement('button');
-      b.className = 'rs-frag';
-      b.textContent = t.frags[fi];
-      b.addEventListener('click', function() { if (locked) return; picked.push(fi); render(); });
-      poolEl.appendChild(b);
-    });
-    btn.disabled = locked || picked.length !== t.frags.length;
-  }
-  btn.addEventListener('click', function() {
-    locked = true;
-    var ok = picked.every(function(fi, pos) { return fi === pos; });
-    chainEl.querySelectorAll('.rs-frag').forEach(function(li, pos) { li.classList.add(picked[pos] === pos ? 'correct' : 'wrong'); });
-    fb.className = 'fb show ' + (ok ? 'ok' : 'no');
-    fb.innerHTML = ok ? 'Richtig! Die Kette stimmt.' :
-      '<b>Richtige Reihenfolge:</b><ol style="margin:6px 0 0 1.1rem;">' + t.frags.map(function(f) { return '<li>' + f + '</li>'; }).join('') + '</ol>';
-    btn.disabled = true;
-    finishTask(ok ? 1 : 0, ok);
-  });
-  render();
-}
-
-/* Besten Satz wählen: Punkt nur beim ersten Versuch */
-function buildChoose(block, t, finishTask) {
-  var triedWrong = false, finished = false;
-  var html = '';
-  LSEngine.shuffleIdx(t.opts.length).forEach(function(oi) { html += '<button class="opt" data-o="' + oi + '">' + t.opts[oi] + '</button>'; });
-  html += '<div class="fb"></div>';
-  var wrap = document.createElement('div');
-  wrap.innerHTML = html;
-  block.appendChild(wrap);
-  var fb = wrap.querySelector('.fb');
-  wrap.querySelectorAll('.opt').forEach(function(b) {
-    b.addEventListener('click', function() {
-      if (finished) return;
-      var ok = +b.dataset.o === 0;
-      b.classList.add(ok ? 'correct' : 'wrong');
-      fb.className = 'fb show ' + (ok ? 'ok' : 'no');
-      fb.innerHTML = (ok ? 'Richtig! ' : 'Noch nicht. ') + t.fb;
-      if (ok) {
-        finished = true;
-        wrap.querySelectorAll('.opt').forEach(function(x) { x.disabled = true; });
-        finishTask(triedWrong ? 0 : 1, !triedWrong);
-      } else {
-        triedWrong = true;
-        b.disabled = true;
-      }
-    });
-  });
-}
-
-/* Freitext: eigene Antwort schreiben, Musterantwort aufdecken, Selbstcheck ankreuzen */
-function buildFree(block, t, finishTask) {
-  var wrap = document.createElement('div');
-  var checks = t.checks.map(function(c, ci) {
-    return '<label class="rs-check"><input type="checkbox" data-c="' + ci + '"> ' + c + '</label>';
-  }).join('');
-  wrap.innerHTML =
-    '<textarea class="rs-text" placeholder="Ihre Erklärung in ganzen Sätzen: was passiert und weshalb …"></textarea>' +
-    '<div class="check-btn-row"><button class="btn btn-primary rs-show">Musterantwort zeigen</button></div>' +
-    '<div class="rs-model" style="display:none;">' +
-      '<div class="rs-model-text"><b>Musterantwort:</b> ' + t.model + '</div>' +
-      '<div class="rs-hint">Selbstcheck: Was steht auch in Ihrer Antwort?</div>' + checks +
-      '<div class="check-btn-row"><button class="btn btn-success rs-done">Selbstcheck abschliessen</button></div>' +
-    '</div>';
-  block.appendChild(wrap);
-  var ta = wrap.querySelector('.rs-text');
-  wrap.querySelector('.rs-show').addEventListener('click', function() {
-    if (!ta.value.trim()) { ta.focus(); ta.placeholder = 'Schreiben Sie zuerst Ihre eigene Erklärung.'; return; }
-    ta.readOnly = true;
-    this.disabled = true;
-    wrap.querySelector('.rs-model').style.display = 'block';
-  });
-  wrap.querySelector('.rs-done').addEventListener('click', function() {
-    var boxes = wrap.querySelectorAll('.rs-check input');
-    var hit = 0;
-    boxes.forEach(function(b) { if (b.checked) hit++; b.disabled = true; });
-    this.disabled = true;
-    finishTask(Math.round(hit / boxes.length * 2) / 2, hit === boxes.length);
-  });
-}
 
 LSEngine.buildAll(); LSEngine.showCard(0); LSEngine.updateNav();
 </script>

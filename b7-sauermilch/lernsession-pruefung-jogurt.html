@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Challenge: Prüfungsvorbereitung Joghurt (b.7)</title>
-  <link rel="stylesheet" href="../style.css?v=a43de43a">
-  <script src="../assets/lernsession-engine.js?v=a822aef3"></script>
+  <link rel="stylesheet" href="../style.css?v=888806ed">
+  <script src="../assets/lernsession-engine.js?v=1bb6119e"></script>
 </head>
 <body>
 
@@ -294,127 +294,12 @@ LSEngine.configure({
 LSEngine.initState();
 
 function buildBody(idx, st){
-  if(st.type==='info')  buildInfo(idx, st);
-  if(st.type==='order') buildOrder(idx, st);
+  if(st.type==='info')  LSEngine.buildInfo(idx, st);
+  if(st.type==='order') LSEngine.buildOrder(idx, st);
   if(st.type==='tf')    LSEngine.buildTF(idx, st);
-  if(st.type==='label') (MODE==='challenge'?LSEngine.buildLabelType:buildLabelChoose)(idx, st);
+  if(st.type==='label') (MODE==='challenge'?LSEngine.buildLabelType:LSEngine.buildLabelSelect)(idx, st);
   if(st.type==='gaps')  LSEngine.buildGaps(idx, st);
   if(st.type==='quiz')  LSEngine.buildQuiz(idx, st);
-}
-
-/* Info */
-function buildInfo(idx, st){
-  maxPts[idx]=0;
-  document.getElementById('body-'+idx).innerHTML='<div class="read">'+st.read+'</div>'+
-    '<div class="read-btn-row"><button class="btn btn-primary" id="readbtn-'+idx+'">Gelesen</button></div>';
-  document.getElementById('readbtn-'+idx).addEventListener('click', function(){ if(solved[idx]) return; solved[idx]=true; this.disabled=true; this.textContent='Gelesen ✓'; LSEngine.updateNav(); });
-}
-
-/* Reihenfolge: Klick (▲▼) + Drag & Drop + Touch */
-var ordDrag=null, ordTouchRow=null, ordTouchList=null, ordClone=null, ordOffY=0;
-
-function buildOrder(idx, st){
-  maxPts[idx]=st.steps.length;
-  var html='<div class="ord-list" id="ord-'+idx+'">';
-  LSEngine.shuffleIdx(st.steps.length).forEach(function(si){
-    html+='<div class="ord-row" draggable="true" data-step="'+si+'">'+
-      '<span class="ord-grip">⋮⋮</span>'+
-      '<div class="ord-btns"><button type="button" class="ord-btn" data-dir="-1">▲</button><button type="button" class="ord-btn" data-dir="1">▼</button></div>'+
-      '<div class="ord-text">'+st.steps[si]+'</div><div class="ord-tag"></div></div>';
-  });
-  html+='</div><div class="check-btn-row"><button class="btn btn-primary" id="ordcheck-'+idx+'">Überprüfen</button></div>';
-  document.getElementById('body-'+idx).innerHTML=html;
-  var list=document.getElementById('ord-'+idx);
-
-  // Klick: ▲▼
-  list.querySelectorAll('.ord-btn').forEach(function(b){
-    b.addEventListener('click', function(){
-      if(solved[idx]) return;
-      var row=b.parentNode.parentNode; var dir=+b.dataset.dir;
-      if(dir<0 && row.previousElementSibling){ list.insertBefore(row, row.previousElementSibling); }
-      if(dir>0 && row.nextElementSibling){ list.insertBefore(row.nextElementSibling, row); }
-    });
-  });
-
-  // Drag & Drop (Desktop) + Touch (Mobil)
-  list.querySelectorAll('.ord-row').forEach(function(row){
-    row.addEventListener('dragstart', function(e){ if(solved[idx]){ e.preventDefault(); return; } ordDrag=row; row.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; });
-    row.addEventListener('dragend', function(){ row.classList.remove('dragging'); list.querySelectorAll('.ord-row').forEach(function(r){ r.classList.remove('drag-over'); }); });
-    row.addEventListener('dragover', function(e){
-      if(!ordDrag || ordDrag===row || solved[idx]) return;
-      e.preventDefault();
-      var r=row.getBoundingClientRect(); var after=(e.clientY-r.top) > r.height/2;
-      list.insertBefore(ordDrag, after ? row.nextElementSibling : row);
-    });
-    row.addEventListener('touchstart', function(e){
-      if(solved[idx] || e.target.closest('.ord-btn')) return;
-      e.preventDefault();
-      var t=e.touches[0], rect=row.getBoundingClientRect();
-      ordTouchRow=row; ordTouchList=list; ordOffY=t.clientY-rect.top;
-      ordClone=row.cloneNode(true); ordClone.id='ordClone';
-      ordClone.style.cssText='position:fixed;z-index:9999;pointer-events:none;opacity:0.9;margin:0;width:'+rect.width+'px;left:'+rect.left+'px;top:'+(t.clientY-ordOffY)+'px;box-shadow:0 8px 28px rgba(0,0,0,0.18);';
-      document.body.appendChild(ordClone);
-      row.style.opacity='0.3';
-    }, {passive:false});
-  });
-
-  document.getElementById('ordcheck-'+idx).addEventListener('click', function(){
-    if(solved[idx]) return;
-    var rows=list.querySelectorAll('.ord-row'); var correct=0;
-    rows.forEach(function(row, pos){
-      var ok=(+row.dataset.step===pos);
-      row.classList.add(ok?'ord-correct':'ord-wrong'); row.setAttribute('draggable','false');
-      row.querySelector('.ord-tag').textContent = ok?'✓':('→ '+(+row.dataset.step+1)); if(ok) correct++;
-    });
-    earned[idx]=correct; solved[idx]=true; this.disabled=true; LSEngine.updateNav();
-  });
-}
-
-document.addEventListener('touchmove', function(e){
-  if(!ordTouchRow) return;
-  e.preventDefault();
-  var t=e.touches[0];
-  ordClone.style.top=(t.clientY-ordOffY)+'px';
-  ordClone.style.display='none';
-  var el=document.elementFromPoint(t.clientX, t.clientY);
-  ordClone.style.display='';
-  var over=el ? el.closest('.ord-row') : null;
-  if(over && over!==ordTouchRow && over.parentNode===ordTouchList){
-    var r=over.getBoundingClientRect(); var after=(t.clientY-r.top) > r.height/2;
-    ordTouchList.insertBefore(ordTouchRow, after ? over.nextElementSibling : over);
-  }
-}, {passive:false});
-
-document.addEventListener('touchend', function(){
-  if(!ordTouchRow) return;
-  if(ordClone){ ordClone.remove(); ordClone=null; }
-  ordTouchRow.style.opacity=''; ordTouchRow=null; ordTouchList=null;
-});
-
-/* Beschriften – Lernpfad: zuordnen per Auswahl */
-function buildLabelChoose(idx, st){
-  maxPts[idx]=st.items.length*0.5;
-  var names=st.items.map(function(it){return it.name;}).filter(function(v,i,a){return a.indexOf(v)===i;});
-  var optHtml=LSEngine.shuffle(names).map(function(o){return '<option>'+o+'</option>';}).join('');
-  var html='<div class="slots-grid">';
-  st.items.forEach(function(it){
-    html+='<div class="slot-row"><div class="slot-num">'+it.n+'</div><div class="type-cell">'+
-      '<select class="lp-select" id="lb-'+idx+'-'+it.n+'"><option value="">…</option>'+optHtml+'</select>'+
-      '<div class="type-sol" id="lbsol-'+idx+'-'+it.n+'" style="display:none;"></div></div></div>';
-  });
-  html+='</div><div class="check-btn-row"><button class="btn btn-primary" id="lbcheck-'+idx+'">Überprüfen</button></div>';
-  document.getElementById('body-'+idx).innerHTML=html;
-  document.getElementById('lbcheck-'+idx).addEventListener('click', function(){
-    if(solved[idx]) return; var correct=0;
-    st.items.forEach(function(it){
-      var sel=document.getElementById('lb-'+idx+'-'+it.n); var sol=document.getElementById('lbsol-'+idx+'-'+it.n);
-      sel.classList.remove('correct','wrong');
-      var ok=(sel.value===it.name);
-      if(ok){ sel.classList.add('correct'); sol.style.display='none'; correct++; } else { sel.classList.add('wrong'); sol.textContent='→ '+it.name; sol.style.display='block'; }
-      sel.disabled=true;
-    });
-    earned[idx]=correct*0.5; solved[idx]=true; this.disabled=true; LSEngine.updateNav();
-  });
 }
 
 LSEngine.buildAll(); LSEngine.showCard(0); LSEngine.updateNav();

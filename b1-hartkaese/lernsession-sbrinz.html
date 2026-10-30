@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Challenge: Sbrinz AOP</title>
-  <link rel="stylesheet" href="../style.css?v=a43de43a">
-  <script src="../assets/lernsession-engine.js?v=a822aef3"></script>
+  <link rel="stylesheet" href="../style.css?v=888806ed">
+  <script src="../assets/lernsession-engine.js?v=1bb6119e"></script>
 </head>
 <body>
 
@@ -326,91 +326,12 @@ LSEngine.initState();
 
 /* ---------- Aufbau aller Stationen ---------- */
 function buildBody(idx, st) {
-  var body = document.getElementById('body-' + idx);
   if (st.type === 'slides') LSEngine.buildSlides(idx, st);
   if (st.type === 'quiz')   LSEngine.buildQuiz(idx, st);
   if (st.type === 'tf')     LSEngine.buildTF(idx, st);
   if (st.type === 'gaps')   LSEngine.buildGaps(idx, st);
-  if (st.type === 'decide') buildDecide(body, idx, st);
-  if (st.type === 'errors') buildErrors(body, idx, st);
-}
-
-/* ---------- Prozess-Entscheid ---------- */
-function buildDecide(body, idx, st) {
-  maxPts[idx] = 0.5;
-  var block = document.createElement('div');
-  block.className = 'q-block';
-  var h = '';
-  st.options.forEach(function(op, oi) {
-    h += '<button class="opt" data-o="' + oi + '">' + op.t + '</button>';
-  });
-  h += '<div class="fb" id="decfb-' + idx + '"></div>';
-  block.innerHTML = h;
-  body.appendChild(block);
-  var triedWrong = false;
-  body.querySelectorAll('.opt').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      if (solved[idx]) return;
-      var oi = +btn.dataset.o;
-      var op = st.options[oi];
-      var fb = document.getElementById('decfb-' + idx);
-      body.querySelectorAll('.opt').forEach(function(b) { b.classList.remove('wrong', 'correct'); });
-      fb.className = 'fb show ' + (op.correct ? 'ok' : 'no');
-      fb.innerHTML = op.fb;
-      if (op.correct) {
-        btn.classList.add('correct');
-        body.querySelectorAll('.opt').forEach(function(b) { b.disabled = true; });
-        if (!triedWrong) earned[idx] = 0.5;
-        solved[idx] = true;
-        LSEngine.updateNav();
-      } else {
-        btn.classList.add('wrong');
-        triedWrong = true;
-      }
-    });
-  });
-}
-
-/* ---------- Fehlersuche ---------- */
-function buildErrors(body, idx, st) {
-  var wrongCount = 0;
-  st.items.forEach(function(it) { if (it.wrong) wrongCount++; });
-  maxPts[idx] = wrongCount * 0.5;
-
-  var html = '<div class="err-intro">Tippen Sie die falschen Angaben an:</div>';
-  st.items.forEach(function(it, ii) {
-    html += '<div class="err-line">' + it.label + ' ' +
-      '<span class="err-chip" data-i="' + ii + '">' + it.value + '</span>' +
-      '<span class="err-corr" id="errcorr-' + idx + '-' + ii + '">→ richtig: ' + (it.corr || '') + '</span>' +
-      '</div>';
-  });
-  html += '<div class="check-btn-row"><button class="btn btn-primary" id="errcheck-' + idx + '">Auswerten</button></div>';
-  body.innerHTML = html;
-
-  body.querySelectorAll('.err-chip').forEach(function(chip) {
-    chip.addEventListener('click', function() {
-      if (chip.classList.contains('locked')) return;
-      chip.classList.toggle('marked');
-    });
-  });
-
-  document.getElementById('errcheck-' + idx).addEventListener('click', function() {
-    var score = 0;
-    body.querySelectorAll('.err-chip').forEach(function(chip) {
-      var ii = +chip.dataset.i;
-      var it = st.items[ii];
-      var marked = chip.classList.contains('marked');
-      chip.classList.add('locked');
-      var decisionOk = (it.wrong === marked);
-      if (it.wrong && marked) { chip.classList.remove('marked'); chip.classList.add('is-correct-mark'); document.getElementById('errcorr-' + idx + '-' + ii).classList.add('show'); score++; }
-      else if (it.wrong && !marked) { chip.classList.add('missed'); document.getElementById('errcorr-' + idx + '-' + ii).classList.add('show'); }
-      else if (!it.wrong && marked) { chip.classList.add('wrong'); chip.style.background = 'var(--red-light)'; chip.style.color = 'var(--red-dark)'; chip.style.borderColor = 'var(--red)'; score--; }
-    });
-    earned[idx] = Math.max(0, score) * 0.5;
-    solved[idx] = true;
-    this.disabled = true;
-    LSEngine.updateNav();
-  });
+  if (st.type === 'decide') LSEngine.buildDecide(idx, st);
+  if (st.type === 'errors') LSEngine.buildErrors(idx, st);
 }
 
 LSEngine.buildAll(); LSEngine.showCard(0); LSEngine.updateNav();

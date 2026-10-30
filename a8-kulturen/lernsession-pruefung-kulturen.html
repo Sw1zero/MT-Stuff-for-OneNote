@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kulturen – Challenge (a.8)</title>
-  <link rel="stylesheet" href="../style.css?v=a43de43a">
+  <link rel="stylesheet" href="../style.css?v=888806ed">
   <script src="../assets/dnd.js"></script>
-  <script src="../assets/lernsession-engine.js?v=a822aef3"></script>
+  <script src="../assets/lernsession-engine.js?v=1bb6119e"></script>
 </head>
 <body>
 
@@ -286,70 +286,13 @@ function buildBody(idx, st){
   if(st.type==='tf')    LSEngine.buildTF(idx, st);
   if(st.type==='label')  (MODE==='challenge') ? LSEngine.buildLabelType(idx, st) : LSEngine.buildLabelChoose(idx, st);
   if(st.type==='gaps')  LSEngine.buildGaps(idx, st);
-  if(st.type==='table') buildTable(idx, st);
+  if(st.type==='table') LSEngine.buildTable(idx, st);
   if(st.type==='quiz')  LSEngine.buildQuiz(idx, st);
   if(st.type==='explain') LSEngine.buildExplain(idx, st);
 }
 
 /* Zuordnungs-Tabelle – Drag & Drop (wie buildLabelChoose, aber Tabellenzeilen statt Bild-Slots;
    mehrere Zeilen dürfen denselben Chip-Text als Lösung haben, dafür keine Namens-Deduplizierung) */
-function buildTable(idx, st){
-  maxPts[idx]=st.rows.length*0.5;
-  var body=document.getElementById('body-'+idx);
-  body.innerHTML='';
-
-  var correctWords=st.rows.map(function(row){ return row.opts[row.correct]; });
-  var uniqueCorrect=correctWords.filter(function(v,i,a){ return a.indexOf(v)===i; });
-  var allOpts=[]; st.rows.forEach(function(row){ row.opts.forEach(function(o){ if(allOpts.indexOf(o)===-1) allOpts.push(o); }); });
-  var distractorWords=allOpts.filter(function(o){ return uniqueCorrect.indexOf(o)===-1; });
-  var chipWords=correctWords.slice();
-  distractorWords.forEach(function(d){ chipWords.push(d); chipWords.push(d); });
-
-  var bank=document.createElement('div'); bank.className='lb-bank';
-  LSEngine.shuffle(chipWords).forEach(function(word){
-    var chip=document.createElement('span'); chip.className='lb-chip'; chip.textContent=word; chip.dataset.word=word; chip.setAttribute('draggable','true');
-    chip.addEventListener('dragstart',function(e){LSEngine.lbState.word=word;LSEngine.lbState.src=chip;LSEngine.lbState.bank=bank;e.dataTransfer.effectAllowed='move';});
-    chip.addEventListener('touchstart',function(e){LSEngine.lbState.bank=bank;MTDnD.touchStart(e,chip,word,false,'.lb-slot',LSEngine.lbOnDrop);},{passive:false});
-    chip.addEventListener('click',function(){LSEngine.lbSelectChip(chip,word,bank);});
-    bank.appendChild(chip);
-  });
-  body.appendChild(bank);
-
-  var table=document.createElement('table'); table.className='gap-table';
-  table.innerHTML='<thead><tr><th>'+st.stmtHeader+'</th><th>'+st.pickHeader+'</th></tr></thead>';
-  var tbody=document.createElement('tbody');
-  st.rows.forEach(function(row, ri){
-    var tr=document.createElement('tr');
-    var tdStmt=document.createElement('td'); tdStmt.className='gt-stmt'; tdStmt.textContent=row.text;
-    var tdPick=document.createElement('td'); tdPick.className='gt-pick';
-    var box=document.createElement('div'); box.className='lb-slot'; box.dataset.row=ri; box.dataset.correct=row.opts[row.correct]; box.textContent='—';
-    box.addEventListener('dragover',function(e){e.preventDefault();if(!box.classList.contains('correct')&&!box.classList.contains('wrong'))box.classList.add('lb-over');});
-    box.addEventListener('dragleave',function(){box.classList.remove('lb-over');});
-    box.addEventListener('drop',function(e){e.preventDefault();box.classList.remove('lb-over');LSEngine.lbDrop(box);});
-    box.addEventListener('dragstart',function(e){if(!box.dataset.filled){e.preventDefault();return;}LSEngine.lbState.word=box.dataset.filled;LSEngine.lbState.src=box;LSEngine.lbState.bank=bank;e.dataTransfer.effectAllowed='move';});
-    box.addEventListener('touchstart',function(e){if(!box.dataset.filled)return;LSEngine.lbState.bank=bank;MTDnD.touchStart(e,box,box.dataset.filled,true,'.lb-slot',LSEngine.lbOnDrop);},{passive:false});
-    box.addEventListener('click',function(){LSEngine.lbClickBox(box,bank);});
-    tdPick.appendChild(box);
-    tr.appendChild(tdStmt); tr.appendChild(tdPick);
-    tbody.appendChild(tr);
-  });
-  table.appendChild(tbody);
-  body.appendChild(table);
-
-  var checkRow=document.createElement('div'); checkRow.className='check-btn-row';
-  var checkBtn=document.createElement('button'); checkBtn.className='btn btn-primary'; checkBtn.textContent='Prüfen';
-  checkRow.appendChild(checkBtn); body.appendChild(checkRow);
-
-  checkBtn.addEventListener('click', function(){
-    if(solved[idx]) return; var correct=0;
-    table.querySelectorAll('.lb-slot').forEach(function(box){
-      box.classList.remove('lb-filled','lb-over','lb-ready');
-      var good=(box.dataset.filled===box.dataset.correct);
-      if(good){ box.classList.add('correct'); correct++; } else { box.classList.add('wrong'); }
-    });
-    earned[idx]=correct*0.5; solved[idx]=true; checkBtn.disabled=true; LSEngine.updateNav();
-  });
-}
 
 LSEngine.buildAll(); LSEngine.showCard(0); LSEngine.updateNav();
 </script>

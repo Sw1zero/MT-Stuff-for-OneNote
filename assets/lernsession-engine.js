@@ -28,7 +28,8 @@
      LSEngine.goNext() / .goPrev() / .jumpTo(i) / .restart()
      LSEngine.findIdx(id) / .shuffle(a) / .shuffleIdx(n)
      LSEngine.buildPdf/.buildVideo/.buildSlides/.buildTF/.buildGaps/.buildQuiz/
-       .buildLabelType/.buildLabelChoose/.buildExplain(idx, st)
+       .buildLabelType/.buildLabelChoose/.buildExplain/.buildDecide/.buildErrors/
+       .buildReason/.buildInfo/.buildOrder/.buildLabelSelect/.buildTable(idx, st)
        (buildTF: optional st.trueLabel/st.falseLabel statt "Wahr"/"Falsch")
      LSEngine.lbState/.lbFill/.lbClear/.lbUse/.lbReturn/.lbDrop/.lbOnDrop/
        .lbSelectChip/.lbClickBox – Drag&Drop-Baustein hinter buildLabelChoose,
@@ -52,6 +53,20 @@
   function feedback(el, ok, titel, text){
     el.className='q-feedback show '+(ok?'ok':'nok');
     el.innerHTML=(ok?OK_SVG:NOK_SVG)+'<div><b>'+titel+'</b>'+(text?'<span>'+text+'</span>':'')+'</div>';
+  }
+  // Zusammenfassung nach «Prüfen», direkt über dem Knopf
+  function bilanz(vor, korrekt, total, was, hinweis){
+    var el=document.createElement('div'); el.setAttribute('role','status');
+    vor.parentNode.insertBefore(el, vor);
+    var ok=korrekt===total;
+    feedback(el, ok, ok?'Richtig!':'Nicht ganz.', korrekt+' von '+total+' '+was+' richtig.'+(ok?'':' '+hinweis));
+  }
+  // Symbol in einem Feld, bei falschem Inhalt zusätzlich der richtige Begriff
+  function markiere(el, ok, richtig){
+    if(el.classList.contains('lb-slot') && !el.dataset.filled) el.textContent='';   // leeres Feld: ohne Platzhalter-Strich
+    var m=document.createElement('span'); m.className='gap-mark '+(ok?'ok':'nok');
+    m.innerHTML=(ok?OK_SVG:NOK_SVG)+(ok?'':'<span>'+richtig+'</span>');
+    el.appendChild(m);
   }
 
   /* ---------- Setup ---------- */
@@ -309,6 +324,7 @@
         var ok=matchKeys(inp.value, it);
         if(ok){ inp.classList.add('correct'); sol.style.display='none'; correct++; } else { inp.classList.add('wrong'); sol.textContent='→ '+it.name; sol.style.display='block'; }
       });
+      bilanz(this.parentNode, correct, st.items.length, 'Bezeichnungen', 'Die richtige Bezeichnung steht jeweils unter dem falschen Feld.');
       earned[idx]=correct*0.5; solved[idx]=true; this.disabled=true; updateNav();
     });
   }
@@ -384,8 +400,11 @@
       st.items.forEach(function(p){
         var box=grid.querySelector('[data-slot="'+p.n+'"]');
         box.classList.remove('lb-filled','lb-over','lb-ready');
-        if(box.dataset.filled===p.name){box.classList.add('correct');correct++;}else{box.classList.add('wrong');}
+        var ok=box.dataset.filled===p.name;
+        box.classList.add(ok?'correct':'wrong'); if(ok) correct++;
+        markiere(box, ok, p.name);
       });
+      bilanz(checkBtn, correct, st.items.length, 'Bezeichnungen', 'Die richtige Bezeichnung steht jeweils im falschen Feld.');
       earned[idx]=correct*0.5; solved[idx]=true; checkBtn.disabled=true; updateNav();
     });
     body.appendChild(checkBtn);
@@ -459,6 +478,386 @@
 
     show();
   }
+
+  /* ---------- Weitere Posten-Typen (bis 30.10.2026 seiteneigen, unverändert übernommen) ----------
+     decide/errors: Emmentaler, Sbrinz · reason (chain/choose/free): Halbhartkäse · info, order, labelSelect: Jogurt · table: Kulturen */
+  function buildDecide(idx, st) {
+    var body = document.getElementById('body-' + idx);
+    maxPts[idx] = 0.5;
+    var block = document.createElement('div');
+    block.className = 'q-block';
+    var h = '';
+    st.options.forEach(function(op, oi) {
+      h += '<button class="opt" data-o="' + oi + '">' + op.t + '</button>';
+    });
+    h += '<div class="q-feedback" id="decfb-' + idx + '" role="status"></div>';
+    block.innerHTML = h;
+    body.appendChild(block);
+    var triedWrong = false;
+    body.querySelectorAll('.opt').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        if (solved[idx]) return;
+        var oi = +btn.dataset.o;
+        var op = st.options[oi];
+        var fb = document.getElementById('decfb-' + idx);
+        body.querySelectorAll('.opt').forEach(function(b) { b.classList.remove('wrong', 'correct'); });
+        feedback(fb, op.correct, op.correct ? 'Richtig!' : 'Nicht ganz. Versuchen Sie es nochmals.', op.fb);
+        if (op.correct) {
+          btn.classList.add('correct');
+          body.querySelectorAll('.opt').forEach(function(b) { b.disabled = true; });
+          if (!triedWrong) earned[idx] = 0.5;
+          solved[idx] = true;
+          updateNav();
+        } else {
+          btn.classList.add('wrong');
+          triedWrong = true;
+        }
+      });
+    });
+  }
+
+  function buildErrors(idx, st) {
+    var body = document.getElementById('body-' + idx);
+    var wrongCount = 0;
+    st.items.forEach(function(it) { if (it.wrong) wrongCount++; });
+    maxPts[idx] = wrongCount * 0.5;
+
+    var html = '<div class="err-intro">Tippen Sie die falschen Angaben an:</div>';
+    st.items.forEach(function(it, ii) {
+      html += '<div class="err-line">' + it.label + ' ' +
+        '<span class="err-chip" data-i="' + ii + '">' + it.value + '</span>' +
+        '<span class="err-corr" id="errcorr-' + idx + '-' + ii + '">→ richtig: ' + (it.corr || '') + '</span>' +
+        '</div>';
+    });
+    html += '<div class="q-feedback" id="errfb-' + idx + '" role="status"></div>';
+    html += '<div class="check-btn-row"><button class="btn btn-primary" id="errcheck-' + idx + '">Auswerten</button></div>';
+    body.innerHTML = html;
+
+    body.querySelectorAll('.err-chip').forEach(function(chip) {
+      chip.addEventListener('click', function() {
+        if (chip.classList.contains('locked')) return;
+        chip.classList.toggle('marked');
+      });
+    });
+
+    document.getElementById('errcheck-' + idx).addEventListener('click', function() {
+      var score = 0;
+      body.querySelectorAll('.err-chip').forEach(function(chip) {
+        var ii = +chip.dataset.i;
+        var it = st.items[ii];
+        var marked = chip.classList.contains('marked');
+        chip.classList.add('locked');
+        var decisionOk = (it.wrong === marked);
+        if (it.wrong && marked) { chip.classList.remove('marked'); chip.classList.add('is-correct-mark'); document.getElementById('errcorr-' + idx + '-' + ii).classList.add('show'); score++; }
+        else if (it.wrong && !marked) { chip.classList.add('missed'); document.getElementById('errcorr-' + idx + '-' + ii).classList.add('show'); }
+        else if (!it.wrong && marked) { chip.classList.add('wrong'); chip.style.background = 'var(--red-light)'; chip.style.color = 'var(--red-dark)'; chip.style.borderColor = 'var(--red)'; score--; }
+      });
+      var gefunden = body.querySelectorAll('.err-chip.is-correct-mark').length, zuviel = body.querySelectorAll('.err-chip.wrong').length;
+      var ok = gefunden === wrongCount && !zuviel;
+      feedback(document.getElementById('errfb-' + idx), ok, ok ? 'Richtig!' : 'Nicht ganz.',
+        gefunden + ' von ' + wrongCount + ' Fehlern gefunden.' + (zuviel ? ' ' + zuviel + ' richtige Angabe' + (zuviel > 1 ? 'n' : '') + ' fälschlich angetippt.' : '') +
+        (ok ? '' : ' Die Korrektur steht hinter jedem Fehler.'));
+      earned[idx] = Math.max(0, score) * 0.5;
+      solved[idx] = true;
+      this.disabled = true;
+      updateNav();
+    });
+  }
+
+  function buildReason(idx, st) {
+    var body = document.getElementById('body-' + idx);
+    maxPts[idx] = st.tasks.length;
+    earned[idx] = 0;
+    var done = 0;
+    function finishTask(pts, ok) {
+      earned[idx] += pts;
+      done++;
+      if (done === st.tasks.length) solved[idx] = true;
+      updateNav();
+    }
+    st.tasks.forEach(function(t, ti) {
+      var block = document.createElement('div');
+      block.className = 'q-block rs-task';
+      block.innerHTML = '<div class="q-text">' + (ti + 1) + '. ' + t.q + '</div>';
+      body.appendChild(block);
+      if (t.kind === 'chain')  buildChain(block, t, finishTask);
+      if (t.kind === 'choose') buildChoose(block, t, finishTask);
+      if (t.kind === 'free')   buildFree(block, t, finishTask);
+    });
+  }
+
+  function buildChain(block, t, finishTask) {
+    var picked = [];
+    var order = shuffleIdx(t.frags.length);
+    var wrap = document.createElement('div');
+    wrap.innerHTML = '<div class="rs-hint">Tippen Sie die Sätze in der richtigen Reihenfolge an.</div>' +
+      '<ol class="rs-chain"></ol><div class="rs-pool"></div>' +
+      '<div class="check-btn-row"><button class="btn btn-primary" disabled>Prüfen</button></div><div class="q-feedback" role="status"></div>';
+    block.appendChild(wrap);
+    var chainEl = wrap.querySelector('.rs-chain'), poolEl = wrap.querySelector('.rs-pool');
+    var btn = wrap.querySelector('button'), fb = wrap.querySelector('.q-feedback');
+    var locked = false;
+    function render() {
+      chainEl.innerHTML = ''; poolEl.innerHTML = '';
+      picked.forEach(function(fi, pos) {
+        var li = document.createElement('li');
+        li.className = 'rs-frag in-chain';
+        li.textContent = t.frags[fi];
+        li.addEventListener('click', function() { if (locked) return; picked.splice(pos, 1); render(); });
+        chainEl.appendChild(li);
+      });
+      order.forEach(function(fi) {
+        if (picked.indexOf(fi) !== -1) return;
+        var b = document.createElement('button');
+        b.className = 'rs-frag';
+        b.textContent = t.frags[fi];
+        b.addEventListener('click', function() { if (locked) return; picked.push(fi); render(); });
+        poolEl.appendChild(b);
+      });
+      btn.disabled = locked || picked.length !== t.frags.length;
+    }
+    btn.addEventListener('click', function() {
+      locked = true;
+      var ok = picked.every(function(fi, pos) { return fi === pos; });
+      chainEl.querySelectorAll('.rs-frag').forEach(function(li, pos) { li.classList.add(picked[pos] === pos ? 'correct' : 'wrong'); });
+      feedback(fb, ok, ok ? 'Richtig!' : 'Nicht ganz.', ok ? 'Die Kette stimmt.' :
+        'Richtige Reihenfolge:<ol style="margin:6px 0 0 1.1rem;">' + t.frags.map(function(f) { return '<li>' + f + '</li>'; }).join('') + '</ol>');
+      btn.disabled = true;
+      finishTask(ok ? 1 : 0, ok);
+    });
+    render();
+  }
+
+  function buildChoose(block, t, finishTask) {
+    var triedWrong = false, finished = false;
+    var html = '';
+    shuffleIdx(t.opts.length).forEach(function(oi) { html += '<button class="opt" data-o="' + oi + '">' + t.opts[oi] + '</button>'; });
+    html += '<div class="q-feedback" role="status"></div>';
+    var wrap = document.createElement('div');
+    wrap.innerHTML = html;
+    block.appendChild(wrap);
+    var fb = wrap.querySelector('.q-feedback');
+    wrap.querySelectorAll('.opt').forEach(function(b) {
+      b.addEventListener('click', function() {
+        if (finished) return;
+        var ok = +b.dataset.o === 0;
+        b.classList.add(ok ? 'correct' : 'wrong');
+        feedback(fb, ok, ok ? 'Richtig!' : 'Noch nicht. Versuchen Sie es nochmals.', t.fb);
+        if (ok) {
+          finished = true;
+          wrap.querySelectorAll('.opt').forEach(function(x) { x.disabled = true; });
+          finishTask(triedWrong ? 0 : 1, !triedWrong);
+        } else {
+          triedWrong = true;
+          b.disabled = true;
+        }
+      });
+    });
+  }
+
+  function buildFree(block, t, finishTask) {
+    var wrap = document.createElement('div');
+    var checks = t.checks.map(function(c, ci) {
+      return '<label class="rs-check"><input type="checkbox" data-c="' + ci + '"> ' + c + '</label>';
+    }).join('');
+    wrap.innerHTML =
+      '<textarea class="rs-text" placeholder="Ihre Erklärung in ganzen Sätzen: was passiert und weshalb …"></textarea>' +
+      '<div class="check-btn-row"><button class="btn btn-primary rs-show">Musterantwort zeigen</button></div>' +
+      '<div class="rs-model" style="display:none;">' +
+        '<div class="rs-model-text"><b>Musterantwort:</b> ' + t.model + '</div>' +
+        '<div class="rs-hint">Selbstcheck: Was steht auch in Ihrer Antwort?</div>' + checks +
+        '<div class="check-btn-row"><button class="btn btn-success rs-done">Selbstcheck abschliessen</button></div>' +
+      '</div>';
+    block.appendChild(wrap);
+    var ta = wrap.querySelector('.rs-text');
+    wrap.querySelector('.rs-show').addEventListener('click', function() {
+      if (!ta.value.trim()) { ta.focus(); ta.placeholder = 'Schreiben Sie zuerst Ihre eigene Erklärung.'; return; }
+      ta.readOnly = true;
+      this.disabled = true;
+      wrap.querySelector('.rs-model').style.display = 'block';
+    });
+    wrap.querySelector('.rs-done').addEventListener('click', function() {
+      var boxes = wrap.querySelectorAll('.rs-check input');
+      var hit = 0;
+      boxes.forEach(function(b) { if (b.checked) hit++; b.disabled = true; });
+      this.disabled = true;
+      finishTask(Math.round(hit / boxes.length * 2) / 2, hit === boxes.length);
+    });
+  }
+
+  function buildInfo(idx, st){
+    maxPts[idx]=0;
+    document.getElementById('body-'+idx).innerHTML='<div class="read">'+st.read+'</div>'+
+      '<div class="read-btn-row"><button class="btn btn-primary" id="readbtn-'+idx+'">Gelesen</button></div>';
+    document.getElementById('readbtn-'+idx).addEventListener('click', function(){ if(solved[idx]) return; solved[idx]=true; this.disabled=true; this.textContent='Gelesen ✓'; updateNav(); });
+  }
+
+  function buildOrder(idx, st){
+    maxPts[idx]=st.steps.length;
+    var html='<div class="ord-list" id="ord-'+idx+'">';
+    shuffleIdx(st.steps.length).forEach(function(si){
+      html+='<div class="ord-row" draggable="true" data-step="'+si+'">'+
+        '<span class="ord-grip">⋮⋮</span>'+
+        '<div class="ord-btns"><button type="button" class="ord-btn" data-dir="-1">▲</button><button type="button" class="ord-btn" data-dir="1">▼</button></div>'+
+        '<div class="ord-text">'+st.steps[si]+'</div><div class="ord-tag"></div></div>';
+    });
+    html+='</div><div class="check-btn-row"><button class="btn btn-primary" id="ordcheck-'+idx+'">Überprüfen</button></div>';
+    document.getElementById('body-'+idx).innerHTML=html;
+    var list=document.getElementById('ord-'+idx);
+
+    // Klick: ▲▼
+    list.querySelectorAll('.ord-btn').forEach(function(b){
+      b.addEventListener('click', function(){
+        if(solved[idx]) return;
+        var row=b.parentNode.parentNode; var dir=+b.dataset.dir;
+        if(dir<0 && row.previousElementSibling){ list.insertBefore(row, row.previousElementSibling); }
+        if(dir>0 && row.nextElementSibling){ list.insertBefore(row.nextElementSibling, row); }
+      });
+    });
+
+    // Drag & Drop (Desktop) + Touch (Mobil)
+    list.querySelectorAll('.ord-row').forEach(function(row){
+      row.addEventListener('dragstart', function(e){ if(solved[idx]){ e.preventDefault(); return; } ordDrag=row; row.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; });
+      row.addEventListener('dragend', function(){ row.classList.remove('dragging'); list.querySelectorAll('.ord-row').forEach(function(r){ r.classList.remove('drag-over'); }); });
+      row.addEventListener('dragover', function(e){
+        if(!ordDrag || ordDrag===row || solved[idx]) return;
+        e.preventDefault();
+        var r=row.getBoundingClientRect(); var after=(e.clientY-r.top) > r.height/2;
+        list.insertBefore(ordDrag, after ? row.nextElementSibling : row);
+      });
+      row.addEventListener('touchstart', function(e){
+        if(solved[idx] || e.target.closest('.ord-btn')) return;
+        e.preventDefault();
+        var t=e.touches[0], rect=row.getBoundingClientRect();
+        ordTouchRow=row; ordTouchList=list; ordOffY=t.clientY-rect.top;
+        ordClone=row.cloneNode(true); ordClone.id='ordClone';
+        ordClone.style.cssText='position:fixed;z-index:9999;pointer-events:none;opacity:0.9;margin:0;width:'+rect.width+'px;left:'+rect.left+'px;top:'+(t.clientY-ordOffY)+'px;box-shadow:0 8px 28px rgba(0,0,0,0.18);';
+        document.body.appendChild(ordClone);
+        row.style.opacity='0.3';
+      }, {passive:false});
+    });
+
+    document.getElementById('ordcheck-'+idx).addEventListener('click', function(){
+      if(solved[idx]) return;
+      var rows=list.querySelectorAll('.ord-row'); var correct=0;
+      rows.forEach(function(row, pos){
+        var ok=(+row.dataset.step===pos);
+        row.classList.add(ok?'ord-correct':'ord-wrong'); row.setAttribute('draggable','false');
+        row.querySelector('.ord-tag').textContent = ok?'✓':('→ '+(+row.dataset.step+1)); if(ok) correct++;
+      });
+      bilanz(this.parentNode, correct, rows.length, 'Schritte', 'Die Zahl hinter einem falschen Schritt zeigt seinen richtigen Platz.');
+      earned[idx]=correct; solved[idx]=true; this.disabled=true; updateNav();
+    });
+  }
+
+  function buildLabelSelect(idx, st){
+    maxPts[idx]=st.items.length*0.5;
+    var names=st.items.map(function(it){return it.name;}).filter(function(v,i,a){return a.indexOf(v)===i;});
+    var optHtml=shuffle(names).map(function(o){return '<option>'+o+'</option>';}).join('');
+    var html='<div class="slots-grid">';
+    st.items.forEach(function(it){
+      html+='<div class="slot-row"><div class="slot-num">'+it.n+'</div><div class="type-cell">'+
+        '<select class="lp-select" id="lb-'+idx+'-'+it.n+'"><option value="">…</option>'+optHtml+'</select>'+
+        '<div class="type-sol" id="lbsol-'+idx+'-'+it.n+'" style="display:none;"></div></div></div>';
+    });
+    html+='</div><div class="check-btn-row"><button class="btn btn-primary" id="lbcheck-'+idx+'">Überprüfen</button></div>';
+    document.getElementById('body-'+idx).innerHTML=html;
+    document.getElementById('lbcheck-'+idx).addEventListener('click', function(){
+      if(solved[idx]) return; var correct=0;
+      st.items.forEach(function(it){
+        var sel=document.getElementById('lb-'+idx+'-'+it.n); var sol=document.getElementById('lbsol-'+idx+'-'+it.n);
+        sel.classList.remove('correct','wrong');
+        var ok=(sel.value===it.name);
+        if(ok){ sel.classList.add('correct'); sol.style.display='none'; correct++; } else { sel.classList.add('wrong'); sol.textContent='→ '+it.name; sol.style.display='block'; }
+        sel.disabled=true;
+      });
+      bilanz(this.parentNode, correct, st.items.length, 'Bezeichnungen', 'Die richtige Bezeichnung steht jeweils unter der falschen Auswahl.');
+      earned[idx]=correct*0.5; solved[idx]=true; this.disabled=true; updateNav();
+    });
+  }
+
+  function buildTable(idx, st){
+    maxPts[idx]=st.rows.length*0.5;
+    var body=document.getElementById('body-'+idx);
+    body.innerHTML='';
+
+    var correctWords=st.rows.map(function(row){ return row.opts[row.correct]; });
+    var uniqueCorrect=correctWords.filter(function(v,i,a){ return a.indexOf(v)===i; });
+    var allOpts=[]; st.rows.forEach(function(row){ row.opts.forEach(function(o){ if(allOpts.indexOf(o)===-1) allOpts.push(o); }); });
+    var distractorWords=allOpts.filter(function(o){ return uniqueCorrect.indexOf(o)===-1; });
+    var chipWords=correctWords.slice();
+    distractorWords.forEach(function(d){ chipWords.push(d); chipWords.push(d); });
+
+    var bank=document.createElement('div'); bank.className='lb-bank';
+    shuffle(chipWords).forEach(function(word){
+      var chip=document.createElement('span'); chip.className='lb-chip'; chip.textContent=word; chip.dataset.word=word; chip.setAttribute('draggable','true');
+      chip.addEventListener('dragstart',function(e){lbState.word=word;lbState.src=chip;lbState.bank=bank;e.dataTransfer.effectAllowed='move';});
+      chip.addEventListener('touchstart',function(e){lbState.bank=bank;MTDnD.touchStart(e,chip,word,false,'.lb-slot',lbOnDrop);},{passive:false});
+      chip.addEventListener('click',function(){lbSelectChip(chip,word,bank);});
+      bank.appendChild(chip);
+    });
+    body.appendChild(bank);
+
+    var table=document.createElement('table'); table.className='gap-table';
+    table.innerHTML='<thead><tr><th>'+st.stmtHeader+'</th><th>'+st.pickHeader+'</th></tr></thead>';
+    var tbody=document.createElement('tbody');
+    st.rows.forEach(function(row, ri){
+      var tr=document.createElement('tr');
+      var tdStmt=document.createElement('td'); tdStmt.className='gt-stmt'; tdStmt.textContent=row.text;
+      var tdPick=document.createElement('td'); tdPick.className='gt-pick';
+      var box=document.createElement('div'); box.className='lb-slot'; box.dataset.row=ri; box.dataset.correct=row.opts[row.correct]; box.textContent='—';
+      box.addEventListener('dragover',function(e){e.preventDefault();if(!box.classList.contains('correct')&&!box.classList.contains('wrong'))box.classList.add('lb-over');});
+      box.addEventListener('dragleave',function(){box.classList.remove('lb-over');});
+      box.addEventListener('drop',function(e){e.preventDefault();box.classList.remove('lb-over');lbDrop(box);});
+      box.addEventListener('dragstart',function(e){if(!box.dataset.filled){e.preventDefault();return;}lbState.word=box.dataset.filled;lbState.src=box;lbState.bank=bank;e.dataTransfer.effectAllowed='move';});
+      box.addEventListener('touchstart',function(e){if(!box.dataset.filled)return;lbState.bank=bank;MTDnD.touchStart(e,box,box.dataset.filled,true,'.lb-slot',lbOnDrop);},{passive:false});
+      box.addEventListener('click',function(){lbClickBox(box,bank);});
+      tdPick.appendChild(box);
+      tr.appendChild(tdStmt); tr.appendChild(tdPick);
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    body.appendChild(table);
+
+    var checkRow=document.createElement('div'); checkRow.className='check-btn-row';
+    var checkBtn=document.createElement('button'); checkBtn.className='btn btn-primary'; checkBtn.textContent='Prüfen';
+    checkRow.appendChild(checkBtn); body.appendChild(checkRow);
+
+    checkBtn.addEventListener('click', function(){
+      if(solved[idx]) return; var correct=0;
+      table.querySelectorAll('.lb-slot').forEach(function(box){
+        box.classList.remove('lb-filled','lb-over','lb-ready');
+        var good=(box.dataset.filled===box.dataset.correct);
+        box.classList.add(good?'correct':'wrong'); if(good) correct++;
+        markiere(box, good, box.dataset.correct);
+      });
+      bilanz(checkRow, correct, st.rows.length, 'Zuordnungen', 'Der richtige Begriff steht jeweils im falschen Feld.');
+      earned[idx]=correct*0.5; solved[idx]=true; checkBtn.disabled=true; updateNav();
+    });
+  }
+
+  /* Reihenfolge: Ziehen per Touch (Desktop über draggable) */
+  var ordDrag=null, ordTouchRow=null, ordTouchList=null, ordClone=null, ordOffY=0;
+  document.addEventListener('touchmove', function(e){
+    if(!ordTouchRow) return;
+    e.preventDefault();
+    var t=e.touches[0];
+    ordClone.style.top=(t.clientY-ordOffY)+'px';
+    ordClone.style.display='none';
+    var el=document.elementFromPoint(t.clientX, t.clientY);
+    ordClone.style.display='';
+    var over=el ? el.closest('.ord-row') : null;
+    if(over && over!==ordTouchRow && over.parentNode===ordTouchList){
+      var r=over.getBoundingClientRect(); var after=(t.clientY-r.top) > r.height/2;
+      ordTouchList.insertBefore(ordTouchRow, after ? over.nextElementSibling : over);
+    }
+  }, {passive:false});
+
+  document.addEventListener('touchend', function(){
+    if(!ordTouchRow) return;
+    if(ordClone){ ordClone.remove(); ordClone=null; }
+    ordTouchRow.style.opacity=''; ordTouchRow=null; ordTouchList=null;
+  });
 
   /* ---------- Navigation / Auswertung ---------- */
   function renderProgress(){
@@ -581,6 +980,13 @@
     buildLabelType: buildLabelType,
     buildLabelChoose: buildLabelChoose,
     buildExplain: buildExplain,
+    buildDecide: buildDecide,
+    buildErrors: buildErrors,
+    buildReason: buildReason,
+    buildInfo: buildInfo,
+    buildOrder: buildOrder,
+    buildLabelSelect: buildLabelSelect,
+    buildTable: buildTable,
     lbState: lbState,
     lbFill: lbFill,
     lbClear: lbClear,
