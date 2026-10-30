@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Challenge: Prüfungsvorbereitung Joghurt (b.7)</title>
-  <link rel="stylesheet" href="../style.css?v=e8ebde3e">
-  <script src="../assets/lernsession-engine.js?v=e97e5615"></script>
+  <link rel="stylesheet" href="../style.css?v=a43de43a">
+  <script src="../assets/lernsession-engine.js?v=a822aef3"></script>
 </head>
 <body>
 
@@ -25,22 +25,6 @@
   <a class="back-link" href="../index.html">← Alle Lerntools</a>
 
   <div class="ls-wrap">
-    <div class="hud">
-      <div class="hud-xp"><span class="hud-label">XP</span><span class="hud-val" id="hudXp">0</span></div>
-      <div class="hud-bar"><div class="hud-bar-fill" id="hudBar"></div></div>
-      <div class="hud-streak" id="hudStreak">
-        <span id="hudStreakEmoji">🔥</span>
-        <div class="hud-fire-wrap" id="hudFireWrap" style="display:none">
-          <div class="fire">
-            <div class="fire-bottom"><div class="main-fire"></div></div>
-            <div class="fire-center"><div class="main-fire"></div><div class="particle-fire"></div></div>
-            <div class="fire-right"><div class="main-fire"></div><div class="particle-fire"></div></div>
-            <div class="fire-left"><div class="main-fire"></div><div class="particle-fire"></div></div>
-          </div>
-        </div>
-        <span id="hudStreakNum">0</span>
-      </div>
-    </div>
     <div class="ls-meta" id="lsMeta"></div>
     <div class="ls-select-hint"><span class="ls-select-badge">👆 Posten antippen – frei wählbar, keine feste Reihenfolge</span></div>
     <div class="ls-dots" id="lsDots"></div>
@@ -267,7 +251,7 @@ var ALL = [
   },
   /* 15 */ {
     kicker:'Prüfungsrunde', title:'Mischverfahren & Nachsäuern', id:'boss', boss:true, type:'quiz',
-    lead:'Die Schlussrunde, jede richtige Antwort gibt extra XP!',
+    lead:'Die Schlussrunde.',
     questions:[
       { q:'Welchen Vorteil hat das Warmmischverfahren?',
         opts:['Das Joghurt dickt beim Kühlen in der Verpackung nach (gute Endviskosität)','Man kann am nächsten Tag mischen','Die Gallerte wird nie mechanisch belastet'], correct:0 },
@@ -294,18 +278,6 @@ LSEngine.configure({
     docTitle: function(mode){ return (mode==='challenge'?'Challenge':'Lernpfad') + ': Joghurt herstellen (b.7)'; }
   },
   finish: {
-    rank: function(pct){ return pct>=90?'Joghurt-Meister 🥇' : pct>=75?'Joghurt-Profi' : pct>=50?'Joghurt-Geselle' : 'Joghurt-Lehrling'; },
-    badges: function(pct){
-      var aIdx=LSEngine.findIdx('anlage'), kIdx=LSEngine.findIdx('kulturen'), oIdx=LSEngine.findIdx('ablauf');
-      return [
-        { icon:'📖', name:'Aufmerksamer Leser', got:true },
-        { icon:'🔢', name:'Ablauf-Profi', got: oIdx>=0 && earned[oIdx]===maxPts[oIdx] },
-        { icon:'🏭', name:'Anlagen-Kenner', got: aIdx>=0 && earned[aIdx]===maxPts[aIdx] },
-        { icon:'🦠', name:'Kultur-Kenner', got: kIdx>=0 && earned[kIdx]===maxPts[kIdx] },
-        { icon:'🔥', name:'Serien-Säurer (Streak 8+)', got: bestStreak>=8 },
-        { icon:'🥇', name:'Joghurt-Meister (90%)', got: pct>=90 }
-      ];
-    },
     headerLabel: function(){ return 'Geschafft'; },
     backLink: false,
     closingHtml:
@@ -334,8 +306,8 @@ function buildBody(idx, st){
 function buildInfo(idx, st){
   maxPts[idx]=0;
   document.getElementById('body-'+idx).innerHTML='<div class="read">'+st.read+'</div>'+
-    '<div class="read-btn-row"><button class="btn btn-primary" id="readbtn-'+idx+'">Gelesen ✓ (+5 XP)</button></div>';
-  document.getElementById('readbtn-'+idx).addEventListener('click', function(){ if(solved[idx]) return; solved[idx]=true; LSEngine.addXp(5); this.disabled=true; this.textContent='Gelesen ✓'; LSEngine.updateNav(); });
+    '<div class="read-btn-row"><button class="btn btn-primary" id="readbtn-'+idx+'">Gelesen</button></div>';
+  document.getElementById('readbtn-'+idx).addEventListener('click', function(){ if(solved[idx]) return; solved[idx]=true; this.disabled=true; this.textContent='Gelesen ✓'; LSEngine.updateNav(); });
 }
 
 /* Reihenfolge: Klick (▲▼) + Drag & Drop + Touch */
@@ -392,8 +364,7 @@ function buildOrder(idx, st){
     rows.forEach(function(row, pos){
       var ok=(+row.dataset.step===pos);
       row.classList.add(ok?'ord-correct':'ord-wrong'); row.setAttribute('draggable','false');
-      row.querySelector('.ord-tag').textContent = ok?'✓':('→ '+(+row.dataset.step+1));
-      LSEngine.registerAnswer(ok); if(ok) correct++;
+      row.querySelector('.ord-tag').textContent = ok?'✓':('→ '+(+row.dataset.step+1)); if(ok) correct++;
     });
     earned[idx]=correct; solved[idx]=true; this.disabled=true; LSEngine.updateNav();
   });
@@ -440,7 +411,7 @@ function buildLabelChoose(idx, st){
       sel.classList.remove('correct','wrong');
       var ok=(sel.value===it.name);
       if(ok){ sel.classList.add('correct'); sol.style.display='none'; correct++; } else { sel.classList.add('wrong'); sol.textContent='→ '+it.name; sol.style.display='block'; }
-      sel.disabled=true; LSEngine.registerAnswer(ok);
+      sel.disabled=true;
     });
     earned[idx]=correct*0.5; solved[idx]=true; this.disabled=true; LSEngine.updateNav();
   });

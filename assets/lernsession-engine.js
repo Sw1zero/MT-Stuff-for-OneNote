@@ -1,6 +1,6 @@
 /* assets/lernsession-engine.js – gemeinsame Engine der MT-Lernsession-Tools (Quelle: bzwu/.claude/skills/lerntool/basis/lernsession-engine.js, verteilt mit sync_basis.py)
    ---------------------------------------------------------------
-   HUD (XP/Streak), Posten-Navigation und Auswertung sowie die häufig
+   Posten-Navigation und Auswertung sowie die häufig
    wiederkehrenden Posten-Typen (PDF, Video, Folien, Wahr/Falsch,
    Lückentext, Quiz, Beschriften, Erklären-Karten). Löst die bisher in
    jedem lernsession-*.html copy-paste eingebettete Engine ab.
@@ -19,17 +19,14 @@
    API:
      LSEngine.configure({unitLabel, modeBanner:{pageTitle,subtitle,docTitle}, finish:{...}})
        modeBanner.pageTitle/subtitle/docTitle: function(mode) -> string
-       finish.rank: function(pct) -> string
-       finish.badges: function(pct) -> [{icon,name,got}, ...]
        finish.pointsWord: string, Default 'Punkte'
        finish.headerLabel: function(mode) -> string, Default Prüfung beendet/Geschafft
        finish.closingHtml: string, wird nach den Abzeichen eingefügt
        finish.backLink: false blendet den "Alle Lerntools"-Link aus (Default true)
-     LSEngine.initState() – setzt N/current/solved/earned/maxPts/xp/streak/bestStreak
+     LSEngine.initState() – setzt N/current/solved/earned/maxPts
      LSEngine.buildAll() / .showCard(which) / .updateNav() / .renderProgress()
      LSEngine.goNext() / .goPrev() / .jumpTo(i) / .restart()
      LSEngine.findIdx(id) / .shuffle(a) / .shuffleIdx(n)
-     LSEngine.addXp(n) / .registerAnswer(ok)
      LSEngine.buildPdf/.buildVideo/.buildSlides/.buildTF/.buildGaps/.buildQuiz/
        .buildLabelType/.buildLabelChoose/.buildExplain(idx, st)
        (buildTF: optional st.trueLabel/st.falseLabel statt "Wahr"/"Falsch")
@@ -38,6 +35,8 @@
        öffentlich für eigene Zuordnungs-Varianten (z. B. Tabellen-Zuordnung).
    --------------------------------------------------------------- */
 (function(win){
+  var OK_SVG = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
+  var NOK_SVG = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>';
   var CHECK_SVG = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
   var unitLabel = 'Posten';
   var finishCfg = null;
@@ -49,23 +48,10 @@
   function fold(s){ return String(s).toLowerCase().replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss').replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim(); }
   function matchKeys(input, it){ var f=fold(input); if(!f) return false; if(f===fold(it.name)) return true; for(var i=0;i<it.keys.length;i++){ if(f.indexOf(fold(it.keys[i]))!==-1) return true; } return false; }
 
-  /* ---------- HUD / XP / Streak ---------- */
-  function renderHud(){
-    document.getElementById('hudXp').textContent = xp;
-    var sc=0; for(var i=0;i<N;i++){ if(solved[i]) sc++; }
-    document.getElementById('hudBar').style.width = Math.round(sc/N*100)+'%';
-    document.getElementById('hudStreakNum').textContent = streak;
-    var onFire = streak >= 3;
-    document.getElementById('hudBar').classList.toggle('on-fire', onFire);
-    document.getElementById('hudStreakEmoji').style.display = onFire ? 'none' : '';
-    document.getElementById('hudFireWrap').style.display = onFire ? 'inline-block' : 'none';
-    document.getElementById('hudStreakNum').className = onFire ? 'streak-num-fire' : '';
-  }
-  function addXp(n){ xp+=n; var el=document.getElementById('hudXp'); renderHud(); el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
-  function showStreakPop(){ var el=document.createElement('span'); el.className='streak-pop'; el.textContent='+1 🔥'; document.getElementById('hudStreak').appendChild(el); setTimeout(function(){ el.remove(); }, 900); }
-  function registerAnswer(ok){
-    if(ok){ streak++; if(streak>bestStreak) bestStreak=streak; addXp(10+(streak>=3?5:0)); showStreakPop(); var s=document.getElementById('hudStreak'); s.classList.remove('pulse'); void s.offsetWidth; s.classList.add('pulse'); }
-    else { streak=0; renderHud(); }
+  /* ---------- Rückmeldung: nie nur Farbe, immer Symbol und Wort (wie basis/quiz.js) ---------- */
+  function feedback(el, ok, titel, text){
+    el.className='q-feedback show '+(ok?'ok':'nok');
+    el.innerHTML=(ok?OK_SVG:NOK_SVG)+'<div><b>'+titel+'</b>'+(text?'<span>'+text+'</span>':'')+'</div>';
   }
 
   /* ---------- Setup ---------- */
@@ -82,7 +68,6 @@
     if(MODE==='challenge'){
       document.getElementById('lsDots').classList.add('selectable');
       document.querySelector('.ls-select-hint').classList.add('show');
-      var hud=document.querySelector('.hud'); if(hud) hud.style.display='none';
     }
   }
 
@@ -91,7 +76,6 @@
     win.current = 0;
     win.solved = []; win.earned = []; win.maxPts = [];
     for (var i = 0; i < N; i++) { solved[i] = false; earned[i] = 0; maxPts[i] = 0; }
-    win.xp = 0; win.streak = 0; win.bestStreak = 0;
   }
 
   /* ---------- Posten-Rahmen ---------- */
@@ -121,9 +105,9 @@
         'PDF wird nicht angezeigt? <a href="'+st.src+'" target="_blank">Folien herunterladen</a></p>'+
       '<div class="read-btn-row"><button class="read-btn" id="pdfbtn-'+idx+'">'+
       '<div class="read-btn-icon">'+CHECK_SVG+'</div>'+
-      '<span class="read-btn-text">Gelesen ✓ (+5 XP)</span></button></div>';
+      '<span class="read-btn-text">Gelesen</span></button></div>';
     document.getElementById('pdfbtn-'+idx).addEventListener('click', function(){
-      if(solved[idx]) return; solved[idx]=true; addXp(5);
+      if(solved[idx]) return; solved[idx]=true;
       this.disabled=true; this.classList.add('done');
       this.querySelector('.read-btn-text').textContent='Gelesen ✓';
       updateNav();
@@ -137,9 +121,9 @@
       '<iframe width="100%" height="100%" src="'+st.src+'" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="display:block;border:0;"></iframe></div>'+
       '<div class="read-btn-row"><button class="read-btn" id="vidbtn-'+idx+'">'+
       '<div class="read-btn-icon">'+CHECK_SVG+'</div>'+
-      '<span class="read-btn-text">Gesehen ✓ (+5 XP)</span></button></div>';
+      '<span class="read-btn-text">Gesehen</span></button></div>';
     document.getElementById('vidbtn-'+idx).addEventListener('click', function(){
-      if(solved[idx]) return; solved[idx]=true; addXp(5);
+      if(solved[idx]) return; solved[idx]=true;
       this.disabled=true; this.classList.add('done');
       this.querySelector('.read-btn-text').textContent='Gesehen ✓';
       updateNav();
@@ -170,7 +154,7 @@
     html+='<div class="read-btn-row" id="sbtnrow-'+idx+'" style="display:'+(slides.length<=1?'':'none')+'">';
     html+='<button class="read-btn" id="readbtn-'+idx+'">';
     html+='<div class="read-btn-icon">'+CHECK_SVG+'</div>';
-    html+='<span class="read-btn-text">Gelesen ✓ (+5 XP)</span></button></div>';
+    html+='<span class="read-btn-text">Gelesen</span></button></div>';
     body.innerHTML=html;
 
     function renderDots(){
@@ -208,7 +192,7 @@
     },{passive:true});
 
     document.getElementById('readbtn-'+idx).addEventListener('click',function(){
-      if(solved[idx]) return; solved[idx]=true; addXp(5);
+      if(solved[idx]) return; solved[idx]=true;
       this.disabled=true; this.classList.add('done');
       this.querySelector('.read-btn-text').textContent='Gelesen ✓';
       updateNav();
@@ -226,7 +210,7 @@
       item.innerHTML='<div class="tf-statement">'+it.s+'</div>'+
         '<div class="tf-btns"><button class="tf-btn" data-i="'+ii+'" data-v="true">'+trueLabel+'</button>'+
         '<button class="tf-btn" data-i="'+ii+'" data-v="false">'+falseLabel+'</button></div>'+
-        '<div class="tf-exp" id="tfexp-'+idx+'-'+ii+'">'+it.e+'</div>';
+        '<div class="q-feedback" id="tfexp-'+idx+'-'+ii+'" role="status"></div>';
       body.appendChild(item);
     });
     body.querySelectorAll('.tf-btn').forEach(function(btn){
@@ -235,8 +219,9 @@
         if(body.querySelector('.tf-btn[data-i="'+ii+'"]:disabled')) return;
         var it=st.items[ii];
         body.querySelectorAll('.tf-btn[data-i="'+ii+'"]').forEach(function(b){ b.disabled=true; if((b.dataset.v==='true')===it.a) b.classList.add('reveal'); });
-        if(pick===it.a){ btn.classList.add('sel-correct'); earned[idx]+=0.5; registerAnswer(true); } else { btn.classList.add('sel-wrong'); registerAnswer(false); }
-        document.getElementById('tfexp-'+idx+'-'+ii).classList.add('show');
+        var ok=pick===it.a;
+        btn.classList.add(ok?'sel-correct':'sel-wrong'); if(ok) earned[idx]+=0.5;
+        feedback(document.getElementById('tfexp-'+idx+'-'+ii), ok, ok?'Richtig!':'Nicht ganz. Richtig ist «'+(it.a?trueLabel:falseLabel)+'».', it.e);
         var answered=0; for(var k=0;k<st.items.length;k++){ if(document.querySelector('#body-'+idx+' .tf-btn[data-i="'+k+'"]:disabled')) answered++; }
         if(answered===st.items.length) solved[idx]=true;
         updateNav();
@@ -255,13 +240,21 @@
         html+='</select>';
       }
     });
-    html+='</div><div class="check-btn-row"><button class="btn btn-primary" id="gapcheck-'+idx+'">Prüfen</button></div>';
+    html+='</div><div class="q-feedback" id="gapfb-'+idx+'" role="status"></div><div class="check-btn-row"><button class="btn btn-primary" id="gapcheck-'+idx+'">Prüfen</button></div>';
     document.getElementById('body-'+idx).innerHTML=html;
     maxPts[idx]=gapCount*0.5;
     document.getElementById('gapcheck-'+idx).addEventListener('click', function(){
       if(solved[idx]) return;
       var sels=document.querySelectorAll('#body-'+idx+' select'); var ok=0;
-      sels.forEach(function(sel){ sel.classList.remove('correct','wrong'); var good=(+sel.value===+sel.dataset.correct); if(good){sel.classList.add('correct'); ok++;} else sel.classList.add('wrong'); sel.disabled=true; registerAnswer(good); });
+      sels.forEach(function(sel){
+        sel.classList.remove('correct','wrong'); var good=(+sel.value===+sel.dataset.correct);
+        sel.classList.add(good?'correct':'wrong'); if(good) ok++; sel.disabled=true;
+        // Symbol hinter jeder Lücke, bei falschen zusätzlich der richtige Begriff
+        var m=document.createElement('span'); m.className='gap-mark '+(good?'ok':'nok');
+        m.innerHTML=(good?OK_SVG:NOK_SVG)+(good?'':'<span>'+sel.querySelector('option[value="'+sel.dataset.correct+'"]').textContent+'</span>');
+        sel.after(m);
+      });
+      feedback(document.getElementById('gapfb-'+idx), ok===sels.length, ok===sels.length?'Richtig!':'Nicht ganz.', ok+' von '+sels.length+' Lücken richtig.'+(ok===sels.length?'':' Der richtige Begriff steht jeweils hinter der falschen Lücke.'));
       earned[idx]=ok*0.5; solved[idx]=true; this.disabled=true; updateNav();
     });
   }
@@ -274,6 +267,7 @@
       var block=document.createElement('div'); block.className='q-block';
       var h='<div class="q-text">'+(qi+1)+'. '+qq.q+'</div>';
       shuffleIdx(qq.opts.length).forEach(function(oi){ h+='<button class="opt" data-q="'+qi+'" data-o="'+oi+'">'+qq.opts[oi]+'</button>'; });
+      h+='<div class="q-feedback" id="qfb-'+idx+'-'+qi+'" role="status"></div>';
       block.innerHTML=h; body.appendChild(block);
     });
     body.querySelectorAll('.opt').forEach(function(btn){
@@ -281,7 +275,9 @@
         var qi=+btn.dataset.q, oi=+btn.dataset.o, qq=st.questions[qi];
         if(body.querySelector('.opt[data-q="'+qi+'"]:disabled')) return;
         body.querySelectorAll('.opt[data-q="'+qi+'"]').forEach(function(b){ b.disabled=true; if(+b.dataset.o===qq.correct) b.classList.add('correct'); });
-        if(oi!==qq.correct){ btn.classList.add('wrong'); registerAnswer(false); } else { earned[idx]+=0.5; registerAnswer(true); }
+        var ok=oi===qq.correct;
+        if(ok) earned[idx]+=0.5; else btn.classList.add('wrong');
+        feedback(document.getElementById('qfb-'+idx+'-'+qi), ok, ok?'Richtig!':'Nicht ganz. Richtig ist «'+qq.opts[qq.correct]+'».', qq.e||'');
         var answered=0; for(var k=0;k<st.questions.length;k++){ if(document.querySelector('#body-'+idx+' .opt[data-q="'+k+'"]:disabled')) answered++; }
         if(answered===st.questions.length) solved[idx]=true;
         updateNav();
@@ -312,7 +308,6 @@
         inp.classList.remove('correct','wrong');
         var ok=matchKeys(inp.value, it);
         if(ok){ inp.classList.add('correct'); sol.style.display='none'; correct++; } else { inp.classList.add('wrong'); sol.textContent='→ '+it.name; sol.style.display='block'; }
-        registerAnswer(ok);
       });
       earned[idx]=correct*0.5; solved[idx]=true; this.disabled=true; updateNav();
     });
@@ -432,7 +427,7 @@
 
     function rate(ok){
       if(rated[cur]!==null) return;
-      rated[cur]=ok; registerAnswer(ok);
+      rated[cur]=ok;
       var doneCount=0, goodCount=0;
       rated.forEach(function(r){ if(r!==null) doneCount++; if(r===true) goodCount++; });
       earned[idx]=goodCount;
@@ -493,7 +488,7 @@
     var nextBtn=document.getElementById('nextBtn'), prevBtn=document.getElementById('prevBtn');
     prevBtn.style.visibility=(current===0)?'hidden':'visible';
     if(current<N){ nextBtn.disabled=!solved[current]; nextBtn.textContent=(current===N-1)?'Zur Auswertung →':'Weiter →'; }
-    renderProgress(); renderHud();
+    renderProgress();
   }
   function goNext(){ if(current<N){ if(!solved[current]) return; current++; if(current<N){ showCard(current); updateNav(); } else { showFinish(); } } }
   function goPrev(){ if(current===0) return; if(current>=N) current=N-1; else current--; showCard(current); document.getElementById('nextBtn').style.visibility='visible'; document.getElementById('nextBtn').disabled=false; updateNav(); }
@@ -506,10 +501,6 @@
       else { total+=earned[i]; max+=maxPts[i]; }
     }
     var pct=max>0?Math.round(total/max*100):0;
-    var rank = cfg.rank ? cfg.rank(pct) : '';
-    var badges = cfg.badges ? cfg.badges(pct) : [];
-    var got=0, bh=''; badges.forEach(function(b){ if(b.got) got++; bh+='<span class="badge-chip'+(b.got?' earned':'')+'">'+(b.got?b.icon:'<span class="lock">🔒</span>')+' '+b.name+'</span>'; });
-
     var pointsWord = cfg.pointsWord || 'Punkte';
     var headline, scoreSub, explainNote='', breakdown='';
     if(MODE==='challenge'){
@@ -524,8 +515,9 @@
       }
       breakdown+='</ul>';
     } else {
-      headline = '<div class="rank">'+rank+'</div><div class="big-score">'+xp+' XP</div>';
-      scoreSub = '<div class="score-sub">'+total+' / '+max+' '+pointsWord+' ('+pct+' %) · längste Serie 🔥 '+bestStreak+' · '+got+'/'+badges.length+' Abzeichen</div>';
+      headline = '<div class="big-score">'+pct+' %</div>';
+      scoreSub = '<div class="score-sub">'+total+' / '+max+' '+pointsWord+' ('+pct+' %)</div>'+
+        (expTotal>0 ? '<div class="score-sub">Erklären-Karten: '+expGood+' von '+expTotal+' selbst als «gewusst» eingeschätzt</div>' : '');
     }
     var headerLabel = cfg.headerLabel ? cfg.headerLabel(MODE) : (MODE==='challenge'?'Prüfung beendet':'Geschafft');
     var closingHtml = cfg.closingHtml || '';
@@ -536,7 +528,6 @@
       scoreSub+
       explainNote+
       breakdown+
-      '<div class="badges">'+bh+'</div>'+
       closingHtml+
       '<button class="btn btn-primary" onclick="LSEngine.restart()">Nochmals starten</button>'+
       backLinkHtml;
@@ -547,7 +538,7 @@
   }
 
   function restart(){
-    current=0; xp=0; streak=0; bestStreak=0;
+    current=0;
     for(var i=0;i<N;i++){ solved[i]=false; earned[i]=0; }
     document.getElementById('nextBtn').style.visibility='visible';
     buildAll(); showCard(0); updateNav();
@@ -573,8 +564,6 @@
     findIdx: findIdx,
     shuffle: shuffle,
     shuffleIdx: shuffleIdx,
-    addXp: addXp,
-    registerAnswer: registerAnswer,
     buildAll: buildAll,
     renderProgress: renderProgress,
     jumpTo: jumpTo,

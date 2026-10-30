@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lernpfad: Halbhartkäse</title>
-  <link rel="stylesheet" href="../style.css?v=e8ebde3e">
-  <script src="../assets/lernsession-engine.js?v=e97e5615"></script>
+  <link rel="stylesheet" href="../style.css?v=a43de43a">
+  <script src="../assets/lernsession-engine.js?v=a822aef3"></script>
 </head>
 <body>
 
@@ -25,23 +25,6 @@
   <a class="back-link" href="../index.html">← Alle Lerntools</a>
 
   <div class="ls-wrap">
-    <div class="hud">
-      <div class="hud-xp"><span class="hud-label">XP</span><span class="hud-val" id="hudXp">0</span></div>
-      <div class="hud-bar"><div class="hud-bar-fill" id="hudBar"></div></div>
-      <div class="hud-streak" id="hudStreak">
-        <span id="hudStreakEmoji">🔥</span>
-        <div class="hud-fire-wrap" id="hudFireWrap" style="display:none">
-          <div class="fire">
-            <div class="fire-bottom"><div class="main-fire"></div></div>
-            <div class="fire-center"><div class="main-fire"></div><div class="particle-fire"></div></div>
-            <div class="fire-right"><div class="main-fire"></div><div class="particle-fire"></div></div>
-            <div class="fire-left"><div class="main-fire"></div><div class="particle-fire"></div></div>
-          </div>
-        </div>
-        <span id="hudStreakNum">0</span>
-      </div>
-    </div>
-
     <div class="ls-meta" id="lsMeta"></div>
     <div class="ls-select-hint"><span class="ls-select-badge">👆 Posten antippen – frei wählbar, keine feste Reihenfolge</span></div>
     <div class="ls-dots" id="lsDots"></div>
@@ -544,24 +527,6 @@ LSEngine.configure({
     docTitle: function(mode){ return (mode==='challenge'?'Challenge':'Lernpfad') + ': Halbhartkäse'; }
   },
   finish: {
-    rank: function(pct){
-      if (pct >= 90)      return 'Halbhartkäse-Meister 🧀';
-      else if (pct >= 75) return 'Käser';
-      else if (pct >= 50) return 'Käser in Ausbildung';
-      else                return 'Lehrling';
-    },
-    badges: function(pct){
-      var bIdx = LSEngine.findIdx('boss');
-      var reasonFull = true;
-      for (var i = 0; i < N; i++) { if (STATIONS[i].type === 'reason' && earned[i] < maxPts[i]) reasonFull = false; }
-      return [
-        { icon: '📖', name: 'Aufmerksamer Leser', got: true },
-        { icon: '🧠', name: 'Begründungs-Profi', got: reasonFull },
-        { icon: '🔥', name: 'Serienkäser (Streak 8+)', got: bestStreak >= 8 },
-        { icon: '🎓', name: 'Meisterprüfung', got: bIdx >= 0 && maxPts[bIdx] > 0 && earned[bIdx] === maxPts[bIdx] },
-        { icon: '🧀', name: 'Prüfungsbereit (90%)', got: pct >= 90 }
-      ];
-    },
     pointsWord: 'Wissenspunkte',
     backLink: false,
     closingHtml:
@@ -596,7 +561,6 @@ function buildReason(body, idx, st) {
   var done = 0;
   function finishTask(pts, ok) {
     earned[idx] += pts;
-    LSEngine.registerAnswer(ok);
     done++;
     if (done === st.tasks.length) solved[idx] = true;
     LSEngine.updateNav();

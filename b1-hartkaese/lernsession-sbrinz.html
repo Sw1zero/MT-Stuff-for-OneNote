@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Challenge: Sbrinz AOP</title>
-  <link rel="stylesheet" href="../style.css?v=e8ebde3e">
-  <script src="../assets/lernsession-engine.js?v=e97e5615"></script>
+  <link rel="stylesheet" href="../style.css?v=a43de43a">
+  <script src="../assets/lernsession-engine.js?v=a822aef3"></script>
 </head>
 <body>
 
@@ -25,23 +25,6 @@
   <a class="back-link" href="../index.html">← Alle Lerntools</a>
 
   <div class="ls-wrap">
-    <div class="hud">
-      <div class="hud-xp"><span class="hud-label">XP</span><span class="hud-val" id="hudXp">0</span></div>
-      <div class="hud-bar"><div class="hud-bar-fill" id="hudBar"></div></div>
-      <div class="hud-streak" id="hudStreak">
-        <span id="hudStreakEmoji">🔥</span>
-        <div class="hud-fire-wrap" id="hudFireWrap" style="display:none">
-          <div class="fire">
-            <div class="fire-bottom"><div class="main-fire"></div></div>
-            <div class="fire-center"><div class="main-fire"></div><div class="particle-fire"></div></div>
-            <div class="fire-right"><div class="main-fire"></div><div class="particle-fire"></div></div>
-            <div class="fire-left"><div class="main-fire"></div><div class="particle-fire"></div></div>
-          </div>
-        </div>
-        <span id="hudStreakNum">0</span>
-      </div>
-    </div>
-
     <div class="ls-meta" id="lsMeta"></div>
     <div class="ls-select-hint"><span class="ls-select-badge">👆 Posten antippen – frei wählbar, keine feste Reihenfolge</span></div>
     <div class="ls-dots" id="lsDots"></div>
@@ -63,7 +46,7 @@
 <script>
 /* ============================================================
    Lernsession Sbrinz AOP, Inhalte aus b.1 Lehrmittel
-   13 Stationen mit Lesetexten + Gamification (XP, Streak, Abzeichen)
+   13 Stationen mit Lesetexten
    ============================================================ */
 var ALL = [
   /* 0 */ {
@@ -296,7 +279,7 @@ var ALL = [
   },
   /* 12 */ {
     kicker: 'Meisterprüfung', title: 'Sbrinz-Meisterprüfung', id: 'boss', boss: true,
-    lead: 'Die Schlussrunde quer durch alle Stationen, jede richtige Antwort gibt extra XP!',
+    lead: 'Die Schlussrunde quer durch alle Stationen.',
     type: 'quiz',
     questions: [
       { q: 'Warum wird beim Sbrinz (fast) kein Wasser zugesetzt?',
@@ -326,23 +309,6 @@ LSEngine.configure({
     docTitle: function(mode){ return (mode==='challenge'?'Challenge':'Lernpfad') + ': Sbrinz AOP'; }
   },
   finish: {
-    rank: function(pct){
-      if (pct >= 90)      return 'Sbrinz-Meister 🧀';
-      else if (pct >= 75) return 'Sbrinz-Affineur';
-      else if (pct >= 50) return 'Sbrinz-Geselle';
-      else                return 'Sbrinz-Lehrling';
-    },
-    badges: function(pct){
-      var pIdx = LSEngine.findIdx('pflichtenheft'), fIdx = LSEngine.findIdx('fehler'), bIdx = LSEngine.findIdx('boss');
-      return [
-        { icon: '📖', name: 'Aufmerksamer Leser', got: true },
-        { icon: '📜', name: 'Pflichtenheft-Profi', got: pIdx >= 0 && earned[pIdx] === maxPts[pIdx] },
-        { icon: '🔍', name: 'Fehlerjäger',        got: fIdx >= 0 && earned[fIdx] === maxPts[fIdx] },
-        { icon: '🔥', name: 'Serienkäser (Streak 8+)', got: bestStreak >= 8 },
-        { icon: '🎓', name: 'Meisterprüfung',     got: bIdx >= 0 && maxPts[bIdx] > 0 && earned[bIdx] === maxPts[bIdx] },
-        { icon: '🧀', name: 'Sbrinz-Meister (90%)', got: pct >= 90 }
-      ];
-    },
     pointsWord: 'Wissenspunkte',
     backLink: false,
     closingHtml:
@@ -395,13 +361,11 @@ function buildDecide(body, idx, st) {
         btn.classList.add('correct');
         body.querySelectorAll('.opt').forEach(function(b) { b.disabled = true; });
         if (!triedWrong) earned[idx] = 0.5;
-        LSEngine.registerAnswer(!triedWrong);
         solved[idx] = true;
         LSEngine.updateNav();
       } else {
         btn.classList.add('wrong');
         triedWrong = true;
-        LSEngine.registerAnswer(false);
       }
     });
   });
@@ -438,7 +402,6 @@ function buildErrors(body, idx, st) {
       var marked = chip.classList.contains('marked');
       chip.classList.add('locked');
       var decisionOk = (it.wrong === marked);
-      LSEngine.registerAnswer(decisionOk);
       if (it.wrong && marked) { chip.classList.remove('marked'); chip.classList.add('is-correct-mark'); document.getElementById('errcorr-' + idx + '-' + ii).classList.add('show'); score++; }
       else if (it.wrong && !marked) { chip.classList.add('missed'); document.getElementById('errcorr-' + idx + '-' + ii).classList.add('show'); }
       else if (!it.wrong && marked) { chip.classList.add('wrong'); chip.style.background = 'var(--red-light)'; chip.style.color = 'var(--red-dark)'; chip.style.borderColor = 'var(--red)'; score--; }
