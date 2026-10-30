@@ -4,236 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FSK oder FSML zuordnen</title>
-  <link rel="stylesheet" href="../style.css?v=c27a4c2d">
-  <script src="../assets/dnd.js"></script>
-  <script src="../assets/zuordnung3.js"></script>
-  <style>
-    .back-link {
-      display: inline-block;
-      font-size: 0.82rem;
-      color: var(--text-muted);
-      text-decoration: none;
-      margin-bottom: 1.5rem;
-      transition: color 0.15s;
-    }
-    .back-link:hover { color: var(--red); }
-
-    .level-bar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:1.25rem; }
-    .level-btn { font-family:var(--font); font-size:0.82rem; font-weight:600; padding:7px 16px; border-radius:20px; border:1.5px solid var(--border); background:var(--surface); color:var(--text-muted); cursor:pointer; transition:all 0.15s; }
-    .level-btn:hover { border-color:var(--blue); color:var(--blue-dark); }
-    .level-btn.active { background:var(--blue-dark); border-color:var(--blue-dark); color:#fff; }
-
-    .instruction {
-      font-size: 0.84rem;
-      color: var(--text-muted);
-      margin-bottom: 1.25rem;
-      text-align: center;
-      line-height: 1.5;
-    }
-
-    .card-pool {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      justify-content: center;
-      background: var(--blue-light);
-      border-radius: var(--radius-md);
-      padding: 0.9rem 1rem;
-      margin-bottom: 1.75rem;
-      min-height: 60px;
-    }
-
-    .karte {
-      font-family: var(--font);
-      font-size: 0.80rem;
-      font-weight: 500;
-      background: var(--surface);
-      border: 2px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 0.38rem 0.75rem;
-      cursor: grab;
-      color: var(--text);
-      line-height: 1.45;
-      user-select: none;
-      touch-action: none;
-      max-width: 280px;
-      transition: border-color 0.15s, box-shadow 0.15s, opacity 0.15s;
-    }
-    .karte:hover { border-color: var(--blue); }
-    .karte.dragging { opacity: 0.3; }
-    .karte.used { opacity: 0.18; pointer-events: none; }
-    .karte.selected {
-      background: var(--blue);
-      border-color: var(--blue);
-      color: #fff;
-    }
-
-    .spalten-wrap {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-    }
-    @media (max-width: 700px) {
-      .spalten-wrap { grid-template-columns: 1fr; }
-    }
-
-    .spalte {
-      background: var(--surface);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-sm);
-      overflow: hidden;
-      border-top: 5px solid var(--zone-color, var(--blue-dark));
-    }
-
-    .spalte-header {
-      text-align: center;
-      padding: 0.7rem 0.5rem 0.3rem;
-    }
-    .spalte-header .zone-name {
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--text);
-    }
-
-    .drop-zone {
-      min-height: 120px;
-      margin: 0.7rem;
-      border: 2px dashed var(--border);
-      border-radius: var(--radius-sm);
-      padding: 0.5rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.4rem;
-      background: #fafbfc;
-      transition: all 0.15s;
-    }
-    .drop-zone.over {
-      border-color: var(--blue);
-      border-style: solid;
-      background: #e8f4ff;
-    }
-    .drop-zone.ready {
-      border-color: var(--blue);
-      border-style: solid;
-      background: #f0f7ff;
-    }
-
-    .placed-karte {
-      font-family: var(--font);
-      font-size: 0.79rem;
-      font-weight: 500;
-      background: var(--surface);
-      border: 2px solid var(--blue);
-      border-radius: var(--radius-sm);
-      padding: 0.32rem 0.6rem;
-      color: var(--text);
-      cursor: grab;
-      user-select: none;
-      touch-action: none;
-      line-height: 1.4;
-      transition: border-color 0.15s, background 0.15s;
-    }
-    .placed-karte:hover { border-color: var(--blue-dark); }
-    .placed-karte.dragging { opacity: 0.3; }
-    .placed-karte.correct {
-      border-color: #16a34a !important;
-      background: #f0fdf4 !important;
-      color: #15803d !important;
-      cursor: default;
-      pointer-events: none;
-    }
-    .placed-karte.wrong {
-      border-color: var(--red) !important;
-      background: var(--red-light, #fff0f0) !important;
-      color: var(--red) !important;
-      cursor: default;
-      pointer-events: none;
-    }
-
-    /* Mittel + Schwer: eine Zeile pro Aussage */
-    .item-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0.6rem;
-      margin-bottom: 1.5rem;
-    }
-    .item-row {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      background: var(--surface);
-      border-radius: var(--radius-md);
-      box-shadow: var(--shadow-sm);
-      padding: 0.7rem 1rem;
-      flex-wrap: wrap;
-    }
-    .item-label {
-      flex: 1 1 220px;
-      font-size: 0.86rem;
-      font-weight: 600;
-      color: var(--text);
-    }
-
-    .mc-cell { display: flex; gap: 0.4rem; flex-wrap: wrap; }
-    .mc-btn {
-      font-family: var(--font);
-      font-size: 0.78rem;
-      font-weight: 600;
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 0.4rem 0.75rem;
-      cursor: pointer;
-      color: var(--text);
-      transition: all 0.15s;
-    }
-    .mc-btn:hover { border-color: var(--blue); background: #f0f7ff; }
-    .mc-btn.correct { border-color: #16a34a; background: #f0fdf4; color: #15803d; cursor: default; }
-    .mc-btn.wrong   { border-color: var(--red); background: var(--red-light); color: var(--red); cursor: default; }
-    .mc-btn.locked  { pointer-events: none; opacity: 0.55; }
-    .mc-btn.locked.correct, .mc-btn.locked.wrong { opacity: 1; }
-
-    .type-input {
-      width: 160px;
-      font-family: var(--font);
-      font-size: 0.82rem;
-      padding: 0.4rem 0.6rem;
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-sm);
-      background: #f8fafc;
-      color: var(--text);
-      transition: border-color 0.15s;
-    }
-    .type-input:focus { outline: none; border-color: var(--blue); background: #fff; }
-    .type-input.correct { border-color: #16a34a; background: #f0fdf4; }
-    .type-input.wrong { border-color: var(--red); background: var(--red-light); }
-    .type-sol { font-size: 0.72rem; color: #15803d; margin-top: 3px; display: none; flex-basis: 100%; }
-
-    .btn-row {
-      display: flex;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin-bottom: 0.5rem;
-    }
-
-    .result-banner {
-      margin-top: 1.25rem;
-      padding: 0.9rem 1rem;
-      border-radius: var(--radius-md);
-      font-weight: 600;
-      font-size: 0.92rem;
-      text-align: center;
-      display: none;
-    }
-    .result-banner.show   { display: block; }
-    .result-banner.perfect { background: #f0fdf4; color: #15803d; border: 1.5px solid #bbf7d0; }
-    .result-banner.partial { background: #fff7ed; color: #c2410c; border: 1.5px solid #fed7aa; }
-  </style>
+  <link rel="stylesheet" href="../style.css?v=2b1c59ec">
 </head>
 <body>
-
 <header class="bzwu-header">
   <div class="header-text">
     <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · b.2</span>
@@ -245,190 +18,47 @@
     <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
   </div>
 </header>
-
-<main class="page-main">
-
-  <a class="back-link" href="../index.html">← Alle Lerntools</a>
-
-  <div class="level-bar">
-    <button class="level-btn active" id="lvl-einfach" onclick="setLevel('einfach')">Einfach – zuordnen</button>
-    <button class="level-btn"        id="lvl-mittel"  onclick="setLevel('mittel')">Mittel – anklicken</button>
-    <button class="level-btn"        id="lvl-schwer"  onclick="setLevel('schwer')">Schwer – eintippen</button>
-  </div>
-
-  <p class="instruction" id="instruction"></p>
-
-  <div id="modeBody"></div>
-
-  <div class="btn-row" id="btnRow">
-    <button type="button" class="btn btn-primary" id="checkBtn" onclick="checkLevel()">Überprüfen</button>
-    <button type="button" class="btn btn-ghost" onclick="resetLevel()">Neu mischen</button>
-  </div>
-
-  <div class="result-banner" id="resultBanner"></div>
-
+<main class="z-wrap">
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+  <div id="zuordnung"></div>
 </main>
-
 <footer class="bzwu-footer">
   BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
 </footer>
-
+<script src="../assets/zuordnung.js?v=e60abfaa"></script>
 <script>
-var ZONES = [
-  { key: "fsk",   label: "FSK · Fettsirtenkultur",    color: "#134061" },
-  { key: "fsml",  label: "FSML · Fettsirtenmagenlab", color: "#69A9C9" },
-  { key: "beide", label: "Beide · FSK und FSML",       color: "#15803d" }
-];
-var ZONE_KEYS = {
-  fsk:   ["fsk", "fettsirtenkultur"],
-  fsml:  ["fsml", "fettsirtenmagenlab", "magenlab"],
-  beide: ["beide", "beides"]
-};
-
-// Quelle: Lehrmittel b.2, S. 8–9
-var KARTEN = [
-  { id: 1,  text: "Bebrüten bei 38 °C",                                         zone: "fsk"   },
-  { id: 2,  text: "Bebrüten während ca. 5–10 h",                                zone: "fsk"   },
-  { id: 3,  text: "Fertig bei ca. 25–30 °SH",                                   zone: "fsk"   },
-  { id: 4,  text: "Bebrüten bei 32–35 °C",                                      zone: "fsml"  },
-  { id: 5,  text: "Bebrüten während ca. 18–24 h",                               zone: "fsml"  },
-  { id: 6,  text: "Fertig bei ca. 55–70 °SH",                                   zone: "fsml"  },
-  { id: 7,  text: "Kälbermagen in der Fettsirte",                               zone: "fsml"  },
-  { id: 8,  text: "Mägen mit heisser Sirte von min. 60 °C abbrühen",            zone: "fsml"  },
-  { id: 9,  text: "Grössere bakteriologische Vielfalt",                         zone: "fsml"  },
-  { id: 10, text: "Zusätzliche eiweissabbauende Bakterien unterstützen den Geschmack", zone: "fsml" },
-  { id: 11, text: "Labwirkung ist unbedeutend",                                 zone: "fsml"  },
-  { id: 12, text: "Fettsirte vor dem Bruchabfüllen aus dem Fertiger entnehmen", zone: "beide" },
-  { id: 13, text: "Fettsirte auf ca. 60 °C erhitzen",                           zone: "beide" },
-  { id: 14, text: "Auf ca. 40–45 °C abkühlen",                                  zone: "beide" },
-  { id: 15, text: "Mit ca. 1 ‰ RMK oder MK beimpfen",                           zone: "beide" },
-  { id: 16, text: "Eher etwas mehr Löcher und Aroma im Käse",                   zone: "beide" },
-  { id: 17, text: "In der Mundart oft «Lab» genannt",                           zone: "beide" }
-];
-
-KARTEN = MTDnD.shuffle(KARTEN);   // Liste ist nach Kultur sortiert, Schwer zeigt sie sonst gruppiert
-var engine = Zuordnung3.karten.createEngine(KARTEN, 'zone');
-var karteById = engine.karteById;
-
-var mcScore = 0, mcTotal = 0;
-
-/* ---------- EINFACH: Drag & Drop in Spalten ---------- */
-function buildEinfach(body) {
-  var wrap = document.createElement('div');
-  wrap.className = 'spalten-wrap';
-  ZONES.forEach(function(z) {
-    var col = document.createElement('div');
-    col.className = 'spalte';
-    col.style.setProperty('--zone-color', z.color);
-    col.innerHTML = '<div class="spalte-header"><div class="zone-name">' + z.label + '</div></div>' +
-      '<div class="drop-zone" data-zone="' + z.key + '" id="zone-' + z.key + '"></div>';
-    wrap.appendChild(col);
-  });
-  body.innerHTML = '<div class="card-pool" id="cardPool"></div>';
-  body.appendChild(wrap);
-
-  engine.renderPool(document.getElementById('cardPool'));
-  engine.setupZones();
-}
-
-function checkEinfach() {
-  var res = engine.checkEinfach();
-  showResult(res.correct, res.total, KARTEN.length);
-}
-
-/* ---------- MITTEL: pro Aussage anklicken ---------- */
-function buildMittel(body) {
-  mcScore = 0; mcTotal = 0;
-  var list = document.createElement('div');
-  list.className = 'item-list';
-  MTDnD.shuffle(KARTEN.slice()).forEach(function(k) {
-    var row = document.createElement('div');
-    row.className = 'item-row';
-    var label = document.createElement('div');
-    label.className = 'item-label';
-    label.textContent = k.text;
-    row.appendChild(label);
-    row.appendChild(buildMcCell(k));
-    list.appendChild(row);
-  });
-  body.appendChild(list);
-}
-function buildMcCell(k) {
-  var wrap = document.createElement('div');
-  wrap.className = 'mc-cell';
-  MTDnD.shuffle(ZONES.slice()).forEach(function(z) {
-    var btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'mc-btn';
-    btn.textContent = z.label.split(' · ')[0];
-    btn.onclick = function() {
-      var cellBtns = wrap.querySelectorAll('.mc-btn');
-      cellBtns.forEach(function(b) { b.classList.add('locked'); });
-      mcTotal++;
-      if (z.key === k.zone) { btn.classList.add('correct'); mcScore++; }
-      else {
-        btn.classList.add('wrong');
-        var correctLabel = ZONES.filter(function(zz) { return zz.key === k.zone; })[0].label.split(' · ')[0];
-        cellBtns.forEach(function(b) { if (b.textContent === correctLabel) b.classList.add('correct'); });
-      }
-      if (mcTotal === KARTEN.length) showResult(mcScore, mcTotal, KARTEN.length);
-    };
-    wrap.appendChild(btn);
-  });
-  return wrap;
-}
-
-/* ---------- SCHWER: Freitext eintippen ---------- */
-function buildSchwer(body) {
-  var list = document.createElement('div');
-  list.className = 'item-list';
-  KARTEN.forEach(function(k, i) {
-    var row = document.createElement('div');
-    row.className = 'item-row';
-    row.innerHTML = '<div class="item-label">' + k.text + '</div>' +
-      '<input class="type-input" id="ti-' + i + '" type="text" autocomplete="off" placeholder="FSK / FSML / beide">' +
-      '<div class="type-sol" id="tisol-' + i + '"></div>';
-    list.appendChild(row);
-  });
-  body.appendChild(list);
-}
-function checkSchwer() {
-  var correct = 0, total = KARTEN.length;
-  KARTEN.forEach(function(k, i) {
-    var input = document.getElementById('ti-' + i), sol = document.getElementById('tisol-' + i);
-    input.classList.remove('correct', 'wrong');
-    if (Zuordnung3.matchKeys(input.value, ZONE_KEYS[k.zone])) { input.classList.add('correct'); sol.style.display = 'none'; correct++; }
-    else {
-      input.classList.add('wrong');
-      var zoneLabel = ZONES.filter(function(z) { return z.key === k.zone; })[0].label;
-      sol.textContent = '→ ' + zoneLabel;
-      sol.style.display = 'block';
-    }
-  });
-  showResult(correct, total, total);
-}
-
-/* ---------- gemeinsam ---------- */
-function showResult(correct, filled, total) {
-  var banner = document.getElementById('resultBanner');
-  if (correct === total) {
-    Zuordnung3.showResult(banner, true, 'Perfekt! Alle ' + total + ' Aussagen richtig zugeordnet.');
-  } else {
-    Zuordnung3.showResult(banner, false, correct + ' von ' + (filled || total) + ' richtig. Rot markierte nochmals überprüfen.');
+Zuordnung.init({
+  stufen: ['zuordnen', 'anklicken', 'eintippen'],
+  gruppen: [
+    { key: 'fsk', label: 'FSK · Fettsirtenkultur', keys: ['fsk', 'fettsirtenkultur'] },
+    { key: 'fsml', label: 'FSML · Fettsirtenmagenlab', keys: ['fsml', 'fettsirtenmagenlab', 'magenlab'] },
+    { key: 'beide', label: 'Beide · FSK und FSML', keys: ['beide', 'beides'] }
+  ],
+  karten: [
+    { text: 'Bebrüten bei 38 °C', gruppe: 'fsk' },
+    { text: 'Bebrüten während ca. 5–10 h', gruppe: 'fsk' },
+    { text: 'Fertig bei ca. 25–30 °SH', gruppe: 'fsk' },
+    { text: 'Bebrüten bei 32–35 °C', gruppe: 'fsml' },
+    { text: 'Bebrüten während ca. 18–24 h', gruppe: 'fsml' },
+    { text: 'Fertig bei ca. 55–70 °SH', gruppe: 'fsml' },
+    { text: 'Kälbermagen in der Fettsirte', gruppe: 'fsml' },
+    { text: 'Mägen mit heisser Sirte von min. 60 °C abbrühen', gruppe: 'fsml' },
+    { text: 'Grössere bakteriologische Vielfalt', gruppe: 'fsml' },
+    { text: 'Zusätzliche eiweissabbauende Bakterien unterstützen den Geschmack', gruppe: 'fsml' },
+    { text: 'Labwirkung ist unbedeutend', gruppe: 'fsml' },
+    { text: 'Fettsirte vor dem Bruchabfüllen aus dem Fertiger entnehmen', gruppe: 'beide' },
+    { text: 'Fettsirte auf ca. 60 °C erhitzen', gruppe: 'beide' },
+    { text: 'Auf ca. 40–45 °C abkühlen', gruppe: 'beide' },
+    { text: 'Mit ca. 1 ‰ RMK oder MK beimpfen', gruppe: 'beide' },
+    { text: 'Eher etwas mehr Löcher und Aroma im Käse', gruppe: 'beide' },
+    { text: 'In der Mundart oft «Lab» genannt', gruppe: 'beide' }
+  ],
+  intro: {
+    zuordnen: 'Tippen Sie auf die Kultur, zu der die Aussage unten gehört (FSK, FSML oder beide), oder ziehen Sie die Karte dorthin.',
+    anklicken: 'Klicken Sie pro Aussage an, ob sie für FSK, FSML oder beide gilt.',
+    eintippen: 'Schreiben Sie zu jeder Aussage: FSK, FSML oder beide.'
   }
-}
-
-Zuordnung3.levelBar({
-  instructions: {
-    einfach: 'Ziehen Sie jede Karte zur richtigen Kultur: FSK, FSML oder beide.',
-    mittel:  'Klicken Sie pro Aussage an, ob sie für FSK, FSML oder beide gilt.',
-    schwer:  'Schreiben Sie zu jeder Aussage: FSK, FSML oder beide.'
-  },
-  checkBtn: { einfach: '', mittel: 'none', schwer: '' },
-  build: { einfach: buildEinfach, mittel: buildMittel, schwer: buildSchwer },
-  check: { einfach: checkEinfach, schwer: checkSchwer }
 });
-setLevel('einfach');
 </script>
 </body>
 </html>
