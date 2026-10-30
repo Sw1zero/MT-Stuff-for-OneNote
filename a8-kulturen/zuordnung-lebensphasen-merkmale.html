@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Merkmale zuordnen – Lebensphasen</title>
+  <link rel="stylesheet" href="../style.css?v=c1e40ffd">
+</head>
+<body>
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · a.8</span>
+    <h1>Lebensphasen der Mikroorganismen</h1>
+    <p>Ordnen Sie jedes Merkmal der richtigen Phase zu.</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+<main class="z-wrap">
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+  <div id="zuordnung"></div>
+</main>
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+<script src="../assets/zuordnung.js?v=046b71c5"></script>
+<script>
+Zuordnung.init({
+  stufen: ['zuordnen', 'anklicken', 'eintippen'],
+  intro: {
+    zuordnen: 'Tippen Sie auf die Phase, zu der das Merkmal unten gehört. Achtung: Stationäre Phase und Absterbephase haben beide mit Nährstoffmangel zu tun.',
+    anklicken: 'Wählen Sie zu jedem Merkmal die passende Phase.',
+    eintippen: 'Schreiben Sie zu jedem Merkmal die passende Phase auf.'
+  },
+  gruppen: [
+    { key: 'A', label: 'Anpassungsphase', keys: ['anpassung'] },
+    { key: 'B', label: 'Vermehrungsphase', keys: ['vermehrung', 'log'] },
+    { key: 'C', label: 'Stationäre Phase', keys: ['station'] },
+    { key: 'D', label: 'Absterbephase', keys: ['absterb'] }
+  ],
+  karten: [
+    { text: 'Die Bakterien passen sich der neuen Umwelt an.', gruppe: 'A' },
+    { text: 'Praktisch keine Vermehrung (erst gegen Ende der Phase).', gruppe: 'A' },
+    { text: 'Keine bis geringe Erhöhung der Keimzahl.', gruppe: 'A' },
+    { text: 'Stoffwechsel schwach und verlangsamt, nimmt erst gegen Ende zu.', gruppe: 'A' },
+    { text: 'Die Bakterien haben sich angepasst.', gruppe: 'B' },
+    { text: 'Sehr starke und sehr schnelle Vermehrung, kürzeste Generationszeit, intensivster Stoffwechsel.', gruppe: 'B' },
+    { text: 'Die Keimzahl nimmt schnell zu.', gruppe: 'B' },
+    { text: 'Nährstoffmangel, Umweltbedingungen werden ungünstig (Säure).', gruppe: 'C' },
+    { text: 'Vermehrung und Stoffwechsel sind gebremst.', gruppe: 'C' },
+    { text: 'Keimzahl bleibt konstant (Gleichgewicht neu entstehender und sterbender Zellen).', gruppe: 'C' },
+    { text: 'Nährstoffmangel und sehr ungünstige Umweltbedingungen (Säuregrad).', gruppe: 'D' },
+    { text: 'Die Keimzahl sinkt (hoher Anteil sterbender Zellen).', gruppe: 'D' }
+  ]
+});
+</script>
+</body>
+</html>

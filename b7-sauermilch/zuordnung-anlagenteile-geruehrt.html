@@ -4,166 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Anlagenteile zuordnen – Gerührter Joghurt</title>
-  <link rel="stylesheet" href="../style.css?v=8f1d3ec9">
-  <script src="../assets/dnd.js"></script>
-  <style>
-    .back-link {
-      display: inline-block;
-      font-size: 0.82rem;
-      color: var(--text-muted);
-      text-decoration: none;
-      margin-bottom: 1.5rem;
-      transition: color 0.15s;
-    }
-    .back-link:hover { color: var(--red); }
-
-    .schema-wrap {
-      background: var(--surface);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-sm);
-      padding: 1rem;
-      margin-bottom: 1.5rem;
-    }
-    .schema-wrap img {
-      width: 100%;
-      display: block;
-      border-radius: var(--radius-sm);
-    }
-
-    .instruction {
-      font-size: 0.84rem;
-      color: var(--text-muted);
-      margin-bottom: 1rem;
-      text-align: center;
-    }
-
-    /* Word bank */
-    .word-bank {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      background: var(--blue-light);
-      border-radius: var(--radius-md);
-      padding: 0.9rem 1rem;
-      margin-bottom: 1.5rem;
-      min-height: 56px;
-    }
-
-    .word-chip {
-      font-family: var(--font);
-      font-size: 0.82rem;
-      font-weight: 500;
-      background: var(--surface);
-      border: 2px solid var(--border);
-      border-radius: 20px;
-      padding: 0.32rem 0.85rem;
-      cursor: grab;
-      color: var(--text);
-      line-height: 1.4;
-      user-select: none;
-      touch-action: none;
-      transition: border-color 0.15s, box-shadow 0.15s, opacity 0.15s;
-    }
-    .word-chip:hover { border-color: var(--blue); }
-    .word-chip.dragging { opacity: 0.3; }
-    .word-chip.used { opacity: 0.2; pointer-events: none; }
-    .word-chip.selected { background: var(--blue); border-color: var(--blue); color: #fff; }
-    .slot-box.ready { border-color: var(--blue); border-style: solid; background: #f0f7ff; }
-
-    /* Slots */
-    .slots-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.55rem;
-      margin-bottom: 1.5rem;
-    }
-    @media (max-width: 480px) {
-      .slots-grid { grid-template-columns: 1fr; }
-    }
-
-    .slot-row {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .slot-num {
-      width: 30px;
-      height: 30px;
-      flex-shrink: 0;
-      border-radius: 50%;
-      background: var(--red);
-      color: #fff;
-      font-size: 0.78rem;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .slot-box {
-      flex: 1;
-      min-height: 38px;
-      border: 2px dashed var(--border);
-      border-radius: var(--radius-sm);
-      padding: 0.3rem 0.65rem;
-      font-size: 0.82rem;
-      font-family: var(--font);
-      color: var(--text-subtle);
-      display: flex;
-      align-items: center;
-      transition: all 0.15s;
-      background: var(--surface);
-    }
-    .slot-box.over {
-      border-color: var(--blue);
-      border-style: solid;
-      background: #e8f4ff;
-    }
-    .slot-box.filled {
-      border-style: solid;
-      border-color: var(--blue);
-      color: var(--text);
-      font-weight: 500;
-      cursor: grab;
-      touch-action: none;
-      user-select: none;
-    }
-    .slot-box.correct {
-      border-color: #16a34a !important;
-      background: #f0fdf4 !important;
-      color: #15803d !important;
-      cursor: default;
-    }
-    .slot-box.wrong {
-      border-color: var(--red) !important;
-      background: var(--red-light) !important;
-      color: var(--red) !important;
-      cursor: default;
-    }
-
-    .btn-row {
-      display: flex;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-    }
-
-    .result-banner {
-      margin-top: 1.25rem;
-      padding: 0.9rem 1rem;
-      border-radius: var(--radius-md);
-      font-weight: 600;
-      font-size: 0.92rem;
-      text-align: center;
-      display: none;
-    }
-    .result-banner.show   { display: block; }
-    .result-banner.perfect { background: #f0fdf4; color: #15803d; border: 1.5px solid #bbf7d0; }
-    .result-banner.partial { background: #fff7ed; color: #c2410c; border: 1.5px solid #fed7aa; }
-  </style>
+  <link rel="stylesheet" href="../style.css?v=c1e40ffd">
 </head>
 <body>
-
 <header class="bzwu-header">
   <div class="header-text">
   <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · b.7</span>
@@ -175,53 +18,38 @@
     <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
   </div>
 </header>
-
-<main class="page-main">
-
-  <a class="back-link" href="../index.html">← Alle Lerntools</a>
-
-  <div class="schema-wrap">
-    <img src="images/b.7_Anlage_geruehrt_Nummern.png" alt="Anlagenschema gerührter Joghurt mit nummerierten Anlagenteilen">
-    <p style="font-size:0.72rem;color:var(--text-subtle);margin-top:0.5rem;text-align:right;">
-      &copy; Tetra Pak Handbuch der Milch und Molkereitechnik, Gelsenkirchen (D)
-    </p>
-  </div>
-
-  <p class="instruction">Ziehen Sie die Begriffe auf die richtige Nummer. Bereits platzierten Begriff zurückziehen um ihn zu tauschen.</p>
-
-  <div class="word-bank" id="wordBank"></div>
-  <div class="slots-grid" id="slotsGrid"></div>
-
-  <div class="btn-row">
-    <button type="button" class="btn btn-primary" onclick="checkAll()">Überprüfen</button>
-    <button type="button" class="btn btn-ghost" onclick="resetAll()">Zurücksetzen</button>
-  </div>
-
-  <div class="result-banner" id="resultBanner"></div>
-
+<main class="z-wrap">
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+  <div id="zuordnung"></div>
 </main>
-
 <footer class="bzwu-footer">
   BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
 </footer>
-
+<script src="../assets/zuordnung.js?v=046b71c5"></script>
 <script>
-var ANSWERS = [
-  'Vorlaufgefäss',
-  'Pulverzusatz',
-  'Homogenisator',
-  'Plattenwärmetauscher',
-  'Heisshalter',
-  'Tanks für Betriebskultur',
-  'Bebrütungstanks für Joghurt',
-  'Spaltenfilter',
-  'Plattenwärmetauscher (Kühler)',
-  'Puffertanks',
-  'Gebinde mit Fruchtgrundstoff',
-  'Mischer Joghurt - Fruchtgrundstoff',
-  'Abfülllinie'
-];
+Zuordnung.init({
+  stufen: ['zuordnen', 'eintippen'],
+  beschriften: {
+    bild: 'images/b.7_Anlage_geruehrt_Nummern.png',
+    alt: 'Anlagenschema mit nummerierten Anlagenteilen',
+    quelle: '© Tetra Pak Handbuch der Milch und Molkereitechnik, Gelsenkirchen (D)',
+    teile: [
+      { n: 1, name: 'Vorlaufgefäss', keys: ['vorlauf'] },
+      { n: 2, name: 'Pulverzusatz' },
+      { n: 3, name: 'Homogenisator' },
+      { n: 4, name: 'Plattenwärmetauscher' },
+      { n: 5, name: 'Heisshalter', keys: ['heisshalter'] },
+      { n: 6, name: 'Tanks für Betriebskultur', keys: ['betriebskultur'] },
+      { n: 7, name: 'Bebrütungstanks für Joghurt', keys: ['bebruetung'] },
+      { n: 8, name: 'Spaltenfilter' },
+      { n: 9, name: 'Plattenwärmetauscher (Kühler)', keys: ['kuehler'] },
+      { n: 10, name: 'Puffertanks', keys: ['puffer'] },
+      { n: 11, name: 'Gebinde mit Fruchtgrundstoff', keys: ['fruchtgrundstoff'] },
+      { n: 12, name: 'Mischer Joghurt - Fruchtgrundstoff', keys: ['mischer'] },
+      { n: 13, name: 'Abfülllinie', keys: ['abfuell'] }
+    ]
+  }
+});
 </script>
-<script src="../assets/anlagenteile-engine.js"></script>
 </body>
 </html>

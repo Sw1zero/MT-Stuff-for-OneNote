@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wahr oder Falsch – Vermehrungszyklus der Bakteriophagen</title>
+  <link rel="stylesheet" href="../style.css?v=c1e40ffd">
+</head>
+<body>
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · a.8</span>
+    <h1>Wahr oder Falsch?</h1>
+    <p>Lytischer Vermehrungszyklus · Wischen Sie nach rechts für wahr, nach links für falsch</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+<main class="q-wrap">
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+  <div id="quiz"></div>
+</main>
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+<script src="../assets/quiz.js?v=730b4668"></script>
+<script>
+var CARDS = [
+  { statement: 'Der Phage verankert sich mit seinen Stacheln in der Zellwand der Bakterie.', answer: true, explanation: 'Danach dringt nur die Phagenerbsubstanz in die Zelle ein, nicht der ganze Phage.' },
+  { statement: 'Bei der Vermehrung dringt der ganze Phage mit Kopf und Schwanz in die Bakterienzelle ein.', answer: false, explanation: 'Nur die Phagenerbsubstanz dringt ein. Kopf und Schwanzhülle bleiben aussen an der Zellwand.' },
+  { statement: 'Eine befallene Bakterienzelle kann in 20 bis 80 Minuten 50 bis 300 neue Phagen bilden.', answer: true, explanation: 'Danach wird die Zellwand aufgelöst und die neuen Phagen werden freigesetzt.' },
+  { statement: 'Nach der Vermehrung wird die Bakterienzellwand aufgelöst und das Bakterium zerstört.', answer: true, explanation: 'Der Zerfall der Zellwand setzt die neu gebildeten Phagen frei.' },
+  { statement: 'Die freigesetzten Phagen befallen keine weiteren Bakterienzellen mehr.', answer: false, explanation: 'Sie lösen im Gegenteil eine Kettenreaktion aus und befallen weitere Bakterienzellen.' },
+  { statement: 'Der lytische Zyklus führt in der Regel zu keiner Säuerungsstörung.', answer: false, explanation: 'Im Gegenteil: Der lytische Zyklus führt in der Regel zu einer Säuerungsstörung.' },
+  { statement: 'Bakteriophagen sind hitzeempfindlicher als ihre Wirtsbakterien.', answer: false, explanation: 'Phagen sind weniger hitzeempfindlich als ihre Wirte.' },
+  { statement: 'Phagen sind wirtsspezifisch und befallen nur einen oder wenige Stämme einer Bakterienart.', answer: true, explanation: 'Deshalb hilft z.B. eine Kulturenrotation gegen hartnäckige Phagen.' }
+];
+
+Quiz.init({ wahrFalsch: true, questions: CARDS, messages: { excellent: 'Sie kennen den lytischen Vermehrungszyklus der Bakteriophagen sehr gut.' } });
+</script>
+</body>
+</html>

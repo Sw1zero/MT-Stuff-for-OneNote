@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lytischen Zyklus beschriften – Bakteriophagen</title>
+  <link rel="stylesheet" href="../style.css?v=c1e40ffd">
+</head>
+<body>
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · a.8</span>
+    <h1>Vermehrungszyklen der Bakteriophagen</h1>
+    <p>Beschriften Sie die 5 Schritte des lytischen Zyklus.</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+<main class="z-wrap">
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+  <div id="zuordnung"></div>
+</main>
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+<script src="../assets/zuordnung.js?v=046b71c5"></script>
+<script>
+Zuordnung.init({
+  stufen: ['zuordnen', 'zeigen', 'eintippen'],
+  intro: {
+    zuordnen: 'Tippen Sie auf die Nummer im Zyklus, zu der der Schritt unten gehört, oder ziehen Sie ihn dorthin.',
+    zeigen: 'Tippen Sie im Diagramm auf die Stelle, an der der gesuchte Schritt passiert.',
+    eintippen: 'Schreiben Sie zu jeder Nummer den Schritt auf. Es genügt der Kernbegriff.'
+  },
+  beschriften: {
+    bildLeer: 'images/a.8_lytische_Vermehrung_unbeschriftet.png',
+    alt: 'Lytischer Vermehrungszyklus eines Bakteriophagen',
+    teile: [
+      { n: 1, name: 'Befall eines Bakteriums', keys: ['befall'], zonen: [{ cx: 32.0, cy: 18.4 }] },
+      { n: 2, name: 'Auflösung der Zellwand', keys: ['aufloes', 'zellwand'], zonen: [{ cx: 14.7, cy: 51.0 }] },
+      { n: 3, name: 'Einbringen der Phagensubstanz', keys: ['einbring', 'phagensubstanz', 'erbsubstanz'], zonen: [{ cx: 32.0, cy: 84.2 }] },
+      { n: 4, name: 'Bildung von Phagen durch Umsteuerung des Bakterienstoffwechsels', keys: ['bildung', 'umsteuer'], zonen: [{ cx: 67.8, cy: 81.5 }] },
+      { n: 5, name: 'Zerfall der Bakterienzelle = Freisetzung von neuen Phagen', keys: ['zerfall', 'freisetz'], zonen: [{ cx: 85.8, cy: 49.0 }] }
+    ]
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lernkärtchen – Lebensphasen</title>
+  <link rel="stylesheet" href="../style.css?v=c1e40ffd">
+</head>
+<body>
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · a.8</span>
+    <h1>Lebensphasen der Mikroorganismen</h1>
+    <p>Die vier Phasen im Überblick, mit Ferien-Vergleich</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+<main class="q-wrap">
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+  <div id="lernkaertchen"></div>
+</main>
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+<script src="../assets/lernkaertchen.js?v=f1ed9e92"></script>
+<script>
+Lernkaertchen.init({
+  karten: [
+    { vorne: 'Anpassungsphase', hinten: '<ul><li>Die Bakterien passen sich der neuen Umwelt an.</li><li>Praktisch keine Vermehrung (erst gegen Ende der Phase).</li><li>Keine bis geringe Erhöhung der Keimzahl.</li><li>Stoffwechsel schwach und verlangsamt, nimmt erst gegen Ende zu.</li></ul><b>Ferien-Vergleich:</b> Sie kommen am Ferienort an und müssen Läden, Lokale und Restaurants erst mühsam suchen.' },
+    { vorne: 'Vermehrungsphase', hinten: '<ul><li>Die Bakterien haben sich angepasst.</li><li>Sehr starke und sehr schnelle Vermehrung, kürzeste Generationszeit, intensivster Stoffwechsel.</li><li>Die Keimzahl nimmt schnell zu.</li></ul><b>Ferien-Vergleich:</b> Sie fühlen sich richtig wohl, sind unternehmungslustig und entdecken laufend Neues.' },
+    { vorne: 'Stationäre Phase', hinten: '<ul><li>Nährstoffmangel, Umweltbedingungen werden ungünstig (Säure).</li><li>Vermehrung und Stoffwechsel sind gebremst.</li><li>Keimzahl bleibt konstant (Gleichgewicht neu entstehender und sterbender Zellen).</li></ul><b>Ferien-Vergleich:</b> Sie kennen den Ferienort schon lange, nichts ist mehr neu. Die Faszination lässt nach.' },
+    { vorne: 'Absterbephase', hinten: '<ul><li>Nährstoffmangel und sehr ungünstige Umweltbedingungen (Säuregrad).</li><li>Die Keimzahl sinkt (hoher Anteil sterbender Zellen).</li></ul><b>Ferien-Vergleich:</b> Jeden Tag das Gleiche. Sie sehnen sich zurück nach Zuhause.' }
+  ]
+});
+</script>
+</body>
+</html>

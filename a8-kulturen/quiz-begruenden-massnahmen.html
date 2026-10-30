@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz – Massnahmen begründen</title>
+  <link rel="stylesheet" href="../style.css?v=c1e40ffd">
+</head>
+<body>
+<header class="bzwu-header">
+  <div class="header-text">
+  <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · a.8</span>
+  <h1>Begründen</h1>
+  <p>Welcher Satz begründet die Massnahme wirklich, statt sie nur zu nennen?</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+<main class="q-wrap">
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+  <div id="quiz"></div>
+</main>
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+<script src="../assets/quiz.js?v=730b4668"></script>
+<script>
+var QUESTIONS = [
+  { q: 'Sie kontrollieren eine Kultur nach der vorgesehenen Bebrütungszeit und messen einen Säuregrad von 44 °SH, deutlich über dem Sollwert. Welcher Satz begründet die Massnahme wirklich?', options: ['Die Bebrütungszeit war zu lang, deshalb passen Sie sie an und kontrollieren sie künftig mit einem Timer, damit die Gärung rechtzeitig abbricht.', 'Sie passen einfach die Bebrütungszeit an.', 'Die Impfmenge war zu klein, deshalb erhöhen Sie sie.'], correct: 0, explanation: 'Eine echte Begründung nennt die Ursache, die Massnahme und erklärt, warum die Massnahme das Problem löst.' },
+  { q: 'Eine neue Lernende meldet: ihre Kultur ist nach der planmässigen Bebrütungszeit noch komplett flüssig, der Säuregrad liegt bei nur 18 °SH. Welcher Satz begründet die Massnahme wirklich?', options: ['Die Bebrütungstemperatur war zu tief, deshalb kontrollieren Sie sie mit dem Thermometer und stellen sie auf den Sollwert ein, damit die Gärung im normalen Tempo abläuft.', 'Sie stellen die Temperatur einfach höher.', 'Ein Hemmstoff in der Milch bremst die Bakterien, deshalb führen Sie einen Hemmstoffnachweis durch.'], correct: 0, explanation: 'Eine echte Begründung nennt die Ursache, die Massnahme und erklärt, warum die Massnahme das Problem löst.' },
+  { q: 'Trotz korrekter Temperatur und Zeit bleibt eine Kultur ungewöhnlich dünnflüssig. Sie vermuten ein Problem mit der Ausgangsmilch. Welcher Satz begründet die Massnahme wirklich?', options: ['Ein Hemmstoff in der Ausgangsmilch bremst die Bakterientätigkeit, deshalb führen Sie einen Hemmstoffnachweis durch, um die betroffene Milch zu erkennen und auszusortieren.', 'Sie machen einfach einen Test mit der Milch.', 'Die Bebrütungszeit war zu kurz, deshalb verlängern Sie sie.'], correct: 0, explanation: 'Eine echte Begründung nennt die Ursache, die Massnahme und erklärt, warum die Massnahme das Problem löst.' },
+  { q: 'Eine Kultur zeigt nach der Bebrütung einen deutlich zu tiefen Säuregrad, obwohl Temperatur und Zeit korrekt eingehalten wurden. Im Betriebsjournal fällt eine kleinere Kulturmenge als sonst auf. Welcher Satz begründet die Massnahme wirklich?', options: ['Die Impfmenge war zu klein, deshalb passen Sie sie an die Vorgaben an, damit von Anfang an genug Bakterienmasse für eine termingerechte Säuerung vorhanden ist.', 'Sie geben einfach mehr Kultur dazu.', 'Die Bebrütungstemperatur war zu hoch, deshalb senken Sie sie.'], correct: 0, explanation: 'Eine echte Begründung nennt die Ursache, die Massnahme und erklärt, warum die Massnahme das Problem löst.' }
+];
+
+Quiz.init({ questions: QUESTIONS, badge: 'Begründen' });
+</script>
+</body>
+</html>
