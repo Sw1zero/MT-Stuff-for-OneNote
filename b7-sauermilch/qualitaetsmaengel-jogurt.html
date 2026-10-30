@@ -4,155 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lernkärtchen b.7 – Qualitätsmängel Jogurt</title>
-  <link rel="stylesheet" href="../style.css?v=2a55b1f9">
-  <style>
-    .page-main { display: flex; flex-direction: column; align-items: center; }
-
-    .back-link {
-      font-size: 0.78rem;
-      color: var(--text-subtle);
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      margin-bottom: 20px;
-      align-self: flex-start;
-    }
-    .back-link:hover { color: var(--red); }
-
-    .filter-wrap   { max-width: 500px; margin-bottom: 24px; }
-    .progress-text { margin-bottom: 10px; }
-
-    .progress-bar-wrap {
-      width: 360px;
-      max-width: 90vw;
-      margin-bottom: 28px;
-    }
-
-    /* ---- Flashcard ---- */
-    .scene {
-      width: 440px;
-      max-width: 92vw;
-      height: 310px;
-      perspective: 900px;
-      cursor: pointer;
-      margin-bottom: 32px;
-    }
-
-    .card {
-      width: 100%;
-      height: 100%;
-      position: relative;
-      transform-style: preserve-3d;
-      transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .card.flipped { transform: rotateY(180deg); }
-
-    .card-face {
-      position: absolute;
-      inset: 0;
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
-      border-radius: var(--radius-lg);
-      padding: 28px 32px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      box-shadow: var(--shadow-md);
-    }
-
-    .card-front { background: var(--surface); }
-    .card-back  { background: var(--blue-light); transform: rotateY(180deg); }
-
-    .card-category-badge {
-      display: inline-block;
-      font-size: 0.68rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      padding: 3px 10px;
-      border-radius: 20px;
-      margin-bottom: 14px;
-      align-self: flex-start;
-    }
-
-    /* Frage (etwas kleiner als in lernkaertchen.html, da ganzer Satz) */
-    .card-term {
-      font-size: 0.97rem;
-      font-weight: 600;
-      color: var(--text);
-      line-height: 1.5;
-    }
-
-    .card-hint {
-      margin-top: 14px;
-      font-size: 0.74rem;
-      color: var(--text-subtle);
-    }
-
-    /* Antwort */
-    .card-explanation {
-      font-size: 0.9rem;
-      color: var(--text);
-      line-height: 1.6;
-      overflow-y: auto;
-      max-height: 210px;
-    }
-
-    .card-explanation strong { color: var(--blue-dark); }
-
-    .card-explanation ul {
-      margin: 6px 0 0 0;
-      padding-left: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    /* ---- Controls ---- */
-    .controls {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin-bottom: 12px;
-    }
-
-    /* ---- Richtig/Falsch-Bestätigung ---- */
-    .rating-row {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      margin-bottom: 12px;
-    }
-
-    .btn-danger {
-      background: var(--red);
-      color: #fff;
-      box-shadow: 0 2px 8px rgba(204,51,51,0.25);
-    }
-
-    .btn-danger:hover { background: var(--red-dark); }
-
-    /* ---- Abschluss-Bildschirm ---- */
-    .complete-panel {
-      width: 440px;
-      max-width: 92vw;
-      padding: 40px 36px;
-      text-align: center;
-      background: var(--surface);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-md);
-      margin-bottom: 32px;
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--text);
-    }
-  </style>
+  <link rel="stylesheet" href="../style.css?v=b9875ea9">
 </head>
 <body>
+
 <header class="bzwu-header">
   <div class="header-text">
   <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · b.7</span>
@@ -165,123 +20,32 @@
   </div>
 </header>
 
-<main class="page-main">
+<main class="q-wrap">
   <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
-
-  <div class="filter-wrap" id="filterWrap"></div>
-
-  <div class="progress-text" id="progressText"></div>
-  <div class="progress-bar-wrap">
-    <div class="progress-bar-fill" id="progressBar"></div>
-  </div>
-
-  <div class="scene" id="scene">
-    <div class="card" id="card">
-      <div class="card-face card-front">
-        <span class="card-category-badge" id="frontLabel"></span>
-        <div class="card-term" id="frontTerm"></div>
-        <div class="card-hint">Karte umdrehen für die Antwort</div>
-      </div>
-      <div class="card-face card-back">
-        <span class="card-category-badge" id="backLabel"></span>
-        <div class="card-explanation" id="backExplanation"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="complete-panel" id="completePanel" hidden>
-    <p id="completeText">Alle Karten gewusst.</p>
-  </div>
-
-  <div class="rating-row" id="ratingRow" hidden>
-    <button class="btn btn-danger" id="unknownBtn">Wusste ich nicht</button>
-    <button class="btn btn-success" id="knownBtn">Wusste ich</button>
-  </div>
-
-  <div class="controls" id="controlsNav">
-    <button class="btn btn-ghost"   id="prevBtn">&#8592; Zurück</button>
-    <button class="btn btn-success" id="flipBtn">Umdrehen</button>
-    <button class="btn btn-ghost"   id="nextBtn">Weiter &#8594;</button>
-  </div>
-  <div class="controls">
-    <button class="btn btn-primary" id="shuffleBtn">&#x21C4; Mischen</button>
-  </div>
-
-  <p class="keyboard-hint" style="margin-top:12px;">
-    <kbd>&#8592;</kbd> <kbd>&#8594;</kbd> navigieren &nbsp;|&nbsp;
-    <kbd>Leertaste</kbd> umdrehen &nbsp;|&nbsp;
-    <kbd>S</kbd> mischen
-  </p>
+  <div id="lernkaertchen"></div>
 </main>
 
 <footer class="bzwu-footer">
   BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
 </footer>
 
-  <script>
-    const ALL_CARDS = [
-      {
-        category: 'Mikrobiologisch',
-        term:      'Erklären Sie, wie es zu einer geblähten Jogurtverpackung kommen kann. Nennen Sie drei Möglichkeiten, wie das passieren kann.',
-        explanation: '<strong>Ursache:</strong> Hefen produzieren bei der Gärung CO₂ → Druck in der Verpackung steigt.<br><br><strong>Eintragsquellen:</strong><ul><li>Raumluft</li><li>Kontaminierter Grundstoff oder Zucker</li><li>Unsaubere Anlagen oder Kontakt mit den Händen</li></ul>',
-      },
-      {
-        category: 'Mikrobiologisch',
-        term:  'Beschreiben Sie, auf welchem Weg Schimmelpilze auf die Jogurtoberfläche gelangen können. Bringen Sie ein Beispiel.',
-        explanation:    'Schimmelpilze gelangen über <strong>Raumluft</strong> (z. B. offene Fenster im Abfüllraum), über <strong>unsaubere Verpackungen</strong> oder über <strong>Spritzwasser</strong> auf die Oberfläche.',
-      },
-      {
-        category: 'Konsistenz & Struktur',
-        term:  'Erklären Sie, welche Produktionsfehler zu einem griesigen Jogurt führen können. Nennen Sie vier Ursachen.',
-        explanation:    '<ul><li>Nature-Jogurt zu wenig strukturbearbeitet</li><li>Abfallende Bebrütungstemperatur</li><li>Zu hohe Bebrütungstemperatur (Lb.-Anteil zu hoch)</li><li>Zu hohe fettfreie Milchtrockenmasse</li></ul>',
-      },
-      {
-        category: 'Konsistenz & Struktur',
-        term:  'Erklären Sie, warum eine ungenügende thermische Belastung der Milch zu einer zu tiefen Viskosität des Jogurts führt.',
-        explanation:    'Bei ungenügender Erhitzung werden die <strong>Molkenproteine nicht ausreichend denaturiert</strong>. Sie können dann nicht genügend Wasser binden → Jogurt wird zu dünnflüssig.',
-      },
-      {
-        category: 'Konsistenz & Struktur',
-        term:  'Beschreiben Sie fünf verschiedene Ursachen, die zu einem zu dünnflüssigen Jogurt führen können.',
-        explanation:    '<ul><li>Ungenügende thermische Belastung der Milch</li><li>Keine oder ungenügende Homogenisation</li><li>Zu starke mechanische Belastung der Gallerte (starkes Rühren, ungeeignete Pumpen)</li><li>Zu tiefe fettfreie Trockenmasse / Verwässerung</li><li>Ungenügende Säuerung</li></ul>',
-      },
-      {
-        category: 'Konsistenz & Struktur',
-        term:  'Erklären Sie, warum Erschütterungen während der Gerinnung oder des Kühlens zur Molkenabscheidung führen können. Bringen Sie ein Beispiel.',
-        explanation:    'Die Gallerte ist während der Gerinnung und beim Kühlen mechanisch empfindlich. <strong>Erschütterungen</strong> (z. B. Transport auf unebener Strasse) zerstören das Proteingerüst → Molke tritt aus.',
-      },
-      {
-        category: 'Konsistenz & Struktur',
-        term:  'Beschreiben Sie, wie Lufteinzug beim Mischen die Qualität des Jogurts beeinflussen kann. Erklären Sie den Zusammenhang mit der Molkenabscheidung.',
-        explanation:    'Luftblasen, die durch undichte Leitungen oder falsches Mischen eingetragen werden, <strong>stören die Gallertstruktur</strong>. Das Proteingerüst wird beschädigt → Molke scheidet sich ab → Molkenlässigkeit.',
-      },
-      {
-        category: 'Konsistenz & Struktur',
-        term:  'Beschreiben Sie zwei mögliche Ursachen für einen fadenziehenden Jogurt. Bringen Sie je ein Beispiel.',
-        explanation:    '<ul><li><strong>Zu tiefe Bebrütungstemperatur</strong> (z. B. Thermostat defekt) → Fadenziehende Milchsäurebakterien sind im Vorteil</li><li><strong>Infektion mit fadenziehenden Milchsäurebakterien</strong> (z. B. durch unzureichende Anlagenreinigung)</li></ul>',
-      },
-      {
-        category: 'Geschmack',
-        term:  'Erklären Sie, warum ein zu langsames oder ungenügendes Kühlen nach der Bebrütung zu einem übersäuerten Jogurt führt.',
-        explanation:    'Bei hoher Temperatur arbeiten die Milchsäurebakterien weiter → <strong>Nachsäuerung</strong>: Milchsäureproduktion setzt sich fort → Säuregehalt steigt an. Erst unter 10 °C wird die Säuerung gestoppt.',
-      },
-      {
-        category: 'Geschmack',
-        term:  'Erklären Sie den Einfluss eines hohen Laktobazillenanteils in der Jogurtkultur auf die Säuerung. Bringen Sie ein Beispiel.',
-        explanation:    'Laktobazillen säuern <strong>stärker</strong> als Streptokokken. Ein zu hoher Lb.-Anteil führt zu übermässiger Milchsäurebildung → Jogurt wird übersäuert (z. B. wenn die Kultur aus dem Gleichgewicht gerät und Lb. dominieren).',
-      },
-    ];
+<script src="../assets/lernkaertchen.js?v=f1ed9e92"></script>
+<script>
+Lernkaertchen.init({
+  karten: [
+    { vorne: 'Erklären Sie, wie es zu einer geblähten Jogurtverpackung kommen kann. Nennen Sie drei Möglichkeiten, wie das passieren kann.', hinten: '<strong>Ursache:</strong> Hefen produzieren bei der Gärung CO₂ → Druck in der Verpackung steigt.<br><br><strong>Eintragsquellen:</strong><ul><li>Raumluft</li><li>Kontaminierter Grundstoff oder Zucker</li><li>Unsaubere Anlagen oder Kontakt mit den Händen</li></ul>', kategorie: 'Mikrobiologisch' },
+    { vorne: 'Beschreiben Sie, auf welchem Weg Schimmelpilze auf die Jogurtoberfläche gelangen können. Bringen Sie ein Beispiel.', hinten: 'Schimmelpilze gelangen über <strong>Raumluft</strong> (z. B. offene Fenster im Abfüllraum), über <strong>unsaubere Verpackungen</strong> oder über <strong>Spritzwasser</strong> auf die Oberfläche.', kategorie: 'Mikrobiologisch' },
+    { vorne: 'Erklären Sie, welche Produktionsfehler zu einem griesigen Jogurt führen können. Nennen Sie vier Ursachen.', hinten: '<ul><li>Nature-Jogurt zu wenig strukturbearbeitet</li><li>Abfallende Bebrütungstemperatur</li><li>Zu hohe Bebrütungstemperatur (Lb.-Anteil zu hoch)</li><li>Zu hohe fettfreie Milchtrockenmasse</li></ul>', kategorie: 'Konsistenz & Struktur' },
+    { vorne: 'Erklären Sie, warum eine ungenügende thermische Belastung der Milch zu einer zu tiefen Viskosität des Jogurts führt.', hinten: 'Bei ungenügender Erhitzung werden die <strong>Molkenproteine nicht ausreichend denaturiert</strong>. Sie können dann nicht genügend Wasser binden → Jogurt wird zu dünnflüssig.', kategorie: 'Konsistenz & Struktur' },
+    { vorne: 'Beschreiben Sie fünf verschiedene Ursachen, die zu einem zu dünnflüssigen Jogurt führen können.', hinten: '<ul><li>Ungenügende thermische Belastung der Milch</li><li>Keine oder ungenügende Homogenisation</li><li>Zu starke mechanische Belastung der Gallerte (starkes Rühren, ungeeignete Pumpen)</li><li>Zu tiefe fettfreie Trockenmasse / Verwässerung</li><li>Ungenügende Säuerung</li></ul>', kategorie: 'Konsistenz & Struktur' },
+    { vorne: 'Erklären Sie, warum Erschütterungen während der Gerinnung oder des Kühlens zur Molkenabscheidung führen können. Bringen Sie ein Beispiel.', hinten: 'Die Gallerte ist während der Gerinnung und beim Kühlen mechanisch empfindlich. <strong>Erschütterungen</strong> (z. B. Transport auf unebener Strasse) zerstören das Proteingerüst → Molke tritt aus.', kategorie: 'Konsistenz & Struktur' },
+    { vorne: 'Beschreiben Sie, wie Lufteinzug beim Mischen die Qualität des Jogurts beeinflussen kann. Erklären Sie den Zusammenhang mit der Molkenabscheidung.', hinten: 'Luftblasen, die durch undichte Leitungen oder falsches Mischen eingetragen werden, <strong>stören die Gallertstruktur</strong>. Das Proteingerüst wird beschädigt → Molke scheidet sich ab → Molkenlässigkeit.', kategorie: 'Konsistenz & Struktur' },
+    { vorne: 'Beschreiben Sie zwei mögliche Ursachen für einen fadenziehenden Jogurt. Bringen Sie je ein Beispiel.', hinten: '<ul><li><strong>Zu tiefe Bebrütungstemperatur</strong> (z. B. Thermostat defekt) → Fadenziehende Milchsäurebakterien sind im Vorteil</li><li><strong>Infektion mit fadenziehenden Milchsäurebakterien</strong> (z. B. durch unzureichende Anlagenreinigung)</li></ul>', kategorie: 'Konsistenz & Struktur' },
+    { vorne: 'Erklären Sie, warum ein zu langsames oder ungenügendes Kühlen nach der Bebrütung zu einem übersäuerten Jogurt führt.', hinten: 'Bei hoher Temperatur arbeiten die Milchsäurebakterien weiter → <strong>Nachsäuerung</strong>: Milchsäureproduktion setzt sich fort → Säuregehalt steigt an. Erst unter 10 °C wird die Säuerung gestoppt.', kategorie: 'Geschmack' },
+    { vorne: 'Erklären Sie den Einfluss eines hohen Laktobazillenanteils in der Jogurtkultur auf die Säuerung. Bringen Sie ein Beispiel.', hinten: 'Laktobazillen säuern <strong>stärker</strong> als Streptokokken. Ein zu hoher Lb.-Anteil führt zu übermässiger Milchsäurebildung → Jogurt wird übersäuert (z. B. wenn die Kultur aus dem Gleichgewicht gerät und Lb. dominieren).', kategorie: 'Geschmack' }
+  ]
+});
+</script>
 
-    const CATEGORY_COLORS = {
-      'Mikrobiologisch':     { bg: '#ffedd5', fg: '#9a3412' },
-      'Konsistenz & Struktur': { bg: '#dbeeff', fg: '#1e4e8c' },
-      'Geschmack':           { bg: '#dcfce7', fg: '#15803d' },
-    };
-
-  </script>
-  <script src="../assets/lernkaertchen-engine.js"></script>
-  <script>
-    MTFlashcards.init({ cards: ALL_CARDS, categoryColors: CATEGORY_COLORS });
-  </script>
 </body>
 </html>
