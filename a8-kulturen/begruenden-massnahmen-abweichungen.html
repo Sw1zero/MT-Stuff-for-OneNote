@@ -207,6 +207,10 @@
       .blank-cell { min-width: 110px; font-size: 0.74rem; }
       .compare-table td.prop-label { width: auto; }
     }
+    @media (max-width: 600px) {
+      .compare-table { display: block; overflow-x: auto; }
+      .compare-table th, .compare-table td { padding: 0.5rem 0.6rem; }
+    }
   </style>
 </head>
 <body>
