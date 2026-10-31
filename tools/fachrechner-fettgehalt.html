@@ -2,80 +2,11 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fachrechner – Fettgehalt standardisieren</title>
-  <link rel="stylesheet" href="../style.css?v=9d4bf0bd">
+  <title>Mischungskreuz</title>
+  <meta http-equiv="refresh" content="0; url=fachrechner-mischungskreuz.html">
+  <link rel="canonical" href="fachrechner-mischungskreuz.html">
 </head>
 <body>
-
-<header class="bzwu-header">
-  <div class="header-text">
-    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Rechner</span>
-    <h1>Fettgehalt standardisieren</h1>
-    <p>Zwei Komponenten mit dem Mischungskreuz auf einen Ziel-Fettgehalt mischen.</p>
-  </div>
-  <div class="header-logos">
-    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
-    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
-  </div>
-</header>
-
-<main class="page-main">
-  <a class="back-link" href="../index.html">← Alle Lerntools</a>
-  <div id="mischungskreuz"></div>
-</main>
-
-<footer class="bzwu-footer">
-  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
-</footer>
-
-<script src="../assets/rechner.js?v=5fca8161"></script>
-<script src="../assets/mischungskreuz.js?v=53580109"></script>
-<script>
-var pick = Rechner.pick, z = Rechner.zahl;
-
-var POOL = [
-  { A: ['Vollmilch', 3.5], B: ['Magermilch', 0.1], ziele: [0.5, 1.0, 1.5, 2.0, 2.5, 3.0], produkt: 'teilentrahmte Milch' },
-  { A: ['Vollrahm', 35], B: ['Magermilch', 0.1], ziele: [3.5, 3.6, 3.8, 4.0, 4.5], produkt: 'Vollmilch' },
-  { A: ['Vollrahm', 35], B: ['Vollmilch', 3.5], ziele: [15, 18, 20, 23, 25, 28, 30], produkt: 'Halbrahm' },
-  { A: ['Doppelrahm', 45], B: ['Vollmilch', 3.5], ziele: [35, 36, 38, 40], produkt: 'Rahm' },
-  { A: ['Doppelrahm', 45], B: ['Vollrahm', 35], ziele: [36, 37, 38, 39, 40, 41, 42, 43, 44], produkt: 'Vollrahm' }
-];
-var MENGEN = [1000, 1200, 1500, 1800, 2000, 2500, 3000, 3500, 4000, 4500, 5000];
-var BEKANNT = [100, 150, 200, 250, 300, 400, 500, 600, 800, 1000, 1200, 1500];
-
-function genGesamt() {
-  var p = pick(POOL), c = pick(p.ziele), M = pick(MENGEN);
-  return Mischungskreuz.aufgabe({ nameA: p.A[0], a: p.A[1], nameB: p.B[0], b: p.B[1], c: c, gesucht: 'mengen', menge: M, probe: true,
-    text: 'Sie stellen <strong>' + z(M) + ' kg ' + p.produkt + '</strong> mit <strong>' + z(c) + ' %</strong> Fett her. Sie haben <strong>' + p.A[0] +
-      '</strong> mit ' + z(p.A[1]) + ' % und <strong>' + p.B[0] + '</strong> mit ' + z(p.B[1]) + ' % Fett. Wie viel kg brauchen Sie von jeder Komponente?' });
-}
-
-function genBekannt() {
-  var p = pick(POOL), c = pick(p.ziele), g = pick(['A', 'B']), m = pick(BEKANNT);
-  var hat = g === 'A' ? p.A : p.B, dazu = g === 'A' ? p.B : p.A;
-  return Mischungskreuz.aufgabe({ nameA: p.A[0], a: p.A[1], nameB: p.B[0], b: p.B[1], c: c, gesucht: 'mengen', menge: m, gegeben: g, probe: true,
-    text: 'Sie haben <strong>' + z(m) + ' kg ' + hat[0] + '</strong> (' + z(hat[1]) + ' % Fett) und möchten daraus ' + p.produkt + ' mit <strong>' + z(c) +
-      ' %</strong> Fett herstellen. Dazu geben Sie <strong>' + dazu[0] + '</strong> (' + z(dazu[1]) + ' % Fett) zu. Wie viel kg ' + dazu[0] +
-      ' brauchen Sie, und wie gross ist die Gesamtmenge?' });
-}
-
-Mischungskreuz.seite({
-  uebung: {
-    kategorien: [
-      { name: 'Gesamtmenge bekannt', aufgaben: [genGesamt] },
-      { name: 'Eine Menge bekannt', aufgaben: [genBekannt] }
-    ],
-  hilfe: { titel: 'So geht das Mischungskreuz', html:
-    '<ol><li>Links oben Komponente A mit ihrem Wert, links unten Komponente B.</li>' +
-    '<li>In die Mitte den Zielwert.</li>' +
-    '<li>Über Kreuz rechnen, immer grosse minus kleine Zahl. Rechts stehen die Teile.</li>' +
-    '<li>Teile zusammenzählen: Gesamtteile.</li>' +
-    '<li>Menge = Teile ÷ Gesamtteile × Gesamtmenge.</li></ol>' +
-    '<p>Der Zielwert liegt immer zwischen den beiden Werten.</p>' }
-  },
-  rechner: { probe: true, vorlagen: [{ titel: 'Vollmilch und Magermilch', nameA: 'Vollmilch', a: 3.8, nameB: 'Magermilch', b: 0.1, c: 1.5, menge: 100 }] }
-});
-</script>
+  <p>Dieses Tool ist umgezogen: <a href="fachrechner-mischungskreuz.html">Mischungskreuz</a></p>
 </body>
 </html>

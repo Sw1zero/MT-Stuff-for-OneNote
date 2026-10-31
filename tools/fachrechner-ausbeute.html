@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fachrechner – Käseausbeute</title>
+  <link rel="stylesheet" href="../style.css?v=9d4bf0bd">
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+  <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Rechner</span>
+  <h1>Käseausbeute – Rechnen</h1>
+  <p>Ausbeute, Leichtung und Wirtschaftlichkeit üben, immer mit neuen Zahlen.</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+  <a class="back-link" href="../index.html">← Alle Lerntools</a>
+  <div id="rechner"></div>
+</main>
+
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+
+<script src="../assets/rechner.js?v=5fca8161"></script>
+<script>
+var pick = Rechner.pick;
+function z(n, st) { return Rechner.zahl(st === undefined ? parseFloat(n.toFixed(3)) : n, st); }  // höchstens 3 Stellen wie im LS
+
+var Q_MILCH          = [2000, 3300, 5000, 8000, 10000, 15000, 20000, 25000, 50000, 75000, 100000, 110500];
+var Q_KAESE_PCT      = [7.8, 8.35, 8.5, 8.75, 9.0, 9.25, 9.5, 10.0, 10.25, 10.5];
+var Q_BUTTER_PCT     = [0.9, 1.0, 1.05, 1.1, 1.2, 1.35, 1.4];
+var Q_LEICHTUNG      = [0.4, 0.5, 0.75, 0.9, 1.05, 1.2, 1.5, 1.8, 2.0];
+var Q_ABPRESSE_KG    = [500, 800, 1000, 1325, 1500, 2000, 2500, 3000];
+var Q_HANDELSREIF_KG = [250, 364, 500, 1000, 2000, 4500, 7500];
+var Q_MENGE_CHF      = [1000, 10000, 150000, 835000, 5000000];
+var Q_PREIS          = [6.20, 7.00, 7.50, 8.00, 9.50];
+var Q_AENDERUNG      = [0.1, 0.25, 0.5, 0.75, 1.0];
+
+function genAusbeute() {
+  var milch = pick(Q_MILCH);
+  var kaese = Math.round(milch * pick(Q_KAESE_PCT) / 100), butter = Math.round(milch * pick(Q_BUTTER_PCT) / 100);
+  var aK = kaese / milch * 100, aB = butter / milch * 100;
+  return {
+    text: 'In einer Käserei werden aus <strong>' + z(milch) + ' kg</strong> Milch <strong>' + z(kaese) + ' kg</strong> Käse und <strong>' +
+      z(butter) + ' kg</strong> Käsereibutter fabriziert. Wie gross sind die Ausbeuten von Käse und Butter in %?',
+    felder: [{ label: 'Ausbeute Käse', einheit: '%', wert: aK }, { label: 'Ausbeute Butter', einheit: '%', wert: aB }],
+    weg: [
+      'Ausbeute = Produkt ÷ Milch × 100',
+      'Ausbeute Käse = ' + z(kaese) + ' kg ÷ ' + z(milch) + ' kg × 100 = <strong>' + z(aK) + ' %</strong>',
+      'Ausbeute Butter = ' + z(butter) + ' kg ÷ ' + z(milch) + ' kg × 100 = <strong>' + z(aB) + ' %</strong>'
+    ]
+  };
+}
+
+function genMenge() {
+  var milch = pick(Q_MILCH), kPct = pick(Q_KAESE_PCT), bPct = pick(Q_BUTTER_PCT);
+  var kaese = milch * kPct / 100, butter = milch * bPct / 100;
+  return {
+    text: 'Es wurden <strong>' + z(milch) + ' kg</strong> Milch verarbeitet. Die Käseausbeute betrug <strong>' + z(kPct) +
+      ' %</strong>, die Buttermenge <strong>' + z(bPct) + ' %</strong>. Berechnen Sie die Käsemenge ab Presse und die Buttermenge in kg.',
+    felder: [{ label: 'Käsemenge', einheit: 'kg', wert: kaese }, { label: 'Buttermenge', einheit: 'kg', wert: butter }],
+    weg: [
+      'Menge = Milch × Ausbeute ÷ 100',
+      'Käsemenge = ' + z(milch) + ' kg × ' + z(kPct) + ' ÷ 100 = <strong>' + z(kaese) + ' kg</strong>',
+      'Buttermenge = ' + z(milch) + ' kg × ' + z(bPct) + ' ÷ 100 = <strong>' + z(butter) + ' kg</strong>'
+    ]
+  };
+}
+
+function genLeichtung() {
+  var abPresse = pick(Q_ABPRESSE_KG), leichtung = pick(Q_LEICHTUNG);
+  var verlust = abPresse * leichtung / 100, handelsreif = abPresse - verlust;
+  return {
+    text: 'Der Gewichtsverlust im Reifekeller (Leichtung) betrug <strong>' + z(leichtung) + ' %</strong>. Die Käse wogen ab Presse <strong>' +
+      z(abPresse) + ' kg</strong>. Wie gross ist das handelsreife Gewicht?',
+    felder: [{ label: 'Gewicht handelsreif', einheit: 'kg', wert: handelsreif }],
+    weg: [
+      'Verlust = ' + z(abPresse) + ' kg × ' + z(leichtung) + ' ÷ 100 = ' + z(verlust) + ' kg',
+      'Handelsreifes Gewicht = ' + z(abPresse) + ' kg − ' + z(verlust) + ' kg = <strong>' + z(handelsreif) + ' kg</strong>'
+    ]
+  };
+}
+
+function genHandelsreif() {
+  var abPressePct = pick(Q_KAESE_PCT), leichtung = pick(Q_LEICHTUNG);
+  var verlust = abPressePct * leichtung / 100, handelsreif = abPressePct - verlust;
+  return {
+    text: 'Die Leichtung der Käse im Reifekeller war <strong>' + z(leichtung) + ' %</strong>. Die Ausbeute ab Presse betrug <strong>' +
+      z(abPressePct) + ' %</strong>. Wie gross war die Ausbeute handelsreif in %?',
+    felder: [{ label: 'Ausbeute handelsreif', einheit: '%', wert: handelsreif }],
+    weg: [
+      'Verlust = ' + z(abPressePct) + ' % × ' + z(leichtung) + ' ÷ 100 = ' + z(verlust) + ' %',
+      'Ausbeute handelsreif = ' + z(abPressePct) + ' % − ' + z(verlust) + ' % = <strong>' + z(handelsreif) + ' %</strong>'
+    ]
+  };
+}
+
+function genAusgangsmilch() {
+  var abPressePct = pick(Q_KAESE_PCT), leichtung = pick(Q_LEICHTUNG), handelsreif = pick(Q_HANDELSREIF_KG);
+  var abPresse = handelsreif / (100 - leichtung) * 100, milch = abPresse / abPressePct * 100;
+  return {
+    text: 'Ausbeute ab Presse: <strong>' + z(abPressePct) + ' %</strong>. Leichtung im Reifekeller: <strong>' + z(leichtung) +
+      ' %</strong>. Ausbeute handelsreif: <strong>' + z(handelsreif) + ' kg</strong>. Berechnen Sie zuerst das Gewicht ab Presse (vor der Leichtung), danach die Ausgangsvollmilch.',
+    felder: [{ label: 'Gewicht ab Presse', einheit: 'kg', wert: abPresse }, { label: 'Ausgangsvollmilch', einheit: 'kg', wert: milch, mehrstufig: true }],
+    weg: [
+      'Handelsreif sind noch 100 % − ' + z(leichtung) + ' % = ' + z(100 - leichtung) + ' % vom Gewicht ab Presse',
+      'Gewicht ab Presse = ' + z(handelsreif) + ' kg ÷ ' + z(100 - leichtung) + ' × 100 = <strong>' + z(abPresse) + ' kg</strong>',
+      'Ausgangsvollmilch = ' + z(abPresse) + ' kg ÷ ' + z(abPressePct) + ' × 100 = <strong>' + z(milch) + ' kg</strong>'
+    ]
+  };
+}
+
+function genVerlust() {
+  var preis = pick(Q_PREIS), aenderung = pick(Q_AENDERUNG), menge = pick(Q_MENGE_CHF);
+  var kg = menge * aenderung / 100, betrag = kg * preis;
+  return {
+    text: 'Handelsreife Produktmenge: <strong>' + z(menge) + ' kg</strong>, Preis <strong>CHF ' + z(preis, 2) +
+      '</strong> pro kg. Die Leichtung im Reifekeller ist um <strong>' + z(aenderung) + ' %</strong> höher als normal. Wie gross ist der Verlust in CHF?',
+    felder: [{ label: 'Verlust', einheit: 'CHF', wert: betrag }],
+    weg: [
+      'Verlust = Produktmenge × Leichtung % × Preis',
+      'Mehr Leichtung = ' + z(menge) + ' kg × ' + z(aenderung) + ' ÷ 100 = ' + z(kg) + ' kg',
+      'Verlust = ' + z(kg) + ' kg × CHF ' + z(preis, 2) + ' = <strong>CHF ' + z(betrag, 2) + '</strong>'
+    ]
+  };
+}
+
+function genErtrag() {
+  var preis = pick(Q_PREIS), aenderung = pick(Q_AENDERUNG), menge = pick(Q_MENGE_CHF);
+  var kg = menge * aenderung / 100, betrag = kg * preis;
+  return {
+    text: 'Ausgangsmilchmenge: <strong>' + z(menge) + ' kg</strong>, Preis <strong>CHF ' + z(preis, 2) +
+      '</strong> pro kg handelsreifes Produkt. Die Ausbeute ändert sich um <strong>' + z(aenderung) + ' %</strong>. Wie gross ist der Mehr- bzw. Minderertrag in CHF?',
+    felder: [{ label: 'Betrag', einheit: 'CHF', wert: betrag }],
+    weg: [
+      'Mehr oder weniger Produkt = ' + z(menge) + ' kg × ' + z(aenderung) + ' ÷ 100 = ' + z(kg) + ' kg',
+      'Betrag = ' + z(kg) + ' kg × CHF ' + z(preis, 2) + ' = <strong>CHF ' + z(betrag, 2) + '</strong>'
+    ]
+  };
+}
+
+Rechner.init({
+  kategorien: [
+    { name: 'Ausbeute (%)', aufgaben: [genAusbeute] },
+    { name: 'Menge (kg)', aufgaben: [genMenge] },
+    { name: 'Leichtung', aufgaben: [genLeichtung] },
+    { name: 'Ausbeute handelsreif', aufgaben: [genHandelsreif] },
+    { name: 'Ausgangsvollmilch', aufgaben: [genAusgangsmilch] },
+    { name: 'Wirtschaftlichkeit', aufgaben: [genVerlust, genErtrag] }
+  ],
+  hilfe: { titel: 'Formeln', html:
+    '<table class="r-tabelle"><tr><th>Gesucht</th><th>Formel</th></tr>' +
+    '<tr><td>Ausbeute in %</td><td>Produkt (kg) ÷ Milch (kg) × 100</td></tr>' +
+    '<tr><td>Produktmenge</td><td>Milch (kg) × Ausbeute (%) ÷ 100</td></tr>' +
+    '<tr><td>Handelsreif nach Leichtung</td><td>ab Presse (kg) − Verlust (kg)</td></tr>' +
+    '<tr><td>Gewicht vor Leichtung</td><td>handelsreif (kg) ÷ (100 % − Leichtung %) × 100</td></tr>' +
+    '<tr><td>Ausgangsvollmilch</td><td>Gewicht ab Presse ÷ Ausbeute ab Presse (%) × 100</td></tr></table>' }
+});
+</script>
+</body>
+</html>
