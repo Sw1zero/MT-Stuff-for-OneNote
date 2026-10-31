@@ -4,145 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hotspot – Bakterienzelle</title>
-  <link rel="stylesheet" href="../style.css?v=cc6a1397">
-  <style>
-    .page-main {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .back-link {
-      font-size: 0.78rem;
-      color: var(--text-subtle);
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      margin-bottom: 20px;
-      align-self: flex-start;
-    }
-    .back-link:hover { color: var(--red); }
-
-    .game-wrap {
-      width: 660px;
-      max-width: 96vw;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    /* ---- Question card ---- */
-    .question-card {
-      background: var(--surface);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-sm);
-      padding: 20px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      min-height: 68px;
-    }
-    .question-text {
-      font-size: 1.05rem;
-      font-weight: 600;
-      color: var(--text);
-    }
-    .question-text span { color: var(--blue-dark); }
-    .progress-badge {
-      font-size: 0.78rem;
-      font-weight: 700;
-      color: var(--text-subtle);
-      background: #f1f5f9;
-      border-radius: 20px;
-      padding: 4px 12px;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-
-    /* ---- Feedback bar ---- */
-    .feedback-bar {
-      height: 40px;
-      border-radius: var(--radius-sm);
-      display: flex;
-      align-items: center;
-      padding: 0 16px;
-      font-size: 0.88rem;
-      font-weight: 600;
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-    .feedback-bar.visible { opacity: 1; }
-    .feedback-bar.correct-fb { background: #dcfce7; color: #166534; }
-    .feedback-bar.wrong-fb   { background: var(--red-light); color: #991b1b; }
-
-    /* ---- Image wrapper ---- */
-    .img-wrap {
-      position: relative;
-      display: block;
-      cursor: crosshair;
-      user-select: none;
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      box-shadow: var(--shadow-sm);
-      background: #f8fafc;
-    }
-    .img-wrap img {
-      display: block;
-      width: 100%;
-      height: auto;
-    }
-    .img-wrap svg {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      pointer-events: none;
-    }
-    .img-wrap.locked { cursor: default; }
-
-    /* ---- End screen ---- */
-    .end-screen {
-      background: var(--surface);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-sm);
-      padding: 40px 32px;
-      text-align: center;
-      display: none;
-    }
-    .end-screen.visible { display: block; }
-    .end-score {
-      font-size: 2.8rem;
-      font-weight: 800;
-      color: var(--blue-dark);
-      margin-bottom: 4px;
-    }
-    .end-label {
-      font-size: 0.88rem;
-      color: var(--text-subtle);
-      margin-bottom: 28px;
-    }
-
-    /* ---- Start overlay ---- */
-    .start-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(255,255,255,0.82);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: var(--radius-lg);
-      backdrop-filter: blur(2px);
-    }
-    .start-overlay.hidden { display: none; }
-
-    @keyframes pulse-ring {
-      0%   { r: 18; opacity: 0.9; }
-      60%  { r: 32; opacity: 0.4; }
-      100% { r: 40; opacity: 0; }
-    }
-    .pulse-anim { animation: pulse-ring 0.8s ease-out forwards; }
-  </style>
+  <link rel="stylesheet" href="../style.css?v=06398179">
 </head>
 <body>
 
@@ -150,7 +12,7 @@
   <div class="header-text">
   <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · a.8</span>
   <h1>Bakterienzelle</h1>
-  <p>Klick auf die richtige Struktur im Bild.</p>
+  <p>Tippen Sie im Bild auf die gesuchte Struktur.</p>
   </div>
   <div class="header-logos">
     <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
@@ -158,40 +20,25 @@
   </div>
 </header>
 
-<main class="page-main">
+<main class="q-wrap">
   <a class="back-link" href="../index.html">← Alle Lerntools</a>
-
-<div class="game-wrap">
-
-  <div class="question-card" id="questionCard">
-    <div class="question-text" id="questionText">–</div>
-    <div class="progress-badge" id="progressBadge">0 / 8</div>
-  </div>
-
-  <div class="feedback-bar" id="feedbackBar"></div>
-
-  <div class="img-wrap" id="imgWrap">
-    <img id="bzImg" src="images/a.8_Bakterienzelle_leer.png" alt="Bakterienzelle" draggable="false">
-    <svg id="bzSvg" viewBox="0 0 656 551" preserveAspectRatio="xMidYMid meet"></svg>
-
-    <!-- Start overlay -->
-    <div class="start-overlay" id="startOverlay">
-      <button class="btn btn-primary" onclick="startGame()" style="font-size:1rem;padding:12px 32px;">
-        Starten
-      </button>
+  <section class="q-card" id="hKarte">
+    <div class="q-meta" id="hMeta"><span>Struktur <strong id="hPos">1</strong> / 8</span></div>
+    <p class="q-text" id="hFrage">Tippen Sie auf: <span id="hName"></span></p>
+    <p class="h-tipp" id="hTipp"></p>
+    <div class="h-bild" id="hBild">
+      <img id="hImg" src="images/a.8_Bakterienzelle_leer.png" alt="Bakterienzelle ohne Beschriftung" draggable="false">
+      <svg id="hSvg" viewBox="0 0 656 551" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
     </div>
-  </div>
-
-  <!-- End screen (replaces image) -->
-  <div class="end-screen" id="endScreen">
-    <div class="end-score" id="endScore">–</div>
-    <div class="end-label">von 8 Strukturen beim ersten Versuch gefunden</div>
-    <button class="btn btn-primary" onclick="startGame()" style="margin-right:10px">Nochmals</button>
-    <button class="btn btn-ghost"   onclick="showAllZones()">Alle Strukturen anzeigen</button>
-  </div>
-
-</div>
-
+    <div class="q-feedback" id="hFb" role="status" aria-live="polite"></div>
+  </section>
+  <section class="q-card q-end" id="hEnd">
+    <h2>Fertig!</h2>
+    <p id="hErgebnis"></p>
+    <button type="button" class="q-btn" id="hNochmals">Nochmals</button>
+    <button type="button" class="q-btn ghost" id="hAlle">Alle Strukturen anzeigen</button>
+  </section>
+  <div class="q-next" id="hNext"><button type="button" class="q-btn" id="hBtn">Weiter</button></div>
 </main>
 
 <footer class="bzwu-footer">
@@ -200,28 +47,31 @@
 
 <script>
   var IMG_W = 656, IMG_H = 551;
+  var OK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
+  var NOK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>';
+  function farbe(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
 
   /* Zonentypen:
      circle   → {cx, cy in %, r in px}
-     polygon  → Klick muss INNERHALB der Fläche sein
-     polyline → Klick muss max. tolerance px neben der Linie sein        */
+     polygon  → Tippen muss INNERHALB der Fläche sein
+     polyline → Tippen muss max. tolerance px neben der Linie sein        */
   var ZONES = [
     {
-      name: 'Zellwand', type: 'polyline', tolerance: 25,
-      hint: 'Klick auf den äussersten dunklen Ring',
+      name: 'Zellwand', type: 'polyline', tolerance: 25, marke: { cx: 45, cy: 26 },
+      hint: 'Der äusserste dunkle Ring',
       points: [{cx:23,cy:26},{cx:69,cy:26},{cx:78,cy:31},{cx:86,cy:46},
                {cx:84,cy:62},{cx:73,cy:74},{cx:16,cy:74},{cx:6,cy:67},
                {cx:1,cy:52},{cx:8,cy:32},{cx:23,cy:26}]
     },
     {
-      name: 'Cytoplasmamembran', type: 'polyline', tolerance: 22,
-      hint: 'Klick auf den inneren Ring',
+      name: 'Cytoplasmamembran', type: 'polyline', tolerance: 22, marke: { cx: 45, cy: 70 },
+      hint: 'Der innere Ring',
       points: [{cx:16,cy:31},{cx:73,cy:32},{cx:82,cy:45},{cx:73,cy:69},
                {cx:19,cy:70},{cx:9,cy:64},{cx:5,cy:51},{cx:9,cy:38},{cx:16,cy:31}]
     },
     {
-      name: 'Cytoplasma', type: 'polygon',
-      hint: 'Klick irgendwo ins Zellinnere',
+      name: 'Cytoplasma', type: 'polygon', marke: { cx: 18, cy: 50 },
+      hint: 'Irgendwo im Zellinneren',
       points: [{cx:17,cy:32},{cx:69,cy:32},{cx:82,cy:48},
                {cx:71,cy:69},{cx:18,cy:70},{cx:6,cy:52}]
     },
@@ -236,18 +86,17 @@
                {cx:24,cy:84},{cx:39,cy:90},{cx:60,cy:84},{cx:76,cy:85},{cx:90,cy:74}]
     },
     {
-      name: 'Schleimkapsel', type: 'polyline', tolerance: 35,
-      hint: 'Klick auf den gestrichelten Aussenbereich',
+      name: 'Schleimkapsel', type: 'polyline', tolerance: 35, marke: { cx: 88, cy: 52 },
+      hint: 'Der gestrichelte Aussenbereich',
       points: [{cx:46,cy:23},{cx:73,cy:24},{cx:81,cy:31},
                {cx:88,cy:47},{cx:86,cy:61},{cx:78,cy:74},{cx:46,cy:77}]
     },
     { name: 'Ribosomen', type: 'circle', cx: 53, cy: 64, r: 40 },
   ];
 
-  var questions = [];
-  var current   = 0;
-  var score     = 0;
-  var locked    = false;
+  var fragen = [], pos = 0, treffer = 0, gesperrt = false;
+  function el(id) { return document.getElementById(id); }
+  function mischen(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
 
   /* ---- Hilfsfunktionen Geometrie ---- */
   function ptPx(p) { return { x: p.cx / 100 * IMG_W, y: p.cy / 100 * IMG_H }; }
@@ -321,142 +170,102 @@
     }
   }
 
+  function mitte(z) {
+    if (z.marke) return ptPx(z.marke);  // Ringe: Mittelpunkt läge in der Zellmitte
+    if (z.type === 'circle') return { x: z.cx / 100 * IMG_W, y: z.cy / 100 * IMG_H };
+    var pts = z.points.map(ptPx);
+    return { x: pts.reduce(function (s, p) { return s + p.x; }, 0) / pts.length, y: pts.reduce(function (s, p) { return s + p.y; }, 0) / pts.length };
+  }
   function addLabel(svg, x, y, text, color) {
-    var bg = document.createElementNS('http://www.w3.org/2000/svg','rect');
-    var w = text.length * 6.8 + 10;
-    bg.setAttribute('x', x - w/2); bg.setAttribute('y', y - 11);
-    bg.setAttribute('width', w); bg.setAttribute('height', '17');
-    bg.setAttribute('rx', '4'); bg.setAttribute('fill', 'white'); bg.setAttribute('fill-opacity', '0.88');
+    var w = String(text).length * 13 + 18;  // 22 Einheiten im 656er-Bild = gut 12 px auf dem Handy
+    var bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    bg.setAttribute('x', x - w / 2); bg.setAttribute('y', y - 20); bg.setAttribute('width', w); bg.setAttribute('height', 32);
+    bg.setAttribute('rx', 5); bg.setAttribute('fill', 'white'); bg.setAttribute('fill-opacity', '0.92');
     svg.appendChild(bg);
-    var t = document.createElementNS('http://www.w3.org/2000/svg','text');
-    t.setAttribute('x', x); t.setAttribute('y', y + 3);
-    t.setAttribute('text-anchor', 'middle'); t.setAttribute('font-size', '11');
-    t.setAttribute('font-weight', '700'); t.setAttribute('fill', color);
-    t.setAttribute('font-family', 'system-ui,sans-serif');
+    var t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    t.setAttribute('x', x); t.setAttribute('y', y + 4); t.setAttribute('text-anchor', 'middle');
+    t.setAttribute('font-size', '22'); t.setAttribute('font-weight', '700'); t.setAttribute('fill', color);
     t.textContent = text;
     svg.appendChild(t);
   }
 
-  /* ---- Spiel ---- */
-  function shuffle(arr) {
-    var a = arr.slice();
-    for (var i = a.length - 1; i > 0; i--) {
-      var j = Math.floor(Math.random() * (i + 1));
-      var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
-    }
-    return a;
+  function start() {
+    fragen = mischen(ZONES.map(function (_, i) { return i; }));
+    pos = 0; treffer = 0;
+    el('hEnd').classList.remove('show');
+    el('hKarte').hidden = false;
+    frage();
   }
 
-  function startGame() {
-    document.getElementById('startOverlay').classList.add('hidden');
-    document.getElementById('endScreen').classList.remove('visible');
-    document.getElementById('imgWrap').style.display = 'block';
-    document.getElementById('questionCard').style.display = 'flex';
-    document.getElementById('feedbackBar').className = 'feedback-bar';
-    questions = shuffle(ZONES.map(function(_, i) { return i; }));
-    current = 0; score = 0; locked = false;
-    clearSvg(); showQuestion();
+  function frage() {
+    var z = ZONES[fragen[pos]];
+    el('hPos').textContent = pos + 1;
+    el('hFrage').innerHTML = 'Tippen Sie auf: <span id="hName"></span>';  // «Alle Strukturen» überschreibt die Frage
+    el('hName').textContent = z.name;
+    el('hTipp').textContent = z.hint ? 'Tipp: ' + z.hint : '';
+    el('hTipp').hidden = !z.hint;
+    el('hFb').className = 'q-feedback';
+    el('hMeta').hidden = false;
+    el('hNext').classList.remove('show');
+    el('hSvg').innerHTML = '';
+    el('hBild').classList.remove('gesperrt');
+    gesperrt = false;
   }
 
-  function showQuestion() {
-    if (current >= questions.length) { showEndScreen(); return; }
-    var zone = ZONES[questions[current]];
-    var hint = zone.hint
-      ? '<div style="font-size:0.75rem;font-weight:400;color:var(--text-subtle);margin-top:3px">' + zone.hint + '</div>'
-      : '';
-    document.getElementById('questionText').innerHTML = 'Klick auf: <span>' + zone.name + '</span>' + hint;
-    document.getElementById('progressBadge').textContent = (current + 1) + ' / ' + questions.length;
-    document.getElementById('feedbackBar').className = 'feedback-bar';
-    clearSvg(); locked = false;
-  }
-
-  function clearSvg() { document.getElementById('bzSvg').innerHTML = ''; }
-
-  document.getElementById('imgWrap').addEventListener('click', function(e) {
-    if (locked) return;
-    if (e.target.id === 'startOverlay' || e.target.closest('#startOverlay')) return;
-
-    var rect   = document.getElementById('bzImg').getBoundingClientRect();
-    var clickX = (e.clientX - rect.left) / rect.width  * IMG_W;
-    var clickY = (e.clientY - rect.top)  / rect.height * IMG_H;
-    var zone   = ZONES[questions[current]];
-    var correct = isHit(clickX, clickY, zone);
-
-    locked = true;
-    var svg   = document.getElementById('bzSvg');
-    var color = correct ? '#16a34a' : '#dc2626';
-
-    /* Klickpunkt */
-    var dot = document.createElementNS('http://www.w3.org/2000/svg','circle');
-    dot.setAttribute('cx', clickX); dot.setAttribute('cy', clickY); dot.setAttribute('r', '14');
-    dot.setAttribute('fill', color); dot.setAttribute('fill-opacity', '0.35');
-    dot.setAttribute('stroke', color); dot.setAttribute('stroke-width', '2.5');
+  el('hBild').addEventListener('click', function (e) {
+    if (gesperrt) return;
+    var r = el('hImg').getBoundingClientRect();
+    var x = (e.clientX - r.left) / r.width * IMG_W, y = (e.clientY - r.top) / r.height * IMG_H;
+    var z = ZONES[fragen[pos]], ok = isHit(x, y, z), svg = el('hSvg');
+    var c = farbe(ok ? '--success' : '--red');
+    gesperrt = true;
+    el('hBild').classList.add('gesperrt');
+    var dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    dot.setAttribute('cx', x); dot.setAttribute('cy', y); dot.setAttribute('r', 14);
+    dot.setAttribute('fill', c); dot.setAttribute('fill-opacity', '0.35'); dot.setAttribute('stroke', c); dot.setAttribute('stroke-width', 3);
     svg.appendChild(dot);
-
-    /* Bei falsch: korrekte Zone einzeichnen */
-    if (!correct) drawZoneSvg(svg, zone, '#16a34a', false);
-
-    if (correct) {
-      score++;
-      setFeedback(true, zone.name + ' – Richtig!');
-      setTimeout(function() { current++; showQuestion(); }, 1400);
-    } else {
-      setFeedback(false, 'Nicht ganz – die korrekte Zone wird grün markiert.');
-      setTimeout(function() { current++; showQuestion(); }, 2800);
-    }
+    if (!ok) drawZoneSvg(svg, z, farbe('--success'), true);
+    if (ok) treffer++;
+    var fb = el('hFb');
+    fb.className = 'q-feedback show ' + (ok ? 'ok' : 'nok');
+    fb.innerHTML = (ok ? OK : NOK) + '<div><b>' + (ok ? 'Richtig!' : 'Nicht ganz.') + '</b><span>' +
+      (ok ? z.name + ' gefunden.' : 'Gesucht war: ' + z.name + ' (grün eingezeichnet).') + '</span></div>';
+    el('hBtn').textContent = pos === fragen.length - 1 ? 'Ergebnis anzeigen' : 'Weiter';
+    el('hNext').classList.add('show');
+    el('hBtn').focus({ preventScroll: true });
   });
 
-  function setFeedback(correct, text) {
-    var bar = document.getElementById('feedbackBar');
-    bar.textContent = (correct ? '✓  ' : '✗  ') + text;
-    bar.className = 'feedback-bar visible ' + (correct ? 'correct-fb' : 'wrong-fb');
-  }
+  el('hBtn').onclick = function () {
+    if (++pos < fragen.length) return frage();
+    el('hNext').classList.remove('show');
+    el('hKarte').hidden = true;
+    el('hErgebnis').textContent = treffer + ' von ' + fragen.length + ' Strukturen beim ersten Tippen gefunden.';
+    el('hEnd').classList.add('show');
+  };
 
-  function showEndScreen() {
-    document.getElementById('imgWrap').style.display = 'none';
-    document.getElementById('questionCard').style.display = 'none';
-    document.getElementById('feedbackBar').className = 'feedback-bar';
-    document.getElementById('endScore').textContent = score + ' / ' + questions.length;
-    document.getElementById('endScreen').classList.add('visible');
-  }
+  el('hNochmals').onclick = start;
+  el('hAlle').onclick = function () {
+    el('hEnd').classList.remove('show');
+    el('hKarte').hidden = false;
+    el('hFrage').textContent = 'Alle Strukturen';
+    el('hMeta').hidden = true;
+    el('hTipp').hidden = false;
+    el('hTipp').textContent = ZONES.map(function (z, i) { return (i + 1) + ' ' + z.name; }).join(' · ');
+    el('hFb').className = 'q-feedback';
+    gesperrt = true;
+    el('hBild').classList.add('gesperrt');
+    el('hSvg').innerHTML = '';
+    var c = farbe('--blue-dark');
+    ZONES.forEach(function (z, i) { drawZoneSvg(el('hSvg'), z, c, false); });
+    ZONES.forEach(function (z, i) { var m = mitte(z); addLabel(el('hSvg'), m.x, m.y, i + 1, c); });  // Nummern im Bild, Namen darunter
+    el('hBtn').textContent = 'Nochmals üben';
+    el('hBtn').onclick = function () { el('hBtn').onclick = weiter; start(); };
+    el('hNext').classList.add('show');
+  };
+  var weiter = el('hBtn').onclick;
 
-  function showAllZones() {
-    document.getElementById('endScreen').classList.remove('visible');
-    document.getElementById('imgWrap').style.display = 'block';
-    document.getElementById('questionCard').style.display = 'flex';
-    document.getElementById('questionText').innerHTML = 'Alle Strukturen';
-    document.getElementById('progressBadge').textContent = '';
-    locked = true; clearSvg();
-    var colors = ['#0066CC','#C40027','#059669','#7c3aed','#d97706','#0891b2','#be185d','#4d7c0f'];
-    var svg = document.getElementById('bzSvg');
-    ZONES.forEach(function(zone, i) { drawZoneSvg(svg, zone, colors[i], true); });
-    document.getElementById('feedbackBar').className = 'feedback-bar visible correct-fb';
-    document.getElementById('feedbackBar').textContent = 'Übersicht aller Strukturen – klick «Nochmals» um neu zu starten.';
-  }
-
-  /* ---- Debug-Modus (?debug) ---- */
-  if (window.location.search.indexOf('debug') !== -1) {
-    document.getElementById('startOverlay').classList.add('hidden');
-    document.getElementById('questionCard').style.display = 'flex';
-    document.getElementById('questionText').innerHTML = '<span style="color:#d97706">Debug-Modus</span>';
-    document.getElementById('progressBadge').textContent = 'Klick zum Messen';
-    locked = true;
-    var dbgSvg    = document.getElementById('bzSvg');
-    var dbgColors = ['#0066CC','#C40027','#059669','#7c3aed','#d97706','#0891b2','#be185d','#4d7c0f'];
-    ZONES.forEach(function(zone, i) { drawZoneSvg(dbgSvg, zone, dbgColors[i], true); });
-    document.getElementById('imgWrap').addEventListener('click', function(e) {
-      var rect   = document.getElementById('bzImg').getBoundingClientRect();
-      var clickX = Math.round((e.clientX - rect.left) / rect.width  * IMG_W);
-      var clickY = Math.round((e.clientY - rect.top)  / rect.height * IMG_H);
-      document.getElementById('progressBadge').textContent =
-        'px: ' + clickX + ' / ' + clickY + '  |  %: ' +
-        Math.round(clickX/IMG_W*100) + ' / ' + Math.round(clickY/IMG_H*100);
-      var d = document.createElementNS('http://www.w3.org/2000/svg','circle');
-      d.setAttribute('cx', clickX); d.setAttribute('cy', clickY); d.setAttribute('r', '5');
-      d.setAttribute('fill', '#f59e0b'); d.setAttribute('stroke', '#92400e'); d.setAttribute('stroke-width', '1.5');
-      dbgSvg.appendChild(d);
-    });
-  }
+  window.LerntoolTest = { typ: 'hotspot' };
+  start();
 </script>
 </body>
 </html>

@@ -4,105 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Prozess-Entscheid – Jogurtherstellung</title>
-  <link rel="stylesheet" href="../style.css?v=cc6a1397">
-  <style>
-    .page-main { display:flex; flex-direction:column; align-items:center; }
-
-    .back-link {
-      font-size:.78rem; color:var(--text-subtle); text-decoration:none;
-      display:inline-flex; align-items:center; gap:4px;
-      margin-bottom:20px; align-self:flex-start;
-    }
-    .back-link:hover { color:var(--red); }
-
-    .game-wrap { width:580px; max-width:96vw; display:flex; flex-direction:column; gap:16px; }
-
-    /* ---- Fortschrittsleiste ---- */
-    .progress-steps {
-      display:flex; align-items:center; justify-content:center;
-      gap:0; overflow-x:auto; padding:4px 0;
-    }
-    .ps-item { display:flex; flex-direction:column; align-items:center; gap:4px; flex-shrink:0; }
-    .ps-circle {
-      width:28px; height:28px; border-radius:50%;
-      border:2px solid var(--border); background:var(--surface);
-      display:flex; align-items:center; justify-content:center;
-      font-size:.7rem; font-weight:700; color:var(--text-subtle);
-      transition:all .3s;
-    }
-    .ps-circle.done    { background:var(--blue-dark); border-color:var(--blue-dark); color:#fff; }
-    .ps-circle.current { background:var(--surface); border-color:var(--blue-dark); color:var(--blue-dark); box-shadow:0 0 0 3px #dbeafe; }
-    .ps-label { font-size:.62rem; color:var(--text-subtle); font-weight:600; text-align:center; max-width:58px; line-height:1.2; }
-    .ps-label.current-lbl { color:var(--blue-dark); }
-    .ps-connector { width:24px; height:2px; background:var(--border); margin-bottom:18px; flex-shrink:0; }
-    .ps-connector.done-conn { background:var(--blue-dark); }
-
-    /* ---- Situation ---- */
-    .situation-card {
-      background:#f0f7ff; border-radius:var(--radius-lg);
-      padding:14px 20px; font-size:.85rem; color:var(--text-muted);
-      line-height:1.6; border-left:3px solid var(--blue-dark);
-    }
-
-    /* ---- Frage ---- */
-    .question-card {
-      background:var(--surface); border-radius:var(--radius-lg);
-      box-shadow:var(--shadow-sm); padding:22px 24px;
-    }
-    .question-label {
-      font-size:.68rem; font-weight:700; text-transform:uppercase;
-      letter-spacing:.08em; color:var(--text-subtle); margin-bottom:10px;
-    }
-    .question-text { font-size:1rem; font-weight:600; color:var(--text); line-height:1.5; }
-
-    /* ---- Antwort-Buttons ---- */
-    .choices { display:flex; flex-direction:column; gap:10px; }
-    .choice-btn {
-      font-family:var(--font); font-size:.9rem; font-weight:500;
-      padding:13px 18px; border-radius:var(--radius-sm);
-      border:1.5px solid var(--border); background:var(--surface);
-      color:var(--text); cursor:pointer; text-align:left;
-      transition:all .15s; line-height:1.4;
-    }
-    .choice-btn:hover:not(:disabled) { border-color:var(--blue-dark); background:#f0f7ff; color:var(--blue-dark); }
-    .choice-btn.correct-choice { border-color:#16a34a; background:#f0fff4; color:#166534; font-weight:600; }
-    .choice-btn.wrong-choice   { border-color:var(--red); background:var(--red-light); color:#991b1b; }
-    .choice-btn:disabled { cursor:default; }
-
-    /* ---- Feedback ---- */
-    .feedback-card {
-      border-radius:var(--radius-lg); padding:16px 20px;
-      font-size:.88rem; line-height:1.65; display:none;
-    }
-    .feedback-card.visible  { display:block; }
-    .feedback-card.correct-fb {
-      background:#f0fff4; border:1px solid #9ae6b4; color:#166534;
-    }
-    .feedback-card.wrong-fb {
-      background:var(--red-light); border:1px solid #fca5a5; color:#991b1b;
-    }
-    .feedback-card strong { display:block; margin-bottom:6px; font-size:.9rem; }
-
-    /* ---- Buttons ---- */
-    .action-row { display:flex; gap:10px; flex-wrap:wrap; }
-
-    /* ---- Erfolg-Bildschirm ---- */
-    .success-screen {
-      background:var(--surface); border-radius:var(--radius-lg);
-      box-shadow:var(--shadow-sm); padding:40px 32px; text-align:center;
-      display:none;
-    }
-    .success-screen.visible { display:block; }
-    .success-icon { font-size:2.5rem; margin-bottom:12px; }
-    .success-title { font-size:1.2rem; font-weight:700; color:var(--blue-dark); margin-bottom:8px; }
-    .success-sub   { font-size:.88rem; color:var(--text-subtle); margin-bottom:24px; line-height:1.6; }
-    .score-display {
-      display:inline-block; background:#f0f7ff; border:2px solid var(--blue-dark);
-      border-radius:var(--radius-lg); padding:12px 28px; margin-bottom:24px;
-    }
-    .score-num   { font-size:2rem; font-weight:800; color:var(--blue-dark); }
-    .score-label { font-size:.78rem; color:var(--text-subtle); margin-top:2px; }
-  </style>
+  <link rel="stylesheet" href="../style.css?v=06398179">
 </head>
 <body>
 
@@ -118,54 +20,16 @@
   </div>
 </header>
 
-<main class="page-main">
+<main class="q-wrap">
   <a class="back-link" href="../index.html">← Alle Lerntools</a>
-
-<div class="game-wrap">
-
-  <!-- Fortschrittsleiste -->
-  <div class="progress-steps" id="progressSteps"></div>
-
-  <!-- Situation -->
-  <div class="situation-card" id="situationText"></div>
-
-  <!-- Frage + Antworten -->
-  <div class="question-card" id="questionCard">
-    <div class="question-label">Entscheidung</div>
-    <div class="question-text" id="questionText"></div>
-  </div>
-
-  <div class="choices" id="choicesArea"></div>
-
-  <!-- Feedback -->
-  <div class="feedback-card" id="feedbackCard"></div>
-
-  <!-- Aktions-Buttons -->
-  <div class="action-row" id="actionRow"></div>
-
-  <!-- Erfolgs-Bildschirm -->
-  <div class="success-screen" id="successScreen">
-    <div class="success-icon">🧪</div>
-    <div class="success-title">Jogurt erfolgreich hergestellt!</div>
-    <div class="success-sub">
-      Sie haben alle 6 Produktionsschritte korrekt entschieden.<br>
-      Jeder Fehler führte zur Erklärung des Zusammenhangs.
-    </div>
-    <div class="score-display">
-      <div class="score-num" id="scoreNum">–</div>
-      <div class="score-label">Versuche insgesamt</div>
-    </div>
-    <div style="font-size:.82rem;color:var(--text-subtle);margin-bottom:24px" id="scoreComment"></div>
-    <button class="btn btn-primary" onclick="restart()">Nochmals versuchen</button>
-  </div>
-
-</div>
+  <div id="quiz"></div>
 </main>
 
 <footer class="bzwu-footer">
   BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
 </footer>
 
+<script src="../assets/quiz.js?v=6c3e9a7b"></script>
 <script>
   var STEPS = [
     {
@@ -297,152 +161,21 @@
     },
   ];
 
-  var currentStep  = 0;
-  var totalTries   = 0;
-  var stepTries    = 0;
-
-  /* ---- Fortschrittsleiste aufbauen ---- */
-  function buildProgress() {
-    var wrap = document.getElementById('progressSteps');
-    wrap.innerHTML = '';
-    STEPS.forEach(function(s, i) {
-      if (i > 0) {
-        var conn = document.createElement('div');
-        conn.className = 'ps-connector' + (i <= currentStep ? ' done-conn' : '');
-        wrap.appendChild(conn);
-      }
-      var item = document.createElement('div');
-      item.className = 'ps-item';
-
-      var circle = document.createElement('div');
-      var cls = 'ps-circle';
-      if (i < currentStep)       cls += ' done';
-      else if (i === currentStep) cls += ' current';
-      circle.className = cls;
-      circle.textContent = i < currentStep ? '✓' : (i + 1);
-      item.appendChild(circle);
-
-      var label = document.createElement('div');
-      label.className = 'ps-label' + (i === currentStep ? ' current-lbl' : '');
-      label.textContent = s.name;
-      item.appendChild(label);
-
-      wrap.appendChild(item);
-    });
-  }
-
-  /* ---- Schritt anzeigen ---- */
-  function showStep(idx) {
-    var s = STEPS[idx];
-    stepTries = 0;
-
-    buildProgress();
-
-    document.getElementById('situationText').textContent = s.situation;
-    document.getElementById('questionText').textContent  = s.question;
-    document.getElementById('feedbackCard').className    = 'feedback-card';
-    document.getElementById('feedbackCard').innerHTML    = '';
-    document.getElementById('actionRow').innerHTML       = '';
-
-    var area = document.getElementById('choicesArea');
-    area.innerHTML = '';
-    s.choices.forEach(function(c, ci) {
-      var btn = document.createElement('button');
-      btn.className   = 'choice-btn';
-      btn.textContent = c.label;
-      btn.addEventListener('click', function() { handleChoice(ci); });
-      area.appendChild(btn);
-    });
-
-    document.getElementById('questionCard').style.display    = '';
-    document.getElementById('choicesArea').style.display     = '';
-    document.getElementById('situationText').style.display   = '';
-  }
-
-  /* ---- Antwort auswerten ---- */
-  function handleChoice(ci) {
-    var s = STEPS[currentStep];
-    var c = s.choices[ci];
-    totalTries++;
-    stepTries++;
-
-    // Alle Buttons deaktivieren + markieren
-    var btns = document.getElementById('choicesArea').querySelectorAll('.choice-btn');
-    btns.forEach(function(b, bi) {
-      b.disabled = true;
-      if (bi === ci) {
-        b.classList.add(c.correct ? 'correct-choice' : 'wrong-choice');
-      }
-      if (!c.correct && s.choices[bi].correct) {
-        b.classList.add('correct-choice'); // richtige Antwort zeigen
-      }
-    });
-
-    var fb = document.getElementById('feedbackCard');
-    fb.innerHTML = '<strong>' + (c.correct ? '✓  Richtig!' : '✗  Nicht ganz.') + '</strong>' + c.feedback;
-    fb.className = 'feedback-card visible ' + (c.correct ? 'correct-fb' : 'wrong-fb');
-
-    var ar = document.getElementById('actionRow');
-    ar.innerHTML = '';
-
-    if (c.correct) {
-      if (currentStep < STEPS.length - 1) {
-        var next = document.createElement('button');
-        next.className   = 'btn btn-primary';
-        next.textContent = 'Weiter → ' + STEPS[currentStep + 1].name;
-        next.addEventListener('click', function() {
-          currentStep++;
-          showStep(currentStep);
-        });
-        ar.appendChild(next);
-      } else {
-        showSuccess();
-      }
-    } else {
-      var retry = document.createElement('button');
-      retry.className   = 'btn btn-ghost';
-      retry.textContent = 'Nochmals versuchen';
-      retry.addEventListener('click', function() { showStep(currentStep); });
-      ar.appendChild(retry);
-    }
-  }
-
-  /* ---- Erfolg ---- */
-  function showSuccess() {
-    document.getElementById('situationText').style.display = 'none';
-    document.getElementById('questionCard').style.display  = 'none';
-    document.getElementById('choicesArea').style.display   = 'none';
-    document.getElementById('feedbackCard').className      = 'feedback-card';
-    document.getElementById('actionRow').innerHTML         = '';
-
-    var mistakes = totalTries - STEPS.length;
-    document.getElementById('scoreNum').textContent = totalTries;
-
-    var comment;
-    if (mistakes === 0)      comment = 'Perfekt – kein einziger Fehler!';
-    else if (mistakes <= 2)  comment = 'Sehr gut – nur ' + mistakes + ' Fehler.';
-    else if (mistakes <= 4)  comment = 'Gut – ' + mistakes + ' Fehler. Wiederholen lohnt sich.';
-    else                     comment = mistakes + ' Fehler – die Erklärungen nochmals lesen empfohlen.';
-    document.getElementById('scoreComment').textContent = comment;
-
-    document.getElementById('successScreen').classList.add('visible');
-    buildProgress(); // alle Schritte grün zeigen
-  }
-
-  /* ---- Neustart ---- */
-  function restart() {
-    currentStep = 0;
-    totalTries  = 0;
-    stepTries   = 0;
-    document.getElementById('successScreen').classList.remove('visible');
-    document.getElementById('situationText').style.display = '';
-    document.getElementById('questionCard').style.display  = '';
-    document.getElementById('choicesArea').style.display   = '';
-    showStep(0);
-  }
-
-  /* ---- Start ---- */
-  showStep(0);
+// Jeder Prozessschritt wird eine Quizfrage, die Erklärung hängt an der gewählten Antwort
+Quiz.init({
+  mischen: false,
+  questions: STEPS.map(function (s) {
+    var richtig = s.choices.filter(function (c) { return c.correct; })[0];
+    return {
+      badge: s.name,
+      question: s.situation + ' ' + s.question,
+      answers: s.choices.map(function (c) { return c.label; }),
+      correct: s.choices.indexOf(richtig),
+      feedback: s.choices.map(function (c) { return c.feedback.replace(/^Richtig! /, ''); }),
+      explanation: richtig.feedback.replace(/^Richtig! /, '')
+    };
+  })
+});
 </script>
 </body>
 </html>
