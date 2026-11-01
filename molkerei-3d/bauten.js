@@ -118,26 +118,62 @@ const BAUTEN = {
     el('a-cylinder', { radius: 0.022, height: 0.02, rotation: '90 0 0', position: '0 0.85 0.392', material: CHROM, 'segments-radial': 6 }, ober);
     el('a-torus', { radius: 0.389, 'radius-tubular': 0.011, rotation: '90 0 0', position: '0 0.935 0', material: MATT, 'segments-radial': 8, 'segments-tubular': 64 }, ober);
 
-    // 4 Trommel mit Tellerpaket: erst sichtbar bei offener Haube.
-    // Beim Öffnen hebt sich alles gestaffelt wie eine Explosionszeichnung (data-oeffnen = Hub in m),
-    // die Teller rücken dabei auseinander, damit man das Paket als einzelne Teller sieht.
+    // 4 Trommel: erst sichtbar bei offener Haube. Bauweise nach Westfalia MHA (Bild 19, Schnitt) und
+    // Lehrmittel a.2 «Trommelbestandteile» 1-12. Beim Öffnen heben sich die Teile in umgekehrter
+    // Einbaureihenfolge wie in der Explosionszeichnung (data-oeffnen = Hub in m): 12 bleibt, 1 hebt am meisten.
     const hub = (g, wert) => el('a-entity', { 'data-oeffnen': String(wert) }, g);
-    const trommel = teil(m, 'trommel');
-    el('a-entity', { drehprofil: 'punkte: 0.05 0.80, 0.25 0.81, 0.285 0.86, 0.29 0.93, 0.28 1.0, 0.27 1.0' }, trommel);
-    const verteiler = hub(teil(m, 'verteiler'), 0.2);
-    stehend(verteiler, 0.045, 0.34, 0, 0.8, 0, MATT);
-    el('a-cone', { 'radius-bottom': 0.11, 'radius-top': 0.045, height: 0.06, position: '0 0.85 0', material: MATT }, verteiler);
-    const teller = teil(m, 'tellerpaket');
-    for (let i = 0; i < 14; i++) {
-      el('a-cone', { 'radius-bottom': 0.24, 'radius-top': 0.075, height: 0.09, 'open-ended': true, position: `0 ${0.87 + i * 0.011} 0`, material: CHROM + '; side: double', 'segments-radial': 36 }, hub(teller, (0.22 + i * 0.022).toFixed(3)));
+    const profil = (g, punkte, farbe = '#d3d8dc') => el('a-entity', { drehprofil: `punkte: ${punkte}; farbe: ${farbe}` }, g);
+    const DUNKEL = '#8f9aa4';
+
+    // 12 Trommelunterteil: Topf mit Schlammaustrittsöffnungen rundum, Spindelmutter in der Mitte
+    const unterteil = teil(m, 'trommelunterteil');
+    profil(unterteil, '0.05 0.80, 0.22 0.80, 0.27 0.815, 0.29 0.85, 0.29 0.97, 0.265 0.97, 0.265 0.845, 0.05 0.845');
+    for (let i = 0; i < 10; i++) {
+      const w = i * Math.PI / 5;
+      el('a-cylinder', { radius: 0.011, height: 0.01, rotation: `90 ${-w * 180 / Math.PI + 90} 0`, position: `${0.29 * Math.cos(w)} 0.89 ${0.29 * Math.sin(w)}`, material: SCHWARZ }, unterteil);
     }
-    const scheide = hub(teil(m, 'scheideteller'), 0.58);
-    el('a-cone', { 'radius-bottom': 0.21, 'radius-top': 0.07, height: 0.07, 'open-ended': true, position: '0 1.06 0', material: 'color: #8f9aa4; metalness: 0.4; roughness: 0.3; side: double', 'segments-radial': 36 }, scheide);
-    const deckel = hub(teil(m, 'trommeldeckel'), 0.85);
-    el('a-entity', { drehprofil: 'punkte: 0.285 1.0, 0.24 1.06, 0.12 1.17, 0.07 1.2, 0.07 1.24, 0 1.24' }, deckel);
+    el('a-cone', { 'radius-bottom': 0.03, 'radius-top': 0.008, height: 0.05, position: '0 0.87 0', material: MATT }, unterteil);
+
+    // 11 Kolbenschieber (Schieberboden): Scheibe, die die Schlammaustrittsöffnungen von innen abdeckt
+    profil(hub(teil(m, 'kolbenschieber'), 0.15), '0.04 0.86, 0.255 0.86, 0.26 0.875, 0.24 0.885, 0.07 0.915, 0.04 0.915', DUNKEL);
+
+    // 10 Verteiler: Kegelfuss mit Steigrohr
+    const verteiler = hub(teil(m, 'verteiler'), 0.32);
+    el('a-cone', { 'radius-bottom': 0.2, 'radius-top': 0.045, height: 0.09, position: '0 0.965 0', material: MATT }, verteiler);
+    stehend(verteiler, 0.045, 0.24, 0, 0.92, 0, MATT);
+
+    // 9 Teller: rücken beim Öffnen auseinander, damit man das Paket als einzelne Teller sieht
+    const teller = teil(m, 'tellerpaket');
+    for (let i = 0; i < 10; i++) {
+      el('a-cone', { 'radius-bottom': 0.235, 'radius-top': 0.07, height: 0.085, 'open-ended': true, position: `0 ${0.975 + i * 0.009} 0`, material: CHROM + '; side: double', 'segments-radial': 36 }, hub(teller, (0.48 + i * 0.035).toFixed(3)));
+    }
+
+    // 8 Einlaufrohr mit Rahmgreifer: Rohr durch die Mitte, Greiferscheibe oben
+    const einlauf = hub(teil(m, 'einlaufrohr'), 0.95);
+    stehend(einlauf, 0.02, 0.2, 0, 1.03, 0, CHROM);
+    stehend(einlauf, 0.05, 0.012, 0, 1.17, 0, CHROM);
+
+    // 7 Scheideteller: grösser und dunkler als die Teller, trennt Rahm- und Magermilchweg
+    el('a-cone', { 'radius-bottom': 0.22, 'radius-top': 0.08, height: 0.08, 'open-ended': true, position: '0 1.09 0', material: `color: ${DUNKEL}; metalness: 0.4; roughness: 0.3; side: double`, 'segments-radial': 36 }, hub(teil(m, 'scheideteller'), 1.05));
+
+    // 6 Dichtring zwischen Unterteil und Deckel
+    el('a-torus', { radius: 0.277, 'radius-tubular': 0.006, rotation: '90 0 0', position: '0 0.972 0', material: SCHWARZ, 'segments-tubular': 64 }, hub(teil(m, 'dichtring'), 1.15));
+
+    // 5 Trommeldeckel: Kegel mit Hals zur Greiferkammer
+    profil(hub(teil(m, 'trommeldeckel'), 1.25), '0.29 0.975, 0.275 1.0, 0.11 1.15, 0.09 1.17, 0.09 1.215, 0.065 1.215');
+
+    // 4 Trommelverschlussring: grosser Gewindering, hält Deckel und Unterteil zusammen
+    profil(hub(teil(m, 'trommelverschlussring'), 1.38), '0.29 0.95, 0.312 0.95, 0.312 1.0, 0.285 1.0', '#b9c0c6');
+
+    // 3 Magermilchgreifer, 2 Greiferkammerdeckel, 1 Greiferkammerverschlussring
+    const mager = hub(teil(m, 'magermilchgreifer'), 1.5);
+    stehend(mager, 0.075, 0.01, 0, 1.195, 0, CHROM);
+    stehend(mager, 0.025, 0.04, 0, 1.205, 0, CHROM);
+    stehend(hub(teil(m, 'greiferkammerdeckel'), 1.58), 0.088, 0.015, 0, 1.215, 0, MATT);
+    el('a-torus', { radius: 0.09, 'radius-tubular': 0.008, rotation: '90 0 0', position: '0 1.232 0', material: MATT, 'segments-tubular': 32 }, hub(teil(m, 'greiferkammerverschlussring'), 1.66));
 
     // 6 Gestellhaube mit Kragen und Warnschild, darauf Zulauf und Abläufe: hebt sich beim Öffnen am weitesten
-    const oben = hub(m, 1.25);
+    const oben = hub(m, 2.0);
     const haube = teil(oben, 'gestellhaube');
     el('a-entity', { drehprofil: 'punkte: 0.385 0.94, 0.32 1.04, 0.21 1.21, 0.10 1.37, 0.06 1.41, 0.06 1.43, 0 1.43' }, haube);
     stehend(haube, 0.07, 0.02, 0, 1.425, 0, MATT);

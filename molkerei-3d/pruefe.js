@@ -51,7 +51,7 @@ async (page) => {
   ok((await t('overlay-aktion').textContent()) === 'Haube öffnen', 'Knopf «Haube öffnen» fehlt');
   await t('overlay-aktion').click();
   await page.waitForTimeout(2000);
-  ok(await page.evaluate(() => document.querySelector('[data-oeffnen="1.25"]').object3D.position.y > 1.2), 'Haube hebt sich nicht');
+  ok(await page.evaluate(() => document.querySelector('[data-oeffnen="2"]').object3D.position.y > 1.95), 'Haube hebt sich nicht');
   ok((await t('overlay-aktion').textContent()) === 'Haube schliessen', 'Knopf wechselt nicht auf «schliessen»');
   await t('overlay-uebersicht').click();
   ok((await t('overlay-text').textContent()).startsWith('Der Separator trennt'), 'Übersicht zeigt nicht den Anlagentext');
