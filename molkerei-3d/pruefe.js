@@ -37,6 +37,26 @@ async (page) => {
   await t('overlay-schliessen').click();
   ok(!(await t('overlay').isVisible()), 'X schliesst nicht');
 
+  // Lagertank (glTF aus Blender): echter Klick auf das Rührwerk zeigt das Teil
+  await page.waitForFunction(() => document.querySelector('[data-anlage="lagertank-1"] [data-teil="ruehrwerk"]'), null, { timeout: 15000 });
+  await page.evaluate(() => {
+    document.getElementById('spieler').object3D.position.set(12.4, 0, 30);
+    const lc = document.getElementById('kamera').components['look-controls'];
+    lc.yawObject.rotation.y = 0; lc.pitchObject.rotation.x = 0;
+  });
+  await page.waitForTimeout(300);
+  const rw = await page.evaluate(() => {
+    const kam = document.querySelector('a-scene').camera, p = new THREE.Vector3();
+    document.querySelector('[data-anlage="lagertank-1"] [data-teil="ruehrwerk"]').object3D.getObjectByName('motor').getWorldPosition(p);
+    p.project(kam);
+    return [(p.x + 1) / 2, (1 - p.y) / 2];
+  });
+  await page.mouse.move(box.x + rw[0] * box.width, box.y + rw[1] * box.height);
+  await page.waitForTimeout(200);
+  await page.mouse.down(); await page.mouse.up();
+  ok((await t('overlay-teil').textContent()) === 'Rührwerk', `Klick auf Rührwerk zeigt: ${await t('overlay-teil').textContent()}`);
+  await page.evaluate(() => window.kaeserei.schliessen());
+
   // Separator: echter Klick auf die Haube zeigt das Teil, Knopf öffnet die Haube, Übersicht zeigt die Anlage
   await page.evaluate(() => {
     document.getElementById('spieler').object3D.position.set(28.2, 0, 28.0);

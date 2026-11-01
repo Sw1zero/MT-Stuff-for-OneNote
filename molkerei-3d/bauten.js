@@ -272,8 +272,15 @@ const BAUTEN = {
   },
 
   // Lagertank: in Blender gebaut (material/molkerei-3d/lagertank.blend in bzwu), hier nur das exportierte Modell
+  // Gruppen mit einer Teil-id aus anlagen.js werden nach dem Laden eigene Entities mit data-teil (Klick, Hervorheben).
   lagertank(g) {
-    el('a-entity', { 'gltf-model': 'modelle/lagertank.glb' }, g);
+    const m = el('a-entity', { 'gltf-model': 'modelle/lagertank.glb' }, g);
+    const ids = anlageVon(g.dataset.anlage).teile.map(t => t.id);
+    m.addEventListener('model-loaded', () => {
+      for (const node of [...m.getObject3D('mesh').getObjectByName('lagertank').children]) {
+        if (ids.includes(node.name)) el('a-entity', { 'data-teil': node.name, class: 'klickbar' }, g).setObject3D('mesh', node);
+      }
+    });
   },
 
   // Käsefertiger: Kessi Ø 3 m, Rand 1.5 m, Brücke mit Antrieb, Harfe in der Milch

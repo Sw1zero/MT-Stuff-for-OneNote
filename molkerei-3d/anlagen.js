@@ -78,6 +78,23 @@ const START = { x: 5, z: 30, blick: [1, 0] };
 // Anlagen. x/z = Mitte, relativ zur Ecke x0/z0 ihres Raums. b = Breite (x), t = Tiefe (z).
 // bau: 'separator' | 'kaesefertiger' | 'lagertank' = in 3D gebaut, sonst nur Umriss am Boden ("Anlage folgt").
 // Alle Masse ohne Quelle sind geschätzt.
+// Lagertank: Texte aus Lehrmittel a.1 «Milch lagern» (Lagergefässe, Tankinstallationen, Kühlung).
+// Teil-ids = Gruppennamen in material/molkerei-3d/lagertank.blend (bzwu).
+const LAGERTANK = {
+  teile: [
+    { id: 'mannloch', name: 'Mannloch', text: 'Das Mannloch ermöglicht den Einstieg in den Tank.' },
+    { id: 'einlauf', name: 'Einlaufbogen', text: 'Über den Einlaufbogen befüllen Sie den Tank schonend und schaumfrei. Grosse Tanks werden aus den gleichen Gründen oft von unten über den Auslaufstutzen befüllt.' },
+    { id: 'ruehrwerk', name: 'Rührwerk', text: 'Das Rührwerk rührt die Milch schonend und verhindert, dass sie sich während der Lagerung entmischt. Je grösser der Rührwerkdurchmesser ist, umso kleiner kann die Umdrehungszahl sein.' },
+    { id: 'thermometer', name: 'Temperaturfühler', text: 'Der Temperaturfühler informiert Sie über die Temperatur der Milch. Die Kühlung auf 1 bis 5 °C vermindert die Aktivität der meisten Mikroorganismen deutlich.' },
+    { id: 'cip', name: 'CIP-Vorrichtung', text: 'Die CIP-Vorrichtung ermöglicht die Kreislaufreinigung des Tanks.' },
+    { id: 'auslauf', name: 'Auslaufstutzen', text: 'Über den Auslaufstutzen fliesst die Milch aus dem Tank weiter zur Verarbeitung. Grosse Tanks werden oft auch von unten über den Auslaufstutzen befüllt, weil das schonend und schaumfrei ist.' },
+    { id: 'kuehlwasser', name: 'Doppelmantel mit Eiswasser', text: 'Lagertanks haben einen Doppelmantel. Darin wird mit Eiswasser gekühlt oder mit Warmwasser geheizt, damit sich die Milch während der Lagerung weder erwärmt noch zu stark abkühlt. Das Eiswasser kommt hier von der Kälteanlage im Untergeschoss.' }
+  ],
+  text: 'Im Lagertank lagern Sie die Rohmilch bis zur Verarbeitung, höchstens 48 Stunden. ' +
+    'Der Tank ist aus Chromstahl und schützt die Milch vor Licht. Licht verursacht den Geschmacksfehler «talgig, metallisch». ' +
+    'Die Temperatur entscheidet: Bei 4.5 °C steigt die Keimzahl in 48 Stunden von 10 000 auf 50 000 pro ml, bei 10 °C auf 5 000 000.'
+};
+
 const ANLAGEN = [
   // Milchannahme (a.1)
   { id: 'annahmestation', name: 'Annahmestation', raum: 'annahme', x: 4, z: 10, b: 2, t: 1.5 },
@@ -85,8 +102,8 @@ const ANLAGEN = [
   // Modell: material/molkerei-3d/lagertank.blend (bzwu), Export modelle/lagertank.glb.
   // shortcut: Ein- und Auslauf Milch teilen sich den Einlauf oben (ein Punkt je Medium), bei Bedarf Anschlüsse pro Leitung.
   { id: 'lagertank-1', name: 'Lagertank 1', raum: 'annahme', x: 12, z: 5, b: 4.6, t: 2.1, bau: 'lagertank',
-    anschluesse: { milch: [-1.7, 2.35, -0.3], kuehlwasser: [-2.4, 0.8, 0] } },
-  { id: 'lagertank-2', name: 'Lagertank 2', raum: 'annahme', x: 12, z: 15, b: 4.6, t: 2.1, bau: 'lagertank' },
+    anschluesse: { milch: [-1.7, 2.35, -0.3], kuehlwasser: [-2.4, 0.8, 0] }, ...LAGERTANK },
+  { id: 'lagertank-2', name: 'Lagertank 2', raum: 'annahme', x: 12, z: 15, b: 4.6, t: 2.1, bau: 'lagertank', ...LAGERTANK },
 
   // Milchbehandlung (a.2, a.4, a.5, b.6)
   {
