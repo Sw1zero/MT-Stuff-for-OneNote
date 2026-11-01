@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Molkerei 3D</title>
+  <link rel="stylesheet" href="../style.css?v=d6d6b61d">
+  <link rel="stylesheet" href="style.css?v=d6d6b61d">
+  <script src="https://cdn.jsdelivr.net/npm/aframe@1.8.0/dist/aframe-v1.8.0.min.js"></script>
+  <script src="anlagen.js"></script>
+  <script src="geometrie.js"></script>
+  <script src="script.js"></script>
+  <script src="bauten.js"></script>
+</head>
+<body>
+  <a-scene renderer="antialias: true" background="color: #dfe6ec" cursor="rayOrigin: mouse" raycaster="objects: .klickbar; far: 40"
+           vr-mode-ui="enabled: false" loading-screen="enabled: false" device-orientation-permission-ui="enabled: false">
+    <a-entity light="type: hemisphere; color: #ffffff; groundColor: #b8c0c8; intensity: 2.6"></a-entity>
+    <a-entity light="type: directional; intensity: 1.6" position="-30 60 40"></a-entity>
+    <a-entity id="spieler" gehen>
+      <!-- Augenhöhe 1.60 m bei 1.70 m Körpergrösse -->
+      <a-entity id="kamera" camera="fov: 70" position="0 1.6 0" look-controls="pointerLockEnabled: false; magicWindowTrackingEnabled: false"></a-entity>
+    </a-entity>
+  </a-scene>
+
+  <div class="mk-ui">
+    <p class="mk-raum" data-testid="raum-aktuell" aria-live="polite"></p>
+
+    <details class="mk-raumliste" data-testid="raumliste" open>
+      <summary>Räume</summary>
+      <ul></ul>
+    </details>
+
+    <aside class="mk-info" data-testid="overlay" role="dialog" aria-labelledby="mk-info-titel" hidden>
+      <button type="button" class="mk-schliessen" data-testid="overlay-schliessen" aria-label="Schliessen">×</button>
+      <h2 id="mk-info-titel" data-testid="overlay-titel"></h2>
+      <h3 data-testid="overlay-teil" hidden></h3>
+      <p data-testid="overlay-text"></p>
+      <div class="mk-knoepfe">
+        <button type="button" data-testid="overlay-aktion" hidden></button>
+        <button type="button" data-testid="overlay-uebersicht" hidden>Zur ganzen Anlage</button>
+      </div>
+    </aside>
+
+    <p class="mk-hilfe">W A S D: gehen, mit Shift rennen. Maus ziehen: umschauen. Anlage anklicken: Info.</p>
+  </div>
+
+  <div class="mk-nur-desktop" data-testid="nur-desktop" hidden>
+    <p>Bitte öffnen Sie die Molkerei am Computer. Sie brauchen Tastatur und Maus.</p>
+  </div>
+</body>
+</html>

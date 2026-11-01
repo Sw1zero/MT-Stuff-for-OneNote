@@ -1,0 +1,59 @@
+/* Overlay über der 3D-Szene. Farben und Schrift aus ../style.css (CD). */
+
+.mk-ui { position: fixed; inset: 0; pointer-events: none; z-index: 10; font-family: var(--font); }
+.mk-ui > * { pointer-events: auto; }
+
+.mk-raum {
+  position: absolute; top: 16px; left: 50%; transform: translateX(-50%); margin: 0;
+  padding: 8px 16px; border-radius: var(--radius-md); background: var(--blue-dark); color: #fff;
+  font-weight: 600; box-shadow: var(--shadow-md);
+}
+
+.mk-raumliste {
+  position: absolute; top: 16px; left: 16px; width: 220px; max-height: calc(100vh - 32px); overflow: auto;
+  background: var(--surface); border-radius: var(--radius-md); box-shadow: var(--shadow-md); padding: 8px 12px;
+}
+.mk-raumliste summary { font-weight: 600; color: var(--blue-dark); cursor: pointer; min-height: 44px; display: flex; align-items: center; }
+.mk-raumliste ul { list-style: none; margin: 0; padding: 0; }
+.mk-raumliste button {
+  width: 100%; min-height: 36px; text-align: left; border: 0; border-radius: var(--radius-sm);
+  background: none; color: var(--text); font: inherit; padding: 6px 8px; cursor: pointer;
+}
+.mk-raumliste button:hover { background: var(--blue-tint); }
+.mk-raumliste button[aria-current] { background: var(--blue-light); color: #fff; font-weight: 600; }
+.mk-raumliste button:focus-visible, .mk-schliessen:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+
+.mk-info {
+  position: absolute; top: 16px; right: 16px; width: min(380px, calc(100vw - 32px));
+  background: var(--surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);
+  padding: 20px 24px; border-top: 4px solid var(--blue-light);
+}
+.mk-info[hidden] { display: none; }
+.mk-info h2 { margin: 0 32px 8px 0; color: var(--blue-dark); font-size: 1.25rem; }
+.mk-info p { margin: 0; line-height: 1.55; color: var(--text); }
+.mk-info h3 { margin: 0 0 8px; color: var(--blue-light); font-size: 1.05rem; }
+.mk-info h3[hidden], .mk-knoepfe button[hidden] { display: none; }
+.mk-knoepfe { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.mk-knoepfe button {
+  min-height: 44px; padding: 8px 14px; border-radius: var(--radius-sm); font: inherit; font-weight: 600; cursor: pointer;
+  border: 2px solid var(--blue-dark); background: var(--blue-dark); color: #fff;
+}
+.mk-knoepfe button[data-testid="overlay-uebersicht"] { background: #fff; color: var(--blue-dark); }
+.mk-knoepfe button:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.mk-schliessen {
+  position: absolute; top: 8px; right: 8px; width: 44px; height: 44px; border: 0; border-radius: var(--radius-sm);
+  background: none; font-size: 1.6rem; color: var(--text-muted); cursor: pointer;
+}
+.mk-schliessen:hover { background: var(--bg); }
+
+.mk-hilfe {
+  position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); margin: 0;
+  padding: 6px 14px; border-radius: var(--radius-sm); background: rgba(255, 255, 255, 0.9);
+  color: var(--text-muted); font-size: 0.9rem;
+}
+
+.mk-nur-desktop {
+  position: fixed; inset: 0; z-index: 20; display: flex; align-items: center; justify-content: center;
+  padding: 16px; background: var(--bg); text-align: center; font-family: var(--font); font-size: 1.1rem; color: var(--blue-dark);
+}
+.mk-nur-desktop[hidden] { display: none; }
