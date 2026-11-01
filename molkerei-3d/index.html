@@ -51,10 +51,18 @@
       <h2 id="mk-schnitt-titel">Separator-Trommel im Betrieb</h2>
       <div class="mk-schnitt-inhalt">
         <svg role="img" aria-label="Schnitt durch die Trommel mit Strömung von Milch, Rahm und Magermilch"></svg>
+        <div class="mk-greifer" data-testid="greifer-ansicht" hidden>
+          <svg role="img" aria-label="Greiferkammer von oben mit Flüssigkeitsring und Greifer"></svg>
+          <label for="greifer-drossel">Magermilchschraube: <span>offen</span>
+            <input type="range" id="greifer-drossel" data-testid="greifer-drossel" min="0" max="100" value="50">
+            <span>gedrosselt</span></label>
+          <p class="mk-greifer-status" data-testid="greifer-status" aria-live="polite"></p>
+        </div>
         <div class="mk-schnitt-info">
           <h3 data-testid="schnittbild-teil">Teil anklicken</h3>
           <p data-testid="schnittbild-text">Die Milch (weiss) fliesst durch das Einlaufrohr in den Verteiler und durch die Steiglöcher ins Tellerpaket. Dort trennt sie sich: Der Rahm (gelb) wird nach innen verdrängt und vom Rahmgreifer gefördert, die Magermilch (grau) wird nach aussen gedrückt und vom Magermilchgreifer gefördert. Die Schmutzstoffe (braun) werden gegen die Trommelwand gedrückt und bilden ein Schlammdepot.</p>
-          <p class="mk-hinweis">Schematische Darstellung, nicht massstäblich. Die Farben zeigen, wo sich Milch, Rahm und Magermilch befinden, die Striche die Fliessrichtung. In Wirklichkeit dreht die Trommel, und das Tellerpaket hat 70 bis 130 Teller.</p>
+          <div class="mk-knoepfe"><button type="button" data-testid="schnittbild-entleeren">Teilentleerung auslösen</button><button type="button" data-testid="schnittbild-greifer">Greifer von oben</button></div>
+          <p class="mk-hinweis">Schematische Darstellung, nicht massstäblich. Die Farben zeigen, wo sich Milch, Rahm und Magermilch befinden, die Striche die Fliessrichtung. In Wirklichkeit dreht die Trommel, und das Tellerpaket hat 70 bis 130 Teller. Die Teilentleerung läuft zum Zuschauen langsamer ab: In Wirklichkeit ist die Trommel nur rund eine Sekunde offen.</p>
         </div>
       </div>
     </dialog>

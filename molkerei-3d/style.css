@@ -41,6 +41,7 @@
 }
 .mk-knoepfe button[data-testid="overlay-uebersicht"] { background: #fff; color: var(--blue-dark); }
 .mk-knoepfe button:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.mk-knoepfe button:disabled { opacity: 0.5; cursor: default; }
 .mk-schliessen {
   position: absolute; top: 8px; right: 8px; width: 44px; height: 44px; border: 0; border-radius: var(--radius-sm);
   background: none; font-size: 1.6rem; color: var(--text-muted); cursor: pointer;
@@ -94,6 +95,25 @@
 .sb-teil:hover .sb-text, .sb-teil.sb-aktiv .sb-text { fill: #1d6f99; font-weight: 600; }
 .sb-medium { fill: var(--text-muted); font-size: 16px; }
 .sb-schlamm { fill: #7a5a3a; }
+.sb-wasser { fill: #8ec9e6; }
+.mk-schnitt[data-ansicht="greifer"] .mk-schnitt-inhalt > svg { display: none; }
+.mk-greifer[hidden] { display: none; }
+.mk-greifer svg { width: 100%; height: auto; max-height: calc(100vh - 220px); }
+.mk-greifer label { display: flex; align-items: center; gap: 10px; margin-top: 8px; font-weight: 600; color: var(--text); }
+.mk-greifer input { flex: 1; min-height: 44px; accent-color: var(--blue-dark); }
+.mk-greifer label span { font-weight: 400; color: var(--text-muted); }
+.mk-greifer-status { margin: 8px 0 0; padding: 8px 12px; border-radius: var(--radius-sm); background: var(--blue-tint); color: var(--text); }
+.mk-greifer-status:not([data-zustand="gut"]) { background: #fbe6d4; color: #7a3a0a; }
+.sb-kammerwand { fill: #b9c0c6; stroke: #4a545c; stroke-width: 1.2; }
+.sb-luft { fill: #eef1f3; transition: r 0.4s; }
+.sb-ring { fill: none; stroke: #4d565e; stroke-width: 2; stroke-dasharray: 10 22; animation: sb-drehen 4s linear infinite; }
+@keyframes sb-drehen { to { transform: rotate(360deg); } }
+.sb-greifer { fill: #b9c0c6; fill-opacity: 0.55; stroke: #4a545c; stroke-width: 1.5; }
+.sb-kanal { fill: none; stroke: #4a545c; stroke-width: 12; stroke-linecap: round; }
+.sb-trocken .sb-strich { display: none; }
+.mk-greifer .sb-strich-magermilch { stroke: #fff; }
+.sb-ableiter { fill: var(--sb-mager); stroke: #4a545c; stroke-width: 1.5; }
+@media (prefers-reduced-motion: reduce) { .sb-ring { animation: none; } }
 .sb-kugeln { pointer-events: none; }
 .sb-dreh { fill: none; stroke: var(--blue-light); stroke-width: 3; }
 .sb-spitze { fill: var(--blue-light); }

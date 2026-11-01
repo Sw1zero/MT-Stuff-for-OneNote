@@ -81,6 +81,21 @@ async (page) => {
   await page.locator('[data-sb-teil="kolbenschieber"] text').click();
   ok((await t('schnittbild-teil').textContent()).startsWith('Kolbenschieber'), 'Klick im Schnittbild zeigt kein Teil');
   ok(await page.evaluate(() => ['milch', 'rahm', 'magermilch'].every(m => document.querySelector(`[data-sb-zone="${m}"]`))), 'Farbfläche fehlt im Schnittbild');
+  // Teilentleerung: Knopf gesperrt, solange sie läuft, danach ist das Schlammdepot leer
+  const depot = () => page.locator('[data-sb-depot]:visible').count();
+  ok(await depot() > 0, 'Schlammdepot leer vor der Teilentleerung');
+  await t('schnittbild-entleeren').click();
+  ok(await t('schnittbild-entleeren').isDisabled(), 'Knopf während der Teilentleerung nicht gesperrt');
+  ok(await t('schnittbild-teil').textContent() === 'Teilentleerung', 'Teilentleerung ohne Text');
+  await page.waitForFunction(() => !document.querySelector('[data-testid="schnittbild-entleeren"]').disabled, null, { timeout: 30000 });
+  ok(await depot() <= 2, 'Schlammdepot nach der Teilentleerung nicht leer');
+  // Greifer von oben: Magermilchschraube offen = Schaum, gedrosselt = Überlaufen
+  await t('schnittbild-greifer').click();
+  ok(await t('greifer-ansicht').isVisible(), 'Greifer-Ansicht öffnet nicht');
+  const zustand = async v => { await t('greifer-drossel').fill(v); return t('greifer-status').getAttribute('data-zustand'); };
+  ok(await zustand('0') === 'schaum' && await zustand('50') === 'gut' && await zustand('100') === 'ueberlaufen', 'Magermilchschraube ändert den Zustand nicht');
+  await t('schnittbild-greifer').click();
+  ok(!(await t('greifer-ansicht').isVisible()) && await t('schnittbild-entleeren').isVisible(), 'Zurück zum Schnitt geht nicht');
   await page.keyboard.press('Escape');
   ok(!(await t('schnittbild').evaluate(d => d.open)), 'Esc schliesst das Schnittbild nicht');
   ok(await t('overlay').isVisible(), 'Esc im Schnittbild schliesst auch das Overlay');

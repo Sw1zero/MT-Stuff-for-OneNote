@@ -6,8 +6,8 @@
 
 const SB_TEILE = [
   // [id aus anlagen.js, Polygone "r,y r,y ..." der rechten Hälfte, Ankerpunkt für die Beschriftung]
-  ['trommelunterteil', ['50,600 250,600 290,585 300,555 300,420 275,420 275,580 50,580'], [300, 520]],
-  ['kolbenschieber', ['40,575 270,575 272,562 250,555 70,530 40,530'], [200, 550]],
+  ['trommelunterteil', ['50,625 250,625 290,610 300,580 300,420 275,420 275,602 50,602'], [300, 520]],
+  ['kolbenschieber', ['40,575 272,575 272,538 258,538 250,555 70,530 40,530'], [200, 550]], // Rand verschliesst die Öffnungen
   ['verteiler', ['38,175 46,175 46,470 240,525 240,532 38,477'], [130, 494]],
   ['scheideteller', ['235,338 85,190 85,135 93,135 93,187 240,334'], [150, 251]],
   ['trommeldeckel', ['300,420 300,400 120,140 120,90 108,90 108,143 288,398 288,420'], [250, 328]],
@@ -15,6 +15,7 @@ const SB_TEILE = [
   ['greiferkammerdeckel', ['58,76 126,76 126,90 58,90'], [90, 80]],
   ['greiferkammerverschlussring', ['120,62 136,62 136,100 126,100 126,76 120,76'], [136, 70]],
   ['magermilchgreifer', ['50,0 55,0 55,112 100,112 100,120 50,120'], [90, 116]],
+  ['auffanghaube', ['305,495 345,495 345,665 300,665 300,659 339,659 339,501 305,501'], [345, 600]], // steht still
   ['einlaufrohr', ['14,0 20,0 20,430 14,430', '32,0 38,0 38,158 78,158 78,165 32,165'], [70, 161]]
 ];
 // Teller mit Steigloch bei r 160..180, 10 statt 70 bis 130
@@ -40,6 +41,23 @@ const SB_STRICHE = [
 const SB_SCHMUTZ = 18;       // Punkte je Hälfte
 const SB_SCHMUTZ_TEMPO = 40; // px/s
 const SB_FUELLZEIT = 3;      // s, bis die Trommel voll ist
+const SB_DEPOT = 14;         // Plätze im Schlammdepot je Hälfte
+const SB_HUB = 22;           // px, so weit fällt der Kolbenschieber bei der Teilentleerung
+// Teilentleerung in s: Schieber fällt bis AUF, Schlamm spritzt bis ZU, Schieber steigt bis ENDE.
+// In Wirklichkeit ist die Trommel nur rund 1 s offen, hier zum Zuschauen länger.
+const SB_ENTLEER = { auf: 0.4, zu: 2.4, ende: 2.8 };
+const SB_KAMMER = [575, 602]; // Schliesskammer zwischen Kolbenschieber und Trommelunterteil
+// Teile, die nicht zu den 12 Trommelbestandteilen gehören (Lehrmittel a.2, S. 12 bis 14)
+const SB_EXTRA = [
+  { id: 'schliesskammer', name: 'Schliesskammer', text: 'In die Schliesskammer fliesst Steuerwasser. Es drückt durch die Zentrifugalkraft den Schieberboden (Kolbenschieber) nach oben: Die Trommel ist geschlossen. Fliesst das Wasser aus der Schliesskammer ab, bewegt sich der Schieberboden nach unten und gibt die Schlammaustrittsöffnungen frei.' },
+  { id: 'auffanghaube', name: 'Schlammauffanghaube', text: 'In die Auffanghaube wird der Schlamm ausgeschleudert. Um eine Anlagerung der Feststoffe zu verhindern, wird sie vor und nach jeder Entleerung mit Wasser gespült.' }
+];
+
+// Lehrmittel a.2, S. 12 bis 14
+const SB_TEILENTLEERUNG = 'Das Wasser fliesst aus der Schliesskammer ab. Weil nun kein Druck mehr von unten auf den Kolbenschieber wirkt, '
+  + 'bewegt er sich ein wenig nach unten und gibt die Schlammaustrittsöffnungen frei: Der Schlamm wird in die Auffanghaube ausgeschleudert. '
+  + 'Danach drückt das Steuerwasser in der Schliesskammer den Kolbenschieber wieder nach oben, die Trommel ist geschlossen. '
+  + 'Die Öffnungen sind nur rund eine Sekunde offen, bei der Milchseparierung ca. alle dreissig Minuten. Die Produktzufuhr muss nicht unterbrochen werden.';
 
 const svgEl = (tag, attrs, eltern) => {
   const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
@@ -51,7 +69,7 @@ const spiegel = pts => pts.split(' ').map(p => { const [r, y] = p.split(','); re
 const punkteVon = weg => weg.map(p => p.join(',')).join(' ');
 
 function baueSchnittbild(svg, teile, zeigeTeil) {
-  svg.setAttribute('viewBox', '-340 -40 990 680');
+  svg.setAttribute('viewBox', '-345 -40 995 740');
   const defs = svgEl('defs', {}, svg);
   // Tellerpaket: innen Rahm, am Steigloch Milch, aussen Magermilch (wird mit der Hälfte gespiegelt)
   const verlauf = svgEl('linearGradient', { id: 'sb-verlauf', gradientUnits: 'userSpaceOnUse', x1: 46, y1: 0, x2: 245, y2: 0 }, defs);
@@ -73,8 +91,14 @@ function baueSchnittbild(svg, teile, zeigeTeil) {
   // Die Milch fliesst schon vor dem Auffüllen ein, darum ausserhalb der Füllung noch einmal das Einlaufrohr
   for (const s of [-1, 1]) svgEl('rect', { x: s > 0 ? 0 : -14, y: -20, width: 14, height: 450, class: 'sb-zone sb-zone-milch' }, svg);
 
-  // Schlammdepot an der Trommelwand
-  for (let i = 0; i < 14; i++) for (const s of [-1, 1]) svgEl('circle', { cx: s * (262 + (i % 3) * 5), cy: 470 + i * 7, r: 3.2, class: 'sb-schlamm' }, svg);
+  // Schlammdepot an der Trommelwand, über dem Rand des Kolbenschiebers. Füllt sich mit dem ankommenden Schmutz.
+  const depot = { '-1': [], '1': [] }, stand = { '-1': 6, '1': 6 };
+  for (let i = 0; i < SB_DEPOT; i++) for (const s of [-1, 1]) {
+    const x = s * (262 + (i % 3) * 5), y = 470 + i * 5;
+    depot[s].push({ x, y, el: svgEl('circle', { cx: x, cy: y, r: 3.2, class: 'sb-schlamm', 'data-sb-depot': '' }, svg) });
+  }
+  const zeigeDepot = () => { for (const s of [-1, 1]) depot[s].forEach((d, i) => { d.el.style.display = i < Math.floor(stand[s]) ? '' : 'none'; }); };
+  zeigeDepot();
 
   const gruppen = {};
   const gruppe = id => gruppen[id] || (gruppen[id] = svgEl('g', { class: 'sb-teil', 'data-sb-teil': id, tabindex: 0 }, svg));
@@ -89,19 +113,26 @@ function baueSchnittbild(svg, teile, zeigeTeil) {
   // Schlammaustrittsöffnungen in der Wand, vom Kolbenschieber verschlossen
   for (const s of [-1, 1]) svgEl('rect', { x: s > 0 ? 275 : -300, y: 545, width: 25, height: 9, class: 'sb-oeffnung' }, gruppe('trommelunterteil'));
   for (const s of [-1, 1]) svgEl('circle', { cx: s * 294, cy: 408, r: 5 }, gruppe('dichtring'));
+  const wasser = [-1, 1].map(s => svgEl('rect', { x: s > 0 ? 40 : -275, y: SB_KAMMER[0], width: 235, height: SB_KAMMER[1] - SB_KAMMER[0], class: 'sb-wasser' }, gruppe('schliesskammer')));
+  gruppe('schliesskammer').parentNode.insertBefore(gruppe('schliesskammer'), gruppe('trommelunterteil')); // unter den Teilen
+  // Nur die Form des Kolbenschiebers bewegt sich, nicht seine Beschriftung
+  const schieber = svgEl('g', {}, gruppe('kolbenschieber'));
+  for (const p of [...gruppe('kolbenschieber').querySelectorAll(':scope > polygon')]) schieber.appendChild(p);
 
   // Beschriftung rechts, Linie zum Teil
   const reihe = ['greiferkammerverschlussring', 'greiferkammerdeckel', 'magermilchgreifer', 'einlaufrohr', 'scheideteller',
-    'trommeldeckel', 'tellerpaket', 'dichtring', 'trommelverschlussring', 'verteiler', 'trommelunterteil', 'kolbenschieber'];
+    'trommeldeckel', 'tellerpaket', 'dichtring', 'trommelverschlussring', 'verteiler', 'trommelunterteil', 'kolbenschieber',
+    'schliesskammer', 'auffanghaube'];
   const anker = Object.fromEntries(SB_TEILE.map(t => [t[0], t[2]]));
   anker.tellerpaket = [220, sbTellerY(SB_TELLER[5], 220)];
   anker.dichtring = [294, 408];
+  anker.schliesskammer = [200, 590];
   reihe.forEach((id, i) => {
     const y = 10 + i * 52, [ax, ay] = anker[id];
     const g = gruppe(id);
     svgEl('polyline', { points: `${ax},${ay} 360,${y} 372,${y}`, class: 'sb-linie' }, g);
     const tx = svgEl('text', { x: 378, y: y + 5, class: 'sb-text' }, g);
-    tx.textContent = teile.find(t => t.id === id).name;
+    tx.textContent = [...teile, ...SB_EXTRA].find(t => t.id === id).name;
   });
 
   // Ein- und Ausläufe oben, Drehpfeil unten
@@ -109,8 +140,8 @@ function baueSchnittbild(svg, teile, zeigeTeil) {
     svgEl('text', { x: tx, y: ty, class: 'sb-medium', 'text-anchor': a }, svg).textContent = n;
     svgEl('line', { x1: tx + (a === 'end' ? 5 : -5), y1: ty - 4, x2: x, y2: y, class: 'sb-linie' }, svg);
   });
-  svgEl('path', { d: 'M -120 622 A 120 14 0 1 0 120 622', class: 'sb-dreh', 'marker-end': 'url(#sb-spitze)' }, svg);
-  svgEl('text', { x: 140, y: 640, class: 'sb-medium' }, svg).textContent = 'dreht 5000 bis 7000 U/min';
+  svgEl('path', { d: 'M -120 662 A 120 14 0 1 0 120 662', class: 'sb-dreh', 'marker-end': 'url(#sb-spitze)' }, svg);
+  svgEl('text', { x: -120, y: 698, class: 'sb-medium' }, svg).textContent = 'dreht 5000 bis 7000 U/min';
 
   for (const [id, g] of Object.entries(gruppen)) {
     g.addEventListener('click', () => zeigeTeil(id));
@@ -133,18 +164,46 @@ function baueSchnittbild(svg, teile, zeigeTeil) {
     schmutz.push(k);
   }
 
-  let zeit = 0;
+  let zeit = 0, entleer = null, fertig = null;
+  const entleeren = dt => {
+    entleer.t += dt;
+    const { t } = entleer, { auf, zu, ende } = SB_ENTLEER;
+    const hub = t < auf ? t / auf : t < zu ? 1 : Math.max(0, 1 - (t - zu) / (ende - zu));
+    schieber.setAttribute('transform', `translate(0 ${hub * SB_HUB})`);
+    for (const w of wasser) { w.setAttribute('y', SB_KAMMER[0] + hub * SB_HUB); w.setAttribute('height', SB_KAMMER[1] - SB_KAMMER[0] - hub * SB_HUB); }
+    // Schlamm: zur Öffnung, dann hinaus in die Auffanghaube, einer nach dem anderen
+    for (const s of [-1, 1]) depot[s].forEach((d, i) => {
+      const p = Math.min(Math.max((t - auf - i * 0.07) / 1, 0), 1);
+      const weg = [[d.x, d.y], [s * 287, 549], [s * 335, 555 + (i % 5) * 8], [s * (308 + (i % 4) * 7), 653]], teil = [0.2, 0.45, 1];
+      const k = teil.findIndex(g => p <= g), von = k ? teil[k - 1] : 0, f = (p - von) / (teil[k] - von);
+      d.el.setAttribute('cx', weg[k][0] + (weg[k + 1][0] - weg[k][0]) * f);
+      d.el.setAttribute('cy', weg[k][1] + (weg[k + 1][1] - weg[k][1]) * f);
+      d.el.style.opacity = p < 0.8 ? 1 : (1 - p) / 0.2;
+    });
+    if (t < ende) return;
+    for (const s of [-1, 1]) { stand[s] = 0; depot[s].forEach(d => { d.el.setAttribute('cx', d.x); d.el.setAttribute('cy', d.y); d.el.style.opacity = ''; }); }
+    schieber.removeAttribute('transform');
+    for (const w of wasser) { w.setAttribute('y', SB_KAMMER[0]); w.setAttribute('height', SB_KAMMER[1] - SB_KAMMER[0]); }
+    zeigeDepot();
+    entleer = null;
+    fertig();
+  };
   return {
     neustart() { zeit = 0; },
+    entleeren(wennFertig) { if (!entleer) { entleer = { t: 0 }; fertig = wennFertig; } },
     schritt(dt) {
       zeit += dt;
+      if (entleer) entleeren(dt);
       const voll = Math.min(zeit / SB_FUELLZEIT, 1);
       pegel.setAttribute('y', 600 - voll * 650);
       schicht.style.opacity = voll < 1 ? 0 : 1;
       if (voll < 1) return;
       for (const k of schmutz) {
         k.s += SB_SCHMUTZ_TEMPO * dt;
-        if (k.s >= k.len) neu(k);
+        if (k.s >= k.len) {
+          if (!entleer) { stand[k.seite] = Math.min(SB_DEPOT, stand[k.seite] + 0.3); zeigeDepot(); }
+          neu(k);
+        }
         const [a, b] = k.s < Math.hypot(75, 64) ? [k.weg[0], k.weg[1]] : [k.weg[1], k.weg[2]];
         const s0 = k.s < Math.hypot(75, 64) ? 0 : Math.hypot(75, 64);
         const l = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1, f = Math.min((k.s - s0) / l, 1);
@@ -155,14 +214,92 @@ function baueSchnittbild(svg, teile, zeigeTeil) {
   };
 }
 
+// Greifer von oben: Flüssigkeitsring rotiert, der Greifer steht still. Die Magermilchschraube (Drossel 0..100)
+// verschiebt den Ring zur Mitte (Lehrmittel a.2, S. 7). Greifer reicht bis r 120, Kammerwand bei r 176.
+const SB_GREIFER_TEXT = 'Die Flüssigkeiten Rahm und Magermilch rotieren mit Trommeldrehzahl und bilden in den jeweiligen Greiferkammern einen Flüssigkeitsring. '
+  + 'Der stillstehende Greifer ragt in diesen Flüssigkeitsring hinein. Seine sichelförmigen Kanäle bremsen die Flüssigkeit ab: Geschwindigkeitsenergie wird in Druckenergie umgewandelt. '
+  + 'Damit sich kein Schaum bilden kann, müssen die Greifer unbedingt in den Flüssigkeitsring eintauchen. Je stärker Sie die Abflussmenge drosseln, desto mehr verschiebt sich der Flüssigkeitsring zum Mittelpunkt.';
+const sbRingInnen = drossel => 150 - 1.5 * drossel;
+const sbGreiferZustand = r => r > 118 ? 'schaum' : r < 25 ? 'ueberlaufen' : 'gut';
+const SB_GREIFER_STATUS = {
+  schaum: 'Der Greifer taucht nicht in den Flüssigkeitsring ein: Es bildet sich Schaum.',
+  gut: 'Der Greifer taucht in den Flüssigkeitsring ein und fördert die Magermilch schaumfrei durch den Ableiter.',
+  ueberlaufen: 'Die Greiferkammer ist ganz mit Flüssigkeit gefüllt. Die überschüssige Flüssigkeit fliesst durch die Sicherheitsbohrungen ab: Der Separator läuft über.'
+};
+console.assert(sbGreiferZustand(sbRingInnen(0)) === 'schaum' && sbGreiferZustand(sbRingInnen(50)) === 'gut' && sbGreiferZustand(sbRingInnen(100)) === 'ueberlaufen', 'Greifer-Zustände');
+
+function baueGreifer(svg) {
+  svg.setAttribute('viewBox', '-330 -245 660 460');
+  svgEl('circle', { r: 184, class: 'sb-kammerwand' }, svg);
+  svgEl('circle', { r: 176, class: 'sb-zone-magermilch' }, svg);
+  const luft = svgEl('circle', { r: 75, class: 'sb-luft' }, svg);
+  svgEl('circle', { r: 165, class: 'sb-ring' }, svg); // dreht sich: zeigt die Rotation des Flüssigkeitsrings
+  svgEl('circle', { r: 120, class: 'sb-greifer' }, svg);
+  const kanaele = svgEl('g', {}, svg);
+  for (let k = 0; k < 4; k++) {
+    const pts = [];
+    for (let r = 120; r >= 22; r -= 7) { const w = k * Math.PI / 2 + (120 - r) / 98 * 1.2; pts.push(`${(r * Math.cos(w)).toFixed(1)},${(r * Math.sin(w)).toFixed(1)}`); }
+    svgEl('polyline', { points: pts.join(' '), class: 'sb-kanal' }, kanaele);
+    svgEl('polyline', { points: pts.join(' '), class: 'sb-strich sb-strich-magermilch' }, kanaele);
+  }
+  svgEl('circle', { r: 22, class: 'sb-ableiter' }, svg);
+  svgEl('path', { d: 'M 120 -176 A 212 212 0 0 1 200 -40', class: 'sb-dreh', 'marker-end': 'url(#sb-spitze-g)' }, svg);
+  const mk = svgEl('marker', { id: 'sb-spitze-g', viewBox: '0 0 10 10', refX: 5, refY: 5, markerWidth: 6, markerHeight: 6, orient: 'auto' }, svgEl('defs', {}, svg));
+  svgEl('path', { d: 'M0,0 L10,5 L0,10 z', class: 'sb-spitze' }, mk);
+  svgEl('text', { x: 0, y: -222, class: 'sb-medium', 'text-anchor': 'middle' }, svg).textContent = 'Der Flüssigkeitsring dreht mit der Trommel';
+  [['Flüssigkeitsring', 205, -110, 155, -65, 'start'], ['Greifer steht still', 205, 120, 95, 60, 'start'],
+   ['Ableiter', -205, 120, -18, 12, 'end'], ['Luft', -205, -120, -40, -40, 'end'], ['Kammerwand', -205, 175, -130, 135, 'end']]
+    .forEach(([n, tx, ty, x, y, a]) => {
+      svgEl('line', { x1: tx + (a === 'end' ? 4 : -4), y1: ty - 5, x2: x, y2: y, class: 'sb-linie' }, svg);
+      svgEl('text', { x: tx, y: ty, class: 'sb-medium', 'text-anchor': a }, svg).textContent = n;
+    });
+  return drossel => {
+    const r = sbRingInnen(drossel), zustand = sbGreiferZustand(r);
+    luft.setAttribute('r', Math.max(r, 0));
+    kanaele.classList.toggle('sb-trocken', zustand === 'schaum');
+    return zustand;
+  };
+}
+
 window.schnittbild = (() => {
-  let bild = null, lauf = null, vorher = 0;
+  let bild = null, lauf = null, vorher = 0, greifer = null;
   const d = () => document.querySelector('[data-testid="schnittbild"]');
   const zeigeTeil = (id, teile) => {
-    const t = teile.find(t => t.id === id);
+    const t = [...teile, ...SB_EXTRA].find(t => t.id === id);
     d().querySelector('[data-testid="schnittbild-teil"]').textContent = t.name;
     d().querySelector('[data-testid="schnittbild-text"]').textContent = t.text;
     for (const g of d().querySelectorAll('[data-sb-teil]')) g.classList.toggle('sb-aktiv', g.dataset.sbTeil === id);
+  };
+  const entleeren = () => {
+    const knopf = d().querySelector('[data-testid="schnittbild-entleeren"]');
+    knopf.disabled = true;
+    d().querySelector('[data-testid="schnittbild-teil"]').textContent = 'Teilentleerung';
+    d().querySelector('[data-testid="schnittbild-text"]').textContent = SB_TEILENTLEERUNG;
+    for (const g of d().querySelectorAll('[data-sb-teil]')) g.classList.toggle('sb-aktiv', g.dataset.sbTeil === 'kolbenschieber');
+    bild.entleeren(() => { knopf.disabled = false; });
+  };
+  const drossel = () => {
+    const z = greifer(+d().querySelector('[data-testid="greifer-drossel"]').value);
+    const status = d().querySelector('[data-testid="greifer-status"]');
+    status.textContent = SB_GREIFER_STATUS[z];
+    status.dataset.zustand = z;
+  };
+  const ansicht = (welche, teile) => {
+    const g = welche === 'greifer';
+    d().dataset.ansicht = welche;
+    d().querySelector('[data-testid="greifer-ansicht"]').hidden = !g;
+    d().querySelector('[data-testid="schnittbild-entleeren"]').hidden = g;
+    d().querySelector('[data-testid="schnittbild-greifer"]').textContent = g ? 'Zurück zum Schnitt' : 'Greifer von oben';
+    d().querySelector('#mk-schnitt-titel').textContent = g ? 'Greifer von oben' : 'Separator-Trommel im Betrieb';
+    if (g) {
+      if (!greifer) greifer = baueGreifer(d().querySelector('[data-testid="greifer-ansicht"] svg'));
+      d().querySelector('[data-testid="schnittbild-teil"]').textContent = 'Greifer (Schälkörper)';
+      d().querySelector('[data-testid="schnittbild-text"]').textContent = SB_GREIFER_TEXT;
+      drossel();
+    } else {
+      d().querySelector('[data-testid="schnittbild-teil"]').textContent = 'Teil anklicken';
+      d().querySelector('[data-testid="schnittbild-text"]').textContent = d().querySelector('[data-testid="schnittbild-text"]').dataset.start;
+    }
   };
   const tick = t => {
     bild.schritt(Math.min((t - vorher) / 1000, 0.1));
@@ -174,12 +311,23 @@ window.schnittbild = (() => {
       const teile = ANLAGEN.find(a => a.id === anlageId).teile;
       if (!bild) bild = baueSchnittbild(d().querySelector('svg'), teile, id => zeigeTeil(id, teile));
       bild.neustart();
+      ansicht('schnitt');
       d().showModal();
+      // Die 3D-Szene ist hinter dem Dialog verdeckt: nicht rendern, sonst ruckelt das Schnittbild auf schwachen Laptops
+      const szene = document.querySelector('a-scene');
+      if (szene && szene.renderer) szene.renderer.setAnimationLoop(null);
       vorher = performance.now();
       if (!lauf) lauf = requestAnimationFrame(tick);
     },
     schliessen() { d().close(); },
-    anhalten() { cancelAnimationFrame(lauf); lauf = null; }
+    anhalten() {
+      cancelAnimationFrame(lauf); lauf = null;
+      const szene = document.querySelector('a-scene');
+      if (szene && szene.renderer) szene.renderer.setAnimationLoop(szene.render);
+    },
+    entleeren,
+    greifer() { ansicht(d().dataset.ansicht === 'greifer' ? 'schnitt' : 'greifer'); },
+    drossel
   };
 })();
 
@@ -187,4 +335,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const d = document.querySelector('[data-testid="schnittbild"]');
   d.querySelector('[data-testid="schnittbild-schliessen"]').addEventListener('click', () => d.close());
   d.addEventListener('close', () => window.schnittbild.anhalten());
+  d.querySelector('[data-testid="schnittbild-entleeren"]').addEventListener('click', () => window.schnittbild.entleeren());
+  d.querySelector('[data-testid="schnittbild-greifer"]').addEventListener('click', () => window.schnittbild.greifer());
+  d.querySelector('[data-testid="greifer-drossel"]').addEventListener('input', () => window.schnittbild.drossel());
+  const text = d.querySelector('[data-testid="schnittbild-text"]');
+  text.dataset.start = text.textContent;
 });
