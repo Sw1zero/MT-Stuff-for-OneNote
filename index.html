@@ -6,36 +6,18 @@
   <title>BZWU Milchtechnologie – Lerntools</title>
   <link rel="stylesheet" href="style.css?v=d6d6b61d">
   <style>
-    .filter-bar {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 12px 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .filter-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .filter-label {
-      font-size: 0.72rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      color: var(--text-subtle);
-      width: 48px;
-      flex-shrink: 0;
-    }
-    @media (max-width: 600px) {
-      .filter-bar { padding: 10px 16px; }
-      .filter-label { width: auto; }
-    }
 
     .module-section { margin-bottom: 8px; }
     .module-section.hidden { display: none; }
+
+    .sn-pfad { font-size: 0.9rem; color: var(--text-muted); margin: 0 0 6px; }
+    .sn-pfad a { color: var(--blue-dark); display: inline-block; min-height: 44px; line-height: 44px; }
+    .sn-titel { font-size: 1.35rem; color: var(--blue-dark); margin: 0 0 16px; }
+    .sn-titel:focus { outline: none; }
+    .tool-card.sn-stufe { padding-right: 44px; justify-content: center; min-height: 92px; }
+    .tool-card.sn-stufe .card-title { font-size: 1.08rem; }
+    .sn-ansicht .card-top .badge:not(.badge-type) { display: none; }   /* Modul steht schon im Pfad */
+    .sn-pfeil { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); font-size: 1.8rem; color: var(--blue-light); }
   </style>
 </head>
 <body>
@@ -44,49 +26,12 @@
   <div class="header-text">
   <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ</span>
   <h1>Lerntools</h1>
-  <p>Interaktive Übungen für den Unterricht – einfach anklicken und loslegen.</p>
   </div>
   <div class="header-logos">
     <img src="assets/logos/bzwu.png" alt="BZWU" class="header-logo">
     <img src="assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
   </div>
 </header>
-
-<div class="filter-bar">
-  <div class="filter-row">
-    <span class="filter-label">Modul</span>
-    <button class="filter-btn active" data-filter="module" data-value="all">Alle</button>
-    <button class="filter-btn" data-filter="module" data-value="a1">a.1</button>
-    <button class="filter-btn" data-filter="module" data-value="a2">a.2</button>
-    <button class="filter-btn" data-filter="module" data-value="a7">a.7</button>
-    <button class="filter-btn" data-filter="module" data-value="a8">a.8</button>
-    <button class="filter-btn" data-filter="module" data-value="b1">b.1</button>
-    <button class="filter-btn" data-filter="module" data-value="b2">b.2</button>
-    <button class="filter-btn" data-filter="module" data-value="b7">b.7</button>
-    <button class="filter-btn" data-filter="module" data-value="d1">d.1</button>
-    <button class="filter-btn" data-filter="module" data-value="erklaervideos">Erklärvideos</button>
-    <button class="filter-btn" data-filter="module" data-value="rechner">Rechner</button>
-  </div>
-  <div class="filter-row">
-    <span class="filter-label">Typ</span>
-    <button class="filter-btn active" data-filter="type" data-value="all">Alle</button>
-    <button class="filter-btn" data-filter="type" data-value="erklaervideo">Erklärvideo</button>
-    <button class="filter-btn" data-filter="type" data-value="beschriften">Beschriften</button>
-    <button class="filter-btn" data-filter="type" data-value="challenge">Challenge</button>
-    <button class="filter-btn" data-filter="type" data-value="fachrechner">Fachrechner</button>
-    <button class="filter-btn" data-filter="type" data-value="hotspot">Hotspot</button>
-    <button class="filter-btn" data-filter="type" data-value="lernkaertchen">Lernkärtchen</button>
-    <button class="filter-btn" data-filter="type" data-value="lernpfad">Lernpfad</button>
-    <button class="filter-btn" data-filter="type" data-value="lueckentext">Lückentext</button>
-    <button class="filter-btn" data-filter="type" data-value="memory">Memory</button>
-    <button class="filter-btn" data-filter="type" data-value="quiz">Quiz</button>
-    <button class="filter-btn" data-filter="type" data-value="sortierer">Sortierer</button>
-    <button class="filter-btn" data-filter="type" data-value="tabellen-luecken">Tabellen-Lücken</button>
-    <button class="filter-btn" data-filter="type" data-value="trainer">Trainer</button>
-    <button class="filter-btn" data-filter="type" data-value="wahr-falsch">Wahr/Falsch</button>
-    <button class="filter-btn" data-filter="type" data-value="zuordnung">Zuordnung</button>
-  </div>
-</div>
 
 <main class="page-main">
 
@@ -95,7 +40,7 @@
     <div class="section-title">a.1 – Rohstoffe annehmen</div>
     <div class="tool-grid">
 
-      <a class="tool-card" href="a1-rohstoffe/milchsammelwagen-beschriften.html" data-module="a1" data-type="beschriften">
+      <a class="tool-card" href="a1-rohstoffe/milchsammelwagen-beschriften.html" data-thema="Milchannahme" data-module="a1" data-type="beschriften">
         <div class="card-top">
           <span class="badge badge-module">a.1</span>
           <span class="badge badge-type">Zuordnung</span>
@@ -110,7 +55,7 @@
         </div>
       </a>
 
-      <a class="tool-card" href="a1-rohstoffe/mid-beschriften.html" data-module="a1" data-type="beschriften">
+      <a class="tool-card" href="a1-rohstoffe/mid-beschriften.html" data-thema="Milchannahme" data-module="a1" data-type="beschriften">
         <div class="card-top">
           <span class="badge badge-module">a.1</span>
           <span class="badge badge-type">Zuordnung</span>
@@ -125,7 +70,7 @@
         </div>
       </a>
 
-      <a class="tool-card" href="a1-rohstoffe/milchinhaltsstoffe-zuordnen.html" data-module="a1" data-type="beschriften">
+      <a class="tool-card" href="a1-rohstoffe/milchinhaltsstoffe-zuordnen.html" data-thema="Bestandteile der Milch" data-module="a1" data-type="beschriften">
         <div class="card-top">
           <span class="badge badge-module">a.1</span>
           <span class="badge badge-type">Beschriften</span>
@@ -140,8 +85,7 @@
         </div>
       </a>
 
-
-      <a class="tool-card" href="a1-rohstoffe/zuordnung-eiweisse.html" data-module="a1" data-type="zuordnung">
+      <a class="tool-card" href="a1-rohstoffe/zuordnung-eiweisse.html" data-thema="Bestandteile der Milch" data-module="a1" data-type="zuordnung">
         <div class="card-top">
           <span class="badge badge-module">a.1</span>
           <span class="badge badge-type">Zuordnung</span>
@@ -154,7 +98,7 @@
         </div>
       </a>
 
-      <a class="tool-card" href="a1-rohstoffe/wahr-falsch-milchbestandteile.html" data-module="a1" data-type="wahr-falsch">
+      <a class="tool-card" href="a1-rohstoffe/wahr-falsch-milchbestandteile.html" data-thema="Bestandteile der Milch" data-module="a1" data-type="wahr-falsch">
         <div class="card-top">
           <span class="badge badge-module">a.1</span>
           <span class="badge badge-type">Wahr/Falsch</span>
@@ -213,115 +157,7 @@
     <div class="section-title">a.7 – Technische Einrichtungen</div>
     <div class="tool-grid">
 
-      <a class="tool-card" href="a7-technische-einrichtungen/lernsession-waermeerzeugung.html" data-module="a7" data-type="lernpfad">
-        <div class="card-top">
-          <span class="badge badge-module">a.7</span>
-          <span class="badge badge-type badge-lernpfad">Lernpfad</span>
-        </div>
-        <div class="card-title">Wärmeerzeugung – Lernpfad</div>
-        <div class="card-meta">
-          15 Posten
-          <span class="dot"></span>
-          mit Lesetexten
-          <span class="dot"></span>
-          Brenner · Dampfkessel · Warmwasser
-        </div>
-      </a>
-
-      <a class="tool-card" href="a7-technische-einrichtungen/lernsession-waermeerzeugung.html?mode=challenge" data-module="a7" data-type="challenge">
-        <div class="card-top">
-          <span class="badge badge-module">a.7</span>
-          <span class="badge badge-type badge-challenge">Challenge</span>
-        </div>
-        <div class="card-title">Wärmeerzeugung – Challenge</div>
-        <div class="card-meta">
-          Prüfungsmodus
-          <span class="dot"></span>
-          ohne Hilfen
-          <span class="dot"></span>
-          simulierte Note
-        </div>
-      </a>
-
-      <a class="tool-card" href="a7-technische-einrichtungen/lernsession-kaelteanlagen.html" data-module="a7" data-type="lernpfad">
-        <div class="card-top">
-          <span class="badge badge-module">a.7</span>
-          <span class="badge badge-type badge-lernpfad">Lernpfad</span>
-        </div>
-        <div class="card-title">Kälteanlagen – Lernpfad</div>
-        <div class="card-meta">
-          15 Posten
-          <span class="dot"></span>
-          mit Videos &amp; Lesetexten
-          <span class="dot"></span>
-          Kompressionsprinzip &middot; Regulierung &middot; Gefahren &middot; WRG
-        </div>
-      </a>
-
-      <a class="tool-card" href="a7-technische-einrichtungen/lernsession-kaelteanlagen.html?mode=challenge" data-module="a7" data-type="challenge">
-        <div class="card-top">
-          <span class="badge badge-module">a.7</span>
-          <span class="badge badge-type badge-challenge">Challenge</span>
-        </div>
-        <div class="card-title">Kälteanlagen – Challenge</div>
-        <div class="card-meta">
-          Prüfungsmodus
-          <span class="dot"></span>
-          ohne Hilfen
-          <span class="dot"></span>
-          simulierte Note
-        </div>
-      </a>
-
-      <a class="tool-card" href="a7-technische-einrichtungen/beschriften.html?set=oelbrenner" data-module="a7" data-type="beschriften">
-        <div class="card-top"><span class="badge badge-module">a.7</span><span class="badge badge-type">Beschriften</span></div>
-        <div class="card-title">Ölbrenner beschriften</div>
-        <div class="card-meta">15 Bauteile <span class="dot"></span> Einfach · Mittel · Schwer</div>
-      </a>
-
-      <a class="tool-card" href="a7-technische-einrichtungen/beschriften.html?set=dampfkessel" data-module="a7" data-type="beschriften">
-        <div class="card-top"><span class="badge badge-module">a.7</span><span class="badge badge-type">Beschriften</span></div>
-        <div class="card-title">Dreizugdampfkessel beschriften</div>
-        <div class="card-meta">6 Teile <span class="dot"></span> Einfach · Mittel · Schwer</div>
-      </a>
-
-      <a class="tool-card" href="a7-technische-einrichtungen/zuordnung-dampfkessel-gefahren.html" data-module="a7" data-type="zuordnung">
-        <div class="card-top"><span class="badge badge-module">a.7</span><span class="badge badge-type">Zuordnung</span></div>
-        <div class="card-title">Dampfkessel: Gefahrenquellen</div>
-        <div class="card-meta">3 Gefahren <span class="dot"></span> Einfach · Mittel · Schwer</div>
-      </a>
-
-      <a class="tool-card" href="a7-technische-einrichtungen/wahr-falsch-dampfkessel.html" data-module="a7" data-type="wahr-falsch">
-        <div class="card-top"><span class="badge badge-module">a.7</span><span class="badge badge-type">Wahr/Falsch</span></div>
-        <div class="card-title">Dampfkessel: Wahr oder Falsch?</div>
-        <div class="card-meta">12 Aussagen <span class="dot"></span> Swipe-Karten</div>
-      </a>
-
-      <a class="tool-card" href="a7-technische-einrichtungen/beschriften.html?set=warmwasser" data-module="a7" data-type="beschriften">
-        <div class="card-top"><span class="badge badge-module">a.7</span><span class="badge badge-type">Beschriften</span></div>
-        <div class="card-title">Warmwasseranlage beschriften</div>
-        <div class="card-meta">14 Teile <span class="dot"></span> Einfach · Mittel · Schwer</div>
-      </a>
-
-      <a class="tool-card" href="a7-technische-einrichtungen/beschriften.html?set=kaelteanlage" data-module="a7" data-type="beschriften">
-        <div class="card-top"><span class="badge badge-module">a.7</span><span class="badge badge-type">Beschriften</span></div>
-        <div class="card-title">Kälteanlage beschriften</div>
-        <div class="card-meta">4 Bauteile <span class="dot"></span> Einfach · Mittel · Schwer</div>
-      </a>
-
-      <a class="tool-card" href="a7-technische-einrichtungen/beschriften.html?set=kaelteregulierung" data-module="a7" data-type="beschriften">
-        <div class="card-top"><span class="badge badge-module">a.7</span><span class="badge badge-type">Beschriften</span></div>
-        <div class="card-title">Kälteregulierung beschriften</div>
-        <div class="card-meta">6 Elemente <span class="dot"></span> Einfach · Mittel · Schwer</div>
-      </a>
-
-      <a class="tool-card" href="a7-technische-einrichtungen/beschriften.html?set=wrgboiler" data-module="a7" data-type="beschriften">
-        <div class="card-top"><span class="badge badge-module">a.7</span><span class="badge badge-type">Beschriften</span></div>
-        <div class="card-title">WRG-Boiler beschriften</div>
-        <div class="card-meta">6 Elemente <span class="dot"></span> Einfach · Mittel · Schwer</div>
-      </a>
-
-      <a class="tool-card" href="a7-technische-einrichtungen/tabellen-luecken-metalle.html" data-module="a7" data-type="tabellen-luecken">
+      <a class="tool-card" href="a7-technische-einrichtungen/tabellen-luecken-metalle.html" data-thema="Werkstoffe und Schmierstoffe" data-module="a7" data-type="tabellen-luecken">
         <div class="card-top">
           <span class="badge badge-module">a.7</span>
           <span class="badge badge-type">Tabellen-Lücken</span>
@@ -336,7 +172,7 @@
         </div>
       </a>
 
-      <a class="tool-card" href="a7-technische-einrichtungen/quiz-werkstoffe-schmierstoffe.html" data-module="a7" data-type="quiz">
+      <a class="tool-card" href="a7-technische-einrichtungen/quiz-werkstoffe-schmierstoffe.html" data-thema="Werkstoffe und Schmierstoffe" data-module="a7" data-type="quiz">
         <div class="card-top">
           <span class="badge badge-module">a.7</span>
           <span class="badge badge-type">Quiz</span>
@@ -349,6 +185,114 @@
         </div>
       </a>
 
+      <a class="tool-card" href="a7-technische-einrichtungen/beschriften.html?set=oelbrenner" data-thema="Wärmeerzeugung und Warmwasser" data-module="a7" data-type="beschriften">
+        <div class="card-top"><span class="badge badge-module">a.7</span><span class="badge badge-type">Beschriften</span></div>
+        <div class="card-title">Ölbrenner beschriften</div>
+        <div class="card-meta">15 Bauteile <span class="dot"></span> Einfach · Mittel · Schwer</div>
+      </a>
+
+      <a class="tool-card" href="a7-technische-einrichtungen/beschriften.html?set=dampfkessel" data-thema="Wärmeerzeugung und Warmwasser" data-module="a7" data-type="beschriften">
+        <div class="card-top"><span class="badge badge-module">a.7</span><span class="badge badge-type">Beschriften</span></div>
+        <div class="card-title">Dreizugdampfkessel beschriften</div>
+        <div class="card-meta">6 Teile <span class="dot"></span> Einfach · Mittel · Schwer</div>
+      </a>
+
+      <a class="tool-card" href="a7-technische-einrichtungen/zuordnung-dampfkessel-gefahren.html" data-thema="Wärmeerzeugung und Warmwasser" data-module="a7" data-type="zuordnung">
+        <div class="card-top"><span class="badge badge-module">a.7</span><span class="badge badge-type">Zuordnung</span></div>
+        <div class="card-title">Dampfkessel: Gefahrenquellen</div>
+        <div class="card-meta">3 Gefahren <span class="dot"></span> Einfach · Mittel · Schwer</div>
+      </a>
+
+      <a class="tool-card" href="a7-technische-einrichtungen/wahr-falsch-dampfkessel.html" data-thema="Wärmeerzeugung und Warmwasser" data-module="a7" data-type="wahr-falsch">
+        <div class="card-top"><span class="badge badge-module">a.7</span><span class="badge badge-type">Wahr/Falsch</span></div>
+        <div class="card-title">Dampfkessel: Wahr oder Falsch?</div>
+        <div class="card-meta">12 Aussagen <span class="dot"></span> Swipe-Karten</div>
+      </a>
+
+      <a class="tool-card" href="a7-technische-einrichtungen/beschriften.html?set=warmwasser" data-thema="Wärmeerzeugung und Warmwasser" data-module="a7" data-type="beschriften">
+        <div class="card-top"><span class="badge badge-module">a.7</span><span class="badge badge-type">Beschriften</span></div>
+        <div class="card-title">Warmwasseranlage beschriften</div>
+        <div class="card-meta">14 Teile <span class="dot"></span> Einfach · Mittel · Schwer</div>
+      </a>
+
+      <a class="tool-card" href="a7-technische-einrichtungen/lernsession-waermeerzeugung.html" data-thema="Wärmeerzeugung und Warmwasser" data-module="a7" data-type="lernpfad">
+        <div class="card-top">
+          <span class="badge badge-module">a.7</span>
+          <span class="badge badge-type badge-lernpfad">Lernpfad</span>
+        </div>
+        <div class="card-title">Wärmeerzeugung – Lernpfad</div>
+        <div class="card-meta">
+          15 Posten
+          <span class="dot"></span>
+          mit Lesetexten
+          <span class="dot"></span>
+          Brenner · Dampfkessel · Warmwasser
+        </div>
+      </a>
+
+      <a class="tool-card" href="a7-technische-einrichtungen/lernsession-waermeerzeugung.html?mode=challenge" data-thema="Wärmeerzeugung und Warmwasser" data-module="a7" data-type="challenge">
+        <div class="card-top">
+          <span class="badge badge-module">a.7</span>
+          <span class="badge badge-type badge-challenge">Challenge</span>
+        </div>
+        <div class="card-title">Wärmeerzeugung – Challenge</div>
+        <div class="card-meta">
+          Prüfungsmodus
+          <span class="dot"></span>
+          ohne Hilfen
+          <span class="dot"></span>
+          simulierte Note
+        </div>
+      </a>
+
+      <a class="tool-card" href="a7-technische-einrichtungen/beschriften.html?set=kaelteanlage" data-thema="Kälteanlage und Wärmerückgewinnung" data-module="a7" data-type="beschriften">
+        <div class="card-top"><span class="badge badge-module">a.7</span><span class="badge badge-type">Beschriften</span></div>
+        <div class="card-title">Kälteanlage beschriften</div>
+        <div class="card-meta">4 Bauteile <span class="dot"></span> Einfach · Mittel · Schwer</div>
+      </a>
+
+      <a class="tool-card" href="a7-technische-einrichtungen/beschriften.html?set=kaelteregulierung" data-thema="Kälteanlage und Wärmerückgewinnung" data-module="a7" data-type="beschriften">
+        <div class="card-top"><span class="badge badge-module">a.7</span><span class="badge badge-type">Beschriften</span></div>
+        <div class="card-title">Kälteregulierung beschriften</div>
+        <div class="card-meta">6 Elemente <span class="dot"></span> Einfach · Mittel · Schwer</div>
+      </a>
+
+      <a class="tool-card" href="a7-technische-einrichtungen/beschriften.html?set=wrgboiler" data-thema="Kälteanlage und Wärmerückgewinnung" data-module="a7" data-type="beschriften">
+        <div class="card-top"><span class="badge badge-module">a.7</span><span class="badge badge-type">Beschriften</span></div>
+        <div class="card-title">WRG-Boiler beschriften</div>
+        <div class="card-meta">6 Elemente <span class="dot"></span> Einfach · Mittel · Schwer</div>
+      </a>
+
+      <a class="tool-card" href="a7-technische-einrichtungen/lernsession-kaelteanlagen.html" data-thema="Kälteanlage und Wärmerückgewinnung" data-module="a7" data-type="lernpfad">
+        <div class="card-top">
+          <span class="badge badge-module">a.7</span>
+          <span class="badge badge-type badge-lernpfad">Lernpfad</span>
+        </div>
+        <div class="card-title">Kälteanlagen – Lernpfad</div>
+        <div class="card-meta">
+          15 Posten
+          <span class="dot"></span>
+          mit Videos &amp; Lesetexten
+          <span class="dot"></span>
+          Kompressionsprinzip &middot; Regulierung &middot; Gefahren &middot; WRG
+        </div>
+      </a>
+
+      <a class="tool-card" href="a7-technische-einrichtungen/lernsession-kaelteanlagen.html?mode=challenge" data-thema="Kälteanlage und Wärmerückgewinnung" data-module="a7" data-type="challenge">
+        <div class="card-top">
+          <span class="badge badge-module">a.7</span>
+          <span class="badge badge-type badge-challenge">Challenge</span>
+        </div>
+        <div class="card-title">Kälteanlagen – Challenge</div>
+        <div class="card-meta">
+          Prüfungsmodus
+          <span class="dot"></span>
+          ohne Hilfen
+          <span class="dot"></span>
+          simulierte Note
+        </div>
+      </a>
+
     </div>
   </div>
 
@@ -357,7 +301,7 @@
     <div class="section-title">a.8 – Kulturen einsetzen</div>
     <div class="tool-grid">
 
-      <a class="tool-card" href="a8-kulturen/hotspot-bakterienzelle.html" data-module="a8" data-type="hotspot">
+      <a class="tool-card" href="a8-kulturen/hotspot-bakterienzelle.html" data-thema="Bakterien und ihre Vermehrung" data-module="a8" data-type="hotspot">
         <div class="card-top">
           <span class="badge badge-module">a.8</span>
           <span class="badge badge-type">Hotspot</span>
@@ -370,7 +314,7 @@
         </div>
       </a>
 
-      <a class="tool-card" href="a8-kulturen/tabellen-luecken-kuehlung.html" data-module="a8" data-type="tabellen-luecken">
+      <a class="tool-card" href="a8-kulturen/tabellen-luecken-kuehlung.html" data-thema="Bakterien und ihre Vermehrung" data-module="a8" data-type="tabellen-luecken">
         <div class="card-top">
           <span class="badge badge-module">a.8</span>
           <span class="badge badge-type">Tabellen-Lücken</span>
@@ -383,121 +327,46 @@
         </div>
       </a>
 
-      <a class="tool-card" href="a8-kulturen/tabellen-luecken-kontrolle.html" data-module="a8" data-type="tabellen-luecken">
-        <div class="card-top">
-          <span class="badge badge-module">a.8</span>
-          <span class="badge badge-type">Tabellen-Lücken</span>
-        </div>
-        <div class="card-title">Kontrolle der Kulturen</div>
-        <div class="card-meta">
-          5 Methoden
-          <span class="dot"></span>
-          mit °SH-Deutung
-        </div>
-      </a>
-
-      <a class="tool-card" href="a8-kulturen/quiz-abweichungen-phagen.html" data-module="a8" data-type="quiz">
-        <div class="card-top">
-          <span class="badge badge-module">a.8</span>
-          <span class="badge badge-type">Quiz</span>
-        </div>
-        <div class="card-title">Abweichungen & Bakteriophagen</div>
-        <div class="card-meta">
-          10 Fragen
-          <span class="dot"></span>
-          Ursachen · Massnahmen · Phagen
-        </div>
-      </a>
-
-      <a class="tool-card" href="a8-kulturen/wahr-falsch-vermehrungszyklus.html" data-module="a8" data-type="wahr-falsch">
-        <div class="card-top">
-          <span class="badge badge-module">a.8</span>
-          <span class="badge badge-type">Wahr/Falsch</span>
-        </div>
-        <div class="card-title">Bakteriophagen: Wahr oder Falsch</div>
-        <div class="card-meta">
-          8 Aussagen
-          <span class="dot"></span>
-          Lytischer Zyklus
-        </div>
-      </a>
-      <a class="tool-card" href="a8-kulturen/beschriften-vermehrungszyklus.html" data-module="a8" data-type="beschriften">
+      <a class="tool-card" href="a8-kulturen/hotspot-lebensphasen.html" data-thema="Bakterien und ihre Vermehrung" data-module="a8" data-type="beschriften">
         <div class="card-top">
           <span class="badge badge-module">a.8</span>
           <span class="badge badge-type">Beschriften</span>
         </div>
-        <div class="card-title">Lytischen Zyklus beschriften</div>
+        <div class="card-title">Wachstumskurve beschriften</div>
         <div class="card-meta">
-          5 Schritte
-          <span class="dot"></span>
-          Einfach · Mittel · Schwer
-        </div>
-      </a>
-      <a class="tool-card" href="a8-kulturen/zuordnung-vermehrungszyklus.html" data-module="a8" data-type="zuordnung">
-        <div class="card-top">
-          <span class="badge badge-module">a.8</span>
-          <span class="badge badge-type">Zuordnung</span>
-        </div>
-        <div class="card-title">Lytisch oder lysogen?</div>
-        <div class="card-meta">
-          8 Merkmale
+          4 Phasen
           <span class="dot"></span>
           Einfach · Mittel · Schwer
         </div>
       </a>
 
-      <a class="tool-card" href="a8-kulturen/zuordnung-hauptaufgaben-milchsaeure.html" data-module="a8" data-type="zuordnung">
+      <a class="tool-card" href="a8-kulturen/zuordnung-lebensphasen-merkmale.html" data-thema="Bakterien und ihre Vermehrung" data-module="a8" data-type="zuordnung">
         <div class="card-top">
           <span class="badge badge-module">a.8</span>
           <span class="badge badge-type">Zuordnung</span>
         </div>
-        <div class="card-title">Hauptaufgaben der Milchsäure</div>
+        <div class="card-title">Lebensphasen: Merkmale zuordnen</div>
         <div class="card-meta">
-          14 Aussagen
+          12 Merkmale
           <span class="dot"></span>
           Einfach · Mittel · Schwer
         </div>
       </a>
-      <a class="tool-card" href="a8-kulturen/lernkaertchen-hauptaufgaben-milchsaeure.html" data-module="a8" data-type="lernkaertchen">
+
+      <a class="tool-card" href="a8-kulturen/lernkaertchen-lebensphasen.html" data-thema="Bakterien und ihre Vermehrung" data-module="a8" data-type="lernkaertchen">
         <div class="card-top">
           <span class="badge badge-module">a.8</span>
           <span class="badge badge-type">Lernkärtchen</span>
         </div>
-        <div class="card-title">Hauptaufgaben selbst erklären</div>
+        <div class="card-title">Lebensphasen im Überblick</div>
         <div class="card-meta">
-          5 Karten
+          4 Karten
           <span class="dot"></span>
-          mit Musterantwort
+          mit Ferien-Vergleich
         </div>
       </a>
 
-      <a class="tool-card" href="a8-kulturen/tabellen-luecken-milchsaeuregaerung.html" data-module="a8" data-type="tabellen-luecken">
-        <div class="card-top">
-          <span class="badge badge-module">a.8</span>
-          <span class="badge badge-type">Tabellen-Lücken</span>
-        </div>
-        <div class="card-title">Milchsäuregärung</div>
-        <div class="card-meta">
-          homo- vs. heterofermentativ
-        </div>
-      </a>
-
-
-
-      <a class="tool-card" href="a8-kulturen/sortierer-fettsirtenkultur.html" data-module="a8" data-type="sortierer">
-        <div class="card-top">
-          <span class="badge badge-module">a.8</span>
-          <span class="badge badge-type">Sortierer</span>
-        </div>
-        <div class="card-title">Fettsirtenkultur herstellen</div>
-        <div class="card-meta">
-          7 Schritte
-          <span class="dot"></span>
-          Drag &amp; Drop
-        </div>
-      </a>
-
-      <a class="tool-card" href="a8-kulturen/zuordnung-kulturenformen.html" data-module="a8" data-type="zuordnung">
+      <a class="tool-card" href="a8-kulturen/zuordnung-kulturenformen.html" data-thema="Kulturenformen und Kontrolle" data-module="a8" data-type="zuordnung">
         <div class="card-top">
           <span class="badge badge-module">a.8</span>
           <span class="badge badge-type">Zuordnung</span>
@@ -512,44 +381,85 @@
         </div>
       </a>
 
-      <a class="tool-card" href="a8-kulturen/hotspot-lebensphasen.html" data-module="a8" data-type="beschriften">
+      <a class="tool-card" href="a8-kulturen/sortierer-fettsirtenkultur.html" data-thema="Kulturenformen und Kontrolle" data-module="a8" data-type="sortierer">
+        <div class="card-top">
+          <span class="badge badge-module">a.8</span>
+          <span class="badge badge-type">Sortierer</span>
+        </div>
+        <div class="card-title">Fettsirtenkultur herstellen</div>
+        <div class="card-meta">
+          7 Schritte
+          <span class="dot"></span>
+          Drag &amp; Drop
+        </div>
+      </a>
+
+      <a class="tool-card" href="a8-kulturen/tabellen-luecken-kontrolle.html" data-thema="Kulturenformen und Kontrolle" data-module="a8" data-type="tabellen-luecken">
+        <div class="card-top">
+          <span class="badge badge-module">a.8</span>
+          <span class="badge badge-type">Tabellen-Lücken</span>
+        </div>
+        <div class="card-title">Kontrolle der Kulturen</div>
+        <div class="card-meta">
+          5 Methoden
+          <span class="dot"></span>
+          mit °SH-Deutung
+        </div>
+      </a>
+
+      <a class="tool-card" href="a8-kulturen/quiz-abweichungen-phagen.html" data-thema="Abweichungen und Bakteriophagen" data-module="a8" data-type="quiz">
+        <div class="card-top">
+          <span class="badge badge-module">a.8</span>
+          <span class="badge badge-type">Quiz</span>
+        </div>
+        <div class="card-title">Abweichungen & Bakteriophagen</div>
+        <div class="card-meta">
+          10 Fragen
+          <span class="dot"></span>
+          Ursachen · Massnahmen · Phagen
+        </div>
+      </a>
+
+      <a class="tool-card" href="a8-kulturen/wahr-falsch-vermehrungszyklus.html" data-thema="Abweichungen und Bakteriophagen" data-module="a8" data-type="wahr-falsch">
+        <div class="card-top">
+          <span class="badge badge-module">a.8</span>
+          <span class="badge badge-type">Wahr/Falsch</span>
+        </div>
+        <div class="card-title">Bakteriophagen: Wahr oder Falsch</div>
+        <div class="card-meta">
+          8 Aussagen
+          <span class="dot"></span>
+          Lytischer Zyklus
+        </div>
+      </a>
+
+      <a class="tool-card" href="a8-kulturen/beschriften-vermehrungszyklus.html" data-thema="Abweichungen und Bakteriophagen" data-module="a8" data-type="beschriften">
         <div class="card-top">
           <span class="badge badge-module">a.8</span>
           <span class="badge badge-type">Beschriften</span>
         </div>
-        <div class="card-title">Wachstumskurve beschriften</div>
+        <div class="card-title">Lytischen Zyklus beschriften</div>
         <div class="card-meta">
-          4 Phasen
+          5 Schritte
           <span class="dot"></span>
           Einfach · Mittel · Schwer
         </div>
       </a>
-      <a class="tool-card" href="a8-kulturen/zuordnung-lebensphasen-merkmale.html" data-module="a8" data-type="zuordnung">
+
+      <a class="tool-card" href="a8-kulturen/zuordnung-vermehrungszyklus.html" data-thema="Abweichungen und Bakteriophagen" data-module="a8" data-type="zuordnung">
         <div class="card-top">
           <span class="badge badge-module">a.8</span>
           <span class="badge badge-type">Zuordnung</span>
         </div>
-        <div class="card-title">Lebensphasen: Merkmale zuordnen</div>
+        <div class="card-title">Lytisch oder lysogen?</div>
         <div class="card-meta">
-          12 Merkmale
+          8 Merkmale
           <span class="dot"></span>
           Einfach · Mittel · Schwer
         </div>
       </a>
-      <a class="tool-card" href="a8-kulturen/lernkaertchen-lebensphasen.html" data-module="a8" data-type="lernkaertchen">
-        <div class="card-top">
-          <span class="badge badge-module">a.8</span>
-          <span class="badge badge-type">Lernkärtchen</span>
-        </div>
-        <div class="card-title">Lebensphasen im Überblick</div>
-        <div class="card-meta">
-          4 Karten
-          <span class="dot"></span>
-          mit Ferien-Vergleich
-        </div>
-      </a>
 
-      <a class="tool-card" href="a8-kulturen/begruenden-massnahmen-abweichungen.html" data-module="a8" data-type="tabellen-luecken">
+      <a class="tool-card" href="a8-kulturen/begruenden-massnahmen-abweichungen.html" data-thema="Abweichungen und Bakteriophagen" data-module="a8" data-type="tabellen-luecken">
         <div class="card-top">
           <span class="badge badge-module">a.8</span>
           <span class="badge badge-type">Tabellen-Lücken</span>
@@ -561,7 +471,8 @@
           Ursache · Massnahme · Wirkung
         </div>
       </a>
-      <a class="tool-card" href="a8-kulturen/quiz-begruenden-massnahmen.html" data-module="a8" data-type="quiz">
+
+      <a class="tool-card" href="a8-kulturen/quiz-begruenden-massnahmen.html" data-thema="Abweichungen und Bakteriophagen" data-module="a8" data-type="quiz">
         <div class="card-top">
           <span class="badge badge-module">a.8</span>
           <span class="badge badge-type">Quiz</span>
@@ -573,7 +484,8 @@
           echte Begründung erkennen
         </div>
       </a>
-      <a class="tool-card" href="a8-kulturen/lernkaertchen-begruenden-massnahmen.html" data-module="a8" data-type="lernkaertchen">
+
+      <a class="tool-card" href="a8-kulturen/lernkaertchen-begruenden-massnahmen.html" data-thema="Abweichungen und Bakteriophagen" data-module="a8" data-type="lernkaertchen">
         <div class="card-top">
           <span class="badge badge-module">a.8</span>
           <span class="badge badge-type">Lernkärtchen</span>
@@ -586,7 +498,44 @@
         </div>
       </a>
 
-      <a class="tool-card" href="a8-kulturen/lernsession-pruefung-kulturen.html" data-module="a8" data-type="lernpfad">
+      <a class="tool-card" href="a8-kulturen/tabellen-luecken-milchsaeuregaerung.html" data-thema="Milchsäuregärung" data-module="a8" data-type="tabellen-luecken">
+        <div class="card-top">
+          <span class="badge badge-module">a.8</span>
+          <span class="badge badge-type">Tabellen-Lücken</span>
+        </div>
+        <div class="card-title">Milchsäuregärung</div>
+        <div class="card-meta">
+          homo- vs. heterofermentativ
+        </div>
+      </a>
+
+      <a class="tool-card" href="a8-kulturen/zuordnung-hauptaufgaben-milchsaeure.html" data-thema="Milchsäuregärung" data-module="a8" data-type="zuordnung">
+        <div class="card-top">
+          <span class="badge badge-module">a.8</span>
+          <span class="badge badge-type">Zuordnung</span>
+        </div>
+        <div class="card-title">Hauptaufgaben der Milchsäure</div>
+        <div class="card-meta">
+          14 Aussagen
+          <span class="dot"></span>
+          Einfach · Mittel · Schwer
+        </div>
+      </a>
+
+      <a class="tool-card" href="a8-kulturen/lernkaertchen-hauptaufgaben-milchsaeure.html" data-thema="Milchsäuregärung" data-module="a8" data-type="lernkaertchen">
+        <div class="card-top">
+          <span class="badge badge-module">a.8</span>
+          <span class="badge badge-type">Lernkärtchen</span>
+        </div>
+        <div class="card-title">Hauptaufgaben selbst erklären</div>
+        <div class="card-meta">
+          5 Karten
+          <span class="dot"></span>
+          mit Musterantwort
+        </div>
+      </a>
+
+      <a class="tool-card" href="a8-kulturen/lernsession-pruefung-kulturen.html" data-thema="Prüfung vorbereiten" data-module="a8" data-type="lernpfad">
         <div class="card-top">
           <span class="badge badge-module">a.8</span>
           <span class="badge badge-type badge-lernpfad">Lernpfad</span>
@@ -601,7 +550,7 @@
         </div>
       </a>
 
-      <a class="tool-card" href="a8-kulturen/lernsession-pruefung-kulturen.html?mode=challenge" data-module="a8" data-type="challenge">
+      <a class="tool-card" href="a8-kulturen/lernsession-pruefung-kulturen.html?mode=challenge" data-thema="Prüfung vorbereiten" data-module="a8" data-type="challenge">
         <div class="card-top">
           <span class="badge badge-module">a.8</span>
           <span class="badge badge-type badge-challenge">Challenge</span>
@@ -624,67 +573,7 @@
     <div class="section-title">b.1 – Hartkäse herstellen</div>
     <div class="tool-grid">
 
-      <a class="tool-card" href="b1-hartkaese/lernsession-sbrinz.html" data-module="b1" data-type="lernpfad">
-        <div class="card-top">
-          <span class="badge badge-module">b.1</span>
-          <span class="badge badge-type badge-lernpfad">Lernpfad</span>
-        </div>
-        <div class="card-title">Sbrinz AOP – Lernpfad</div>
-        <div class="card-meta">
-          13 Stationen
-          <span class="dot"></span>
-          mit Lesetexten
-          <span class="dot"></span>
-          Quiz · Fehlersuche
-        </div>
-      </a>
-
-      <a class="tool-card" href="b1-hartkaese/lernsession-sbrinz.html?mode=challenge" data-module="b1" data-type="challenge">
-        <div class="card-top">
-          <span class="badge badge-module">b.1</span>
-          <span class="badge badge-type badge-challenge">Challenge</span>
-        </div>
-        <div class="card-title">Sbrinz AOP – Challenge</div>
-        <div class="card-meta">
-          Prüfungsmodus
-          <span class="dot"></span>
-          ohne Lesetexte
-          <span class="dot"></span>
-          simulierte Note
-        </div>
-      </a>
-
-      <a class="tool-card" href="b1-hartkaese/lernsession-emmentaler.html" data-module="b1" data-type="lernpfad">
-        <div class="card-top">
-          <span class="badge badge-module">b.1</span>
-          <span class="badge badge-type badge-lernpfad">Lernpfad</span>
-        </div>
-        <div class="card-title">Emmentaler AOP – Lernpfad</div>
-        <div class="card-meta">
-          15 Stationen
-          <span class="dot"></span>
-          mit Lesetexten
-          <span class="dot"></span>
-          Quiz · Fehlersuche
-        </div>
-      </a>
-
-      <a class="tool-card" href="b1-hartkaese/lernsession-emmentaler.html?mode=challenge" data-module="b1" data-type="challenge">
-        <div class="card-top">
-          <span class="badge badge-module">b.1</span>
-          <span class="badge badge-type badge-challenge">Challenge</span>
-        </div>
-        <div class="card-title">Emmentaler AOP – Challenge</div>
-        <div class="card-meta">
-          Prüfungsmodus
-          <span class="dot"></span>
-          ohne Lesetexte
-          <span class="dot"></span>
-          simulierte Note
-        </div>
-      </a>
-
-      <a class="tool-card" href="b1-hartkaese/memory-aop-kaese.html" data-module="b1" data-type="memory">
+      <a class="tool-card" href="b1-hartkaese/memory-aop-kaese.html" data-thema="Käsesorten und Gesetz" data-module="b1" data-type="memory">
         <div class="card-top">
           <span class="badge badge-module">b.1</span>
           <span class="badge badge-type">Memory</span>
@@ -699,7 +588,7 @@
         </div>
       </a>
 
-      <a class="tool-card" href="b1-hartkaese/quiz-gesetzliches-kaese.html" data-module="b1" data-type="quiz">
+      <a class="tool-card" href="b1-hartkaese/quiz-gesetzliches-kaese.html" data-thema="Käsesorten und Gesetz" data-module="b1" data-type="quiz">
         <div class="card-top">
           <span class="badge badge-module">b.1</span>
           <span class="badge badge-type">Quiz</span>
@@ -712,7 +601,7 @@
         </div>
       </a>
 
-      <a class="tool-card" href="b1-hartkaese/tabellen-luecken-vlth-artikel.html" data-module="b1" data-type="tabellen-luecken">
+      <a class="tool-card" href="b1-hartkaese/tabellen-luecken-vlth-artikel.html" data-thema="Käsesorten und Gesetz" data-module="b1" data-type="tabellen-luecken">
         <div class="card-top">
           <span class="badge badge-module">b.1</span>
           <span class="badge badge-type">Tabellen-Lücken</span>
@@ -727,100 +616,7 @@
         </div>
       </a>
 
-      <a class="tool-card" href="b1-hartkaese/wahr-falsch-emmentaler-pflichtenheft.html" data-module="b1" data-type="wahr-falsch">
-        <div class="card-top">
-          <span class="badge badge-module">b.1</span>
-          <span class="badge badge-type">Wahr/Falsch</span>
-        </div>
-        <div class="card-title">Emmentaler AOP-Pflichtenheft</div>
-        <div class="card-meta">
-          11 Aussagen
-          <span class="dot"></span>
-          Swipe-Karten
-        </div>
-      </a>
-
-      <a class="tool-card" href="b1-hartkaese/lernkaertchen-emmentaler-kulturen.html" data-module="b1" data-type="lernkaertchen">
-        <div class="card-top">
-          <span class="badge badge-module">b.1</span>
-          <span class="badge badge-type">Lernkärtchen</span>
-        </div>
-        <div class="card-title">Emmentaler-Kulturen</div>
-        <div class="card-meta">
-          3 Kulturgruppen
-          <span class="dot"></span>
-          Rolle &amp; Funktion
-        </div>
-      </a>
-
-      <a class="tool-card" href="b1-hartkaese/wahr-falsch-gruyere-mechanismus.html" data-module="b1" data-type="wahr-falsch">
-        <div class="card-top">
-          <span class="badge badge-module">b.1</span>
-          <span class="badge badge-type">Wahr/Falsch</span>
-        </div>
-        <div class="card-title">Gruyère-Mechanismus</div>
-        <div class="card-meta">
-          10 Aussagen
-          <span class="dot"></span>
-          Salzbehandlung &amp; Lochunterdrückung
-        </div>
-      </a>
-
-      <a class="tool-card" href="b1-hartkaese/wahr-falsch-sbrinz-signatur.html" data-module="b1" data-type="wahr-falsch">
-        <div class="card-top">
-          <span class="badge badge-module">b.1</span>
-          <span class="badge badge-type">Wahr/Falsch</span>
-        </div>
-        <div class="card-title">Sbrinz Signatur-Mechanismus</div>
-        <div class="card-meta">
-          10 Aussagen
-          <span class="dot"></span>
-          Silofrei · Salzbad · Reifung
-        </div>
-      </a>
-
-      <a class="tool-card" href="b1-hartkaese/lueckentext-propionsaeuregaerung.html" data-module="b1" data-type="lueckentext">
-        <div class="card-top">
-          <span class="badge badge-module">b.1</span>
-          <span class="badge badge-type">Lückentext</span>
-        </div>
-        <div class="card-title">Propionsäuregärung</div>
-        <div class="card-meta">
-          12 Lücken
-          <span class="dot"></span>
-          Einfach / Schwer
-        </div>
-      </a>
-
-      <a class="tool-card" href="b1-hartkaese/sortierer-reifungsschritte-emmentaler.html" data-module="b1" data-type="sortierer">
-        <div class="card-top">
-          <span class="badge badge-module">b.1</span>
-          <span class="badge badge-type">Sortierer</span>
-        </div>
-        <div class="card-title">Emmentaler – Reifungs-Puzzle</div>
-        <div class="card-meta">
-          4 Reifungsschritte
-          <span class="dot"></span>
-          chronologisch ordnen
-        </div>
-      </a>
-
-      <a class="tool-card" href="b1-hartkaese/zuordnung-prozessparameter.html" data-module="b1" data-type="zuordnung">
-        <div class="card-top">
-          <span class="badge badge-module">b.1</span>
-          <span class="badge badge-type">Zuordnung</span>
-        </div>
-        <div class="card-title">Prozessparameter Emmentaler / Gruyère</div>
-        <div class="card-meta">
-          6 Parameter
-          <span class="dot"></span>
-          12 Werte
-          <span class="dot"></span>
-          Klick / Drag / Touch
-        </div>
-      </a>
-
-      <a class="tool-card" href="b1-hartkaese/zuordnung-verordnungen.html" data-module="b1" data-type="zuordnung">
+      <a class="tool-card" href="b1-hartkaese/zuordnung-verordnungen.html" data-thema="Käsesorten und Gesetz" data-module="b1" data-type="zuordnung">
         <div class="card-top">
           <span class="badge badge-module">b.1</span>
           <span class="badge badge-type">Zuordnung</span>
@@ -835,6 +631,159 @@
         </div>
       </a>
 
+      <a class="tool-card" href="b1-hartkaese/wahr-falsch-sbrinz-signatur.html" data-thema="Sbrinz AOP" data-module="b1" data-type="wahr-falsch">
+        <div class="card-top">
+          <span class="badge badge-module">b.1</span>
+          <span class="badge badge-type">Wahr/Falsch</span>
+        </div>
+        <div class="card-title">Sbrinz Signatur-Mechanismus</div>
+        <div class="card-meta">
+          10 Aussagen
+          <span class="dot"></span>
+          Silofrei · Salzbad · Reifung
+        </div>
+      </a>
+
+      <a class="tool-card" href="b1-hartkaese/lernsession-sbrinz.html" data-thema="Sbrinz AOP" data-module="b1" data-type="lernpfad">
+        <div class="card-top">
+          <span class="badge badge-module">b.1</span>
+          <span class="badge badge-type badge-lernpfad">Lernpfad</span>
+        </div>
+        <div class="card-title">Sbrinz AOP – Lernpfad</div>
+        <div class="card-meta">
+          13 Stationen
+          <span class="dot"></span>
+          mit Lesetexten
+          <span class="dot"></span>
+          Quiz · Fehlersuche
+        </div>
+      </a>
+
+      <a class="tool-card" href="b1-hartkaese/lernsession-sbrinz.html?mode=challenge" data-thema="Sbrinz AOP" data-module="b1" data-type="challenge">
+        <div class="card-top">
+          <span class="badge badge-module">b.1</span>
+          <span class="badge badge-type badge-challenge">Challenge</span>
+        </div>
+        <div class="card-title">Sbrinz AOP – Challenge</div>
+        <div class="card-meta">
+          Prüfungsmodus
+          <span class="dot"></span>
+          ohne Lesetexte
+          <span class="dot"></span>
+          simulierte Note
+        </div>
+      </a>
+
+      <a class="tool-card" href="b1-hartkaese/wahr-falsch-emmentaler-pflichtenheft.html" data-thema="Emmentaler AOP" data-module="b1" data-type="wahr-falsch">
+        <div class="card-top">
+          <span class="badge badge-module">b.1</span>
+          <span class="badge badge-type">Wahr/Falsch</span>
+        </div>
+        <div class="card-title">Emmentaler AOP-Pflichtenheft</div>
+        <div class="card-meta">
+          11 Aussagen
+          <span class="dot"></span>
+          Swipe-Karten
+        </div>
+      </a>
+
+      <a class="tool-card" href="b1-hartkaese/lernkaertchen-emmentaler-kulturen.html" data-thema="Emmentaler AOP" data-module="b1" data-type="lernkaertchen">
+        <div class="card-top">
+          <span class="badge badge-module">b.1</span>
+          <span class="badge badge-type">Lernkärtchen</span>
+        </div>
+        <div class="card-title">Emmentaler-Kulturen</div>
+        <div class="card-meta">
+          3 Kulturgruppen
+          <span class="dot"></span>
+          Rolle &amp; Funktion
+        </div>
+      </a>
+
+      <a class="tool-card" href="b1-hartkaese/lueckentext-propionsaeuregaerung.html" data-thema="Emmentaler AOP" data-module="b1" data-type="lueckentext">
+        <div class="card-top">
+          <span class="badge badge-module">b.1</span>
+          <span class="badge badge-type">Lückentext</span>
+        </div>
+        <div class="card-title">Propionsäuregärung</div>
+        <div class="card-meta">
+          12 Lücken
+          <span class="dot"></span>
+          Einfach / Schwer
+        </div>
+      </a>
+
+      <a class="tool-card" href="b1-hartkaese/sortierer-reifungsschritte-emmentaler.html" data-thema="Emmentaler AOP" data-module="b1" data-type="sortierer">
+        <div class="card-top">
+          <span class="badge badge-module">b.1</span>
+          <span class="badge badge-type">Sortierer</span>
+        </div>
+        <div class="card-title">Emmentaler – Reifungs-Puzzle</div>
+        <div class="card-meta">
+          4 Reifungsschritte
+          <span class="dot"></span>
+          chronologisch ordnen
+        </div>
+      </a>
+
+      <a class="tool-card" href="b1-hartkaese/lernsession-emmentaler.html" data-thema="Emmentaler AOP" data-module="b1" data-type="lernpfad">
+        <div class="card-top">
+          <span class="badge badge-module">b.1</span>
+          <span class="badge badge-type badge-lernpfad">Lernpfad</span>
+        </div>
+        <div class="card-title">Emmentaler AOP – Lernpfad</div>
+        <div class="card-meta">
+          15 Stationen
+          <span class="dot"></span>
+          mit Lesetexten
+          <span class="dot"></span>
+          Quiz · Fehlersuche
+        </div>
+      </a>
+
+      <a class="tool-card" href="b1-hartkaese/lernsession-emmentaler.html?mode=challenge" data-thema="Emmentaler AOP" data-module="b1" data-type="challenge">
+        <div class="card-top">
+          <span class="badge badge-module">b.1</span>
+          <span class="badge badge-type badge-challenge">Challenge</span>
+        </div>
+        <div class="card-title">Emmentaler AOP – Challenge</div>
+        <div class="card-meta">
+          Prüfungsmodus
+          <span class="dot"></span>
+          ohne Lesetexte
+          <span class="dot"></span>
+          simulierte Note
+        </div>
+      </a>
+
+      <a class="tool-card" href="b1-hartkaese/wahr-falsch-gruyere-mechanismus.html" data-thema="Gruyère AOP" data-module="b1" data-type="wahr-falsch">
+        <div class="card-top">
+          <span class="badge badge-module">b.1</span>
+          <span class="badge badge-type">Wahr/Falsch</span>
+        </div>
+        <div class="card-title">Gruyère-Mechanismus</div>
+        <div class="card-meta">
+          10 Aussagen
+          <span class="dot"></span>
+          Salzbehandlung &amp; Lochunterdrückung
+        </div>
+      </a>
+
+      <a class="tool-card" href="b1-hartkaese/zuordnung-prozessparameter.html" data-thema="Gruyère AOP" data-module="b1" data-type="zuordnung">
+        <div class="card-top">
+          <span class="badge badge-module">b.1</span>
+          <span class="badge badge-type">Zuordnung</span>
+        </div>
+        <div class="card-title">Prozessparameter Emmentaler / Gruyère</div>
+        <div class="card-meta">
+          6 Parameter
+          <span class="dot"></span>
+          12 Werte
+          <span class="dot"></span>
+          Klick / Drag / Touch
+        </div>
+      </a>
+
     </div>
   </div>
 
@@ -843,37 +792,7 @@
     <div class="section-title">b.2 – Halbhartkäse herstellen</div>
     <div class="tool-grid">
 
-      <a class="tool-card" href="b2-halbhartkase/lernsession-halbhartkaese-bis-salzbad.html" data-module="b2" data-type="lernpfad">
-        <div class="card-top">
-          <span class="badge badge-module">b.2</span>
-          <span class="badge badge-type badge-lernpfad">Lernpfad</span>
-        </div>
-        <div class="card-title">Halbhartkäse bis Salzbad – Lernpfad</div>
-        <div class="card-meta">
-          22 Stationen
-          <span class="dot"></span>
-          Prüfungsvorbereitung
-          <span class="dot"></span>
-          Begründen üben
-        </div>
-      </a>
-
-      <a class="tool-card" href="b2-halbhartkase/lernsession-halbhartkaese-bis-salzbad.html?mode=challenge" data-module="b2" data-type="challenge">
-        <div class="card-top">
-          <span class="badge badge-module">b.2</span>
-          <span class="badge badge-type badge-challenge">Challenge</span>
-        </div>
-        <div class="card-title">Halbhartkäse bis Salzbad – Challenge</div>
-        <div class="card-meta">
-          Prüfungsmodus
-          <span class="dot"></span>
-          ohne Folien
-          <span class="dot"></span>
-          simulierte Note
-        </div>
-      </a>
-
-      <a class="tool-card" href="b2-halbhartkase/zuordnung-kulturen-sorten.html" data-module="b2" data-type="zuordnung">
+      <a class="tool-card" href="b2-halbhartkase/zuordnung-kulturen-sorten.html" data-thema="Kulturen und Wasserzusatz" data-module="b2" data-type="zuordnung">
         <div class="card-top">
           <span class="badge badge-module">b.2</span>
           <span class="badge badge-type">Zuordnung</span>
@@ -886,21 +805,7 @@
         </div>
       </a>
 
-
-      <a class="tool-card" href="b2-halbhartkase/zuordnung-einlaben-bis-wenden.html" data-module="b2" data-type="zuordnung">
-        <div class="card-top">
-          <span class="badge badge-module">b.2</span>
-          <span class="badge badge-type">Zuordnung</span>
-        </div>
-        <div class="card-title">Vom Einlaben bis zum Wenden</div>
-        <div class="card-meta">
-          Appenzeller
-          <span class="dot"></span>
-          9 Schritte mit Parametern · 3 Stufen
-        </div>
-      </a>
-
-      <a class="tool-card" href="b2-halbhartkase/zuordnung-fsk-fsml.html" data-module="b2" data-type="zuordnung">
+      <a class="tool-card" href="b2-halbhartkase/zuordnung-fsk-fsml.html" data-thema="Kulturen und Wasserzusatz" data-module="b2" data-type="zuordnung">
         <div class="card-top">
           <span class="badge badge-module">b.2</span>
           <span class="badge badge-type">Zuordnung</span>
@@ -915,7 +820,7 @@
         </div>
       </a>
 
-      <a class="tool-card" href="b2-halbhartkase/quiz-wasserzusatz.html" data-module="b2" data-type="quiz">
+      <a class="tool-card" href="b2-halbhartkase/quiz-wasserzusatz.html" data-thema="Kulturen und Wasserzusatz" data-module="b2" data-type="quiz">
         <div class="card-top">
           <span class="badge badge-module">b.2</span>
           <span class="badge badge-type">Quiz</span>
@@ -928,7 +833,19 @@
         </div>
       </a>
 
-      <a class="tool-card" href="b2-halbhartkase/quiz-gerinnung.html" data-module="b2" data-type="quiz">
+      <a class="tool-card" href="erklaervideos/wasserzusatz.html" data-thema="Kulturen und Wasserzusatz" data-module="erklaervideos b2" data-type="erklaervideo">
+        <div class="card-top">
+          <span class="badge badge-module">b.2</span>
+          <span class="badge badge-type">Erklärvideo</span>
+        </div>
+        <div class="card-title">Wasserzusatz bei Halbhartkäse</div>
+        <div class="card-meta">
+          Video, 2 Minuten
+          <span class="dot"></span>
+          Milchzucker · Milchsäure · Kalzium · Bruchwaschen</div>
+      </a>
+
+      <a class="tool-card" href="b2-halbhartkase/quiz-gerinnung.html" data-thema="Gerinnung und Bruch" data-module="b2" data-type="quiz">
         <div class="card-top">
           <span class="badge badge-module">b.2</span>
           <span class="badge badge-type">Quiz</span>
@@ -941,7 +858,20 @@
         </div>
       </a>
 
-      <a class="tool-card" href="b2-halbhartkase/quiz-bruch-behandeln-pressen.html" data-module="b2" data-type="quiz">
+      <a class="tool-card" href="b2-halbhartkase/zuordnung-einlaben-bis-wenden.html" data-thema="Gerinnung und Bruch" data-module="b2" data-type="zuordnung">
+        <div class="card-top">
+          <span class="badge badge-module">b.2</span>
+          <span class="badge badge-type">Zuordnung</span>
+        </div>
+        <div class="card-title">Vom Einlaben bis zum Wenden</div>
+        <div class="card-meta">
+          Appenzeller
+          <span class="dot"></span>
+          9 Schritte mit Parametern · 3 Stufen
+        </div>
+      </a>
+
+      <a class="tool-card" href="b2-halbhartkase/quiz-bruch-behandeln-pressen.html" data-thema="Gerinnung und Bruch" data-module="b2" data-type="quiz">
         <div class="card-top">
           <span class="badge badge-module">b.2</span>
           <span class="badge badge-type">Quiz</span>
@@ -954,7 +884,20 @@
         </div>
       </a>
 
-      <a class="tool-card" href="b2-halbhartkase/quiz-milchzuckerabbau-salzbad.html" data-module="b2" data-type="quiz">
+      <a class="tool-card" href="erklaervideos/labgerinnung.html" data-thema="Gerinnung und Bruch" data-module="erklaervideos b1" data-type="erklaervideo">
+        <div class="card-top">
+          <span class="badge badge-module">b.1</span>
+          <span class="badge badge-type">Erklärvideo</span>
+        </div>
+        <div class="card-title">Labgerinnung</div>
+        <div class="card-meta">
+          Video, 2 Minuten
+          <span class="dot"></span>
+          4 Schritte bis zur Gallerte
+        </div>
+      </a>
+
+      <a class="tool-card" href="b2-halbhartkase/quiz-milchzuckerabbau-salzbad.html" data-thema="Milchzucker und Salzbad" data-module="b2" data-type="quiz">
         <div class="card-top">
           <span class="badge badge-module">b.2</span>
           <span class="badge badge-type">Quiz</span>
@@ -967,7 +910,45 @@
         </div>
       </a>
 
-      <a class="tool-card" href="b2-halbhartkase/quiz-ausbeute-einflussfaktoren.html" data-module="b2" data-type="quiz">
+      <a class="tool-card" href="erklaervideos/milchsaeuregaerung.html" data-thema="Milchzucker und Salzbad" data-module="erklaervideos b2" data-type="erklaervideo">
+        <div class="card-top">
+          <span class="badge badge-module">b.2</span>
+          <span class="badge badge-type">Erklärvideo</span>
+        </div>
+        <div class="card-title">Milchsäuregärung im Halbhartkäse</div>
+        <div class="card-meta">
+          Video, 2 Minuten
+          <span class="dot"></span>
+          Menge · Wirkung auf den Teig · Tempo</div>
+      </a>
+
+      <a class="tool-card" href="erklaervideos/salzbad-aufgaben.html" data-thema="Milchzucker und Salzbad" data-module="erklaervideos b1" data-type="erklaervideo">
+        <div class="card-top">
+          <span class="badge badge-module">b.1</span>
+          <span class="badge badge-type">Erklärvideo</span>
+        </div>
+        <div class="card-title">Salzbadbehandlung</div>
+        <div class="card-meta">
+          Video, 2 Minuten
+          <span class="dot"></span>
+          Osmose · Diffusion · 4 Aufgaben
+        </div>
+      </a>
+
+      <a class="tool-card" href="erklaervideos/salzbad-einflussfaktoren.html" data-thema="Milchzucker und Salzbad" data-module="erklaervideos b1" data-type="erklaervideo">
+        <div class="card-top">
+          <span class="badge badge-module">b.1</span>
+          <span class="badge badge-type">Erklärvideo</span>
+        </div>
+        <div class="card-title">Einflussfaktoren der Salzbadbehandlung</div>
+        <div class="card-meta">
+          Video, 3 Minuten
+          <span class="dot"></span>
+          Käse · Salzbad · je 4 Faktoren
+        </div>
+      </a>
+
+      <a class="tool-card" href="b2-halbhartkase/quiz-ausbeute-einflussfaktoren.html" data-thema="Ausbeute" data-module="b2" data-type="quiz">
         <div class="card-top">
           <span class="badge badge-module">b.2</span>
           <span class="badge badge-type">Quiz</span>
@@ -980,6 +961,36 @@
         </div>
       </a>
 
+      <a class="tool-card" href="b2-halbhartkase/lernsession-halbhartkaese-bis-salzbad.html" data-thema="Prüfung vorbereiten" data-module="b2" data-type="lernpfad">
+        <div class="card-top">
+          <span class="badge badge-module">b.2</span>
+          <span class="badge badge-type badge-lernpfad">Lernpfad</span>
+        </div>
+        <div class="card-title">Halbhartkäse bis Salzbad – Lernpfad</div>
+        <div class="card-meta">
+          22 Stationen
+          <span class="dot"></span>
+          Prüfungsvorbereitung
+          <span class="dot"></span>
+          Begründen üben
+        </div>
+      </a>
+
+      <a class="tool-card" href="b2-halbhartkase/lernsession-halbhartkaese-bis-salzbad.html?mode=challenge" data-thema="Prüfung vorbereiten" data-module="b2" data-type="challenge">
+        <div class="card-top">
+          <span class="badge badge-module">b.2</span>
+          <span class="badge badge-type badge-challenge">Challenge</span>
+        </div>
+        <div class="card-title">Halbhartkäse bis Salzbad – Challenge</div>
+        <div class="card-meta">
+          Prüfungsmodus
+          <span class="dot"></span>
+          ohne Folien
+          <span class="dot"></span>
+          simulierte Note
+        </div>
+      </a>
+
     </div>
   </div>
 
@@ -988,37 +999,20 @@
     <div class="section-title">b.7 – Sauermilchprodukte herstellen</div>
     <div class="tool-grid">
 
-      <a class="tool-card" href="b7-sauermilch/lernsession-pruefung-jogurt.html" data-module="b7" data-type="lernpfad">
+      <a class="tool-card" href="b7-sauermilch/quiz-gesetzliches.html" data-thema="Überblick und Gesetz" data-module="b7" data-type="quiz">
         <div class="card-top">
           <span class="badge badge-module">b.7</span>
-          <span class="badge badge-type badge-lernpfad">Lernpfad</span>
+          <span class="badge badge-type">Quiz</span>
         </div>
-        <div class="card-title">Joghurt herstellen – Lernpfad</div>
+        <div class="card-title">Gesetzliche Anforderungen</div>
         <div class="card-meta">
-          15 Posten
+          11 Fragen
           <span class="dot"></span>
-          mit Lesetexten
-          <span class="dot"></span>
-          Ablauf · Kulturen · Technologie
+          VLtH · Fettgehaltsstufen · Keimzahlen
         </div>
       </a>
 
-      <a class="tool-card" href="b7-sauermilch/lernsession-pruefung-jogurt.html?mode=challenge" data-module="b7" data-type="challenge">
-        <div class="card-top">
-          <span class="badge badge-module">b.7</span>
-          <span class="badge badge-type badge-challenge">Challenge</span>
-        </div>
-        <div class="card-title">Joghurt – Prüfungs-Challenge</div>
-        <div class="card-meta">
-          Prüfungsmodus
-          <span class="dot"></span>
-          ohne Hilfen
-          <span class="dot"></span>
-          simulierte Note
-        </div>
-      </a>
-
-      <a class="tool-card" href="b7-sauermilch/lernkaertchen.html" data-module="b7" data-type="lernkaertchen">
+      <a class="tool-card" href="b7-sauermilch/lernkaertchen.html" data-thema="Überblick und Gesetz" data-module="b7" data-type="lernkaertchen">
         <div class="card-top">
           <span class="badge badge-module">b.7</span>
           <span class="badge badge-type">Lernkärtchen</span>
@@ -1033,23 +1027,7 @@
         </div>
       </a>
 
-      <a class="tool-card" href="b7-sauermilch/tabellen-luecken-kulturen.html" data-module="b7" data-type="tabellen-luecken">
-        <div class="card-top">
-          <span class="badge badge-module">b.7</span>
-          <span class="badge badge-type">Tabellen-Lücken</span>
-        </div>
-        <div class="card-title">Jogurtkulturen vergleichen</div>
-        <div class="card-meta">
-          10 Lücken
-          <span class="dot"></span>
-          Sc. thermophilus &amp; Lb. bulgaricus
-          <span class="dot"></span>
-          Wortbank
-        </div>
-      </a>
-
-
-      <a class="tool-card" href="b7-sauermilch/wahr-falsch-sauermilch.html" data-module="b7" data-type="wahr-falsch">
+      <a class="tool-card" href="b7-sauermilch/wahr-falsch-sauermilch.html" data-thema="Überblick und Gesetz" data-module="b7" data-type="wahr-falsch">
         <div class="card-top">
           <span class="badge badge-module">b.7</span>
           <span class="badge badge-type">Wahr/Falsch</span>
@@ -1064,147 +1042,22 @@
         </div>
       </a>
 
-      <a class="tool-card" href="b7-sauermilch/quiz-qualitaetsmaengel.html" data-module="b7" data-type="quiz">
-        <div class="card-top">
-          <span class="badge badge-module">b.7</span>
-          <span class="badge badge-type">Quiz</span>
-        </div>
-        <div class="card-title">Qualitätsmängel erkennen</div>
-        <div class="card-meta">
-          15 Fragen
-          <span class="dot"></span>
-          Multiple Choice
-          <span class="dot"></span>
-          mit Erklärungen
-        </div>
-      </a>
-
-      <a class="tool-card" href="b7-sauermilch/sortierer-jogurtherstellung.html" data-module="b7" data-type="sortierer">
-        <div class="card-top">
-          <span class="badge badge-module">b.7</span>
-          <span class="badge badge-type">Sortierer</span>
-        </div>
-        <div class="card-title">Jogurtherstellung sortieren</div>
-        <div class="card-meta">
-          13 Schritte
-          <span class="dot"></span>
-          Drag &amp; Drop
-          <span class="dot"></span>
-          mit Auswertung
-        </div>
-      </a>
-
-      <a class="tool-card" href="b7-sauermilch/fliessschema-stichfest.html" data-module="b7" data-type="tabellen-luecken">
+      <a class="tool-card" href="b7-sauermilch/tabellen-luecken-kulturen.html" data-thema="Kulturen und Säuregerinnung" data-module="b7" data-type="tabellen-luecken">
         <div class="card-top">
           <span class="badge badge-module">b.7</span>
           <span class="badge badge-type">Tabellen-Lücken</span>
         </div>
-        <div class="card-title">Fliessschema stichfester Jogurt</div>
+        <div class="card-title">Jogurtkulturen vergleichen</div>
         <div class="card-meta">
-          12 Schritte
+          10 Lücken
           <span class="dot"></span>
-          Einfach · Mittel · Schwer
+          Sc. thermophilus &amp; Lb. bulgaricus
+          <span class="dot"></span>
+          Wortbank
         </div>
       </a>
 
-      <a class="tool-card" href="b7-sauermilch/lueckentext-saeuregerinnung.html" data-module="b7" data-type="lueckentext">
-        <div class="card-top">
-          <span class="badge badge-module">b.7</span>
-          <span class="badge badge-type">Lückentext</span>
-        </div>
-        <div class="card-title">Säuregerinnung</div>
-        <div class="card-meta">
-          11 Lücken
-          <span class="dot"></span>
-          Einfach &amp; Schwer
-          <span class="dot"></span>
-          mit Wortbank
-        </div>
-      </a>
-
-      <a class="tool-card" href="b7-sauermilch/zuordnung-anlagenteile-stichfest.html" data-module="b7" data-type="beschriften">
-        <div class="card-top">
-          <span class="badge badge-module">b.7</span>
-          <span class="badge badge-type">Beschriften</span>
-        </div>
-        <div class="card-title">Anlagenteile zuordnen – Stichfest</div>
-        <div class="card-meta">
-          12 Anlagenteile
-          <span class="dot"></span>
-          Stichfester Joghurt
-          <span class="dot"></span>
-          mit Schema
-        </div>
-      </a>
-
-      <a class="tool-card" href="b7-sauermilch/zuordnung-anlagenteile-geruehrt.html" data-module="b7" data-type="beschriften">
-        <div class="card-top">
-          <span class="badge badge-module">b.7</span>
-          <span class="badge badge-type">Beschriften</span>
-        </div>
-        <div class="card-title">Anlagenteile zuordnen – Gerührt</div>
-        <div class="card-meta">
-          13 Anlagenteile
-          <span class="dot"></span>
-          Gerührter Joghurt
-          <span class="dot"></span>
-          mit Schema
-        </div>
-      </a>
-
-      <a class="tool-card" href="b7-sauermilch/prozess-entscheid-jogurt.html" data-module="b7" data-type="quiz">
-        <div class="card-top">
-          <span class="badge badge-module">b.7</span>
-          <span class="badge badge-type">Quiz</span>
-        </div>
-        <div class="card-title">Jogurtherstellung</div>
-        <div class="card-meta">
-          6 Entscheidungen
-          <span class="dot"></span>
-          mit Fehleranalyse
-        </div>
-      </a>
-
-      <a class="tool-card" href="b7-sauermilch/qualitaetsmaengel-jogurt.html" data-module="b7" data-type="lernkaertchen">
-        <div class="card-top">
-          <span class="badge badge-module">b.7</span>
-          <span class="badge badge-type">Lernkärtchen</span>
-        </div>
-        <div class="card-title">Qualitätsmängel Jogurt</div>
-        <div class="card-meta">
-          10 K2-Fragen
-          <span class="dot"></span>
-          Beschreiben · Erklären
-        </div>
-      </a>
-
-      <a class="tool-card" href="b7-sauermilch/quiz-gesetzliches.html" data-module="b7" data-type="quiz">
-        <div class="card-top">
-          <span class="badge badge-module">b.7</span>
-          <span class="badge badge-type">Quiz</span>
-        </div>
-        <div class="card-title">Gesetzliche Anforderungen</div>
-        <div class="card-meta">
-          11 Fragen
-          <span class="dot"></span>
-          VLtH · Fettgehaltsstufen · Keimzahlen
-        </div>
-      </a>
-
-      <a class="tool-card" href="b7-sauermilch/tabellen-luecken-richtwerte.html" data-module="b7" data-type="tabellen-luecken">
-        <div class="card-top">
-          <span class="badge badge-module">b.7</span>
-          <span class="badge badge-type">Tabellen-Lücken</span>
-        </div>
-        <div class="card-title">Richtwerte Joghurtherstellung</div>
-        <div class="card-meta">
-          12 Richtwerte
-          <span class="dot"></span>
-          Temperatur · Druck · Zeit · pH
-        </div>
-      </a>
-
-      <a class="tool-card" href="b7-sauermilch/lueckentext-symbiose-kultur.html" data-module="b7" data-type="lueckentext">
+      <a class="tool-card" href="b7-sauermilch/lueckentext-symbiose-kultur.html" data-thema="Kulturen und Säuregerinnung" data-module="b7" data-type="lueckentext">
         <div class="card-top">
           <span class="badge badge-module">b.7</span>
           <span class="badge badge-type">Lückentext</span>
@@ -1219,6 +1072,163 @@
         </div>
       </a>
 
+      <a class="tool-card" href="b7-sauermilch/lueckentext-saeuregerinnung.html" data-thema="Kulturen und Säuregerinnung" data-module="b7" data-type="lueckentext">
+        <div class="card-top">
+          <span class="badge badge-module">b.7</span>
+          <span class="badge badge-type">Lückentext</span>
+        </div>
+        <div class="card-title">Säuregerinnung</div>
+        <div class="card-meta">
+          11 Lücken
+          <span class="dot"></span>
+          Einfach &amp; Schwer
+          <span class="dot"></span>
+          mit Wortbank
+        </div>
+      </a>
+
+      <a class="tool-card" href="b7-sauermilch/sortierer-jogurtherstellung.html" data-thema="Joghurt herstellen" data-module="b7" data-type="sortierer">
+        <div class="card-top">
+          <span class="badge badge-module">b.7</span>
+          <span class="badge badge-type">Sortierer</span>
+        </div>
+        <div class="card-title">Jogurtherstellung sortieren</div>
+        <div class="card-meta">
+          13 Schritte
+          <span class="dot"></span>
+          Drag &amp; Drop
+          <span class="dot"></span>
+          mit Auswertung
+        </div>
+      </a>
+
+      <a class="tool-card" href="b7-sauermilch/fliessschema-stichfest.html" data-thema="Joghurt herstellen" data-module="b7" data-type="tabellen-luecken">
+        <div class="card-top">
+          <span class="badge badge-module">b.7</span>
+          <span class="badge badge-type">Tabellen-Lücken</span>
+        </div>
+        <div class="card-title">Fliessschema stichfester Jogurt</div>
+        <div class="card-meta">
+          12 Schritte
+          <span class="dot"></span>
+          Einfach · Mittel · Schwer
+        </div>
+      </a>
+
+      <a class="tool-card" href="b7-sauermilch/zuordnung-anlagenteile-stichfest.html" data-thema="Joghurt herstellen" data-module="b7" data-type="beschriften">
+        <div class="card-top">
+          <span class="badge badge-module">b.7</span>
+          <span class="badge badge-type">Beschriften</span>
+        </div>
+        <div class="card-title">Anlagenteile zuordnen – Stichfest</div>
+        <div class="card-meta">
+          12 Anlagenteile
+          <span class="dot"></span>
+          Stichfester Joghurt
+          <span class="dot"></span>
+          mit Schema
+        </div>
+      </a>
+
+      <a class="tool-card" href="b7-sauermilch/zuordnung-anlagenteile-geruehrt.html" data-thema="Joghurt herstellen" data-module="b7" data-type="beschriften">
+        <div class="card-top">
+          <span class="badge badge-module">b.7</span>
+          <span class="badge badge-type">Beschriften</span>
+        </div>
+        <div class="card-title">Anlagenteile zuordnen – Gerührt</div>
+        <div class="card-meta">
+          13 Anlagenteile
+          <span class="dot"></span>
+          Gerührter Joghurt
+          <span class="dot"></span>
+          mit Schema
+        </div>
+      </a>
+
+      <a class="tool-card" href="b7-sauermilch/prozess-entscheid-jogurt.html" data-thema="Joghurt herstellen" data-module="b7" data-type="quiz">
+        <div class="card-top">
+          <span class="badge badge-module">b.7</span>
+          <span class="badge badge-type">Quiz</span>
+        </div>
+        <div class="card-title">Jogurtherstellung</div>
+        <div class="card-meta">
+          6 Entscheidungen
+          <span class="dot"></span>
+          mit Fehleranalyse
+        </div>
+      </a>
+
+      <a class="tool-card" href="b7-sauermilch/tabellen-luecken-richtwerte.html" data-thema="Joghurt herstellen" data-module="b7" data-type="tabellen-luecken">
+        <div class="card-top">
+          <span class="badge badge-module">b.7</span>
+          <span class="badge badge-type">Tabellen-Lücken</span>
+        </div>
+        <div class="card-title">Richtwerte Joghurtherstellung</div>
+        <div class="card-meta">
+          12 Richtwerte
+          <span class="dot"></span>
+          Temperatur · Druck · Zeit · pH
+        </div>
+      </a>
+
+      <a class="tool-card" href="b7-sauermilch/quiz-qualitaetsmaengel.html" data-thema="Qualitätsmängel" data-module="b7" data-type="quiz">
+        <div class="card-top">
+          <span class="badge badge-module">b.7</span>
+          <span class="badge badge-type">Quiz</span>
+        </div>
+        <div class="card-title">Qualitätsmängel erkennen</div>
+        <div class="card-meta">
+          15 Fragen
+          <span class="dot"></span>
+          Multiple Choice
+          <span class="dot"></span>
+          mit Erklärungen
+        </div>
+      </a>
+
+      <a class="tool-card" href="b7-sauermilch/qualitaetsmaengel-jogurt.html" data-thema="Qualitätsmängel" data-module="b7" data-type="lernkaertchen">
+        <div class="card-top">
+          <span class="badge badge-module">b.7</span>
+          <span class="badge badge-type">Lernkärtchen</span>
+        </div>
+        <div class="card-title">Qualitätsmängel Jogurt</div>
+        <div class="card-meta">
+          10 K2-Fragen
+          <span class="dot"></span>
+          Beschreiben · Erklären
+        </div>
+      </a>
+
+      <a class="tool-card" href="b7-sauermilch/lernsession-pruefung-jogurt.html" data-thema="Prüfung vorbereiten" data-module="b7" data-type="lernpfad">
+        <div class="card-top">
+          <span class="badge badge-module">b.7</span>
+          <span class="badge badge-type badge-lernpfad">Lernpfad</span>
+        </div>
+        <div class="card-title">Joghurt herstellen – Lernpfad</div>
+        <div class="card-meta">
+          15 Posten
+          <span class="dot"></span>
+          mit Lesetexten
+          <span class="dot"></span>
+          Ablauf · Kulturen · Technologie
+        </div>
+      </a>
+
+      <a class="tool-card" href="b7-sauermilch/lernsession-pruefung-jogurt.html?mode=challenge" data-thema="Prüfung vorbereiten" data-module="b7" data-type="challenge">
+        <div class="card-top">
+          <span class="badge badge-module">b.7</span>
+          <span class="badge badge-type badge-challenge">Challenge</span>
+        </div>
+        <div class="card-title">Joghurt – Prüfungs-Challenge</div>
+        <div class="card-meta">
+          Prüfungsmodus
+          <span class="dot"></span>
+          ohne Hilfen
+          <span class="dot"></span>
+          simulierte Note
+        </div>
+      </a>
+
     </div>
   </div>
 
@@ -1226,7 +1236,6 @@
   <div class="module-section" id="section-d1">
     <div class="section-title">d.1 – Hygiene</div>
     <div class="tool-grid">
-
 
       <a class="tool-card" href="d1-hygiene/sortierer-haendedesinfektion.html" data-module="d1" data-type="sortierer">
         <div class="card-top">
@@ -1283,76 +1292,6 @@
     </div>
   </div>
 
-  <!-- Erklärvideos (modulübergreifende Rubrik) -->
-  <div class="module-section" id="section-erklaervideos">
-    <div class="section-title">Erklärvideos</div>
-    <div class="tool-grid">
-
-      <a class="tool-card" href="erklaervideos/labgerinnung.html" data-module="erklaervideos b1" data-type="erklaervideo">
-        <div class="card-top">
-          <span class="badge badge-module">b.1</span>
-          <span class="badge badge-type">Erklärvideo</span>
-        </div>
-        <div class="card-title">Labgerinnung</div>
-        <div class="card-meta">
-          Video, 2 Minuten
-          <span class="dot"></span>
-          4 Schritte bis zur Gallerte
-        </div>
-      </a>
-
-      <a class="tool-card" href="erklaervideos/salzbad-aufgaben.html" data-module="erklaervideos b1" data-type="erklaervideo">
-        <div class="card-top">
-          <span class="badge badge-module">b.1</span>
-          <span class="badge badge-type">Erklärvideo</span>
-        </div>
-        <div class="card-title">Salzbadbehandlung</div>
-        <div class="card-meta">
-          Video, 2 Minuten
-          <span class="dot"></span>
-          Osmose · Diffusion · 4 Aufgaben
-        </div>
-      </a>
-
-      <a class="tool-card" href="erklaervideos/salzbad-einflussfaktoren.html" data-module="erklaervideos b1" data-type="erklaervideo">
-        <div class="card-top">
-          <span class="badge badge-module">b.1</span>
-          <span class="badge badge-type">Erklärvideo</span>
-        </div>
-        <div class="card-title">Einflussfaktoren der Salzbadbehandlung</div>
-        <div class="card-meta">
-          Video, 3 Minuten
-          <span class="dot"></span>
-          Käse · Salzbad · je 4 Faktoren
-        </div>
-      </a>
-
-      <a class="tool-card" href="erklaervideos/wasserzusatz.html" data-module="erklaervideos b2" data-type="erklaervideo">
-        <div class="card-top">
-          <span class="badge badge-module">b.2</span>
-          <span class="badge badge-type">Erklärvideo</span>
-        </div>
-        <div class="card-title">Wasserzusatz bei Halbhartkäse</div>
-        <div class="card-meta">
-          Video, 2 Minuten
-          <span class="dot"></span>
-          Milchzucker · Milchsäure · Kalzium · Bruchwaschen</div>
-      </a>
-
-      <a class="tool-card" href="erklaervideos/milchsaeuregaerung.html" data-module="erklaervideos b2" data-type="erklaervideo">
-        <div class="card-top">
-          <span class="badge badge-module">b.2</span>
-          <span class="badge badge-type">Erklärvideo</span>
-        </div>
-        <div class="card-title">Milchsäuregärung im Halbhartkäse</div>
-        <div class="card-meta">
-          Video, 2 Minuten
-          <span class="dot"></span>
-          Menge · Wirkung auf den Teig · Tempo</div>
-      </a>
-
-    </div>
-  </div>
 
   <!-- Rechner -->
   <div class="module-section" id="section-rechner">
@@ -1398,7 +1337,6 @@
         </div>
       </a>
 
-
       <a class="tool-card" href="tools/einheiten-trainer.html" data-module="rechner" data-type="trainer">
         <div class="card-top">
           <span class="badge" style="background:#f3e8ff;color:#6b21a8;">Rechner</span>
@@ -1423,71 +1361,7 @@
   BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
 </footer>
 
-<script>
-var activeModule = 'all';
-var activeType   = 'all';
-
-function setActiveBtn(filter, value) {
-  document.querySelectorAll('.filter-btn[data-filter="' + filter + '"]').forEach(function(b) {
-    b.classList.toggle('active', b.dataset.value === value);
-  });
-}
-
-function saveFilter() {
-  try {
-    localStorage.setItem('ltModule', activeModule);
-    localStorage.setItem('ltType', activeType);
-  } catch (e) {}
-}
-
-function restoreFilter() {
-  try {
-    var m = localStorage.getItem('ltModule');
-    var t = localStorage.getItem('ltType');
-    if (m) activeModule = m;
-    if (t) activeType   = t;
-  } catch (e) {}
-  // Auf 'all' zurückfallen, falls ein gespeicherter Wert nicht (mehr) existiert
-  if (!document.querySelector('.filter-btn[data-filter="module"][data-value="' + activeModule + '"]')) activeModule = 'all';
-  if (!document.querySelector('.filter-btn[data-filter="type"][data-value="' + activeType + '"]'))   activeType   = 'all';
-  setActiveBtn('module', activeModule);
-  setActiveBtn('type', activeType);
-}
-
-document.querySelectorAll('.filter-btn').forEach(function(btn) {
-  btn.addEventListener('click', function() {
-    var filter = btn.dataset.filter;
-    var value  = btn.dataset.value;
-
-    setActiveBtn(filter, value);
-
-    if (filter === 'module') activeModule = value;
-    if (filter === 'type')   activeType   = value;
-
-    saveFilter();
-    applyFilter();
-  });
-});
-
-function applyFilter() {
-  // Show/hide individual cards
-  document.querySelectorAll('.tool-card:not(.disabled)').forEach(function(card) {
-    var moduleMatch = activeModule === 'all' || card.dataset.module.split(' ').indexOf(activeModule) !== -1; // data-module darf mehrere Module enthalten, leerzeichengetrennt
-    var typeMatch   = activeType   === 'all' || card.dataset.type   === activeType;
-    card.style.display = (moduleMatch && typeMatch) ? '' : 'none';
-  });
-
-  // Show/hide module sections when all their cards are hidden
-  document.querySelectorAll('.module-section').forEach(function(section) {
-    var visible = section.querySelectorAll('.tool-card:not(.disabled):not([style*="display: none"])').length;
-    section.classList.toggle('hidden', visible === 0);
-  });
-}
-
-// Beim Laden gespeicherten Filter wiederherstellen
-restoreFilter();
-applyFilter();
-</script>
+<script src="assets/startseite.js?v=69f93a4f"></script>
 
 </body>
 </html>
