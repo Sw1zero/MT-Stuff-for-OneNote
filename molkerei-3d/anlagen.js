@@ -45,6 +45,7 @@ const MEDIEN = {
   milch: { name: 'Milch', farbe: '#ffffff', produkt: true },
   rahm: { name: 'Rahm', farbe: '#f2d54b', produkt: true },
   magermilch: { name: 'Magermilch', farbe: '#9aa3ab', produkt: true },
+  bruch: { name: 'Bruch', farbe: '#f2d54b', produkt: true },
   molke: { name: 'Molke', farbe: '#4f9d5a', produkt: true },
   heisswasser: { name: 'Heisswasser', farbe: '#cc3333' },
   kuehlwasser: { name: 'Kühlwasser', farbe: '#3b7dd8' }
@@ -62,6 +63,7 @@ const LEITUNGEN = [
   { von: 'separator', nach: 'rahmreifer', medium: 'rahm' },
   { von: 'separator', nach: 'kaesefertiger', medium: 'magermilch' },
   { von: 'plattenwaermetauscher', nach: 'kaesefertiger', medium: 'milch' },
+  { von: 'kaesefertiger', nach: 'vorpresswanne', medium: 'bruch' },
   { von: 'vorpresswanne', nach: 'molketank', medium: 'molke' },
   // Versorgung
   { von: 'dampfkessel', nach: 'plattenwaermetauscher', medium: 'heisswasser' },
