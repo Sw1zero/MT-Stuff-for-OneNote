@@ -53,6 +53,8 @@ async (page) => {
   });
   await page.mouse.move(box.x + rw[0] * box.width, box.y + rw[1] * box.height);
   await page.waitForTimeout(200);
+  // Hervorheben bleibt beim Teil: Mantel von Tank 2 teilte sich im glTF das Material
+  ok(await page.evaluate(() => document.querySelector('[data-anlage="lagertank-2"]').object3D.getObjectByName('mantel').material.emissive.getHex() === 0), 'Hervorheben färbt den anderen Tank mit');
   await page.mouse.down(); await page.mouse.up();
   ok((await t('overlay-teil').textContent()) === 'Rührwerk', `Klick auf Rührwerk zeigt: ${await t('overlay-teil').textContent()}`);
   await page.evaluate(() => window.kaeserei.schliessen());

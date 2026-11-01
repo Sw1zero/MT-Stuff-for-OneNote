@@ -88,6 +88,11 @@ const LAGERTANK = {
     { id: 'thermometer', name: 'Temperaturfühler', text: 'Der Temperaturfühler informiert Sie über die Temperatur der Milch. Die Kühlung auf 1 bis 5 °C vermindert die Aktivität der meisten Mikroorganismen deutlich.' },
     { id: 'cip', name: 'CIP-Vorrichtung', text: 'Die CIP-Vorrichtung ermöglicht die Kreislaufreinigung des Tanks.' },
     { id: 'auslauf', name: 'Auslaufstutzen', text: 'Über den Auslaufstutzen fliesst die Milch aus dem Tank weiter zur Verarbeitung. Grosse Tanks werden oft auch von unten über den Auslaufstutzen befüllt, weil das schonend und schaumfrei ist.' },
+    { id: 'licht', name: 'Licht', text: 'Das Licht beleuchtet das Tankinnere.' },
+    { id: 'entlueftung', name: 'Be- und Entlüftungsstutzen', text: 'Der Be- und Entlüftungsstutzen sorgt für den Druckausgleich, wenn Sie den Tank füllen oder leeren.' },
+    { id: 'vollsonde', name: 'Vollsonde', text: 'Die Vollsonde meldet, wenn der Tank voll ist.' },
+    { id: 'leersonde', name: 'Leersonde', text: 'Die Leersonde meldet, wenn der Tank leer ist.' },
+    { id: 'fuellstand', name: 'Füllstandsmessung', text: 'Die Füllstandsmessung informiert Sie über die Füllmenge im Tank.' },
     { id: 'kuehlwasser', name: 'Doppelmantel mit Eiswasser', text: 'Lagertanks haben einen Doppelmantel. Darin wird mit Eiswasser gekühlt oder mit Warmwasser geheizt, damit sich die Milch während der Lagerung weder erwärmt noch zu stark abkühlt. Das Eiswasser kommt hier von der Kälteanlage im Untergeschoss.' }
   ],
   text: 'Im Lagertank lagern Sie die Rohmilch bis zur Verarbeitung, höchstens 48 Stunden. ' +

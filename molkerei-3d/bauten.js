@@ -277,6 +277,8 @@ const BAUTEN = {
     const m = el('a-entity', { 'gltf-model': 'modelle/lagertank.glb' }, g);
     const ids = anlageVon(g.dataset.anlage).teile.map(t => t.id);
     m.addEventListener('model-loaded', () => {
+      // glTF-Teile (und beide Tanks) teilen sich Materialien: eigene Kopie, sonst leuchtet beim Hervorheben alles mit
+      m.getObject3D('mesh').traverse(o => { if (o.material) o.material = o.material.clone(); });
       for (const node of [...m.getObject3D('mesh').getObjectByName('lagertank').children]) {
         if (ids.includes(node.name)) el('a-entity', { 'data-teil': node.name, class: 'klickbar' }, g).setObject3D('mesh', node);
       }
