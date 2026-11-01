@@ -74,6 +74,18 @@ async (page) => {
   ok(!(await haubeGeschnitten()), 'Schnitt bleibt nach Betriebsende');
   await page.evaluate(() => { window.kaeserei.oeffnen('separator'); window.kaeserei.schliessen(); });
 
+  // Schnittbild: Knopf öffnet, Klick auf eine Beschriftung zeigt das Teil, Esc schliesst nur das Schnittbild
+  await page.evaluate(() => window.kaeserei.select('separator'));
+  await t('overlay-schnitt').click();
+  ok(await t('schnittbild').evaluate(d => d.open), 'Schnittbild öffnet nicht');
+  await page.locator('[data-sb-teil="kolbenschieber"] text').click();
+  ok((await t('schnittbild-teil').textContent()).startsWith('Kolbenschieber'), 'Klick im Schnittbild zeigt kein Teil');
+  ok(await page.evaluate(() => ['milch', 'rahm', 'magermilch'].every(m => document.querySelector(`[data-sb-zone="${m}"]`))), 'Farbfläche fehlt im Schnittbild');
+  await page.keyboard.press('Escape');
+  ok(!(await t('schnittbild').evaluate(d => d.open)), 'Esc schliesst das Schnittbild nicht');
+  ok(await t('overlay').isVisible(), 'Esc im Schnittbild schliesst auch das Overlay');
+  await page.evaluate(() => window.kaeserei.schliessen());
+
   // Gehen: 1 s W mit Blick nach Norden = gut 1.4 m
   const pos = () => page.evaluate(() => { const p = document.getElementById('spieler').object3D.position; return [p.x, p.z]; });
   await page.evaluate(() => { document.getElementById('spieler').object3D.position.set(30, 0, 30); document.getElementById('kamera').components['look-controls'].yawObject.rotation.y = 0; });

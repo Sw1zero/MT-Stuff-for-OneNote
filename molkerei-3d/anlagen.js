@@ -89,9 +89,11 @@ const ANLAGEN = [
     id: 'separator', name: 'Separator', raum: 'behandlung', x: 8, z: 6, b: 1.7, t: 0.8, bau: 'separator',
     // Nach Fotos SPX, gut 1.6 m hoch. Alle Texte: Lehrmittel a.2 (Aufbau, Funktion, Trommelbestandteile, Bedienen).
     oeffnen: { auf: 'Haube öffnen', zu: 'Haube schliessen' },
-    // Betrieb: Schnitt durch Haube und Trommel, Trommel dreht, Kugeln zeigen die Wege (bauten.js separatorbetrieb)
+    // Betrieb: Schnitt durch Haube und Trommel, Trommel dreht (bauten.js separatorbetrieb).
+    // Wie es fliesst, zeigt das Schnittbild (schnittbild.js).
     betrieb: { an: 'Betrieb zeigen', aus: 'Betrieb beenden',
-      hinweis: 'Vereinfachte Darstellung: Die Trommel dreht rund 100-mal langsamer als in Wirklichkeit. Die Kugeln zeigen den Weg von Milch (weiss), Rahm (gelb) und Magermilch (grau), nicht einzelne Fettkügelchen.' },
+      hinweis: 'Die Trommel dreht rund 100-mal langsamer als in Wirklichkeit. Wie Milch, Rahm und Magermilch fliessen, zeigt das Schnittbild.' },
+    schnittbild: true,
     // Wo die Leitungen andocken, je Medium [x, y, z] relativ zur Anlagenmitte (sonst Mitte auf 1 m)
     anschluesse: { milch: [0.23, 1.76, 0], rahm: [0.63, 1.47, 0], magermilch: [-0.17, 1.47, 0] },
     teile: [

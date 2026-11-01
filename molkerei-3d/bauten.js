@@ -66,48 +66,19 @@ function manometer(g, x, y, z) {
 }
 
 // Separator im Betrieb: vordere Hälfte von Haube, Gehäuse und Trommel weggeschnitten, drehende Teile drehen
-// (rund 100-mal langsamer als echt), Kugeln fliessen auf den Wegen von Milch, Rahm und Magermilch.
-// Magermilch-Kugeln dunkler als die Leitung, sonst unsichtbar auf Stahl.
-// Wege als Profil (r, y) im Schnitt nach Westfalia MHA Bild 19, die Kugeln drehen mit der Trommel mit.
+// (rund 100-mal langsamer als echt). Die Strömung zeigt das Schnittbild (schnittbild.js), nicht die 3D-Szene:
+// mitdrehende Kugeln in der kleinen Trommel waren nicht zu verfolgen.
 const SEP_GESCHNITTEN = ['gestellhaube', 'gestelloberteil', 'trommelunterteil', 'kolbenschieber', 'verteiler', 'tellerpaket',
   'einlaufrohr', 'scheideteller', 'dichtring', 'trommeldeckel', 'trommelverschlussring', 'magermilchgreifer',
   'greiferkammerdeckel', 'greiferkammerverschlussring'];
 const SEP_DREHEND = ['trommelunterteil', 'kolbenschieber', 'verteiler', 'tellerpaket', 'scheideteller', 'dichtring',
   'trommeldeckel', 'trommelverschlussring', 'greiferkammerdeckel', 'greiferkammerverschlussring']; // Greifer stehen still
-const SEP_WEGE = [
-  // Milch: Einlaufrohr hinunter, im Verteilerfuss nach aussen, durch die Steiglöcher ins Tellerpaket
-  { medium: 'milch', n: 140, punkte: [[0, 1.42], [0.005, 1.0], [0.06, 0.93], [0.165, 0.93], [0.165, 1.0]] },
-  // Rahm: im Tellerpaket nach innen und oben, am Verteiler hoch zum Rahmgreifer, neben dem Einlaufrohr hinaus
-  { medium: 'rahm', n: 90, punkte: [[0.165, 1.0], [0.08, 1.05], [0.06, 1.1], [0.05, 1.17], [0.025, 1.2], [0.025, 1.42]] },
-  // Magermilch: nach aussen zur Trommelwand, zwischen Scheideteller und Trommeldeckel hoch zum Magermilchgreifer
-  { medium: 'magermilch', n: 140, punkte: [[0.165, 1.0], [0.25, 0.97], [0.262, 1.01], [0.2, 1.075], [0.11, 1.155], [0.085, 1.2], [0.06, 1.2]] }
-];
 
 AFRAME.registerComponent('separatorbetrieb', {
   init() {
     this.an = false; this.winkel = 0;
     this.ebene = new THREE.Plane();
     this.ruhig = matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    // Kugeln: ein Points-Objekt, pro Kugel Weg, Startwinkel und Phase
-    this.kugeln = [];
-    for (const w of SEP_WEGE) {
-      const len = w.punkte.slice(1).reduce((s, p, i) => s + Math.hypot(p[0] - w.punkte[i][0], p[1] - w.punkte[i][1]), 0);
-      for (let i = 0; i < w.n; i++) this.kugeln.push({ w, len, phi: Math.random() * Math.PI * 2, t: Math.random() });
-    }
-    const geo = new THREE.BufferGeometry();
-    this.pos = new Float32Array(this.kugeln.length * 3);
-    const farben = new Float32Array(this.kugeln.length * 3);
-    this.kugeln.forEach((k, i) => new THREE.Color({ milch: '#fffaf0', rahm: MEDIEN.rahm.farbe, magermilch: '#6c757d' }[k.w.medium]).toArray(farben, i * 3));
-    geo.setAttribute('position', new THREE.BufferAttribute(this.pos, 3));
-    geo.setAttribute('color', new THREE.BufferAttribute(farben, 3));
-    this.punkte = new THREE.Points(geo, new THREE.PointsMaterial({ size: 0.02, vertexColors: true, clippingPlanes: [this.ebene], depthTest: false }));
-    this.punkte.visible = false;
-    this.punkte.renderOrder = 10; // vor den Tellern zeichnen, sonst verschwindet die Strömung im Paket
-    this.punkte.frustumCulled = false;
-    this.punkte.raycast = () => {}; // Klicks gehen an die Teile dahinter
-    this.el.object3D.add(this.punkte);
-
     this.el.closest('[data-anlage]').addEventListener('betrieb', e => this.schalten(e.detail.an));
   },
   schalten(an) {
@@ -127,24 +98,12 @@ AFRAME.registerComponent('separatorbetrieb', {
       o.material.clippingPlanes = an ? [this.ebene] : null;
       o.material.needsUpdate = true;
     });
-    this.punkte.visible = an;
     if (!an) for (const t of this.drehend) t.object3D.rotation.y = 0;
   },
   tick(t, dt) {
-    if (!this.an) return;
-    const s = Math.min(dt, 100) / 1000;
-    if (!this.ruhig) this.winkel += s * Math.PI * 2; // 1 U/s statt rund 100 U/s
+    if (!this.an || this.ruhig) return;
+    this.winkel += Math.min(dt, 100) / 1000 * Math.PI * 2; // 1 U/s statt rund 100 U/s
     for (const d of this.drehend) d.object3D.rotation.y = this.winkel;
-    this.kugeln.forEach((k, i) => {
-      k.t = (k.t + s * 0.12 / k.len) % 1; // 12 cm/s auf dem Weg
-      let rest = k.t * k.len, p = k.w.punkte, j = 0;
-      for (; j < p.length - 2; j++) { const l = Math.hypot(p[j + 1][0] - p[j][0], p[j + 1][1] - p[j][1]); if (rest <= l) break; rest -= l; }
-      const l = Math.hypot(p[j + 1][0] - p[j][0], p[j + 1][1] - p[j][1]) || 1, f = Math.min(rest / l, 1);
-      const r = p[j][0] + (p[j + 1][0] - p[j][0]) * f, y = p[j][1] + (p[j + 1][1] - p[j][1]) * f;
-      const w = k.phi + this.winkel;
-      this.pos[i * 3] = r * Math.cos(w); this.pos[i * 3 + 1] = y; this.pos[i * 3 + 2] = r * Math.sin(w);
-    });
-    this.punkte.geometry.attributes.position.needsUpdate = true;
   }
 });
 

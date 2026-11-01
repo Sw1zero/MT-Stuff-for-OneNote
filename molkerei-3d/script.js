@@ -122,7 +122,7 @@ AFRAME.registerComponent('gehen', {
     const k = this.tasten;
     const vor = (k.has('KeyW') || k.has('ArrowUp')) - (k.has('KeyS') || k.has('ArrowDown'));
     const seit = (k.has('KeyD') || k.has('ArrowRight')) - (k.has('KeyA') || k.has('ArrowLeft'));
-    if (!vor && !seit) return;
+    if ((!vor && !seit) || document.querySelector('dialog[open]')) return;
     const tempo = k.has('ShiftLeft') || k.has('ShiftRight') ? RENNEN : GEHEN;
     const s = tempo * Math.min(dt, 100) / 1000 / Math.hypot(vor, seit);
     const th = this.kamera.object3D.rotation.y;
@@ -266,6 +266,7 @@ window.kaeserei = {
     $('overlay-betrieb').hidden = !an.betrieb;
     if (an.betrieb) $('overlay-betrieb').textContent = g.dataset.betrieb ? an.betrieb.aus : an.betrieb.an;
     $('overlay-hinweis').hidden = !(an.betrieb && g.dataset.betrieb);
+    $('overlay-schnitt').hidden = !an.schnittbild;
     if (an.betrieb) $('overlay-hinweis').textContent = an.betrieb.hinweis;
     $('overlay').dataset.anlage = id;
     $('overlay').dataset.teil = t ? t.id : '';
@@ -332,8 +333,9 @@ document.addEventListener('DOMContentLoaded', () => {
   $('overlay-schliessen').addEventListener('click', () => window.kaeserei.schliessen());
   $('overlay-aktion').addEventListener('click', () => window.kaeserei.oeffnen($('overlay').dataset.anlage));
   $('overlay-betrieb').addEventListener('click', () => window.kaeserei.betrieb($('overlay').dataset.anlage));
+  $('overlay-schnitt').addEventListener('click', () => window.schnittbild.oeffnen($('overlay').dataset.anlage));
   $('overlay-uebersicht').addEventListener('click', () => window.kaeserei.select($('overlay').dataset.anlage));
-  window.addEventListener('keydown', e => { if (e.key === 'Escape') window.kaeserei.schliessen(); });
+  window.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('schnittbild').open) window.kaeserei.schliessen(); });
 
   const start = () => { setzeSpieler(START.x, START.z, START.blick[0], START.blick[1]); document.body.dataset.bereit = 'ja'; };
   if (szene.hasLoaded) start(); else szene.addEventListener('loaded', start);

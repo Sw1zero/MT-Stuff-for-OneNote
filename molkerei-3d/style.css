@@ -58,3 +58,43 @@
   padding: 16px; background: var(--bg); text-align: center; font-family: var(--font); font-size: 1.1rem; color: var(--blue-dark);
 }
 .mk-nur-desktop[hidden] { display: none; }
+
+/* Schnittbild der Separator-Trommel (schnittbild.js) */
+.mk-schnitt {
+  width: min(1100px, calc(100vw - 32px)); max-height: calc(100vh - 32px); margin: auto; border: 0; border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg); padding: 20px 24px; border-top: 4px solid var(--blue-light); font-family: var(--font);
+}
+.mk-schnitt::backdrop { background: rgba(19, 64, 97, 0.45); }
+.mk-schnitt h2 { margin: 0 40px 8px 0; color: var(--blue-dark); font-size: 1.25rem; }
+.mk-schnitt-inhalt { display: grid; grid-template-columns: 1fr 280px; gap: 20px; align-items: start; }
+.mk-schnitt svg { width: 100%; height: auto; max-height: calc(100vh - 120px); }
+.mk-schnitt-info h3 { margin: 0 0 8px; color: var(--blue-light); font-size: 1.05rem; }
+.mk-schnitt-info p { margin: 0 0 0.6em; line-height: 1.55; color: var(--text); }
+.mk-schnitt .mk-hinweis { font-size: 0.9em; font-style: italic; color: var(--text-muted); }
+.mk-schnitt { --sb-milch: #ffffff; --sb-rahm: #f2d54b; --sb-mager: #a3acb4; }
+.sb-leer { fill: #d3d9de; }
+.sb-zone { stroke: none; }
+.sb-zone-milch { fill: var(--sb-milch); stroke: #b4bcc3; stroke-width: 1; }
+.sb-zone-rahm { fill: var(--sb-rahm); }
+.sb-zone-magermilch { fill: var(--sb-mager); }
+.sb-zone-tellerpaket { fill: url(#sb-verlauf); }
+.sb-strich { fill: none; stroke-width: 2; stroke-dasharray: 7 11; stroke-linejoin: round; animation: sb-fliessen 0.9s linear infinite; }
+.sb-strich-milch { stroke: #9aa3ab; }
+.sb-strich-rahm { stroke: #a8860a; }
+.sb-strich-magermilch { stroke: #4d565e; }
+@keyframes sb-fliessen { to { stroke-dashoffset: -18; } }
+@media (prefers-reduced-motion: reduce) { .sb-strich { animation: none; } }
+.sb-teil { cursor: pointer; fill: #b9c0c6; stroke: #4a545c; stroke-width: 1.2; }
+.sb-teil:hover, .sb-teil:focus-visible, .sb-teil.sb-aktiv { fill: #69a9c9; outline: none; }
+.sb-teil:hover .sb-teller, .sb-teil.sb-aktiv .sb-teller, .sb-teil:hover .sb-linie, .sb-teil.sb-aktiv .sb-linie { stroke: #1d6f99; }
+.sb-teller { stroke: #4a545c; stroke-width: 4; stroke-linecap: round; }
+.sb-oeffnung { fill: #22262a; }
+.sb-linie { fill: none; stroke: #7b858d; stroke-width: 1; }
+.sb-text { fill: var(--text); stroke: none; font-size: 17px; }
+.sb-teil:hover .sb-text, .sb-teil.sb-aktiv .sb-text { fill: #1d6f99; font-weight: 600; }
+.sb-medium { fill: var(--text-muted); font-size: 16px; }
+.sb-schlamm { fill: #7a5a3a; }
+.sb-kugeln { pointer-events: none; }
+.sb-dreh { fill: none; stroke: var(--blue-light); stroke-width: 3; }
+.sb-spitze { fill: var(--blue-light); }
+@media (max-width: 900px) { .mk-schnitt-inhalt { grid-template-columns: 1fr; } }
