@@ -257,6 +257,8 @@ window.kaeserei = {
     $('overlay-titel').textContent = an.name;
     $('overlay-teil').textContent = t ? t.name : '';
     $('overlay-teil').hidden = !t;
+    $('overlay-bild').hidden = !(t && t.bild);
+    if (t && t.bild) { $('overlay-bild').src = t.bild; $('overlay-bild').alt = `Zeichnung ${t.name}`; }
     $('overlay-text').textContent = t ? t.text : an.text || (an.bau ? 'Infotext folgt.' : 'Diese Anlage folgt. Sie wird später in 3D gebaut.');
     $('overlay-uebersicht').hidden = !t;
     const aktion = $('overlay-aktion');

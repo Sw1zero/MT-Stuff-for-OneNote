@@ -164,55 +164,62 @@ const BAUTEN = {
     // Lehrmittel a.2 «Trommelbestandteile» 1-12. Beim Öffnen heben sich die Teile in umgekehrter
     // Einbaureihenfolge wie in der Explosionszeichnung (data-oeffnen = Hub in m): 12 bleibt, 1 hebt am meisten.
     const hub = (g, wert) => el('a-entity', { 'data-oeffnen': String(wert) }, g);
-    const profil = (g, punkte, farbe = '#d3d8dc') => el('a-entity', { drehprofil: `punkte: ${punkte}; farbe: ${farbe}` }, g);
-    const DUNKEL = '#8f9aa4';
+    const profil = (g, punkte, farbe) => el('a-entity', { drehprofil: `punkte: ${punkte}; farbe: ${farbe}; metall: 0.2; rau: 0.45` }, g);
+    // Jedes Trommelteil eine eigene Farbe, Nachbarn im Kontrast: geöffnet sind die Teile so klar zu unterscheiden.
+    // Didaktische Farben, in Wirklichkeit ist alles Chromstahl.
+    const F = {
+      trommelunterteil: '#6f98bd', kolbenschieber: '#e09a4f', verteiler: '#7dba73', tellerpaket: '#e6e9ec',
+      einlaufrohr: '#d9675f', scheideteller: '#3f5f80', trommeldeckel: '#5fb3a8', trommelverschlussring: '#9b78c4',
+      magermilchgreifer: '#d98cb3', greiferkammerdeckel: '#c9a86a', greiferkammerverschlussring: '#4f8a55'
+    };
+    const mat = id => `color: ${F[id]}; metalness: 0.2; roughness: 0.45`;
 
     // 12 Trommelunterteil: Topf mit Schlammaustrittsöffnungen rundum, Spindelmutter in der Mitte
     const unterteil = teil(m, 'trommelunterteil');
-    profil(unterteil, '0.05 0.80, 0.22 0.80, 0.27 0.815, 0.29 0.85, 0.29 0.97, 0.265 0.97, 0.265 0.845, 0.05 0.845');
+    profil(unterteil, '0.05 0.80, 0.22 0.80, 0.27 0.815, 0.29 0.85, 0.29 0.97, 0.265 0.97, 0.265 0.845, 0.05 0.845', F.trommelunterteil);
     for (let i = 0; i < 10; i++) {
       const w = i * Math.PI / 5;
       el('a-cylinder', { radius: 0.011, height: 0.01, rotation: `90 ${-w * 180 / Math.PI + 90} 0`, position: `${0.29 * Math.cos(w)} 0.89 ${0.29 * Math.sin(w)}`, material: SCHWARZ }, unterteil);
     }
-    el('a-cone', { 'radius-bottom': 0.03, 'radius-top': 0.008, height: 0.05, position: '0 0.87 0', material: MATT }, unterteil);
+    el('a-cone', { 'radius-bottom': 0.03, 'radius-top': 0.008, height: 0.05, position: '0 0.87 0', material: mat('trommelunterteil') }, unterteil);
 
     // 11 Kolbenschieber (Schieberboden): Scheibe, die die Schlammaustrittsöffnungen von innen abdeckt
-    profil(hub(teil(m, 'kolbenschieber'), 0.15), '0.04 0.86, 0.255 0.86, 0.26 0.875, 0.24 0.885, 0.07 0.915, 0.04 0.915', DUNKEL);
+    profil(hub(teil(m, 'kolbenschieber'), 0.15), '0.04 0.86, 0.255 0.86, 0.26 0.875, 0.24 0.885, 0.07 0.915, 0.04 0.915', F.kolbenschieber);
 
     // 10 Verteiler: Kegelfuss mit Steigrohr
     const verteiler = hub(teil(m, 'verteiler'), 0.32);
-    el('a-cone', { 'radius-bottom': 0.2, 'radius-top': 0.045, height: 0.09, position: '0 0.965 0', material: MATT }, verteiler);
-    stehend(verteiler, 0.045, 0.24, 0, 0.92, 0, MATT);
+    el('a-cone', { 'radius-bottom': 0.2, 'radius-top': 0.045, height: 0.09, position: '0 0.965 0', material: mat('verteiler') }, verteiler);
+    stehend(verteiler, 0.045, 0.24, 0, 0.92, 0, mat('verteiler'));
 
     // 9 Teller: rücken beim Öffnen auseinander, damit man das Paket als einzelne Teller sieht
     const teller = teil(m, 'tellerpaket');
     for (let i = 0; i < 10; i++) {
-      el('a-cone', { 'radius-bottom': 0.235, 'radius-top': 0.07, height: 0.085, 'open-ended': true, position: `0 ${0.975 + i * 0.009} 0`, material: CHROM + '; side: double', 'segments-radial': 36 }, hub(teller, (0.48 + i * 0.035).toFixed(3)));
+      el('a-cone', { 'radius-bottom': 0.235, 'radius-top': 0.07, height: 0.085, 'open-ended': true, position: `0 ${0.975 + i * 0.009} 0`, material: mat('tellerpaket') + '; side: double', 'segments-radial': 36 }, hub(teller, (0.48 + i * 0.035).toFixed(3)));
     }
 
     // 8 Einlaufrohr mit Rahmgreifer: Rohr durch die Mitte, Greiferscheibe oben
     const einlauf = hub(teil(m, 'einlaufrohr'), 0.95);
-    stehend(einlauf, 0.02, 0.2, 0, 1.03, 0, CHROM);
-    stehend(einlauf, 0.05, 0.012, 0, 1.17, 0, CHROM);
+    stehend(einlauf, 0.02, 0.2, 0, 1.03, 0, mat('einlaufrohr'));
+    stehend(einlauf, 0.05, 0.012, 0, 1.17, 0, mat('einlaufrohr'));
 
     // 7 Scheideteller: grösser und dunkler als die Teller, trennt Rahm- und Magermilchweg
-    el('a-cone', { 'radius-bottom': 0.22, 'radius-top': 0.08, height: 0.08, 'open-ended': true, position: '0 1.09 0', material: `color: ${DUNKEL}; metalness: 0.4; roughness: 0.3; side: double`, 'segments-radial': 36 }, hub(teil(m, 'scheideteller'), 1.05));
+    el('a-cone', { 'radius-bottom': 0.22, 'radius-top': 0.08, height: 0.08, 'open-ended': true, position: '0 1.09 0', material: mat('scheideteller') + '; side: double', 'segments-radial': 36 }, hub(teil(m, 'scheideteller'), 1.05));
 
     // 6 Dichtring zwischen Unterteil und Deckel
     el('a-torus', { radius: 0.277, 'radius-tubular': 0.006, rotation: '90 0 0', position: '0 0.972 0', material: SCHWARZ, 'segments-tubular': 64 }, hub(teil(m, 'dichtring'), 1.15));
 
     // 5 Trommeldeckel: Kegel mit Hals zur Greiferkammer
-    profil(hub(teil(m, 'trommeldeckel'), 1.25), '0.29 0.975, 0.275 1.0, 0.11 1.15, 0.09 1.17, 0.09 1.215, 0.065 1.215');
+    profil(hub(teil(m, 'trommeldeckel'), 1.25), '0.29 0.975, 0.275 1.0, 0.11 1.15, 0.09 1.17, 0.09 1.215, 0.065 1.215', F.trommeldeckel);
 
     // 4 Trommelverschlussring: grosser Gewindering, hält Deckel und Unterteil zusammen
-    profil(hub(teil(m, 'trommelverschlussring'), 1.38), '0.29 0.95, 0.312 0.95, 0.312 1.0, 0.285 1.0', '#b9c0c6');
+    profil(hub(teil(m, 'trommelverschlussring'), 1.38), '0.29 0.95, 0.312 0.95, 0.312 1.0, 0.285 1.0', F.trommelverschlussring);
 
     // 3 Magermilchgreifer, 2 Greiferkammerdeckel, 1 Greiferkammerverschlussring
     const mager = hub(teil(m, 'magermilchgreifer'), 1.5);
-    stehend(mager, 0.075, 0.01, 0, 1.195, 0, CHROM);
-    stehend(mager, 0.025, 0.04, 0, 1.205, 0, CHROM);
-    stehend(hub(teil(m, 'greiferkammerdeckel'), 1.58), 0.088, 0.015, 0, 1.215, 0, MATT);
-    el('a-torus', { radius: 0.09, 'radius-tubular': 0.008, rotation: '90 0 0', position: '0 1.232 0', material: MATT, 'segments-tubular': 32 }, hub(teil(m, 'greiferkammerverschlussring'), 1.66));
+    stehend(mager, 0.075, 0.01, 0, 1.195, 0, mat('magermilchgreifer'));
+    stehend(mager, 0.025, 0.04, 0, 1.205, 0, mat('magermilchgreifer'));
+    stehend(hub(teil(m, 'greiferkammerdeckel'), 1.58), 0.088, 0.015, 0, 1.215, 0, mat('greiferkammerdeckel'));
+    el('a-torus', { radius: 0.09, 'radius-tubular': 0.008, rotation: '90 0 0', position: '0 1.232 0', material: mat('greiferkammerverschlussring'), 'segments-tubular': 32 }, hub(teil(m, 'greiferkammerverschlussring'), 1.66));
 
     // 6 Gestellhaube mit Kragen und Warnschild, darauf Zulauf und Abläufe: hebt sich beim Öffnen am weitesten
     const oben = hub(m, 2.0);

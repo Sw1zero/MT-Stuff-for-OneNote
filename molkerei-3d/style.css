@@ -118,3 +118,6 @@
 .sb-dreh { fill: none; stroke: var(--blue-light); stroke-width: 3; }
 .sb-spitze { fill: var(--blue-light); }
 @media (max-width: 900px) { .mk-schnitt-inhalt { grid-template-columns: 1fr; } }
+
+.mk-teilbild { display: block; max-width: 100%; max-height: 160px; margin: 0 auto 10px; }
+.mk-teilbild[hidden] { display: none; }

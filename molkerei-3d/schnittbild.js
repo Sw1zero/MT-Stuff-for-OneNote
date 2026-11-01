@@ -9,7 +9,7 @@ const SB_TEILE = [
   ['trommelunterteil', ['50,625 250,625 290,610 300,580 300,420 275,420 275,602 50,602'], [300, 520]],
   ['kolbenschieber', ['40,575 272,575 272,538 258,538 250,555 70,530 40,530'], [200, 550]], // Rand verschliesst die Öffnungen
   ['verteiler', ['38,175 46,175 46,470 240,525 240,532 38,477'], [130, 494]],
-  ['scheideteller', ['235,338 85,190 85,135 93,135 93,187 240,334'], [150, 251]],
+  ['scheideteller', ['200,303 85,190 85,135 93,135 93,187 205,299'], [150, 251]], // aussen Spalt zum Trommeldeckel für die Magermilch
   ['trommeldeckel', ['300,420 300,400 120,140 120,90 108,90 108,143 288,398 288,420'], [250, 328]],
   ['trommelverschlussring', ['302,392 324,392 324,432 302,432'], [324, 410]],
   ['greiferkammerdeckel', ['58,76 126,76 126,90 58,90'], [90, 80]],
@@ -28,7 +28,7 @@ const SB_ZONEN = [
   // ganzer Innenraum Magermilch, darüber die anderen
   ['magermilch', '0,90 108,90 108,143 288,398 288,420 275,420 275,580 40,580 40,530 0,530'], // Mitte unten: Spindel
   ['magermilch', '38,-20 50,-20 50,112 38,112'],                                      // Ableiter Magermilch
-  ['tellerpaket', '46,135 85,135 85,190 240,338 245,361 245,520 240,525 46,470'],     // Verlauf Rahm innen bis Magermilch aussen
+  ['tellerpaket', '46,135 85,135 85,190 200,303 245,361 245,520 240,525 46,470'],     // Verlauf Rahm innen bis Magermilch aussen
   ['rahm', '20,-20 32,-20 32,135 46,135 46,190 20,190'],                              // Rahmgreifer und Ableiter
   ['milch', '0,-20 14,-20 14,175 38,175 38,477 160,510 160,300 180,300 180,545 70,530 0,530']
 ];
@@ -36,7 +36,10 @@ const SB_ZONEN = [
 const SB_STRICHE = [
   ['milch', [[7, -20], [7, 440], [40, 500], [170, 528], [170, 310]]],
   ...[1, 4, 7].map(i => ['rahm', [[165, SB_SPALT(i) - 4], [75, SB_SPALT(i) - 81], [60, SB_SPALT(i) - 81], [60, 200], [56, 165], [26, 150], [26, -20]]]),
-  ...[1, 4, 7].map(i => ['magermilch', [[175, SB_SPALT(i) + 4], [245, SB_SPALT(i) + 64], [262, SB_SPALT(i) + 64], [262, 380], [96, 168], [96, 125], [80, 116], [44, 105], [44, -20]]])
+  // Magermilch: aus den Tellerspalten nach aussen, dann gemeinsam an der Wand hoch, um den Scheideteller herum,
+  // im Spalt zum Trommeldeckel nach innen und durch den Greifer hinaus. Gemeinsamer Weg nur einmal, sonst überlagern sich die Striche.
+  ...[1, 4, 7].map(i => ['magermilch', [[175, SB_SPALT(i) + 4], [245, SB_SPALT(i) + 64], [262, SB_SPALT(i) + 64]]]),
+  ['magermilch', [[262, SB_SPALT(1) + 64], [262, 380], [225, 324], [205, 290], [150, 223], [100, 165], [100, 125], [80, 116], [44, 105], [44, -20]]]
 ];
 const SB_SCHMUTZ = 18;       // Punkte je Hälfte
 const SB_SCHMUTZ_TEMPO = 40; // px/s
@@ -268,12 +271,16 @@ window.schnittbild = (() => {
     const t = [...teile, ...SB_EXTRA].find(t => t.id === id);
     d().querySelector('[data-testid="schnittbild-teil"]').textContent = t.name;
     d().querySelector('[data-testid="schnittbild-text"]').textContent = t.text;
+    const bild = d().querySelector('[data-testid="schnittbild-bild"]');
+    bild.hidden = !t.bild;
+    if (t.bild) { bild.src = t.bild; bild.alt = `Zeichnung ${t.name}`; }
     for (const g of d().querySelectorAll('[data-sb-teil]')) g.classList.toggle('sb-aktiv', g.dataset.sbTeil === id);
   };
   const entleeren = () => {
     const knopf = d().querySelector('[data-testid="schnittbild-entleeren"]');
     knopf.disabled = true;
     d().querySelector('[data-testid="schnittbild-teil"]').textContent = 'Teilentleerung';
+    d().querySelector('[data-testid="schnittbild-bild"]').hidden = true;
     d().querySelector('[data-testid="schnittbild-text"]').textContent = SB_TEILENTLEERUNG;
     for (const g of d().querySelectorAll('[data-sb-teil]')) g.classList.toggle('sb-aktiv', g.dataset.sbTeil === 'kolbenschieber');
     bild.entleeren(() => { knopf.disabled = false; });
@@ -291,6 +298,7 @@ window.schnittbild = (() => {
     d().querySelector('[data-testid="schnittbild-entleeren"]').hidden = g;
     d().querySelector('[data-testid="schnittbild-greifer"]').textContent = g ? 'Zurück zum Schnitt' : 'Greifer von oben';
     d().querySelector('#mk-schnitt-titel').textContent = g ? 'Greifer von oben' : 'Separator-Trommel im Betrieb';
+    d().querySelector('[data-testid="schnittbild-bild"]').hidden = true;
     if (g) {
       if (!greifer) greifer = baueGreifer(d().querySelector('[data-testid="greifer-ansicht"] svg'));
       d().querySelector('[data-testid="schnittbild-teil"]').textContent = 'Greifer (Schälkörper)';
