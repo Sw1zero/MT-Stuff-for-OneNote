@@ -80,7 +80,9 @@ async (page) => {
   ok(await t('schnittbild').evaluate(d => d.open), 'Schnittbild öffnet nicht');
   await page.locator('[data-sb-teil="kolbenschieber"] text').click();
   ok((await t('schnittbild-teil').textContent()).startsWith('Kolbenschieber'), 'Klick im Schnittbild zeigt kein Teil');
-  ok(await t('schnittbild-bild').isVisible() && await t('schnittbild-bild').evaluate(i => i.complete && i.naturalWidth > 0), 'Bild des Teils fehlt im Schnittbild');
+  // Auf der VM ohne GPU lädt das Bild teils erst nach dem Klick fertig, darum warten statt sofort prüfen
+  const bildDa = await page.waitForFunction(() => { const i = document.querySelector('[data-testid="schnittbild-bild"]'); return i.complete && i.naturalWidth > 0; }, null, { timeout: 5000 }).then(() => true, () => false);
+  ok(bildDa && await t('schnittbild-bild').isVisible(), 'Bild des Teils fehlt im Schnittbild');
   ok(await page.evaluate(() => ['milch', 'rahm', 'magermilch'].every(m => document.querySelector(`[data-sb-zone="${m}"]`))), 'Farbfläche fehlt im Schnittbild');
   // Teilentleerung: Knopf gesperrt, solange sie läuft, danach ist das Schlammdepot leer
   const depot = () => page.locator('[data-sb-depot]:visible').count();

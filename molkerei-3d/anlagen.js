@@ -76,13 +76,17 @@ const LEITUNGEN = [
 const START = { x: 5, z: 30, blick: [1, 0] };
 
 // Anlagen. x/z = Mitte, relativ zur Ecke x0/z0 ihres Raums. b = Breite (x), t = Tiefe (z).
-// bau: 'separator' | 'kaesefertiger' = in 3D gebaut, sonst nur Umriss am Boden ("Anlage folgt").
+// bau: 'separator' | 'kaesefertiger' | 'lagertank' = in 3D gebaut, sonst nur Umriss am Boden ("Anlage folgt").
 // Alle Masse ohne Quelle sind geschätzt.
 const ANLAGEN = [
   // Milchannahme (a.1)
   { id: 'annahmestation', name: 'Annahmestation', raum: 'annahme', x: 4, z: 10, b: 2, t: 1.5 },
-  { id: 'lagertank-1', name: 'Lagertank 1', raum: 'annahme', x: 12, z: 5, b: 3.5, t: 3.5 },
-  { id: 'lagertank-2', name: 'Lagertank 2', raum: 'annahme', x: 12, z: 15, b: 3.5, t: 3.5 },
+  // Liegender Käserei-Lagertank 10'000 L nach DeLaval DXCE, ohne eigene Kühlung (Eiswasser aus der Kälteanlage).
+  // Modell: material/molkerei-3d/lagertank.blend (bzwu), Export modelle/lagertank.glb.
+  // shortcut: Ein- und Auslauf Milch teilen sich den Einlauf oben (ein Punkt je Medium), bei Bedarf Anschlüsse pro Leitung.
+  { id: 'lagertank-1', name: 'Lagertank 1', raum: 'annahme', x: 12, z: 5, b: 4.6, t: 2.1, bau: 'lagertank',
+    anschluesse: { milch: [-1.7, 2.35, -0.3], kuehlwasser: [-2.4, 0.8, 0] } },
+  { id: 'lagertank-2', name: 'Lagertank 2', raum: 'annahme', x: 12, z: 15, b: 4.6, t: 2.1, bau: 'lagertank' },
 
   // Milchbehandlung (a.2, a.4, a.5, b.6)
   {

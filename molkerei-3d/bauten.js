@@ -271,6 +271,11 @@ const BAUTEN = {
     el('a-torus', { radius: 0.2, 'radius-tubular': 0.04, arc: 180, rotation: '0 90 90', position: '0.27 1.025 -0.6', material: METALL }, g);
   },
 
+  // Lagertank: in Blender gebaut (material/molkerei-3d/lagertank.blend in bzwu), hier nur das exportierte Modell
+  lagertank(g) {
+    el('a-entity', { 'gltf-model': 'modelle/lagertank.glb' }, g);
+  },
+
   // Käsefertiger: Kessi Ø 3 m, Rand 1.5 m, Brücke mit Antrieb, Harfe in der Milch
   kaesefertiger(g) {
     el('a-cylinder', { radius: 1.5, height: 1.5, position: '0 0.75 0', 'open-ended': true, material: METALL + '; side: double' }, g);
