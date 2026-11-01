@@ -31,6 +31,7 @@
 .mk-info[hidden] { display: none; }
 .mk-info h2 { margin: 0 32px 8px 0; color: var(--blue-dark); font-size: 1.25rem; }
 .mk-info p { margin: 0; line-height: 1.55; color: var(--text); }
+.mk-info .mk-hinweis { margin-top: 0.6em; font-size: 0.9em; font-style: italic; }
 .mk-info h3 { margin: 0 0 8px; color: var(--blue-light); font-size: 1.05rem; }
 .mk-info h3[hidden], .mk-knoepfe button[hidden] { display: none; }
 .mk-knoepfe { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }

@@ -57,6 +57,23 @@ async (page) => {
   ok((await t('overlay-text').textContent()).startsWith('Der Separator trennt'), 'Übersicht zeigt nicht den Anlagentext');
   await page.evaluate(() => { window.kaeserei.oeffnen('separator'); window.kaeserei.schliessen(); });
 
+  const haubeGeschnitten = () => page.evaluate(() => {
+    let m; document.querySelector('[data-teil="gestellhaube"]').object3D.traverse(o => { if (!m && o.material) m = o.material; });
+    return !!m.clippingPlanes;
+  });
+  // Betrieb: Knopf schneidet auf und dreht die Trommel, Öffnen der Haube beendet den Betrieb
+  await page.evaluate(() => window.kaeserei.select('separator'));
+  await t('overlay-betrieb').click();
+  ok((await t('overlay-betrieb').textContent()) === 'Betrieb beenden', 'Knopf wechselt nicht auf «Betrieb beenden»');
+  ok(await t('overlay-hinweis').isVisible(), 'Hinweis «vereinfachte Darstellung» fehlt');
+  await page.waitForTimeout(500);
+  ok(await page.evaluate(() => document.querySelector('[data-teil="tellerpaket"]').object3D.rotation.y > 0), 'Trommel dreht nicht');
+  ok(await haubeGeschnitten(), 'Haube nicht aufgeschnitten');
+  await t('overlay-aktion').click();
+  ok((await t('overlay-betrieb').textContent()) === 'Betrieb zeigen', 'Haube öffnen beendet den Betrieb nicht');
+  ok(!(await haubeGeschnitten()), 'Schnitt bleibt nach Betriebsende');
+  await page.evaluate(() => { window.kaeserei.oeffnen('separator'); window.kaeserei.schliessen(); });
+
   // Gehen: 1 s W mit Blick nach Norden = gut 1.4 m
   const pos = () => page.evaluate(() => { const p = document.getElementById('spieler').object3D.position; return [p.x, p.z]; });
   await page.evaluate(() => { document.getElementById('spieler').object3D.position.set(30, 0, 30); document.getElementById('kamera').components['look-controls'].yawObject.rotation.y = 0; });

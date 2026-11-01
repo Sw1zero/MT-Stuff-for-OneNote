@@ -261,7 +261,12 @@ window.kaeserei = {
     $('overlay-uebersicht').hidden = !t;
     const aktion = $('overlay-aktion');
     aktion.hidden = !an.oeffnen;
-    if (an.oeffnen) aktion.textContent = (document.querySelector(`[data-anlage="${id}"]`).dataset.offen ? an.oeffnen.zu : an.oeffnen.auf);
+    const g = document.querySelector(`[data-anlage="${id}"]`);
+    if (an.oeffnen) aktion.textContent = g.dataset.offen ? an.oeffnen.zu : an.oeffnen.auf;
+    $('overlay-betrieb').hidden = !an.betrieb;
+    if (an.betrieb) $('overlay-betrieb').textContent = g.dataset.betrieb ? an.betrieb.aus : an.betrieb.an;
+    $('overlay-hinweis').hidden = !(an.betrieb && g.dataset.betrieb);
+    if (an.betrieb) $('overlay-hinweis').textContent = an.betrieb.hinweis;
     $('overlay').dataset.anlage = id;
     $('overlay').dataset.teil = t ? t.id : '';
     $('overlay').hidden = false;
@@ -271,11 +276,21 @@ window.kaeserei = {
   oeffnen(id) {
     const g = document.querySelector(`[data-anlage="${id}"]`);
     const auf = !g.dataset.offen;
+    if (auf && g.dataset.betrieb) window.kaeserei.betrieb(id); // offen läuft nichts
     if (auf) g.dataset.offen = 'ja'; else delete g.dataset.offen;
     const dur = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 1500;
     for (const t of g.querySelectorAll('[data-oeffnen]')) {
       t.setAttribute('animation__oeffnen', { property: 'position', to: `0 ${auf ? t.dataset.oeffnen : 0} 0`, dur, easing: 'easeInOutQuad' });
     }
+    if ($('overlay').dataset.anlage === id && !$('overlay').hidden) window.kaeserei.select(id, $('overlay').dataset.teil || undefined);
+  },
+  // Betrieb ein/aus: Bau hört auf das Ereignis 'betrieb' an der Anlage, z.B. Separator-Schnitt mit Strömung
+  betrieb(id) {
+    const g = document.querySelector(`[data-anlage="${id}"]`);
+    const an = !g.dataset.betrieb;
+    if (an && g.dataset.offen) window.kaeserei.oeffnen(id); // erst Haube schliessen
+    if (an) g.dataset.betrieb = 'ja'; else delete g.dataset.betrieb;
+    g.emit('betrieb', { an }, false);
     if ($('overlay').dataset.anlage === id && !$('overlay').hidden) window.kaeserei.select(id, $('overlay').dataset.teil || undefined);
   },
   // An den Eingang des Raums (erster Durchgang in TUEREN), 2 m im Raum, Blick hinein.
@@ -316,6 +331,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   $('overlay-schliessen').addEventListener('click', () => window.kaeserei.schliessen());
   $('overlay-aktion').addEventListener('click', () => window.kaeserei.oeffnen($('overlay').dataset.anlage));
+  $('overlay-betrieb').addEventListener('click', () => window.kaeserei.betrieb($('overlay').dataset.anlage));
   $('overlay-uebersicht').addEventListener('click', () => window.kaeserei.select($('overlay').dataset.anlage));
   window.addEventListener('keydown', e => { if (e.key === 'Escape') window.kaeserei.schliessen(); });
 
