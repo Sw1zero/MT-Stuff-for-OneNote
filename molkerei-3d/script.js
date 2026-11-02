@@ -291,6 +291,11 @@ window.kaeserei = {
       const weg = t.dataset.oeffnen.includes(' ') ? t.dataset.oeffnen : `0 ${t.dataset.oeffnen} 0`;
       t.setAttribute('animation__oeffnen', { property: 'position', to: auf ? weg : '0 0 0', dur, easing: 'easeInOutQuad' });
     }
+    // Abgekoppelte Anlage (z.B. Pumpen-Explosion): Leitungen sofort weg, nach dem Zusammenbauen wieder da
+    if (anlageVon(id).oeffnen.leitungenWeg) {
+      const zeigen = () => { for (const l of document.querySelectorAll(`[data-leitung^="${id}>"], [data-leitung*=">${id}:"]`)) l.setAttribute('visible', !g.dataset.offen); };
+      if (auf) zeigen(); else setTimeout(zeigen, dur);
+    }
     if ($('overlay').dataset.anlage === id && !$('overlay').hidden) window.kaeserei.select(id, $('overlay').dataset.teil || undefined);
   },
   // Betrieb ein/aus: Bau hört auf das Ereignis 'betrieb' an der Anlage, z.B. Separator-Schnitt mit Strömung

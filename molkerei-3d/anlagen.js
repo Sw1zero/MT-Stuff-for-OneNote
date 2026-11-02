@@ -121,7 +121,7 @@ const ANLAGEN = [
     // Modell nach Alfa Laval LKH-35: material/molkerei-3d/zentrifugalpumpe.blend (bzwu), Teil-ids = Gruppennamen dort.
     id: 'milchpumpe', name: 'Zentrifugalpumpe', raum: 'annahme', x: 15.6, z: 5, b: 0.95, t: 0.5, bau: 'pumpe',
     anschluesse: { saug: [-0.455, 0.274, 0], druck: [-0.374, 0.524, 0.119] },
-    oeffnen: { auf: 'Explosionsansicht', zu: 'Zusammenbauen' },
+    oeffnen: { auf: 'Explosionsansicht', zu: 'Zusammenbauen', leitungenWeg: true },
     teile: [
       { id: 'laufrad', name: 'Laufrad', text: 'Das Laufrad versetzt die Milch in Rotation, die Zentrifugalkraft beschleunigt sie nach aussen. Mit einem speziellen Laufrad und Gehäuse kann die Zentrifugalpumpe auch Käsebruch fördern. Lassen Sie die Pumpe nie leer laufen, das schädigt das Laufrad.' },
       { id: 'gleitringdichtung', name: 'Gleitringdichtung', text: 'Die Gleitringdichtung dichtet das Pumpengehäuse dort ab, wo die Welle des Motors hineinführt. Lassen Sie die Pumpe nie leer laufen, das schädigt die Gleitringdichtung. Kontrollieren Sie die Dichtigkeit und ersetzen Sie immer alle Gleitringdichtungen, periodisch oder bei Undichtheit.' },

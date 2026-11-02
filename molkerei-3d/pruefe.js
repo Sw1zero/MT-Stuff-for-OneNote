@@ -90,9 +90,14 @@ async (page) => {
   const pumpeX = id => page.evaluate(i => document.querySelector(`[data-anlage="milchpumpe"] [data-teil="${i}"]`).object3D.position.x, id);
   ok(await pumpeX('pumpengehaeuse') < -0.44 && await pumpeX('laufrad') < -0.27 && await pumpeX('elektromotor') === 0, 'Explosionsansicht der Pumpe fährt nicht auseinander');
   ok((await t('overlay-aktion').textContent()) === 'Zusammenbauen', 'Knopf heisst nach der Explosion nicht Zusammenbauen');
+  const pumpenLeitungen = () => page.evaluate(() => ['lagertank-1>milchpumpe:milch', 'milchpumpe>rohrbahnhof:milch']
+    .map(l => document.querySelector(`[data-leitung="${l}"]`).object3D.visible));
+  ok((await pumpenLeitungen()).every(v => !v), 'Leitungen der Pumpe bleiben in der Explosionsansicht sichtbar');
+  ok(await page.evaluate(() => document.querySelector('[data-leitung="rohrbahnhof>lagertank-1:cip"]').object3D.visible), 'Explosion blendet fremde Leitungen aus');
   await t('overlay-aktion').click();
   await page.waitForTimeout(1700);
   ok(await pumpeX('pumpengehaeuse') === 0, 'Pumpe baut sich nicht wieder zusammen');
+  ok((await pumpenLeitungen()).every(v => v), 'Leitungen der Pumpe kommen nach dem Zusammenbauen nicht zurück');
   await page.evaluate(() => window.kaeserei.schliessen());
   for (const l of ['lagertank-1>milchpumpe:milch', 'milchpumpe>rohrbahnhof:milch', 'rohrbahnhof>lagertank-1:cip', 'lagertank-1>kaelteanlage:kuehlwasser']) {
     ok(await page.locator(`[data-leitung="${l}"]`).count() === 1, `Leitung fehlt: ${l}`);
