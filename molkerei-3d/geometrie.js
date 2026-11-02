@@ -109,7 +109,7 @@ function anschluesse() {
   const punkt = (id, name) => {
     const an = anlageVon(id), p = anlagePunkt(an);
     const fest = an.anschluesse && an.anschluesse[name];
-    if (fest) return { x: p.x + fest[0], y: p.y, z: p.z + fest[2], hoch: fest[1] };
+    if (fest) return { x: p.x + fest[0], y: p.y, z: p.z + fest[2], hoch: fest[1], richtung: fest[3] };
     const v = ((k[id] = (k[id] || 0) + 1) - 1 - (zahl[id] - 1) / 2) * 0.15;
     return an.t > an.b ? { ...p, z: p.z + v } : { ...p, x: p.x + v };
   };
@@ -119,14 +119,22 @@ function anschluesse() {
 }
 
 // Weg einer Leitung, nur parallel zu den Wänden: hoch, entlang x, entlang z, runter.
+// Waagrechter Stutzen (Anschluss mit Richtung '-x', '+x', '-z', '+z'): Die Leitung läuft erst STUTZEN_GERADE
+// gerade aus dem Stutzen heraus und steigt dann auf, damit der Bogen nicht im Stutzen sitzt.
+const STUTZEN_GERADE = 0.3;
+const RICHTUNGEN = { '-x': [-1, 0], '+x': [1, 0], '-z': [0, -1], '+z': [0, 1] };
 function rohrWeg(r) {
   const unten = (id, p) => p.y + (p.hoch !== undefined ? p.hoch : id === BAHNHOF ? 1.2 : 1);
+  const raus = p => { const d = RICHTUNGEN[p.richtung]; return d ? { x: p.x + d[0] * STUTZEN_GERADE, z: p.z + d[1] * STUTZEN_GERADE } : p; };
+  const ya = unten(r.von, r.a), yb = unten(r.nach, r.b), A = raus(r.a), B = raus(r.b);
   return [
-    { x: r.a.x, y: unten(r.von, r.a), z: r.a.z },
-    { x: r.a.x, y: r.h, z: r.a.z },
-    { x: r.b.x, y: r.h, z: r.a.z },
-    { x: r.b.x, y: r.h, z: r.b.z },
-    { x: r.b.x, y: unten(r.nach, r.b), z: r.b.z }
+    { x: r.a.x, y: ya, z: r.a.z },
+    { x: A.x, y: ya, z: A.z },
+    { x: A.x, y: r.h, z: A.z },
+    { x: B.x, y: r.h, z: A.z },
+    { x: B.x, y: r.h, z: B.z },
+    { x: B.x, y: yb, z: B.z },
+    { x: r.b.x, y: yb, z: r.b.z }
   ];
 }
 

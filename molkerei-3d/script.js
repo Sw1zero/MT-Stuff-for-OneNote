@@ -88,16 +88,38 @@ AFRAME.registerComponent('flaeche', {
 });
 
 // Rohr zwischen zwei Punkten
+// Leitung durch die Punkte "x y z, x y z, ...": gerade Stücke, an jeder Ecke ein Rohrbogen (Radius ROHR_BOGEN,
+// bei kurzen Stücken kleiner). Punkte, die doppelt sind oder auf einer Geraden liegen, fallen weg.
+const ROHR_R = 0.045, ROHR_BOGEN = 0.15;
+function rohrPunkte(text) {
+  const p = [];
+  for (const v of text.split(',').map(s => new THREE.Vector3(...s.trim().split(/\s+/).map(Number)))) {
+    if (p.length && v.distanceTo(p[p.length - 1]) < 1e-3) continue;
+    if (p.length >= 2) {
+      const d1 = p[p.length - 1].clone().sub(p[p.length - 2]).normalize(), d2 = v.clone().sub(p[p.length - 1]).normalize();
+      if (d1.dot(d2) > 0.999) p.pop();
+    }
+    p.push(v);
+  }
+  return p;
+}
 AFRAME.registerComponent('rohr', {
-  schema: { von: { type: 'vec3' }, nach: { type: 'vec3' }, farbe: { default: '#ffffff' } },
+  schema: { punkte: { default: '' }, farbe: { default: '#ffffff' } },
   init() {
-    const a = new THREE.Vector3().copy(this.data.von), b = new THREE.Vector3().copy(this.data.nach);
-    const dir = b.clone().sub(a);
-    const m = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, dir.length(), 12),
-      new THREE.MeshStandardMaterial({ color: this.data.farbe, roughness: 0.4, metalness: 0.2 }));
-    m.position.copy(a).add(b).multiplyScalar(0.5);
-    m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.normalize());
-    this.el.setObject3D('mesh', m);
+    const p = rohrPunkte(this.data.punkte), g = new THREE.Group();
+    const mat = new THREE.MeshStandardMaterial({ color: this.data.farbe, roughness: 0.4, metalness: 0.2 });
+    const stueck = kurve => g.add(new THREE.Mesh(new THREE.TubeGeometry(kurve, kurve.isLineCurve3 ? 1 : 10, ROHR_R, 12, false), mat));
+    const zu = (i, j, r) => p[i].clone().add(p[j].clone().sub(p[i]).normalize().multiplyScalar(r));
+    let start = p[0];
+    for (let i = 1; i < p.length; i++) {
+      if (i === p.length - 1) { stueck(new THREE.LineCurve3(start, p[i])); break; }
+      const r = Math.min(ROHR_BOGEN, p[i].distanceTo(p[i - 1]) / 2, p[i].distanceTo(p[i + 1]) / 2);
+      const vor = zu(i, i - 1, r), nach = zu(i, i + 1, r);
+      if (vor.distanceTo(start) > 1e-3) stueck(new THREE.LineCurve3(start, vor));
+      stueck(new THREE.QuadraticBezierCurve3(vor, p[i], nach));
+      start = nach;
+    }
+    this.el.setObject3D('mesh', g);
   }
 });
 
@@ -184,13 +206,8 @@ function baueSzene(szene) {
   // Leitungen: hoch aus der Anlage, gerade hinüber, runter in die Zielanlage (bzw. den Bahnhof).
   // Aus dem Untergeschoss steigen sie durch die Decke bis auf LEITUNG_HOEHE im Erdgeschoss.
   for (const r of anschluesse()) {
-    const p = rohrWeg(r);
-    const g = el('a-entity', { 'data-leitung': `${r.von}>${r.nach}:${r.medium}` }, szene);
-    for (let i = 0; i < p.length - 1; i++) {
-      const [a, b] = [p[i], p[i + 1]];
-      if (Math.abs(a.x - b.x) + Math.abs(a.y - b.y) + Math.abs(a.z - b.z) < 1e-3) continue; // Stück der Länge 0
-      el('a-entity', { rohr: `von: ${a.x} ${a.y} ${a.z}; nach: ${b.x} ${b.y} ${b.z}; farbe: ${MEDIEN[r.medium].farbe}` }, g);
-    }
+    const punkte = rohrWeg(r).map(v => `${v.x} ${v.y} ${v.z}`).join(', ');
+    el('a-entity', { 'data-leitung': `${r.von}>${r.nach}:${r.medium}`, rohr: `punkte: ${punkte}; farbe: ${MEDIEN[r.medium].farbe}` }, szene);
   }
 
   // Raumschild über jedem Durchgang, auf beiden Seiten mit dem Namen des Raums dahinter.

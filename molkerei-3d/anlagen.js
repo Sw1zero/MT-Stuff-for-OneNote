@@ -85,6 +85,7 @@ const START = { x: 5, z: 30, blick: [1, 0] };
 
 // Anlagen. x/z = Mitte, relativ zur Ecke x0/z0 ihres Raums. b = Breite (x), t = Tiefe (z).
 // bau: 'separator' | 'kaesefertiger' | 'lagertank' | 'pumpe' | 'bahnhof' = in 3D gebaut, sonst nur Umriss am Boden ("Anlage folgt").
+// anschluesse: name: [x, y, z (relativ zur Anlage), Richtung des Stutzens bei waagrechten Stutzen: '-x' | '+x' | '-z' | '+z'].
 // Alle Masse ohne Quelle sind geschätzt.
 // Lagertank: Texte aus Lehrmittel a.1 «Milch lagern» (Lagergefässe, Tankinstallationen, Kühlung).
 // Teil-ids = Gruppennamen in material/molkerei-3d/lagertank.blend (bzwu).
@@ -120,7 +121,7 @@ const ANLAGEN = [
     // Texte: Lehrmittel a.1 «Pumpen» (Legende 1-6), «Zentrifugalpumpe» und Pflege der Pumpen.
     // Modell nach Alfa Laval LKH-35: material/molkerei-3d/zentrifugalpumpe.blend (bzwu), Teil-ids = Gruppennamen dort.
     id: 'milchpumpe', name: 'Zentrifugalpumpe', raum: 'annahme', x: 15.6, z: 5, b: 0.95, t: 0.5, bau: 'pumpe',
-    anschluesse: { saug: [-0.455, 0.274, 0], druck: [-0.374, 0.524, 0.119] },
+    anschluesse: { saug: [-0.455, 0.274, 0, '-x'], druck: [-0.374, 0.524, 0.119] },
     oeffnen: { auf: 'Explosionsansicht', zu: 'Zusammenbauen', leitungenWeg: true },
     teile: [
       { id: 'laufrad', name: 'Laufrad', text: 'Das Laufrad versetzt die Milch in Rotation, die Zentrifugalkraft beschleunigt sie nach aussen. Mit einem speziellen Laufrad und Gehäuse kann die Zentrifugalpumpe auch Käsebruch fördern. Lassen Sie die Pumpe nie leer laufen, das schädigt das Laufrad.' },

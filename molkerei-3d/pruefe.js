@@ -102,6 +102,17 @@ async (page) => {
   for (const l of ['lagertank-1>milchpumpe:milch', 'milchpumpe>rohrbahnhof:milch', 'rohrbahnhof>lagertank-1:cip', 'lagertank-1>kaelteanlage:kuehlwasser']) {
     ok(await page.locator(`[data-leitung="${l}"]`).count() === 1, `Leitung fehlt: ${l}`);
   }
+  // Leitungen biegen in Bögen ab, Stücke schliessen lückenlos aneinander an
+  const rohrFehler = await page.evaluate(() => {
+    const f = [];
+    for (const g of document.querySelectorAll('[data-leitung]')) {
+      const kurven = g.getObject3D('mesh').children.map(m => m.geometry.parameters.path);
+      if (kurven.length > 1 && !kurven.some(k => k.isQuadraticBezierCurve3)) f.push(`${g.dataset.leitung}: keine Bögen`);
+      for (let i = 1; i < kurven.length; i++) if (kurven[i - 1].getPoint(1).distanceTo(kurven[i].getPoint(0)) > 1e-6) f.push(`${g.dataset.leitung}: Lücke`);
+    }
+    return f;
+  });
+  ok(rohrFehler.length === 0, `Leitungen: ${rohrFehler.slice(0, 3).join('; ')}`);
 
   // Separator: echter Klick auf die Haube zeigt das Teil, Knopf öffnet die Haube, Übersicht zeigt die Anlage
   await page.evaluate(() => {
