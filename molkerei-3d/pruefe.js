@@ -106,13 +106,15 @@ async (page) => {
   const rohrFehler = await page.evaluate(() => {
     const f = [];
     for (const g of document.querySelectorAll('[data-leitung]')) {
-      const kurven = g.getObject3D('mesh').children.map(m => m.geometry.parameters.path);
+      const kurven = g.getObject3D('mesh').children.filter(m => m.name !== 'huelse').map(m => m.geometry.parameters.path);
       if (kurven.length > 1 && !kurven.some(k => k.isQuadraticBezierCurve3)) f.push(`${g.dataset.leitung}: keine Bögen`);
       for (let i = 1; i < kurven.length; i++) if (kurven[i - 1].getPoint(1).distanceTo(kurven[i].getPoint(0)) > 1e-6) f.push(`${g.dataset.leitung}: Lücke`);
     }
     return f;
   });
   ok(rohrFehler.length === 0, `Leitungen: ${rohrFehler.slice(0, 3).join('; ')}`);
+  // Kühlwasser zum Tank geht durch den Boden: dort sitzt eine Hülse
+  ok(await page.evaluate(() => !!document.querySelector('[data-leitung="kaelteanlage>lagertank-1:kuehlwasser"]').getObject3D('mesh').getObjectByName('huelse')), 'Bodenhülse fehlt an der Kühlwasserleitung');
 
   // Separator: echter Klick auf die Haube zeigt das Teil, Knopf öffnet die Haube, Übersicht zeigt die Anlage
   await page.evaluate(() => {
@@ -196,6 +198,18 @@ async (page) => {
   await page.keyboard.up('KeyW'); await page.keyboard.up('ShiftLeft');
   [, z1] = await pos();
   ok(z1 > 20, `Durch die Wand gelaufen: z=${z1.toFixed(2)}`);
+
+  // Podest am Lagertank: über die Treppe hoch, zur Tankseite hin hält die Podestkante
+  const hoch = () => page.evaluate(() => { const p = document.getElementById('spieler').object3D.position; return [p.y, p.z]; });
+  await page.evaluate(() => { document.getElementById('spieler').object3D.position.set(8.2, 0, 23.5); document.getElementById('kamera').components['look-controls'].yawObject.rotation.y = -Math.PI / 2; });
+  await page.keyboard.down('ShiftLeft'); await page.keyboard.down('KeyW'); await page.waitForTimeout(4000);
+  await page.keyboard.up('KeyW'); await page.keyboard.up('ShiftLeft');
+  const [y1] = await hoch();
+  ok(y1 >= 0.6, `Treppe zum Podest: Höhe ${y1.toFixed(2)} m`);
+  await page.evaluate(() => { document.getElementById('kamera').components['look-controls'].yawObject.rotation.y = Math.PI; });
+  await page.keyboard.down('KeyW'); await page.waitForTimeout(1500); await page.keyboard.up('KeyW');
+  const [y2, z2] = await hoch();
+  ok(y2 === y1 && z2 < 23.95, `Vom Podest zum Tank gefallen: y=${y2.toFixed(2)}, z=${z2.toFixed(2)}`);
 
   // Schulenburg-Wanne (glTF aus Blender, Frischkäserei, Mitte 55.5/14): Klick auf die Quarkwanne, Molkenwanne absenken und anheben
   await page.locator('[data-raum="frischkaeserei"]').click();

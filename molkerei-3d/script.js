@@ -63,6 +63,10 @@ const TEXTUREN = {
     g.fillStyle = '#d3d9de'; g.fillRect(0, 0, 3, px);
     g.fillStyle = '#e6eaed'; for (let x = 32; x < px; x += 32) g.fillRect(x, 0, 1, px);
   }),
+  gitterrost: () => textur(0.3, (g, px) => {                               // Gitterrost, Maschen 3 cm
+    g.fillStyle = '#3a3f44'; g.fillRect(0, 0, px, px);
+    g.fillStyle = '#b4bcc3'; for (let i = 0; i < px; i += px / 10) { g.fillRect(i, 0, 5, px); g.fillRect(0, i, px, 3); }
+  }),
   beton: () => textur(2, (g, px) => {
     g.fillStyle = '#b8b7b2'; g.fillRect(0, 0, px, px);
     for (let i = 0; i < 4000; i++) {
@@ -90,7 +94,11 @@ AFRAME.registerComponent('flaeche', {
 // Rohr zwischen zwei Punkten
 // Leitung durch die Punkte "x y z, x y z, ...": gerade Stücke, an jeder Ecke ein Rohrbogen (Radius ROHR_BOGEN,
 // bei kurzen Stücken kleiner). Punkte, die doppelt sind oder auf einer Geraden liegen, fallen weg.
-const ROHR_R = 0.045, ROHR_BOGEN = 0.15;
+// ROHR_R: Leitungen Ø 8 cm, dünner als die Stutzen der Anlagen (Ø 9 cm), damit sie sichtbar im Stutzen stecken.
+const ROHR_R = 0.04, ROHR_BOGEN = 0.15;
+// Hülse, wo eine senkrechte Leitung durch den Boden des Erdgeschosses (= Decke des Untergeschosses) geht.
+const HUELSE = new THREE.CylinderGeometry(ROHR_R + 0.025, ROHR_R + 0.025, 0.1, 24);
+const HUELSE_MAT = new THREE.MeshStandardMaterial({ color: '#8a9299', roughness: 0.5, metalness: 0.6 });
 function rohrPunkte(text) {
   const p = [];
   for (const v of text.split(',').map(s => new THREE.Vector3(...s.trim().split(/\s+/).map(Number)))) {
@@ -118,6 +126,12 @@ AFRAME.registerComponent('rohr', {
       if (vor.distanceTo(start) > 1e-3) stueck(new THREE.LineCurve3(start, vor));
       stueck(new THREE.QuadraticBezierCurve3(vor, p[i], nach));
       start = nach;
+    }
+    for (let i = 1; i < p.length; i++) {
+      const u = p[i - 1], v = p[i];
+      if (Math.abs(u.x - v.x) < 1e-6 && Math.abs(u.z - v.z) < 1e-6 && Math.min(u.y, v.y) < 0 && Math.max(u.y, v.y) > 0) {
+        const h = new THREE.Mesh(HUELSE, HUELSE_MAT); h.position.set(u.x, 0.02, u.z); h.name = 'huelse'; g.add(h);
+      }
     }
     this.el.setObject3D('mesh', g);
   }
@@ -150,9 +164,16 @@ AFRAME.registerComponent('gehen', {
     const th = this.kamera.object3D.rotation.y;
     const dx = (-Math.sin(th) * vor + Math.cos(th) * seit) * s;
     const dz = (-Math.cos(th) * vor - Math.sin(th) * seit) * s;
-    const p = this.el.object3D.position;
-    if (frei(p.x + dx, p.z, p.y)) p.x += dx;
-    if (frei(p.x, p.z + dz, p.y)) p.z += dz;
+    const p = this.el.object3D.position, boden = geschossVon(p.y);
+    // Eine Stufe geht, eine höhere Kante (Podestrand zur Anlage) blockiert wie ein Geländer.
+    // In Schritten von höchstens 10 cm, damit bei wenigen Bildern pro Sekunde keine Stufe übersprungen wird.
+    const geht = (x, z) => frei(x, z, boden) && Math.abs(hoeheAn(x, z, boden) - hoeheAn(p.x, p.z, boden)) <= STUFE_H + 0.05;
+    const n = Math.ceil(Math.hypot(dx, dz) / 0.1);
+    for (let i = 0; i < n; i++) {
+      if (geht(p.x + dx / n, p.z)) p.x += dx / n;
+      if (geht(p.x, p.z + dz / n)) p.z += dz / n;
+    }
+    p.y = boden + hoeheAn(p.x, p.z, boden);
     zeigeRaum();
   }
 });
@@ -222,6 +243,8 @@ function baueSzene(szene) {
     }
   }
 
+  for (const p of PODESTE) podest(p, szene);
+
   for (const an of ANLAGEN) {
     const r = raumVon(an.raum);
     const g = el('a-entity', { 'data-anlage': an.id, position: `${r.x0 + an.x} ${bodenVon(r)} ${r.z0 + an.z}` }, szene);
@@ -243,7 +266,7 @@ let aktuellerRaum = null;
 
 function zeigeRaum() {
   const p = document.getElementById('spieler').object3D.position;
-  const r = raumAn(p.x, p.z, p.y);
+  const r = raumAn(p.x, p.z, geschossVon(p.y));
   if (!r || r.id === aktuellerRaum) return;
   aktuellerRaum = r.id;
   $('raum-aktuell').textContent = 'Sie sind in: ' + r.name;

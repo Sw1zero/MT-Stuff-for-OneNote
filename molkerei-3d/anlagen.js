@@ -82,6 +82,14 @@ const LEITUNGEN = [
   { von: 'cip', nach: 'lagertank-1', medium: 'cip' }
 ];
 
+// Begehbare Metallpodeste neben Anlagen. x/z = Mitte des Podests relativ zum Raum wie bei den Anlagen, b = Länge (x), t = Tiefe (z),
+// hoehe = Höhe der Lauffläche. treppe = Seite der Treppe (geht von dort nach unten), offen = Seite zur Anlage ohne Geländer.
+// Masse geschätzt: Wannenrand der Schulenburg-Wanne auf 1.8 m, Tankoberkante auf 2.15 m.
+const PODESTE = [
+  { id: 'podest-lagertank', raum: 'annahme', x: 12, z: 3.5, b: 4, t: 0.8, hoehe: 1.2, treppe: '-x', offen: '+z' },
+  { id: 'podest-schulenburg', raum: 'frischkaeserei', x: 15.5, z: 12.7, b: 2.8, t: 0.8, hoehe: 1, treppe: '-x', offen: '+z' }
+];
+
 // Startpunkt in der Milchannahme, Blickrichtung als x/z-Vektor (hier nach Osten in die Milchbehandlung).
 const START = { x: 5, z: 30, blick: [1, 0] };
 

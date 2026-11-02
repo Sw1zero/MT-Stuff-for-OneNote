@@ -138,6 +138,32 @@ function rohrWeg(r) {
   ];
 }
 
+// Podeste: Lauffläche und Treppe als Rechtecke. Die Treppe hat n-1 Trittstufen zwischen Boden und Podest.
+const STUFE_H = 0.2, STUFE_T = 0.25;
+const geschossVon = y => Math.round(y / 5) * 5; // shortcut: Geschosse liegen 5 m auseinander, Podeste bleiben unter 2.5 m
+function podestGeo(p) {
+  const r = raumVon(p.raum), x = r.x0 + p.x, z = r.z0 + p.z, n = Math.round(p.hoehe / STUFE_H), L = (n - 1) * STUFE_T;
+  const deck = { x0: x - p.b / 2, x1: x + p.b / 2, z0: z - p.t / 2, z1: z + p.t / 2 };
+  const [dx, dz] = RICHTUNGEN[p.treppe];
+  const treppe = dx ? { x0: dx < 0 ? deck.x0 - L : deck.x1, x1: dx < 0 ? deck.x0 : deck.x1 + L, z0: deck.z0, z1: deck.z1 }
+    : { x0: deck.x0, x1: deck.x1, z0: dz < 0 ? deck.z0 - L : deck.z1, z1: dz < 0 ? deck.z0 : deck.z1 + L };
+  return { deck, treppe, n, L, dx, dz, boden: bodenVon(r) };
+}
+const drin = (q, x, z) => x >= q.x0 && x <= q.x1 && z >= q.z0 && z <= q.z1;
+// Höhe der Lauffläche über dem Geschossboden: 0, Treppenstufe oder Podest.
+function hoeheAn(x, z, boden = 0) {
+  for (const p of PODESTE) {
+    const g = podestGeo(p);
+    if (g.boden !== boden) continue;
+    if (drin(g.deck, x, z)) return p.hoehe;
+    if (drin(g.treppe, x, z)) {
+      const u = g.dx ? (g.dx < 0 ? g.deck.x0 - x : x - g.deck.x1) : (g.dz < 0 ? g.deck.z0 - z : z - g.deck.z1);
+      return (g.n - 1 - Math.min(g.n - 2, Math.floor(u / STUFE_T))) * STUFE_H;
+    }
+  }
+  return 0;
+}
+
 // Plausibilität der Daten, damit Tippfehler beim Anpassen des Grundrisses sofort auffallen.
 for (const an of ANLAGEN) {
   const r = raumVon(an.raum);

@@ -342,3 +342,60 @@ const BAUTEN = {
     el('a-box', { width: 1.3, height: 1.0, depth: 0.04, position: '0.65 1.0 0', material: 'color: #8a99a6; opacity: 0.6; transparent: true' }, g);
   }
 };
+
+// Begehbares Metallpodest mit Treppe (Daten: PODESTE in anlagen.js, Lage und Höhen: podestGeo/hoeheAn in geometrie.js).
+// Stützen mit Fussplatten, Gitterrost, Diagonalen unter der Lauffläche, Geländer mit Hand- und Knieleiste und Fussleiste.
+const DREH = { '+x': 0, '-z': 90, '-x': 180, '+z': -90 }; // Drehung um y, damit lokal +x nach aussen zeigt
+const DUNKEL = 'color: #3a4047; metalness: 0.6; roughness: 0.4';
+const grad = r => r * 180 / Math.PI;
+function kiste(e, w, h, d, pos, rot = '0 0 0', mat = METALL) {
+  return el('a-box', { width: w, height: h, depth: d, position: pos, rotation: rot, material: mat, shadow: 'cast: true; receive: true' }, e);
+}
+function stange(e, len, r, pos, rot) {
+  return el('a-cylinder', { radius: r, height: len, 'segments-radial': 12, position: pos, rotation: rot, material: METALL, shadow: 'cast: true' }, e);
+}
+function rost(e, w, d, y, x = 0) {
+  el('a-entity', { flaeche: `breite: ${w}; hoehe: ${d}; muster: gitterrost`, rotation: '-90 0 0', position: `${x} ${y} 0` }, e);
+}
+function podest(p, szene) {
+  const g = podestGeo(p), h = p.hoehe, D = g.deck, B = D.x1 - D.x0, T = D.z1 - D.z0, G = 1; // G: Geländerhöhe
+  const w = el('a-entity', { 'data-podest': p.id, position: `${(D.x0 + D.x1) / 2} ${g.boden} ${(D.z0 + D.z1) / 2}` }, szene);
+  kiste(w, B, 0.05, T, `0 ${h - 0.026} 0`);
+  rost(w, B, T, h + 0.001);
+  for (const [s, len, off] of [['+x', T, B / 2], ['-x', T, B / 2], ['+z', B, T / 2], ['-z', B, T / 2]]) {
+    const [ox, oz] = RICHTUNGEN[s];
+    const seite = el('a-entity', { position: `${ox * off} 0 ${oz * off}`, rotation: `0 ${DREH[s]} 0` }, w);
+    const gelaender = s !== p.offen && s !== p.treppe, lang = s[1] === 'z';
+    const n = Math.max(2, Math.ceil(len / 1.5) + 1), zs = [...Array(n)].map((_, i) => -len / 2 + 0.03 + i * (len - 0.06) / (n - 1));
+    zs.forEach((z, i) => {
+      const ecke = i === 0 || i === n - 1;
+      if (ecke && !lang) return; // Eckstützen gehören zu den langen Seiten
+      const H = ecke || gelaender ? h + G : h;
+      kiste(seite, 0.05, H, 0.05, `-0.03 ${H / 2} ${z}`);
+      kiste(seite, 0.12, 0.01, 0.12, `-0.03 0.005 ${z}`, '0 0 0', DUNKEL);
+    });
+    if (lang) for (let i = 0; i < n - 1; i++) { // Diagonale zwischen zwei Stützen
+      const dz = zs[i + 1] - zs[i], dy = h - 0.2;
+      kiste(seite, 0.03, Math.hypot(dz, dy), 0.03, `-0.03 ${0.1 + dy / 2} ${(zs[i] + zs[i + 1]) / 2}`, `${grad(Math.atan2(dz, dy))} 0 0`);
+    }
+    if (gelaender) {
+      stange(seite, len, 0.02, `-0.03 ${h + G} 0`, '90 0 0');
+      stange(seite, len, 0.015, `-0.03 ${h + G / 2} 0`, '90 0 0');
+      kiste(seite, 0.006, 0.1, len, `-0.006 ${h + 0.05} 0`);
+    }
+    if (s === p.treppe) { // Treppe: lokal x = Weg nach unten, z quer
+      const L = g.L, W = len, steil = Math.atan2(h, L);
+      for (let k = 0; k < g.n - 1; k++) {
+        const y = (g.n - 1 - k) * STUFE_H, x = (k + 0.5) * STUFE_T;
+        kiste(seite, STUFE_T - 0.01, 0.04, W - 0.06, `${x} ${y - 0.021} 0`);
+        rost(seite, STUFE_T - 0.01, W - 0.06, y, x);
+      }
+      for (const z of [-W / 2 + 0.015, W / 2 - 0.015]) {
+        kiste(seite, Math.hypot(L, h), 0.18, 0.025, `${L / 2} ${h / 2} ${z}`, `0 0 ${-grad(steil)}`);
+        stange(seite, Math.hypot(L, h), 0.02, `${L / 2} ${h / 2 + G} ${z}`, `0 0 ${grad(Math.atan2(L, h))}`);
+        kiste(seite, 0.05, G, 0.05, `${L - 0.03} ${G / 2} ${z}`);
+        kiste(seite, 0.12, 0.01, 0.12, `${L - 0.03} 0.005 ${z}`, '0 0 0', DUNKEL);
+      }
+    }
+  }
+}
