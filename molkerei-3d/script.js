@@ -242,7 +242,12 @@ function setzeSpieler(x, z, dx, dz, boden = 0) {
 }
 
 function hervorheben(g, an) {
-  g.object3D.traverse(o => { if (o.material && o.material.emissive) o.material.emissive.setHex(an ? 0x1d4a66 : 0); });
+  // Eigenes Leuchten (Licht, Temperaturanzeige) merken, sonst ist es nach dem Hervorheben weg
+  g.object3D.traverse(o => {
+    if (!o.material || !o.material.emissive) return;
+    if (o.userData.leuchten === undefined) o.userData.leuchten = o.material.emissive.getHex();
+    o.material.emissive.setHex(an ? 0x1d4a66 : o.userData.leuchten);
+  });
 }
 
 // Getroffenes Teil bzw. Anlage zu einem Klick-/Hover-Ziel

@@ -47,6 +47,7 @@ const MEDIEN = {
   magermilch: { name: 'Magermilch', farbe: '#9aa3ab', produkt: true },
   bruch: { name: 'Bruch', farbe: '#f2d54b', produkt: true },
   molke: { name: 'Molke', farbe: '#4f9d5a', produkt: true },
+  cip: { name: 'CIP-Reinigung', farbe: '#e8892b', produkt: true }, // Farbe vorläufig (Baukasten: «CIP später»), Vorlauf geht über den Bahnhof wie ein Produkt
   heisswasser: { name: 'Heisswasser', farbe: '#cc3333' },
   kuehlwasser: { name: 'Kühlwasser', farbe: '#3b7dd8' }
 };
@@ -55,10 +56,13 @@ const LEITUNG_ABSTAND = 0.08; // m, Höhenversatz pro Leitung, damit sich keine 
 const BAHNHOF = 'rohrbahnhof';
 
 // Prozessschritte von Anlage zu Anlage. Der Umweg über den Bahnhof wird automatisch gezeichnet.
+// Optional: ab/an = Name des Anschlusses an der Anlage (sonst das Medium), direkt = nicht über den Bahnhof,
+// hoehe = Höhe der Leitung in m statt eigener Höhe ab LEITUNG_HOEHE (negativ = im Untergeschoss).
 const LEITUNGEN = [
   // Käserei-Linie (Philipp, 01.11.2026)
   { von: 'annahmestation', nach: 'lagertank-1', medium: 'milch' },
-  { von: 'lagertank-1', nach: 'plattenwaermetauscher', medium: 'milch' },
+  { von: 'lagertank-1', nach: 'milchpumpe', medium: 'milch', ab: 'auslauf', an: 'saug', direkt: true, hoehe: 0.75 },
+  { von: 'milchpumpe', nach: 'plattenwaermetauscher', medium: 'milch', ab: 'druck' },
   { von: 'plattenwaermetauscher', nach: 'separator', medium: 'milch' },
   { von: 'separator', nach: 'rahmreifer', medium: 'rahm' },
   { von: 'separator', nach: 'kaesefertiger', medium: 'magermilch' },
@@ -69,14 +73,18 @@ const LEITUNGEN = [
   { von: 'dampfkessel', nach: 'plattenwaermetauscher', medium: 'heisswasser' },
   { von: 'dampfkessel', nach: 'kaesefertiger', medium: 'heisswasser' },
   { von: 'kaelteanlage', nach: 'plattenwaermetauscher', medium: 'kuehlwasser' },
-  { von: 'kaelteanlage', nach: 'lagertank-1', medium: 'kuehlwasser' }
+  // Eiswasser zum Lagertank: von unten aus dem Untergeschoss in den Doppelmantel, Vor- und Rücklauf
+  { von: 'kaelteanlage', nach: 'lagertank-1', medium: 'kuehlwasser', hoehe: -1 },
+  { von: 'lagertank-1', nach: 'kaelteanlage', medium: 'kuehlwasser', ab: 'ruecklauf', hoehe: -1.1 },
+  // Reinigung
+  { von: 'cip', nach: 'lagertank-1', medium: 'cip' }
 ];
 
 // Startpunkt in der Milchannahme, Blickrichtung als x/z-Vektor (hier nach Osten in die Milchbehandlung).
 const START = { x: 5, z: 30, blick: [1, 0] };
 
 // Anlagen. x/z = Mitte, relativ zur Ecke x0/z0 ihres Raums. b = Breite (x), t = Tiefe (z).
-// bau: 'separator' | 'kaesefertiger' | 'lagertank' = in 3D gebaut, sonst nur Umriss am Boden ("Anlage folgt").
+// bau: 'separator' | 'kaesefertiger' | 'lagertank' | 'pumpe' | 'bahnhof' = in 3D gebaut, sonst nur Umriss am Boden ("Anlage folgt").
 // Alle Masse ohne Quelle sind geschätzt.
 // Lagertank: Texte aus Lehrmittel a.1 «Milch lagern» (Lagergefässe, Tankinstallationen, Kühlung).
 // Teil-ids = Gruppennamen in material/molkerei-3d/lagertank.blend (bzwu).
@@ -105,9 +113,23 @@ const ANLAGEN = [
   { id: 'annahmestation', name: 'Annahmestation', raum: 'annahme', x: 4, z: 10, b: 2, t: 1.5 },
   // Liegender Käserei-Lagertank 10'000 L nach DeLaval DXCE, ohne eigene Kühlung (Eiswasser aus der Kälteanlage).
   // Modell: material/molkerei-3d/lagertank.blend (bzwu), Export modelle/lagertank.glb.
-  // shortcut: Ein- und Auslauf Milch teilen sich den Einlauf oben (ein Punkt je Medium), bei Bedarf Anschlüsse pro Leitung.
   { id: 'lagertank-1', name: 'Lagertank 1', raum: 'annahme', x: 12, z: 5, b: 4.6, t: 2.1, bau: 'lagertank',
-    anschluesse: { milch: [-1.7, 2.35, -0.3], kuehlwasser: [-2.4, 0.8, 0] }, ...LAGERTANK },
+    anschluesse: { milch: [-1.7, 2.35, -0.3], auslauf: [2.4, 0.75, 0], cip: [1.2, 2.35, 0],
+      kuehlwasser: [-2.26, 0.83, -0.25], ruecklauf: [-2.26, 0.83, 0.25] }, ...LAGERTANK },
+  {
+    // Texte: Lehrmittel a.1 «Pumpen» und «Zentrifugalpumpe»
+    id: 'milchpumpe', name: 'Zentrifugalpumpe', raum: 'annahme', x: 15.6, z: 5, b: 0.8, t: 0.4, bau: 'pumpe',
+    anschluesse: { saug: [-0.41, 0.35, 0], druck: [-0.19, 0.62, 0.1] },
+    teile: [
+      { id: 'elektromotor', name: 'Elektromotor', text: 'Der Elektromotor treibt das Laufrad im Pumpengehäuse an.' },
+      { id: 'saugstutzen', name: 'Saugstutzen', text: 'Durch den Saugstutzen in der Mitte des Gehäuses fliesst die Milch in Achsrichtung (axial) dem Laufrad zu. Die Zentrifugalpumpe ist nicht selbstansaugend: Die Milch muss ihr zufliessen. Darum steht die Pumpe tiefer als der Auslaufstutzen des Tanks.' },
+      { id: 'pumpengehaeuse', name: 'Pumpengehäuse', text: 'Im Pumpengehäuse versetzt das Laufrad die Milch in Rotation, die Zentrifugalkraft beschleunigt sie nach aussen. Die Pumpe schöpft nur, wenn Gehäuse und Saugleitung vollständig mit Flüssigkeit gefüllt sind.' },
+      { id: 'druckstutzen', name: 'Druckstutzen', text: 'Am Pumpengehäuse und vor allem beim Druckstutzen wird die Geschwindigkeitsenergie in Druckenergie umgewandelt. Die Milch verlässt die Pumpe mit höherem Druck Richtung Rohrbahnhof.' }
+    ],
+    text: 'Die Zentrifugalpumpe fördert die Milch aus dem Lagertank 1 zum Rohrbahnhof. ' +
+      'Sie ist in Käsereien und Molkereien häufig: Sie fördert schonend, ist einfach und hygienisch gebaut und gut CIP-reinigbar. ' +
+      'Sie ist aber nicht selbstansaugend und eignet sich nicht für Produkte mit hoher Viskosität.'
+  },
   { id: 'lagertank-2', name: 'Lagertank 2', raum: 'annahme', x: 12, z: 15, b: 4.6, t: 2.1, bau: 'lagertank', ...LAGERTANK },
 
   // Milchbehandlung (a.2, a.4, a.5, b.6)

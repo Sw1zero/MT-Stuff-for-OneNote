@@ -58,6 +58,34 @@ async (page) => {
   await page.mouse.down(); await page.mouse.up();
   ok((await t('overlay-teil').textContent()) === 'Rührwerk', `Klick auf Rührwerk zeigt: ${await t('overlay-teil').textContent()}`);
   await page.evaluate(() => window.kaeserei.schliessen());
+  // Temperaturanzeige leuchtet nach dem Hervorheben weiter
+  const wo = async (anlage, teil, name) => page.evaluate(([a, t, n]) => {
+    const kam = document.querySelector('a-scene').camera, p = new THREE.Vector3();
+    document.querySelector(`[data-anlage="${a}"] [data-teil="${t}"]`).object3D.getObjectByName(n).getWorldPosition(p);
+    p.project(kam);
+    return [(p.x + 1) / 2, (1 - p.y) / 2];
+  }, [anlage, teil, name]);
+  const th = await wo('lagertank-1', 'thermometer', 'display');
+  await page.mouse.move(box.x + th[0] * box.width, box.y + th[1] * box.height);
+  await page.waitForTimeout(200);
+  await page.mouse.move(box.x + 5, box.y + 5);
+  await page.waitForTimeout(200);
+  ok(await page.evaluate(() => document.querySelector('[data-anlage="lagertank-1"]').object3D.getObjectByName('wert').material.emissive.getHex() !== 0), 'Temperaturanzeige leuchtet nach dem Hervorheben nicht mehr');
+  // Pumpe nach dem Tank: Klick auf den Motor, Leitungen Auslauf > Pumpe und CIP vom Bahnhof
+  const pu = await page.evaluate(() => {
+    const kam = document.querySelector('a-scene').camera, p = new THREE.Vector3();
+    document.querySelector('[data-anlage="milchpumpe"] [data-teil="elektromotor"] a-cylinder').object3D.getWorldPosition(p);
+    p.project(kam);
+    return [(p.x + 1) / 2, (1 - p.y) / 2];
+  });
+  await page.mouse.move(box.x + pu[0] * box.width, box.y + pu[1] * box.height);
+  await page.waitForTimeout(200);
+  await page.mouse.down(); await page.mouse.up();
+  ok((await t('overlay-titel').textContent()) === 'Zentrifugalpumpe' && (await t('overlay-teil').textContent()) === 'Elektromotor', 'Klick auf Pumpenmotor zeigt nicht den Elektromotor');
+  await page.evaluate(() => window.kaeserei.schliessen());
+  for (const l of ['lagertank-1>milchpumpe:milch', 'milchpumpe>rohrbahnhof:milch', 'rohrbahnhof>lagertank-1:cip', 'lagertank-1>kaelteanlage:kuehlwasser']) {
+    ok(await page.locator(`[data-leitung="${l}"]`).count() === 1, `Leitung fehlt: ${l}`);
+  }
 
   // Separator: echter Klick auf die Haube zeigt das Teil, Knopf öffnet die Haube, Übersicht zeigt die Anlage
   await page.evaluate(() => {

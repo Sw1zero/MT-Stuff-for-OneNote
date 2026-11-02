@@ -98,23 +98,24 @@ for (const l of LEITUNGEN) {
 anlageVon(BAHNHOF);
 
 // Gezeichnete Rohrstücke: Produkte laufen über den Bahnhof (zwei Stücke), Versorgung direkt.
-const ROHRE = LEITUNGEN.flatMap(l => MEDIEN[l.medium].produkt
-  ? [{ ...l, nach: BAHNHOF }, { ...l, von: BAHNHOF }]
+const ROHRE = LEITUNGEN.flatMap(l => MEDIEN[l.medium].produkt && !l.direkt
+  ? [{ ...l, nach: BAHNHOF, an: undefined }, { ...l, von: BAHNHOF, ab: undefined }]
   : [l]);
 
 // Anschlusspunkte: mehrere Rohre an einer Anlage stehen nebeneinander entlang ihrer langen Seite (0.15 m Abstand).
 function anschluesse() {
   const zahl = {}, k = {};
   for (const r of ROHRE) for (const id of [r.von, r.nach]) zahl[id] = (zahl[id] || 0) + 1;
-  const punkt = (id, medium) => {
+  const punkt = (id, name) => {
     const an = anlageVon(id), p = anlagePunkt(an);
-    const fest = an.anschluesse && an.anschluesse[medium];
+    const fest = an.anschluesse && an.anschluesse[name];
     if (fest) return { x: p.x + fest[0], y: p.y, z: p.z + fest[2], hoch: fest[1] };
     const v = ((k[id] = (k[id] || 0) + 1) - 1 - (zahl[id] - 1) / 2) * 0.15;
     return an.t > an.b ? { ...p, z: p.z + v } : { ...p, x: p.x + v };
   };
   // shortcut: jede Leitung auf eigener Höhe (LEITUNG_ABSTAND), damit parallele Stücke sich nicht decken. Ab ~25 Leitungen stossen die obersten an 5-m-Decken: dann Rohrtrassen bündeln.
-  return ROHRE.map((r, i) => ({ ...r, a: punkt(r.von, r.medium), b: punkt(r.nach, r.medium), h: LEITUNG_HOEHE + i * LEITUNG_ABSTAND }));
+  return ROHRE.map((r, i) => ({ ...r, a: punkt(r.von, r.ab || r.medium), b: punkt(r.nach, r.an || r.medium),
+    h: r.hoehe !== undefined ? r.hoehe : LEITUNG_HOEHE + i * LEITUNG_ABSTAND }));
 }
 
 // Weg einer Leitung, nur parallel zu den Wänden: hoch, entlang x, entlang z, runter.

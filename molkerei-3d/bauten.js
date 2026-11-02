@@ -271,6 +271,24 @@ const BAUTEN = {
     el('a-torus', { radius: 0.2, 'radius-tubular': 0.04, arc: 180, rotation: '0 90 90', position: '0.27 1.025 -0.6', material: METALL }, g);
   },
 
+  // Zentrifugalpumpe auf Sockel: Achse entlang x, Saugstutzen axial nach -x (zum Tank), Druckstutzen tangential nach oben
+  pumpe(g) {
+    kasten(g, 0.7, 0.2, 0.28, 0, 0, 0, MATT);
+    const motor = teil(g, 'elektromotor');
+    liegend(motor, 0.12, 0.38, 0.13, 0.35, 0, MATT);
+    liegend(motor, 0.1, 0.04, 0.34, 0.35, 0, MATT);
+    kasten(motor, 0.3, 0.03, 0.2, 0.13, 0.2, 0, MATT);
+    const geh = teil(g, 'pumpengehaeuse');
+    liegend(geh, 0.05, 0.08, -0.1, 0.35, 0);
+    liegend(geh, 0.15, 0.1, -0.19, 0.35, 0);
+    const saug = teil(g, 'saugstutzen');
+    liegend(saug, 0.03, 0.17, -0.325, 0.35, 0);
+    klemme(saug, 0.03, -0.39, 0.35, 0, 'x');
+    const druck = teil(g, 'druckstutzen');
+    stehend(druck, 0.03, 0.17, -0.19, 0.45, 0.1);
+    klemme(druck, 0.03, -0.19, 0.6, 0.1);
+  },
+
   // Lagertank: in Blender gebaut (material/molkerei-3d/lagertank.blend in bzwu), hier nur das exportierte Modell
   // Gruppen mit einer Teil-id aus anlagen.js werden nach dem Laden eigene Entities mit data-teil (Klick, Hervorheben).
   lagertank(g) {
