@@ -250,6 +250,29 @@ const ANLAGEN = [
   { id: 'bebruetungstank', name: 'Bebrütungstank', raum: 'sauermilch', x: 6, z: 6, b: 2.5, t: 2.5 },
   { id: 'mischer', name: 'Mischer', raum: 'sauermilch', x: 14, z: 6, b: 2, t: 2 },
   { id: 'schaberwaermetauscher', name: 'Schaberwärmetauscher', raum: 'sauermilch', x: 10, z: 13, b: 2, t: 1 },
+  {
+    // Masse nach Plevnik SK Classic 200 (Ø 845, Rand 1060, Auslass 485), Eigenbau: material/molkerei-3d/mehrzweckerhitzer.blend (bzwu).
+    // Rührertexte: Lehrmittel a.1 «Milch und Milchprodukte rühren», «Strömungsformen»; Harfe und Strömungsbleche: b.1.
+    // Eigene Sätze: Anlagentext, kessel, steuerung, auslaufhahn, untergestell.
+    id: 'mehrzweckerhitzer', name: 'Mehrzweckerhitzer', raum: 'sauermilch', x: 16, z: 14, b: 1.45, t: 1.2, bau: 'mehrzweck',
+    betrieb: { an: 'Rührwerk einschalten', aus: 'Rührwerk ausschalten', hinweis: 'Wie die Milch strömt, zeigt das Schnittbild.' },
+    // Rührer wechseln: je Variante die sichtbaren Teile. Der Ankerrührer läuft wandnah, die Strömungsbrecher kommen heraus.
+    wechsel: { text: 'Rührer wechseln', varianten: [['propellerruehrer', 'stroemungsbrecher'], ['scheibenruehrer', 'stroemungsbrecher'], ['ankerruehrer'], ['kaeseharfe', 'stroemungsbrecher']] },
+    schnittbild: 'ruehrwerk', // Strömungsformen: schnittbild-ruehrwerk.js
+    teile: [
+      { id: 'kessel', name: 'Kessel mit Mantel', text: 'Der Kessel hat einen isolierten Mantel. Darin heizen Sie mit Heisswasser oder elektrisch bis 100 °C und kühlen mit Leitungswasser, unter 20 °C mit Eiswasser. So können Sie im gleichen Kessel Milch pasteurisieren, Joghurt bebrüten oder Käse herstellen.' },
+      { id: 'ruehrwerk', name: 'Rührwerk', text: 'Der Antrieb der Rührwerke erfolgt über einen Elektromotor mit stufenloser Drehzahlregulierung. Die Rührgeschwindigkeit richtet sich nach dem Rührwerkdurchmesser, der Viskosität und der Empfindlichkeit des Produktes. Je grösser der Rührwerkdurchmesser ist, umso kleiner kann die Umdrehungszahl sein.' },
+      { id: 'propellerruehrer', name: 'Propellerrührer', text: 'Der Propellerrührer erzeugt eine axiale Strömung, von oben nach unten und umgekehrt. Er gehört zu den Rührern für Flüssigkeiten mit niedriger Viskosität wie Vollmilch, Magermilch, Buttermilch oder Molke.' },
+      { id: 'scheibenruehrer', name: 'Scheibenrührer', text: 'Der Scheibenrührer fördert die Flüssigkeit von innen nach aussen (radiale Strömung). Er gehört zu den Rührern für Flüssigkeiten mit niedriger Viskosität wie Vollmilch, Magermilch, Buttermilch oder Molke.' },
+      { id: 'ankerruehrer', name: 'Ankerrührer', text: 'Der Ankerrührer bewegt das Produkt meist tangential mit niedriger Drehzahl. Er läuft wandnah, um das Produkt durch Abschaben zu erfassen. Dadurch ist auch ein verbesserter Wärmeübergang möglich, ohne dass das Rührgut anbrennt. Er eignet sich für Quark, Pudding, Schmelzkäsemassen oder sonstige teigige Massen.' },
+      { id: 'kaeseharfe', name: 'Käseharfe', text: 'Nach dem Dicklegen schneidet die Harfe die Gallerte in Bruchkörner. In runden Kesseln ohne Planetengetriebe erreichen Sie nach den ersten paar Umdrehungen nur noch eine Rührwirkung: Der ganze Inhalt dreht sich im Kreis, ohne Schneidewirkung.' },
+      { id: 'stroemungsbrecher', name: 'Strömungsbrecher', text: 'Eine unerwünschte Tangentialströmung können Sie durch den Einbau von Strömungsbrechern oder durch eine schräge, exzentrische oder seitliche Anordnung des Rührwerks weitgehend verhindern. Der Strömungsbrecher ermöglicht eine gute Durchmischung und erreicht damit eine gleichmässige Temperaturverteilung.' },
+      { id: 'steuerung', name: 'Steuerung', text: 'In der Steuerung stellen Sie Temperatur, Zeit, Rührgeschwindigkeit und Drehrichtung ein. Programme für Pasteurisation, Joghurt oder Käse laufen danach automatisch ab.' },
+      { id: 'auslaufhahn', name: 'Auslaufhahn', text: 'Über den Auslaufhahn entleeren Sie den Kessel, zum Beispiel die Käsemasse direkt auf den Abtropftisch.' },
+      { id: 'untergestell', name: 'Untergestell mit Kippmechanismus', text: 'Mit dem Handrad kippen Sie den Kessel, damit er sich vollständig entleert.' }
+    ],
+    text: 'Im Mehrzweckerhitzer verarbeiten Sie kleine Mengen: Milch pasteurisieren, Joghurt herstellen oder Käse fabrizieren. Für jede Aufgabe setzen Sie den passenden Rührer ein. Vergleichen Sie die Rührer mit «Rührer wechseln», das Schnittbild zeigt ihre Strömungsformen.'
+  },
 
   // Butterei (b.10)
   { id: 'rahmreifer', name: 'Rahmreifer', raum: 'butterei', x: 6, z: 7, b: 3, t: 3 },

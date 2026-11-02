@@ -148,6 +148,36 @@ AFRAME.registerComponent('separatorbetrieb', {
   }
 });
 
+// Mehrzweckerhitzer: zeigt je Variante (anlagen.js wechsel.varianten) nur deren Teile, im Betrieb dreht der Rührer.
+// Rührergruppen haben ihren Ursprung auf der Kesselachse, darum dreht object3D.rotation.y um die Welle.
+const RW_DREHZAHL = { propellerruehrer: 1, scheibenruehrer: 1, ankerruehrer: 0.25, kaeseharfe: 0.25 }; // U/s, gemächlich zum Zuschauen
+AFRAME.registerComponent('ruehrerwechsel', {
+  init() {
+    const g = this.el.closest('[data-anlage]');
+    this.g = g; this.winkel = 0; this.an = false;
+    this.ruhig = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this.alle = [...new Set(anlageVon(g.dataset.anlage).wechsel.varianten.flat())];
+    g.addEventListener('model-loaded', () => this.zeigen(anlageVon(g.dataset.anlage).wechsel.varianten[+g.dataset.variante || 0]));
+    g.addEventListener('wechsel', e => this.zeigen(e.detail.teile));
+    g.addEventListener('betrieb', e => { this.an = e.detail.an; if (!this.an) this.drehen(0); });
+  },
+  teil(id) { return this.g.querySelector(`[data-teil="${id}"]`); },
+  zeigen(teile) {
+    this.sichtbar = teile;
+    for (const id of this.alle) {
+      const t = this.teil(id); if (!t) continue;
+      t.object3D.visible = teile.includes(id);
+      t.classList.toggle('klickbar', teile.includes(id)); // ausgeblendete Rührer nicht anklickbar
+      t.object3D.rotation.y = 0;
+    }
+  },
+  drehen(w) { this.winkel = w; const r = this.sichtbar && this.teil(this.sichtbar[0]); if (r && r.dataset.teil in RW_DREHZAHL) r.object3D.rotation.y = w; },
+  tick(t, dt) {
+    if (!this.an || this.ruhig || !this.sichtbar) return;
+    this.drehen(this.winkel + Math.min(dt, 100) / 1000 * Math.PI * 2 * (RW_DREHZAHL[this.sichtbar[0]] || 0));
+  }
+});
+
 const BAUTEN = {
   // Separator nach Fotos references/_inbox/molkerei/zentrifuge_1+2 (SPX), gut 1.6 m hoch.
   // Teile nach Lehrmittel a.2 «Aufbau des Separators». Die Haube lässt sich öffnen (aktion 'haube').
@@ -329,6 +359,15 @@ const BAUTEN = {
   // Molkenwanne mit Lochsieb steht oben und fährt beim Absenken 0.9 m in die Quarkwanne.
   schulenburg(g) {
     glbTeile(g, 'modelle/schulenburgwanne.glb', 'schulenburgwanne', { molkenwanne: '-0.9', lochsieb: '-0.9' });
+  },
+
+  // Mehrzweckerhitzer 200 l nach Plevnik SK Classic 200: in Blender gebaut (material/molkerei-3d/mehrzweckerhitzer.blend in bzwu).
+  // Vier Rührer in der GLB, ruehrerwechsel zeigt jeweils einen. Milchspiegel halbdurchsichtig, nicht anklickbar.
+  mehrzweck(g) {
+    glbTeile(g, 'modelle/mehrzweckerhitzer.glb', 'mehrzweckerhitzer');
+    el('a-entity', { ruehrerwechsel: '' }, g);
+    // Klicks gehen durch die Milch hindurch auf den Rührer
+    g.addEventListener('model-loaded', () => { g.object3D.getObjectByName('milchspiegel').raycast = () => {}; });
   },
 
   // Käsefertiger: Kessi Ø 3 m, Rand 1.5 m, Brücke mit Antrieb, Harfe in der Milch

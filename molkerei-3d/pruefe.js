@@ -250,6 +250,57 @@ async (page) => {
   ok(!(await t('schnittbild-sw').evaluate(d => d.open)) && await t('overlay').isVisible(), 'Esc schliesst Schnittbild nicht oder auch das Overlay');
   await page.evaluate(() => window.kaeserei.schliessen());
 
+  // Mehrzweckerhitzer (glTF aus Blender, Sauermilch, Mitte 76/14): Klick in den Kessel auf den Propeller, Rührer wechseln, Betrieb, Schnittbild
+  await page.locator('[data-raum="sauermilch"]').click();
+  await page.evaluate(() => {
+    document.getElementById('spieler').object3D.position.set(76, 0, 14.6); // näher, sonst verdeckt der Kesselrand den Propeller
+    const lc = document.getElementById('kamera').components['look-controls'];
+    lc.yawObject.rotation.y = 0; lc.pitchObject.rotation.x = -1.2;
+  });
+  await page.waitForFunction(() => document.querySelector('[data-anlage="mehrzweckerhitzer"] [data-teil="propellerruehrer"]'), null, { timeout: 15000 });
+  await page.waitForTimeout(300);
+  const mz = await page.evaluate(() => {
+    const kam = document.querySelector('a-scene').camera, p = new THREE.Vector3();
+    new THREE.Box3().setFromObject(document.querySelector('[data-anlage="mehrzweckerhitzer"] [data-teil="propellerruehrer"]').object3D.getObjectByName('propellernabe')).getCenter(p);
+    p.project(kam);
+    return [(p.x + 1) / 2, (1 - p.y) / 2];
+  });
+  await page.mouse.move(box.x + mz[0] * box.width, box.y + mz[1] * box.height);
+  await page.waitForTimeout(200);
+  await page.mouse.down(); await page.mouse.up();
+  ok((await t('overlay-titel').textContent()) === 'Mehrzweckerhitzer' && (await t('overlay-teil').textContent()) === 'Propellerrührer', `Klick in den Kessel zeigt: ${await t('overlay-teil').textContent()}`);
+  const mzTeil = id => page.evaluate(i => { const e = document.querySelector(`[data-anlage="mehrzweckerhitzer"] [data-teil="${i}"]`); return { sichtbar: e.object3D.visible, klickbar: e.classList.contains('klickbar'), dreh: e.object3D.rotation.y }; }, id);
+  ok((await mzTeil('scheibenruehrer')).sichtbar === false, 'Scheibenrührer zu Beginn sichtbar');
+  await t('overlay-wechsel').click();
+  ok((await t('overlay-teil').textContent()) === 'Scheibenrührer', 'Rührer wechseln zeigt nicht den Scheibenrührer');
+  const prop = await mzTeil('propellerruehrer');
+  ok(!prop.sichtbar && !prop.klickbar && (await mzTeil('scheibenruehrer')).sichtbar, 'Propeller nach dem Wechsel noch da oder Scheibe fehlt');
+  await t('overlay-wechsel').click();
+  ok((await t('overlay-teil').textContent()) === 'Ankerrührer' && !(await mzTeil('stroemungsbrecher')).sichtbar, 'Ankerrührer fehlt oder Strömungsbrecher noch drin');
+  await t('overlay-betrieb').click();
+  await page.waitForTimeout(600);
+  ok((await mzTeil('ankerruehrer')).dreh !== 0, 'Ankerrührer dreht im Betrieb nicht');
+  await t('overlay-betrieb').click();
+  ok((await mzTeil('ankerruehrer')).dreh === 0, 'Ankerrührer bleibt nach dem Ausschalten verdreht');
+  // Schnittbild übernimmt den Anker (ohne Strömungsbrecher), Propeller ohne Brecher zeigt die Trombe
+  await t('overlay-schnitt').click();
+  ok(await t('schnittbild-rw').evaluate(d => d.open), 'Schnittbild Rührwerk öffnet nicht');
+  let st = await page.evaluate(() => window.ruehrwerkSchnitt.stand());
+  ok(st.ruehrer === 'ankerruehrer' && !st.brecher && await t('rw-brecher').isDisabled(), 'Schnittbild übernimmt den Ankerrührer nicht');
+  await page.locator('[data-testid="schnittbild-rw"] [data-rw="propellerruehrer"]').click();
+  ok((await t('rw-titel').textContent()) === 'Propellerrührer: axiale Strömung', `Titel Propeller: ${await t('rw-titel').textContent()}`);
+  st = await page.evaluate(() => window.ruehrwerkSchnitt.stand());
+  ok(st.trombe, 'Propeller ohne Strömungsbrecher zeigt keine Trombe');
+  await t('rw-brecher').check();
+  st = await page.evaluate(() => window.ruehrwerkSchnitt.stand());
+  ok(st.brecher && !st.trombe && (await t('rw-brechertext').textContent()).startsWith('Strömungsbrecher'), 'Mit Strömungsbrecher bleibt die Trombe');
+  const lage = () => page.evaluate(() => document.querySelector('.rw-teilchen circle').getAttribute('cy'));
+  const l1 = await lage(); await page.waitForTimeout(400);
+  ok(l1 !== await lage(), 'Teilchen im Schnittbild bewegen sich nicht');
+  await page.keyboard.press('Escape');
+  ok(!(await t('schnittbild-rw').evaluate(d => d.open)), 'Esc schliesst Schnittbild Rührwerk nicht');
+  await page.evaluate(() => window.kaeserei.schliessen());
+
   // Durch den Durchgang Milchbehandlung -> Käserei (Tür bei x=30, z=20)
   await page.evaluate(() => document.getElementById('spieler').object3D.position.set(30, 0, 22));
   // rennen, damit es auch bei wenigen fps auf der VM reicht

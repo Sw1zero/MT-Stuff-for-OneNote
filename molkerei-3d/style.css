@@ -148,3 +148,22 @@ svg[data-schritt="4"] .sw-druck .sw-pfeil { animation: sw-druck 5s linear forwar
 @keyframes sw-druck { from { stroke-width: 2; } to { stroke-width: 7; } }
 .mk-schritt-nr { margin: 0 0 4px; font-size: 0.9em; color: var(--text-muted); }
 @media (prefers-reduced-motion: reduce) { .sw-oben, .sw-pegel { transition: none; } .sw-druck .sw-pfeil { animation: none; } }
+
+/* Schnittbild Strömungsformen (schnittbild-ruehrwerk.js) */
+.rw-mantel { fill: #b9c0c6; stroke: #4a545c; stroke-width: 1.2; }
+.rw-innen { fill: #eef1f3; }
+.rw-milch { fill: #fbfaf3; stroke: #b4bcc3; stroke-width: 1; }
+.rw-bahn { fill: none; stroke: #c9d3da; stroke-width: 1.5; stroke-dasharray: 4 6; }
+.rw-teilchen circle { fill: var(--blue-light); }
+.rw-welle { stroke: #4a545c; stroke-width: 6; }
+.rw-ruehrer { fill: #8a96a0; stroke: #4a545c; stroke-width: 1.2; }
+.rw-schaufel { fill: #4a545c; }
+.rw-buegel { fill: none; stroke: #4a545c; stroke-width: 6; stroke-linejoin: round; }
+.rw-messer { stroke: #6b757d; stroke-width: 1.5; }
+.rw-nabe { fill: #4a545c; }
+.rw-brecher { fill: #7b858d; }
+.rw-trombe { fill: #b3261e; font-size: 17px; font-weight: 600; visibility: hidden; }
+svg[data-trombe="ja"] .rw-trombe { visibility: visible; }
+.mk-rw-wahl { margin: 0 0 10px; }
+.mk-rw-wahl button[aria-pressed="false"] { background: #fff; color: var(--blue-dark); }
+.mk-rw-brecher { display: block; margin-bottom: 12px; }

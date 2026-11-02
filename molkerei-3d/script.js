@@ -314,6 +314,8 @@ window.kaeserei = {
     if (an.betrieb) $('overlay-betrieb').textContent = g.dataset.betrieb ? an.betrieb.aus : an.betrieb.an;
     $('overlay-hinweis').hidden = !(an.betrieb && g.dataset.betrieb);
     $('overlay-schnitt').hidden = !an.schnittbild;
+    $('overlay-wechsel').hidden = !an.wechsel;
+    if (an.wechsel) $('overlay-wechsel').textContent = an.wechsel.text;
     if (an.betrieb) $('overlay-hinweis').textContent = an.betrieb.hinweis;
     $('overlay').dataset.anlage = id;
     $('overlay').dataset.teil = t ? t.id : '';
@@ -346,6 +348,15 @@ window.kaeserei = {
     if (an) g.dataset.betrieb = 'ja'; else delete g.dataset.betrieb;
     g.emit('betrieb', { an }, false);
     if ($('overlay').dataset.anlage === id && !$('overlay').hidden) window.kaeserei.select(id, $('overlay').dataset.teil || undefined);
+  },
+  // Nächste Variante zeigen (z.B. anderer Rührer): Bau hört auf das Ereignis 'wechsel', Overlay zeigt das neue Teil
+  wechsel(id) {
+    const g = document.querySelector(`[data-anlage="${id}"]`);
+    const v = anlageVon(id).wechsel.varianten;
+    const i = ((+g.dataset.variante || 0) + 1) % v.length;
+    g.dataset.variante = i;
+    g.emit('wechsel', { teile: v[i] }, false);
+    if ($('overlay').dataset.anlage === id && !$('overlay').hidden) window.kaeserei.select(id, v[i][0]);
   },
   // An den Eingang des Raums (erster Durchgang in TUEREN), 2 m im Raum, Blick hinein.
   gehZu(raumId) {
@@ -388,8 +399,9 @@ document.addEventListener('DOMContentLoaded', () => {
   $('overlay-betrieb').addEventListener('click', () => window.kaeserei.betrieb($('overlay').dataset.anlage));
   $('overlay-schnitt').addEventListener('click', () => {
     const id = $('overlay').dataset.anlage;
-    (anlageVon(id).schnittbild === 'schulenburg' ? window.schulenburgSchnitt : window.schnittbild).oeffnen(id);
+    ({ schulenburg: window.schulenburgSchnitt, ruehrwerk: window.ruehrwerkSchnitt }[anlageVon(id).schnittbild] || window.schnittbild).oeffnen(id);
   });
+  $('overlay-wechsel').addEventListener('click', () => window.kaeserei.wechsel($('overlay').dataset.anlage));
   $('overlay-uebersicht').addEventListener('click', () => window.kaeserei.select($('overlay').dataset.anlage));
   window.addEventListener('keydown', e => { if (e.key === 'Escape' && !document.querySelector('dialog[open]')) window.kaeserei.schliessen(); });
 

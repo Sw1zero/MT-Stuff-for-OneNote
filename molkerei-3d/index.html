@@ -13,6 +13,7 @@
   <script src="bauten.js"></script>
   <script src="schnittbild.js"></script>
   <script src="schnittbild-schulenburg.js"></script>
+  <script src="schnittbild-ruehrwerk.js"></script>
 </head>
 <body>
   <a-scene renderer="antialias: true" shadow="type: pcfsoft" background="color: #dfe6ec" cursor="rayOrigin: mouse" raycaster="objects: .klickbar; far: 40"
@@ -47,6 +48,7 @@
       <div class="mk-knoepfe">
         <button type="button" data-testid="overlay-aktion" hidden></button>
         <button type="button" data-testid="overlay-betrieb" hidden></button>
+        <button type="button" data-testid="overlay-wechsel" hidden></button>
         <button type="button" data-testid="overlay-schnitt" hidden>Schnittbild</button>
         <button type="button" data-testid="overlay-uebersicht" hidden>Zur ganzen Anlage</button>
       </div>
@@ -85,6 +87,24 @@
           <p data-testid="sw-text"></p>
           <div class="mk-knoepfe"><button type="button" data-testid="sw-zurueck">Zurück</button><button type="button" data-testid="sw-weiter">Weiter</button></div>
           <p class="mk-hinweis">Schematische Darstellung, nicht massstäblich. Querschnitt quer zur Wanne: Die Luke liegt an der Stirnseite hinter der Schnittebene. Teile anklicken zeigt ihre Funktion.</p>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog class="mk-schnitt" data-testid="schnittbild-rw" aria-labelledby="mk-rw-titel">
+      <button type="button" class="mk-schliessen" data-testid="schnittbild-rw-schliessen" aria-label="Schliessen">×</button>
+      <h2 id="mk-rw-titel">Strömungsformen im Rührwerksbehälter</h2>
+      <div class="mk-schnitt-inhalt">
+        <svg role="img" aria-label="Kessel im Schnitt und von oben, Teilchen zeigen die Strömung"></svg>
+        <div class="mk-schnitt-info">
+          <div class="mk-knoepfe mk-rw-wahl" role="group" aria-label="Rührer">
+            <button type="button" data-rw="propellerruehrer">Propeller</button><button type="button" data-rw="scheibenruehrer">Scheibe</button><button type="button" data-rw="ankerruehrer">Anker</button><button type="button" data-rw="kaeseharfe">Harfe</button>
+          </div>
+          <label class="mk-rw-brecher"><input type="checkbox" data-testid="rw-brecher" checked> Strömungsbrecher eingebaut</label>
+          <h3 data-testid="rw-titel"></h3>
+          <p data-testid="rw-text"></p>
+          <p data-testid="rw-brechertext"></p>
+          <p class="mk-hinweis">Schematische Darstellung, nicht massstäblich. Links der Kessel im Schnitt, rechts von oben. Die Punkte zeigen, wie die Milch strömt.</p>
         </div>
       </div>
     </dialog>
