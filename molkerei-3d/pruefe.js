@@ -301,6 +301,37 @@ async (page) => {
   ok(!(await t('schnittbild-rw').evaluate(d => d.open)), 'Esc schliesst Schnittbild Rührwerk nicht');
   await page.evaluate(() => window.kaeserei.schliessen());
 
+  // Abtropfgestell (glTF aus Blender, Kühlraum, Mitte 92/35.5): Klick auf einen Quarksack, Abtropfen und zurück
+  await page.locator('[data-raum="abfuellung"]').click();
+  await page.evaluate(() => {
+    document.getElementById('spieler').object3D.position.set(92, 0, 38.3);
+    const lc = document.getElementById('kamera').components['look-controls'];
+    lc.yawObject.rotation.y = 0; lc.pitchObject.rotation.x = -0.05;
+  });
+  await page.waitForFunction(() => document.querySelector('[data-anlage="abtropfgestell"] [data-teil="quarksack"]'), null, { timeout: 15000 });
+  await page.waitForTimeout(300);
+  const sa = await page.evaluate(() => {
+    const kam = document.querySelector('a-scene').camera, p = new THREE.Vector3();
+    new THREE.Box3().setFromObject(document.querySelector('[data-anlage="abtropfgestell"]').object3D.getObjectByName('sack_2')).getCenter(p);
+    p.project(kam);
+    return [(p.x + 1) / 2, (1 - p.y) / 2];
+  });
+  await page.mouse.move(box.x + sa[0] * box.width, box.y + sa[1] * box.height);
+  await page.waitForTimeout(200);
+  await page.mouse.down(); await page.mouse.up();
+  ok((await t('overlay-titel').textContent()) === 'Abtropfgestell (Sackverfahren)' && (await t('overlay-teil').textContent()) === 'Quarksack', `Klick auf Quarksack zeigt: ${await t('overlay-teil').textContent()}`);
+  const saStand = () => page.evaluate(() => { const o = document.querySelector('[data-anlage="abtropfgestell"]').object3D; return [o.getObjectByName('sack_2').scale.x, o.getObjectByName('molkenspiegel').position.y]; });
+  const [sx0, my0] = await saStand();
+  await t('overlay-betrieb').click();
+  await page.waitForTimeout(1500);
+  const [sx1, my1] = await saStand();
+  ok(sx1 < sx0 && my1 > my0, `Säcke tropfen nicht ab: Breite ${sx1}, Molke ${my1}`);
+  ok((await t('overlay-betrieb').textContent()) === 'Säcke neu füllen', 'Knopf wechselt nicht auf «Säcke neu füllen»');
+  await t('overlay-betrieb').click();
+  const [sx2, my2] = await saStand();
+  ok(sx2 === 1 && my2 === my0, 'Säcke neu füllen stellt nicht zurück');
+  await page.evaluate(() => window.kaeserei.schliessen());
+
   // Durch den Durchgang Milchbehandlung -> Käserei (Tür bei x=30, z=20)
   await page.evaluate(() => document.getElementById('spieler').object3D.position.set(30, 0, 22));
   // rennen, damit es auch bei wenigen fps auf der VM reicht

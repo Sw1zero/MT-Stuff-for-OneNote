@@ -241,7 +241,7 @@ const ANLAGEN = [
       { id: 'entnahmeluke', name: 'Entnahmeluke', text: 'Ist genügend Molke abgepresst und die Molkenwanne angehoben, rühren Sie den Quark auf und schieben ihn mit einem Schaber durch eine Luke aus der Wanne.' },
       { id: 'hubzylinder', name: 'Hubzylinder', text: 'Die Hubzylinder heben und senken die Molkenwanne.' }
     ],
-    text: 'In der Schulenburg-Wanne stellen Sie Quark gewerblich her (Schulenburgverfahren). Die Quarkmilch gerinnt in der unteren Wanne, die abgesenkte obere Wanne presst die Molke ab.'
+    text: 'In der Schulenburg-Wanne stellen Sie Quark gewerblich her (Schulenburgverfahren). Die Quarkmilch gerinnt in der unteren Wanne, die abgesenkte obere Wanne presst die Molke ab. Kleine Mengen lassen Sie im Sackverfahren abtropfen: Abtropfgestell im Kühlraum.'
   },
   { id: 'mozzarella', name: 'Kneten und Filieren (Mozzarella)', raum: 'frischkaeserei', x: 10, z: 13, b: 3, t: 1.5 },
 
@@ -294,6 +294,18 @@ const ANLAGEN = [
   // Abfüllung und Kühlraum (alle b)
   { id: 'abfuellanlage', name: 'Abfüllanlage', raum: 'abfuellung', x: 8, z: 5, b: 8, t: 2 },
   { id: 'kuehlraum', name: 'Kühlraum', raum: 'abfuellung', x: 10, z: 14, b: 8, t: 6 },
+  {
+    // Sackverfahren, Texte: Lehrmittel b.5 «Abpressen und Abtropfen von Kleinmengen». Eigene Sätze: Anlagentext, gestell, auffangwanne.
+    // Eigenbau ohne Vorlage, Masse geschätzt: material/molkerei-3d/abtropfgestell_bau.py (bzwu). Steht im Kühlraum, wie im Lehrmittel.
+    id: 'abtropfgestell', name: 'Abtropfgestell (Sackverfahren)', raum: 'abfuellung', x: 12, z: 15.5, b: 2, t: 0.6, bau: 'sackverfahren',
+    betrieb: { an: 'Abtropfen starten', aus: 'Säcke neu füllen' },
+    teile: [
+      { id: 'quarksack', name: 'Quarksack', text: 'Die Quarkgallerte füllen Sie nach dem Schneiden in abgebrühte Säcke ab. Zur Entsirtung hängen Sie die Säcke während einiger Stunden im Kühlraum auf. Je nach Volumen geht die Entsirtung langsamer oder schneller. Während dieser Zeit ist das Infektionsrisiko über die Luft oder über Spritzwasser hoch. Sie achten deshalb auf einwandfreie hygienische Bedingungen.' },
+      { id: 'gestell', name: 'Abtropfgestell', text: 'Am Gestell hängen die Säcke frei, damit die Molke nach allen Seiten abtropfen kann.' },
+      { id: 'auffangwanne', name: 'Auffangwanne', text: 'In der Auffangwanne sammelt sich die abtropfende Quarksirte. Über den Hahn lassen Sie sie ab.' }
+    ],
+    text: 'Kleine Mengen Quark lassen Sie im Sackverfahren abtropfen. Das dauert einige Stunden, im Separator nur wenige Sekunden. Mit «Abtropfen starten» sehen Sie, wie die Säcke schlanker werden und sich die Molke in der Wanne sammelt.'
+  },
 
   // Technik (a.7, d.2, e.2)
   { id: 'dampfkessel', name: 'Dampfkessel', raum: 'technik', x: 6, z: 5, b: 5, t: 2.5 },

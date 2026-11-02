@@ -226,6 +226,51 @@ AFRAME.registerComponent('ruehrerwechsel', {
   }
 });
 
+// Sackverfahren: im Betrieb werden die Quarksäcke schlanker (Ursprung am Haken), Tropfen fallen in die Wanne
+// und der Molkenspiegel steigt. Nach SA_DAUER Sekunden ist abgetropft, «Säcke neu füllen» stellt zurück.
+const SA_DAUER = 20, SA_HUB = 0.12, SA_UNTEN = 0.89, SA_HAKEN = 1.72; // m, Höhen wie in abtropfgestell_bau.py
+AFRAME.registerComponent('sackabtropfen', {
+  init() {
+    const g = this.el.closest('[data-anlage]');
+    this.g = g; this.u = 0; this.an = false;
+    this.ruhig = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this.tropfen = new THREE.InstancedMesh(new THREE.SphereGeometry(0.013, 8, 6), new THREE.MeshBasicMaterial({ color: 0xb8c25a }), 15);
+    this.tropfen.visible = false;
+    this.el.object3D.add(this.tropfen);
+    g.addEventListener('model-loaded', () => {
+      this.saecke = [0, 1, 2, 3, 4].map(i => g.object3D.getObjectByName(`sack_${i}`));
+      this.molke = g.object3D.getObjectByName('molkenspiegel');
+      this.molke.raycast = () => {}; // Klicks gehen auf den Wannenboden
+      this.y0 = this.molke.position.y;
+      this.punkte = Array.from({ length: this.tropfen.count }, (_, i) => ({ x: this.saecke[i % 5].position.x, t: -Math.random() }));
+      this.stand(0);
+    });
+    g.addEventListener('betrieb', e => { this.an = e.detail.an; this.stand(this.an && this.ruhig ? 1 : 0); });
+  },
+  stand(u) {
+    if (!this.saecke) return;
+    this.u = u;
+    const s = 1 - 0.4 * u;
+    for (const k of this.saecke) k.scale.set(s, 1 - 0.12 * u, s);
+    this.molke.position.y = this.y0 + SA_HUB * u;
+    this.molke.visible = u > 0; // vor dem Abtropfen ist die Wanne leer
+    this.tropfen.visible = this.an && u < 1 && !this.ruhig;
+  },
+  tick(t, dt) {
+    if (!this.an || this.ruhig || !this.saecke || this.u >= 1) return;
+    const s = Math.min(dt, 100) / 1000;
+    this.stand(Math.min(1, this.u + s / SA_DAUER));
+    const unten = SA_HAKEN - (SA_HAKEN - SA_UNTEN) * (1 - 0.12 * this.u), boden = this.molke.position.y, m = new THREE.Matrix4();
+    this.punkte.forEach((p, i) => {
+      p.t += s;
+      let y = unten - 4.9 * Math.max(p.t, 0) ** 2;
+      if (y < boden) { p.t = -Math.random() * (0.3 + 2 * this.u); y = unten; } // gegen Ende tropft es seltener
+      this.tropfen.setMatrixAt(i, m.makeTranslation(p.x, p.t < 0 ? -10 : y, 0));
+    });
+    this.tropfen.instanceMatrix.needsUpdate = true;
+  }
+});
+
 const BAUTEN = {
   // Separator nach Fotos references/_inbox/molkerei/zentrifuge_1+2 (SPX), gut 1.6 m hoch.
   // Teile nach Lehrmittel a.2 «Aufbau des Separators». Die Haube lässt sich öffnen (aktion 'haube').
@@ -407,6 +452,12 @@ const BAUTEN = {
   // Molkenwanne mit Lochsieb steht oben und fährt beim Absenken 0.9 m in die Quarkwanne.
   schulenburg(g) {
     glbTeile(g, 'modelle/schulenburgwanne.glb', 'schulenburgwanne', { molkenwanne: '-0.9', lochsieb: '-0.9' });
+  },
+
+  // Abtropfgestell für das Sackverfahren: in Blender gebaut (material/molkerei-3d/abtropfgestell_bau.py in bzwu).
+  sackverfahren(g) {
+    glbTeile(g, 'modelle/abtropfgestell.glb', 'abtropfgestell');
+    el('a-entity', { sackabtropfen: '' }, g);
   },
 
   // Mehrzweckerhitzer 200 l nach Plevnik SK Classic 200: in Blender gebaut (material/molkerei-3d/mehrzweckerhitzer.blend in bzwu).
