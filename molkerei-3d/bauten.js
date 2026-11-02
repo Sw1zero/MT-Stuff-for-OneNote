@@ -301,6 +301,12 @@ const BAUTEN = {
     glbTeile(g, 'modelle/lagertank.glb', 'lagertank');
   },
 
+  // Schulenburg-Wanne nach Plevnik SLB 2000: in Blender gebaut (material/molkerei-3d/schulenburgwanne.blend in bzwu).
+  // Molkenwanne mit Lochsieb steht oben und fährt beim Absenken 0.9 m in die Quarkwanne.
+  schulenburg(g) {
+    glbTeile(g, 'modelle/schulenburgwanne.glb', 'schulenburgwanne', { molkenwanne: '-0.9', lochsieb: '-0.9' });
+  },
+
   // Käsefertiger: Kessi Ø 3 m, Rand 1.5 m, Brücke mit Antrieb, Harfe in der Milch
   kaesefertiger(g) {
     el('a-cylinder', { radius: 1.5, height: 1.5, position: '0 0.75 0', 'open-ended': true, material: METALL + '; side: double' }, g);

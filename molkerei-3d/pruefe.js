@@ -197,6 +197,36 @@ async (page) => {
   [, z1] = await pos();
   ok(z1 > 20, `Durch die Wand gelaufen: z=${z1.toFixed(2)}`);
 
+  // Schulenburg-Wanne (glTF aus Blender, Frischkäserei, Mitte 55.5/14): Klick auf die Quarkwanne, Molkenwanne absenken und anheben
+  await page.locator('[data-raum="frischkaeserei"]').click();
+  await page.evaluate(() => {
+    document.getElementById('spieler').object3D.position.set(55.5, 0, 19.3);
+    const lc = document.getElementById('kamera').components['look-controls'];
+    lc.yawObject.rotation.y = 0; lc.pitchObject.rotation.x = -0.1;
+  });
+  await page.waitForFunction(() => document.querySelector('[data-anlage="schulenburgwanne"] [data-teil="quarkwanne"]'), null, { timeout: 15000 });
+  await page.waitForTimeout(300);
+  const sw = await page.evaluate(() => {
+    const kam = document.querySelector('a-scene').camera, p = new THREE.Vector3();
+    new THREE.Box3().setFromObject(document.querySelector('[data-anlage="schulenburgwanne"] [data-teil="quarkwanne"]').object3D.getObjectByName('quarkwannenmantel')).getCenter(p);
+    p.project(kam);
+    return [(p.x + 1) / 2, (1 - p.y) / 2];
+  });
+  await page.mouse.move(box.x + sw[0] * box.width, box.y + sw[1] * box.height);
+  await page.waitForTimeout(200);
+  await page.mouse.down(); await page.mouse.up();
+  ok((await t('overlay-titel').textContent()) === 'Schulenburg-Wanne' && (await t('overlay-teil').textContent()) === 'Quarkwanne', `Klick auf Quarkwanne zeigt: ${await t('overlay-teil').textContent()}`);
+  ok((await t('overlay-aktion').textContent()) === 'Molkenwanne absenken', 'Knopf «Molkenwanne absenken» fehlt');
+  const swY = id => page.evaluate(i => document.querySelector(`[data-anlage="schulenburgwanne"] [data-teil="${i}"]`).object3D.position.y, id);
+  await t('overlay-aktion').click();
+  await page.waitForTimeout(1700);
+  ok(await swY('molkenwanne') < -0.89 && await swY('lochsieb') < -0.89 && await swY('quarkwanne') === 0, 'Molkenwanne senkt sich nicht ab');
+  ok((await t('overlay-aktion').textContent()) === 'Molkenwanne anheben', 'Knopf wechselt nicht auf «Molkenwanne anheben»');
+  await t('overlay-aktion').click();
+  await page.waitForTimeout(1700);
+  ok(await swY('molkenwanne') === 0, 'Molkenwanne hebt sich nicht wieder');
+  await page.evaluate(() => window.kaeserei.schliessen());
+
   // Durch den Durchgang Milchbehandlung -> Käserei (Tür bei x=30, z=20)
   await page.evaluate(() => document.getElementById('spieler').object3D.position.set(30, 0, 22));
   // rennen, damit es auch bei wenigen fps auf der VM reicht

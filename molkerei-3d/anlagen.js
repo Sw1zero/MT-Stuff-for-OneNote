@@ -215,6 +215,21 @@ const ANLAGEN = [
   // Frischkäserei (b.3–b.5)
   { id: 'weichkaese-formen', name: 'Formtisch Weichkäse', raum: 'frischkaeserei', x: 6, z: 6, b: 6, t: 2 },
   { id: 'quarkseparator', name: 'Quarkseparator', raum: 'frischkaeserei', x: 14, z: 6, b: 1.5, t: 1.5 },
+  {
+    // Texte: Lehrmittel b.5 «Gewerbliche Quarkproduktion in einer Wanne (Schulenburgverfahren)». Eigene Sätze: Hubzylinder, Anlagentext.
+    // Masse nach Plevnik SLB 2000, Eigenbau: material/molkerei-3d/schulenburgwanne.blend (bzwu). Luke an der Stirnseite +x.
+    id: 'schulenburgwanne', name: 'Schulenburg-Wanne', raum: 'frischkaeserei', x: 15.5, z: 14, b: 2.9, t: 1.55, bau: 'schulenburg',
+    oeffnen: { auf: 'Molkenwanne absenken', zu: 'Molkenwanne anheben' },
+    teile: [
+      { id: 'quarkwanne', name: 'Quarkwanne', text: 'In der unteren Wanne füllen Sie die pasteurisierte Quarkmilch ein, säuern diese an und laben ein. Wenn der gewünschte pH-Wert erreicht ist, schneiden Sie die Gallerte in grobe Würfel.' },
+      { id: 'molkenwanne', name: 'Molkenwanne', text: 'Nach dem Schneiden senken Sie die obere Wanne ab. Die abgepresste Molke wird in die obere Wanne gefördert. Mit zunehmender Pressdauer nimmt die Molkenmenge zu und damit wird auch der Pressdruck verstärkt. Ist genügend Molke abgepresst, so heben Sie die Molkenwanne wieder an.' },
+      { id: 'lochsieb', name: 'Lochsieb', text: 'Auf der oberen Wanne ist aussen ein feines Lochsieb angebracht. Zwischen diesem Sieb und der Wannenwand sammelt sich die abgepresste Molke.' },
+      { id: 'molkenpumpe', name: 'Molkenpumpe', text: 'Eine Pumpe fördert die abgepresste Molke in die obere Wanne.' },
+      { id: 'entnahmeluke', name: 'Entnahmeluke', text: 'Ist genügend Molke abgepresst und die Molkenwanne angehoben, rühren Sie den Quark auf und schieben ihn mit einem Schaber durch eine Luke aus der Wanne.' },
+      { id: 'hubzylinder', name: 'Hubzylinder', text: 'Die Hubzylinder heben und senken die Molkenwanne.' }
+    ],
+    text: 'In der Schulenburg-Wanne stellen Sie Quark gewerblich her (Schulenburgverfahren). Die Quarkmilch gerinnt in der unteren Wanne, die abgesenkte obere Wanne presst die Molke ab.'
+  },
   { id: 'mozzarella', name: 'Kneten und Filieren (Mozzarella)', raum: 'frischkaeserei', x: 10, z: 13, b: 3, t: 1.5 },
 
   // Sauermilch und Dessert (a.6, b.7, b.9)
