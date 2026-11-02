@@ -18,6 +18,23 @@ AFRAME.registerComponent('drehprofil', {
 });
 
 const teil = (g, id, attrs = {}) => el('a-entity', { 'data-teil': id, ...attrs }, g);
+
+// In Blender gebaute Anlage (glTF). Gruppen unter dem Knoten wurzel mit einer Teil-id aus anlagen.js werden
+// nach dem Laden eigene Entities mit data-teil (Klick, Hervorheben). hub: Teil-id > "x y z" für data-oeffnen.
+function glbTeile(g, datei, wurzel, hub = {}) {
+  const m = el('a-entity', { 'gltf-model': datei }, g);
+  const ids = anlageVon(g.dataset.anlage).teile.map(t => t.id);
+  m.addEventListener('model-loaded', () => {
+    // glTF-Teile (und gleiche Anlagen) teilen sich Materialien: eigene Kopie, sonst leuchtet beim Hervorheben alles mit
+    m.getObject3D('mesh').traverse(o => { if (o.material) o.material = o.material.clone(); });
+    for (const node of [...m.getObject3D('mesh').getObjectByName(wurzel).children]) {
+      if (!ids.includes(node.name)) continue;
+      const attrs = { 'data-teil': node.name, class: 'klickbar' };
+      if (hub[node.name]) attrs['data-oeffnen'] = hub[node.name];
+      el('a-entity', attrs, g).setObject3D('mesh', node);
+    }
+  });
+}
 const liegend = (g, r, laenge, x, y, z, mat = CHROM) =>
   el('a-cylinder', { radius: r, height: laenge, rotation: '0 0 90', position: `${x} ${y} ${z}`, material: mat, 'segments-radial': 32 }, g);
 const stehend = (g, r, h, x, yUnten, z, mat = CHROM, segmente = 24) =>
@@ -271,36 +288,17 @@ const BAUTEN = {
     el('a-torus', { radius: 0.2, 'radius-tubular': 0.04, arc: 180, rotation: '0 90 90', position: '0.27 1.025 -0.6', material: METALL }, g);
   },
 
-  // Zentrifugalpumpe auf Sockel: Achse entlang x, Saugstutzen axial nach -x (zum Tank), Druckstutzen tangential nach oben
+  // Zentrifugalpumpe nach Alfa Laval LKH-35: in Blender gebaut (material/molkerei-3d/zentrifugalpumpe.blend in bzwu).
+  // Achse entlang x, Saugstutzen axial nach -x (zum Tank), Druckstutzen tangential nach oben.
+  // Explosionsansicht: Gehäuse, Laufrad und Gleitringdichtung fahren entlang der Achse heraus, Motor und Rückwand bleiben.
   pumpe(g) {
-    kasten(g, 0.7, 0.2, 0.28, 0, 0, 0, MATT);
-    const motor = teil(g, 'elektromotor');
-    liegend(motor, 0.12, 0.38, 0.13, 0.35, 0, MATT);
-    liegend(motor, 0.1, 0.04, 0.34, 0.35, 0, MATT);
-    kasten(motor, 0.3, 0.03, 0.2, 0.13, 0.2, 0, MATT);
-    const geh = teil(g, 'pumpengehaeuse');
-    liegend(geh, 0.05, 0.08, -0.1, 0.35, 0);
-    liegend(geh, 0.15, 0.1, -0.19, 0.35, 0);
-    const saug = teil(g, 'saugstutzen');
-    liegend(saug, 0.03, 0.17, -0.325, 0.35, 0);
-    klemme(saug, 0.03, -0.39, 0.35, 0, 'x');
-    const druck = teil(g, 'druckstutzen');
-    stehend(druck, 0.03, 0.17, -0.19, 0.45, 0.1);
-    klemme(druck, 0.03, -0.19, 0.6, 0.1);
+    glbTeile(g, 'modelle/zentrifugalpumpe.glb', 'zentrifugalpumpe',
+      { pumpengehaeuse: '-0.45 0 0', saugstutzen: '-0.45 0 0', druckstutzen: '-0.45 0 0', laufrad: '-0.28 0 0', gleitringdichtung: '-0.12 0 0' });
   },
 
   // Lagertank: in Blender gebaut (material/molkerei-3d/lagertank.blend in bzwu), hier nur das exportierte Modell
-  // Gruppen mit einer Teil-id aus anlagen.js werden nach dem Laden eigene Entities mit data-teil (Klick, Hervorheben).
   lagertank(g) {
-    const m = el('a-entity', { 'gltf-model': 'modelle/lagertank.glb' }, g);
-    const ids = anlageVon(g.dataset.anlage).teile.map(t => t.id);
-    m.addEventListener('model-loaded', () => {
-      // glTF-Teile (und beide Tanks) teilen sich Materialien: eigene Kopie, sonst leuchtet beim Hervorheben alles mit
-      m.getObject3D('mesh').traverse(o => { if (o.material) o.material = o.material.clone(); });
-      for (const node of [...m.getObject3D('mesh').getObjectByName('lagertank').children]) {
-        if (ids.includes(node.name)) el('a-entity', { 'data-teil': node.name, class: 'klickbar' }, g).setObject3D('mesh', node);
-      }
-    });
+    glbTeile(g, 'modelle/lagertank.glb', 'lagertank');
   },
 
   // Käsefertiger: Kessi Ø 3 m, Rand 1.5 m, Brücke mit Antrieb, Harfe in der Milch

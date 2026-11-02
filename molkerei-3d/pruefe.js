@@ -71,10 +71,12 @@ async (page) => {
   await page.mouse.move(box.x + 5, box.y + 5);
   await page.waitForTimeout(200);
   ok(await page.evaluate(() => document.querySelector('[data-anlage="lagertank-1"]').object3D.getObjectByName('wert').material.emissive.getHex() !== 0), 'Temperaturanzeige leuchtet nach dem Hervorheben nicht mehr');
-  // Pumpe nach dem Tank: Klick auf den Motor, Leitungen Auslauf > Pumpe und CIP vom Bahnhof
+  // Pumpe nach dem Tank (glTF aus Blender): Klick auf die Motorverkleidung, Leitungen Auslauf > Pumpe und CIP vom Bahnhof
+  await page.waitForFunction(() => document.querySelector('[data-anlage="milchpumpe"] [data-teil="elektromotor"]'), null, { timeout: 15000 });
   const pu = await page.evaluate(() => {
     const kam = document.querySelector('a-scene').camera, p = new THREE.Vector3();
-    document.querySelector('[data-anlage="milchpumpe"] [data-teil="elektromotor"] a-cylinder').object3D.getWorldPosition(p);
+    // Mitte der Hülle, der Ursprung der Meshes liegt am Boden der Anlage
+    new THREE.Box3().setFromObject(document.querySelector('[data-anlage="milchpumpe"] [data-teil="elektromotor"]').object3D.getObjectByName('verkleidung')).getCenter(p);
     p.project(kam);
     return [(p.x + 1) / 2, (1 - p.y) / 2];
   });
@@ -82,6 +84,15 @@ async (page) => {
   await page.waitForTimeout(200);
   await page.mouse.down(); await page.mouse.up();
   ok((await t('overlay-titel').textContent()) === 'Zentrifugalpumpe' && (await t('overlay-teil').textContent()) === 'Elektromotor', 'Klick auf Pumpenmotor zeigt nicht den Elektromotor');
+  // Explosionsansicht: Gehäuse fährt entlang der Achse heraus, Motor bleibt, Zusammenbauen bringt es zurück
+  await t('overlay-aktion').click();
+  await page.waitForTimeout(1700);
+  const pumpeX = id => page.evaluate(i => document.querySelector(`[data-anlage="milchpumpe"] [data-teil="${i}"]`).object3D.position.x, id);
+  ok(await pumpeX('pumpengehaeuse') < -0.44 && await pumpeX('laufrad') < -0.27 && await pumpeX('elektromotor') === 0, 'Explosionsansicht der Pumpe fährt nicht auseinander');
+  ok((await t('overlay-aktion').textContent()) === 'Zusammenbauen', 'Knopf heisst nach der Explosion nicht Zusammenbauen');
+  await t('overlay-aktion').click();
+  await page.waitForTimeout(1700);
+  ok(await pumpeX('pumpengehaeuse') === 0, 'Pumpe baut sich nicht wieder zusammen');
   await page.evaluate(() => window.kaeserei.schliessen());
   for (const l of ['lagertank-1>milchpumpe:milch', 'milchpumpe>rohrbahnhof:milch', 'rohrbahnhof>lagertank-1:cip', 'lagertank-1>kaelteanlage:kuehlwasser']) {
     ok(await page.locator(`[data-leitung="${l}"]`).count() === 1, `Leitung fehlt: ${l}`);

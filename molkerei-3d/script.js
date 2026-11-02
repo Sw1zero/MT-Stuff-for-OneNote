@@ -280,7 +280,7 @@ window.kaeserei = {
     $('overlay').hidden = false;
   },
   schliessen() { $('overlay').hidden = true; },
-  // Bewegliche Teile ([data-oeffnen] = Hub in m) heben oder senken, z.B. Separator-Haube
+  // Bewegliche Teile ([data-oeffnen] = Hub in m nach oben, oder Weg "x y z") bewegen, z.B. Separator-Haube, Pumpen-Explosion
   oeffnen(id) {
     const g = document.querySelector(`[data-anlage="${id}"]`);
     const auf = !g.dataset.offen;
@@ -288,7 +288,8 @@ window.kaeserei = {
     if (auf) g.dataset.offen = 'ja'; else delete g.dataset.offen;
     const dur = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 1500;
     for (const t of g.querySelectorAll('[data-oeffnen]')) {
-      t.setAttribute('animation__oeffnen', { property: 'position', to: `0 ${auf ? t.dataset.oeffnen : 0} 0`, dur, easing: 'easeInOutQuad' });
+      const weg = t.dataset.oeffnen.includes(' ') ? t.dataset.oeffnen : `0 ${t.dataset.oeffnen} 0`;
+      t.setAttribute('animation__oeffnen', { property: 'position', to: auf ? weg : '0 0 0', dur, easing: 'easeInOutQuad' });
     }
     if ($('overlay').dataset.anlage === id && !$('overlay').hidden) window.kaeserei.select(id, $('overlay').dataset.teil || undefined);
   },

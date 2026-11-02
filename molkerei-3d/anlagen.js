@@ -117,10 +117,14 @@ const ANLAGEN = [
     anschluesse: { milch: [-1.7, 2.35, -0.3], auslauf: [2.4, 0.75, 0], cip: [1.2, 2.35, 0],
       kuehlwasser: [-2.26, 0.83, -0.25], ruecklauf: [-2.26, 0.83, 0.25] }, ...LAGERTANK },
   {
-    // Texte: Lehrmittel a.1 «Pumpen» und «Zentrifugalpumpe»
-    id: 'milchpumpe', name: 'Zentrifugalpumpe', raum: 'annahme', x: 15.6, z: 5, b: 0.8, t: 0.4, bau: 'pumpe',
-    anschluesse: { saug: [-0.41, 0.35, 0], druck: [-0.19, 0.62, 0.1] },
+    // Texte: Lehrmittel a.1 «Pumpen» (Legende 1-6), «Zentrifugalpumpe» und Pflege der Pumpen.
+    // Modell nach Alfa Laval LKH-35: material/molkerei-3d/zentrifugalpumpe.blend (bzwu), Teil-ids = Gruppennamen dort.
+    id: 'milchpumpe', name: 'Zentrifugalpumpe', raum: 'annahme', x: 15.6, z: 5, b: 0.95, t: 0.5, bau: 'pumpe',
+    anschluesse: { saug: [-0.455, 0.274, 0], druck: [-0.374, 0.524, 0.119] },
+    oeffnen: { auf: 'Explosionsansicht', zu: 'Zusammenbauen' },
     teile: [
+      { id: 'laufrad', name: 'Laufrad', text: 'Das Laufrad versetzt die Milch in Rotation, die Zentrifugalkraft beschleunigt sie nach aussen. Mit einem speziellen Laufrad und Gehäuse kann die Zentrifugalpumpe auch Käsebruch fördern. Lassen Sie die Pumpe nie leer laufen, das schädigt das Laufrad.' },
+      { id: 'gleitringdichtung', name: 'Gleitringdichtung', text: 'Die Gleitringdichtung dichtet das Pumpengehäuse dort ab, wo die Welle des Motors hineinführt. Lassen Sie die Pumpe nie leer laufen, das schädigt die Gleitringdichtung. Kontrollieren Sie die Dichtigkeit und ersetzen Sie immer alle Gleitringdichtungen, periodisch oder bei Undichtheit.' },
       { id: 'elektromotor', name: 'Elektromotor', text: 'Der Elektromotor treibt das Laufrad im Pumpengehäuse an.' },
       { id: 'saugstutzen', name: 'Saugstutzen', text: 'Durch den Saugstutzen in der Mitte des Gehäuses fliesst die Milch in Achsrichtung (axial) dem Laufrad zu. Die Zentrifugalpumpe ist nicht selbstansaugend: Die Milch muss ihr zufliessen. Darum steht die Pumpe tiefer als der Auslaufstutzen des Tanks.' },
       { id: 'pumpengehaeuse', name: 'Pumpengehäuse', text: 'Im Pumpengehäuse versetzt das Laufrad die Milch in Rotation, die Zentrifugalkraft beschleunigt sie nach aussen. Die Pumpe schöpft nur, wenn Gehäuse und Saugleitung vollständig mit Flüssigkeit gefüllt sind.' },
