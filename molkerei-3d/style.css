@@ -153,8 +153,6 @@ svg[data-schritt="4"] .sw-druck .sw-pfeil { animation: sw-druck 5s linear forwar
 .rw-mantel { fill: #b9c0c6; stroke: #4a545c; stroke-width: 1.2; }
 .rw-innen { fill: #eef1f3; }
 .rw-milch { fill: #fbfaf3; stroke: #b4bcc3; stroke-width: 1; }
-.rw-bahn { fill: none; stroke: #c9d3da; stroke-width: 1.5; stroke-dasharray: 4 6; }
-.rw-teilchen circle { fill: var(--blue-light); }
 .rw-welle { stroke: #4a545c; stroke-width: 6; }
 .rw-ruehrer { fill: #8a96a0; stroke: #4a545c; stroke-width: 1.2; }
 .rw-schaufel { fill: #4a545c; }
@@ -167,3 +165,5 @@ svg[data-trombe="ja"] .rw-trombe { visibility: visible; }
 .mk-rw-wahl { margin: 0 0 10px; }
 .mk-rw-wahl button[aria-pressed="false"] { background: #fff; color: var(--blue-dark); }
 .mk-rw-brecher { display: block; margin-bottom: 12px; }
+.rw-bahn { fill: none; stroke: #a9cfe2; stroke-width: 2; }
+.rw-teilchen path { fill: var(--blue-dark); }

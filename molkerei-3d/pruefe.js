@@ -144,7 +144,7 @@ async (page) => {
   await page.evaluate(() => window.kaeserei.select('separator'));
   await t('overlay-betrieb').click();
   ok((await t('overlay-betrieb').textContent()) === 'Betrieb beenden', 'Knopf wechselt nicht auf «Betrieb beenden»');
-  ok(await t('overlay-hinweis').isVisible(), 'Hinweis «vereinfachte Darstellung» fehlt');
+  ok(!(await t('overlay-hinweis').isVisible()), 'Hinweis im Betrieb wieder da (Philipp: keine Hinweise auf vereinfachte Darstellung)');
   await page.waitForTimeout(500);
   ok(await page.evaluate(() => document.querySelector('[data-teil="tellerpaket"]').object3D.rotation.y > 0), 'Trommel dreht nicht');
   ok(await haubeGeschnitten(), 'Haube nicht aufgeschnitten');
@@ -294,7 +294,7 @@ async (page) => {
   await t('rw-brecher').check();
   st = await page.evaluate(() => window.ruehrwerkSchnitt.stand());
   ok(st.brecher && !st.trombe && (await t('rw-brechertext').textContent()).startsWith('Strömungsbrecher'), 'Mit Strömungsbrecher bleibt die Trombe');
-  const lage = () => page.evaluate(() => document.querySelector('.rw-teilchen circle').getAttribute('cy'));
+  const lage = () => page.evaluate(() => document.querySelector('.rw-teilchen path').dataset.y);
   const l1 = await lage(); await page.waitForTimeout(400);
   ok(l1 !== await lage(), 'Teilchen im Schnittbild bewegen sich nicht');
   await page.keyboard.press('Escape');

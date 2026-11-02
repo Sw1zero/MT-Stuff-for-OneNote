@@ -157,8 +157,7 @@ const ANLAGEN = [
     oeffnen: { auf: 'Haube öffnen', zu: 'Haube schliessen' },
     // Betrieb: Schnitt durch Haube und Trommel, Trommel dreht (bauten.js separatorbetrieb).
     // Wie es fliesst, zeigt das Schnittbild (schnittbild.js).
-    betrieb: { an: 'Betrieb zeigen', aus: 'Betrieb beenden',
-      hinweis: 'Die Trommel dreht rund 100-mal langsamer als in Wirklichkeit. Wie Milch, Rahm und Magermilch fliessen, zeigt das Schnittbild.' },
+    betrieb: { an: 'Betrieb zeigen', aus: 'Betrieb beenden' },
     schnittbild: true,
     // Wo die Leitungen andocken, je Medium [x, y, z] relativ zur Anlagenmitte (sonst Mitte auf 1 m)
     anschluesse: { milch: [0.23, 1.76, 0], rahm: [0.63, 1.47, 0], magermilch: [-0.17, 1.47, 0] },
@@ -254,8 +253,8 @@ const ANLAGEN = [
     // Masse nach Plevnik SK Classic 200 (Ø 845, Rand 1060, Auslass 485), Eigenbau: material/molkerei-3d/mehrzweckerhitzer.blend (bzwu).
     // Rührertexte: Lehrmittel a.1 «Milch und Milchprodukte rühren», «Strömungsformen»; Harfe und Strömungsbleche: b.1.
     // Eigene Sätze: Anlagentext, kessel, steuerung, auslaufhahn, untergestell.
-    id: 'mehrzweckerhitzer', name: 'Mehrzweckerhitzer', raum: 'sauermilch', x: 16, z: 14, b: 1.45, t: 1.2, bau: 'mehrzweck',
-    betrieb: { an: 'Rührwerk einschalten', aus: 'Rührwerk ausschalten', hinweis: 'Wie die Milch strömt, zeigt das Schnittbild.' },
+    id: 'mehrzweckerhitzer', name: 'Mehrzweckerhitzer', raum: 'sauermilch', x: 16, z: 14, b: 1.65, t: 1.2, bau: 'mehrzweck',
+    betrieb: { an: 'Rührwerk einschalten', aus: 'Rührwerk ausschalten' },
     // Rührer wechseln: je Variante die sichtbaren Teile. Der Ankerrührer läuft wandnah, die Strömungsbrecher kommen heraus.
     wechsel: { text: 'Rührer wechseln', varianten: [['propellerruehrer', 'stroemungsbrecher'], ['scheibenruehrer', 'stroemungsbrecher'], ['ankerruehrer'], ['kaeseharfe', 'stroemungsbrecher']] },
     schnittbild: 'ruehrwerk', // Strömungsformen: schnittbild-ruehrwerk.js
@@ -271,7 +270,7 @@ const ANLAGEN = [
       { id: 'auslaufhahn', name: 'Auslaufhahn', text: 'Über den Auslaufhahn entleeren Sie den Kessel, zum Beispiel die Käsemasse direkt auf den Abtropftisch.' },
       { id: 'untergestell', name: 'Untergestell mit Kippmechanismus', text: 'Mit dem Handrad kippen Sie den Kessel, damit er sich vollständig entleert.' }
     ],
-    text: 'Im Mehrzweckerhitzer verarbeiten Sie kleine Mengen: Milch pasteurisieren, Joghurt herstellen oder Käse fabrizieren. Für jede Aufgabe setzen Sie den passenden Rührer ein. Vergleichen Sie die Rührer mit «Rührer wechseln», das Schnittbild zeigt ihre Strömungsformen.'
+    text: 'Im Mehrzweckerhitzer verarbeiten Sie kleine Mengen: Milch pasteurisieren, Joghurt herstellen oder Käse fabrizieren. Für jede Aufgabe setzen Sie den passenden Rührer ein. Vergleichen Sie die Rührer mit «Rührer wechseln». Bei eingeschaltetem Rührwerk zeigen die blauen Teilchen, wie die Milch strömt.'
   },
 
   // Butterei (b.10)

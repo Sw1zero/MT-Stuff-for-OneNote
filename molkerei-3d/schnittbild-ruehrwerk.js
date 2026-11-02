@@ -1,5 +1,5 @@
-// Schnittbild Strömungsformen im Mehrzweckerhitzer: links Schnitt durch den Kessel, rechts Draufsicht, schematisch.
-// Teilchen wandern auf Bahnen: axial (Propeller), radial (Scheibe), tangential (Anker, Harfe, ohne Strömungsbrecher).
+// Schnittbild Strömungsformen im Mehrzweckerhitzer: links Schnitt durch den Kessel, rechts Draufsicht.
+// Pfeile wandern auf Bahnen: axial (Propeller), radial (Scheibe), tangential (Anker, Harfe, ohne Strömungsbrecher).
 // Ohne Strömungsbrecher bildet sich beim Propeller und der Scheibe eine Trombe.
 // Texte: Lehrmittel a.1 «Strömungsformen», b.1 «Form des Käsefertigers». Rührertexte aus anlagen.js (teile).
 // Braucht ANLAGEN (anlagen.js) und svgEl (schnittbild.js). Testeinstieg: window.ruehrwerkSchnitt.
@@ -37,11 +37,11 @@ function rwBahnen(ruehrer, brecher) {
   const schleifen = (pts, n, v) => { for (const s of [1, -1]) seite.push([rwRund(pts.map(([x, y]) => [cx + s * x, y])), n, v, null]); };
   const kreise = (v, n = 7, radien = [40, 80, 118]) => radien.forEach(rr => aufsicht.push([rwEllipse(RW_O.cx, RW_O.cy, rr, rr), Math.round(n * rr / 80), v, null]));
   const strahlen = v => { for (let i = 0; i < 8; i++) { const w = (i + 0.5) * Math.PI / 4, c = Math.cos(w), s = Math.sin(w); aufsicht.push([`M${RW_O.cx + 25 * c},${RW_O.cy + 25 * s} L${RW_O.cx + 120 * c},${RW_O.cy + 120 * s} Z`, 3, v, null]); } };
-  const ellipsen = (v, n, rx = [110, 60]) => [165, 225, 285, 345].forEach((y, i) => seite.push([rwEllipse(cx, y, rx[i % 2], 9), n, v, y]));
+  const ellipsen = (v, n, rx = [110, 110]) => [200, 320].forEach((y, i) => seite.push([rwEllipse(cx, y, rx[i % 2], 14), n, v, y]));
   const k = trombe ? 0.6 : 1;                                     // Trombe: die Drehung frisst einen Teil der Strömung
   if (ruehrer === 'propellerruehrer') {
-    schleifen([[25, top], [25, unten - 25], [r - cx - 18, unten - 25], [r - cx - 18, oben + 25]], 9, 90 * k);
-    schleifen([[50, top + 45], [50, unten - 70], [r - cx - 55, unten - 70], [r - cx - 55, oben + 70]], 6, 70 * k);
+    schleifen([[25, top], [25, unten - 25], [r - cx - 18, unten - 25], [r - cx - 18, oben + 25]], 6, 90 * k);
+    schleifen([[50, top + 45], [50, unten - 70], [r - cx - 55, unten - 70], [r - cx - 55, oben + 70]], 4, 70 * k);
   }
   if (ruehrer === 'scheibenruehrer') {
     const yd = 300;
@@ -109,7 +109,7 @@ function baueRuehrwerk(svg) {
         const p = svgEl('path', { d, class: 'rw-bahn' }, dyn);
         dyn.insertBefore(p, seite);
         const L = p.getTotalLength();
-        return { p, L, v, ey, punkte: Array.from({ length: n }, (_, i) => ({ s: i * L / n, c: svgEl('circle', { r: 4.5 }, teilchen) })) };
+        return { p, L, v, ey, punkte: Array.from({ length: n }, (_, i) => ({ s: i * L / n, c: svgEl('path', { d: 'M7,0 L-5,-5.5 L-2,0 L-5,5.5 Z' }, teilchen) })) };
       });
       this.schritt(0);
     },
@@ -120,8 +120,9 @@ function baueRuehrwerk(svg) {
       oben2.setAttribute('transform', `rotate(${(winkel * 180 / Math.PI) % 360} ${RW_O.cx} ${RW_O.cy})`);
       for (const b of bahnen) for (const t of b.punkte) {
         t.s = (t.s + b.v * dt) % b.L;
-        const q = b.p.getPointAtLength(t.s);
-        t.c.setAttribute('cx', q.x.toFixed(1)); t.c.setAttribute('cy', q.y.toFixed(1));
+        const q = b.p.getPointAtLength(t.s), q2 = b.p.getPointAtLength((t.s + 3) % b.L); // Pfeil zeigt in Fliessrichtung
+        t.c.setAttribute('transform', `translate(${q.x.toFixed(1)} ${q.y.toFixed(1)}) rotate(${(Math.atan2(q2.y - q.y, q2.x - q.x) * 180 / Math.PI).toFixed(0)})`);
+        t.c.dataset.y = q.y.toFixed(1);
         if (b.ey !== null) t.c.setAttribute('opacity', q.y < b.ey ? 0.3 : 1); // hintere Hälfte der Drehung blass
       }
     }

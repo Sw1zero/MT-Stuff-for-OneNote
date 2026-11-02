@@ -148,18 +148,46 @@ AFRAME.registerComponent('separatorbetrieb', {
   }
 });
 
-// Mehrzweckerhitzer: zeigt je Variante (anlagen.js wechsel.varianten) nur deren Teile, im Betrieb dreht der Rührer.
+// Mehrzweckerhitzer: zeigt je Variante (anlagen.js wechsel.varianten) nur deren Teile. Im Betrieb dreht der Rührer,
+// und blaue Teilchen in der Milch zeigen die Strömung (wie im Schnittbild schnittbild-ruehrwerk.js).
 // Rührergruppen haben ihren Ursprung auf der Kesselachse, darum dreht object3D.rotation.y um die Welle.
 const RW_DREHZAHL = { propellerruehrer: 1, scheibenruehrer: 1, ankerruehrer: 0.25, kaeseharfe: 0.25 }; // U/s, gemächlich zum Zuschauen
+// Strömung je Rührer: Schleifen [r, y] in der Ebene durch die Achse (Milch r < 0.35, y 0.50 bis 0.95),
+// v = m/s auf der Schleife, w = rad/s Drehung um die Achse. Mit Strömungsbrechern dreht der Inhalt kaum mit.
+const RW_STROEMUNG = {
+  propellerruehrer: { v: 0.15, w: 0.25, schleifen: [[[0.05, 0.9], [0.05, 0.6], [0.3, 0.57], [0.3, 0.9]], [[0.1, 0.83], [0.1, 0.66], [0.23, 0.66], [0.23, 0.83]]] },
+  scheibenruehrer: { v: 0.15, w: 0.25, schleifen: [[[0.06, 0.663], [0.31, 0.663], [0.31, 0.91], [0.06, 0.91]], [[0.06, 0.663], [0.31, 0.663], [0.31, 0.55], [0.06, 0.55]]] },
+  ankerruehrer: { v: 0, w: 1.2, schleifen: [] },
+  kaeseharfe: { v: 0.04, w: 0.6, schleifen: [[[0.06, 0.9], [0.06, 0.58], [0.3, 0.58], [0.3, 0.9]]] }
+};
+function rwPunkt(s, u) { // Punkt auf der geschlossenen Schleife s bei Anteil u (0..1)
+  let d = u * s.laenge;
+  for (let i = 0; i < s.P.length; i++) {
+    const a = s.P[i], b = s.P[(i + 1) % s.P.length], l = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    if (d <= l) return [a[0] + (b[0] - a[0]) * d / l, a[1] + (b[1] - a[1]) * d / l];
+    d -= l;
+  }
+  return s.P[0];
+}
 AFRAME.registerComponent('ruehrerwechsel', {
   init() {
     const g = this.el.closest('[data-anlage]');
     this.g = g; this.winkel = 0; this.an = false;
     this.ruhig = matchMedia('(prefers-reduced-motion: reduce)').matches;
     this.alle = [...new Set(anlageVon(g.dataset.anlage).wechsel.varianten.flat())];
+    this.teilchen = new THREE.InstancedMesh(new THREE.SphereGeometry(0.011, 8, 6), new THREE.MeshBasicMaterial({ color: 0x1d6f99 }), 160);
+    this.teilchen.visible = false;
+    this.el.object3D.add(this.teilchen);
     g.addEventListener('model-loaded', () => this.zeigen(anlageVon(g.dataset.anlage).wechsel.varianten[+g.dataset.variante || 0]));
     g.addEventListener('wechsel', e => this.zeigen(e.detail.teile));
-    g.addEventListener('betrieb', e => { this.an = e.detail.an; if (!this.an) this.drehen(0); });
+    g.addEventListener('betrieb', e => {
+      this.an = e.detail.an;
+      if (!this.an) this.drehen(0);
+      this.teilchen.visible = this.an;
+      const milch = g.object3D.getObjectByName('milchspiegel');
+      if (milch) milch.material.opacity = this.an ? 0.2 : 0.45; // im Betrieb durchsichtiger, damit die Teilchen zu sehen sind
+      this.bewegen(0);
+    });
   },
   teil(id) { return this.g.querySelector(`[data-teil="${id}"]`); },
   zeigen(teile) {
@@ -170,11 +198,31 @@ AFRAME.registerComponent('ruehrerwechsel', {
       t.classList.toggle('klickbar', teile.includes(id)); // ausgeblendete Rührer nicht anklickbar
       t.object3D.rotation.y = 0;
     }
+    // Teilchen neu verteilen: auf die Schleifen, oder (nur Drehung) zufällig in der Milch
+    const st = this.stroemung = RW_STROEMUNG[teile[0]];
+    const schleifen = st.schleifen.map(P => ({ P, laenge: P.reduce((l, a, i) => { const b = P[(i + 1) % P.length]; return l + Math.hypot(b[0] - a[0], b[1] - a[1]); }, 0) }));
+    this.punkte = Array.from({ length: this.teilchen.count }, (_, i) => schleifen.length
+      ? { s: schleifen[i % schleifen.length], u: Math.random(), th: Math.random() * Math.PI * 2 }
+      : { r: 0.08 + Math.random() * 0.25, y: 0.55 + Math.random() * 0.37, th: Math.random() * Math.PI * 2 });
+    this.bewegen(0);
+  },
+  bewegen(dt) {
+    if (!this.punkte) return;
+    const m = new THREE.Matrix4(), st = this.stroemung;
+    this.punkte.forEach((p, i) => {
+      p.th += st.w * dt;
+      let r = p.r, y = p.y;
+      if (p.s) { p.u = (p.u + st.v * dt / p.s.laenge) % 1; [r, y] = rwPunkt(p.s, p.u); }
+      this.teilchen.setMatrixAt(i, m.makeTranslation(r * Math.cos(p.th), y, -r * Math.sin(p.th)));
+    });
+    this.teilchen.instanceMatrix.needsUpdate = true;
   },
   drehen(w) { this.winkel = w; const r = this.sichtbar && this.teil(this.sichtbar[0]); if (r && r.dataset.teil in RW_DREHZAHL) r.object3D.rotation.y = w; },
   tick(t, dt) {
     if (!this.an || this.ruhig || !this.sichtbar) return;
-    this.drehen(this.winkel + Math.min(dt, 100) / 1000 * Math.PI * 2 * (RW_DREHZAHL[this.sichtbar[0]] || 0));
+    const s = Math.min(dt, 100) / 1000;
+    this.drehen(this.winkel + s * Math.PI * 2 * (RW_DREHZAHL[this.sichtbar[0]] || 0));
+    this.bewegen(s);
   }
 });
 
