@@ -225,6 +225,15 @@ async (page) => {
   await t('overlay-aktion').click();
   await page.waitForTimeout(1700);
   ok(await swY('molkenwanne') === 0, 'Molkenwanne hebt sich nicht wieder');
+  // Schnittbild Schulenburgverfahren: fünf Schritte, Teil anklicken, Esc schliesst nur den Dialog
+  await t('overlay-schnitt').click();
+  ok(await t('schnittbild-sw').evaluate(d => d.open), 'Schnittbild Schulenburg öffnet nicht');
+  for (let i = 0; i < 3; i++) await t('sw-weiter').click();
+  ok((await t('sw-titel').textContent()) === 'Abpressen' && (await t('sw-nr').textContent()) === 'Schritt 4 von 5', 'Schritt 4 «Abpressen» fehlt');
+  await page.locator('[data-testid="schnittbild-sw"] [data-sb-teil="molkenpumpe"] text').click();
+  ok((await t('sw-titel').textContent()) === 'Molkenpumpe', 'Klick im Schnittbild zeigt die Molkenpumpe nicht');
+  await page.keyboard.press('Escape');
+  ok(!(await t('schnittbild-sw').evaluate(d => d.open)) && await t('overlay').isVisible(), 'Esc schliesst Schnittbild nicht oder auch das Overlay');
   await page.evaluate(() => window.kaeserei.schliessen());
 
   // Durch den Durchgang Milchbehandlung -> Käserei (Tür bei x=30, z=20)

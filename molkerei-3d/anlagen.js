@@ -220,6 +220,7 @@ const ANLAGEN = [
     // Masse nach Plevnik SLB 2000, Eigenbau: material/molkerei-3d/schulenburgwanne.blend (bzwu). Luke an der Stirnseite +x.
     id: 'schulenburgwanne', name: 'Schulenburg-Wanne', raum: 'frischkaeserei', x: 15.5, z: 14, b: 2.9, t: 1.55, bau: 'schulenburg',
     oeffnen: { auf: 'Molkenwanne absenken', zu: 'Molkenwanne anheben' },
+    schnittbild: 'schulenburg', // Prinzip in fünf Schritten: schnittbild-schulenburg.js
     teile: [
       { id: 'quarkwanne', name: 'Quarkwanne', text: 'In der unteren Wanne füllen Sie die pasteurisierte Quarkmilch ein, säuern diese an und laben ein. Wenn der gewünschte pH-Wert erreicht ist, schneiden Sie die Gallerte in grobe Würfel.' },
       { id: 'molkenwanne', name: 'Molkenwanne', text: 'Nach dem Schneiden senken Sie die obere Wanne ab. Die abgepresste Molke wird in die obere Wanne gefördert. Mit zunehmender Pressdauer nimmt die Molkenmenge zu und damit wird auch der Pressdruck verstärkt. Ist genügend Molke abgepresst, so heben Sie die Molkenwanne wieder an.' },

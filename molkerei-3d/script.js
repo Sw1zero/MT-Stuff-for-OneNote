@@ -169,7 +169,7 @@ function el(tag, attrs, eltern) {
 function baueSzene(szene) {
   for (const r of RAEUME) {
     const w = r.x1 - r.x0, t = r.z1 - r.z0, cx = (r.x0 + r.x1) / 2, cz = (r.z0 + r.z1) / 2, b = bodenVon(r);
-    el('a-entity', { flaeche: `breite: ${w}; hoehe: ${t}; muster: boden; farbe: ${r.farbe}`, rotation: '-90 0 0', position: `${cx} ${b} ${cz}`, 'data-boden': r.id }, szene);
+    el('a-entity', { flaeche: `breite: ${w}; hoehe: ${t}; muster: boden; farbe: ${r.farbe}`, rotation: '-90 0 0', position: `${cx} ${b} ${cz}`, 'data-boden': r.id, shadow: 'cast: false; receive: true' }, szene);
     el('a-plane', { width: w, height: t, rotation: '90 0 0', position: `${cx} ${b + r.hoehe} ${cz}`, material: 'color: #f4f5f6; roughness: 1' }, szene);
   }
 
@@ -363,9 +363,12 @@ document.addEventListener('DOMContentLoaded', () => {
   $('overlay-schliessen').addEventListener('click', () => window.kaeserei.schliessen());
   $('overlay-aktion').addEventListener('click', () => window.kaeserei.oeffnen($('overlay').dataset.anlage));
   $('overlay-betrieb').addEventListener('click', () => window.kaeserei.betrieb($('overlay').dataset.anlage));
-  $('overlay-schnitt').addEventListener('click', () => window.schnittbild.oeffnen($('overlay').dataset.anlage));
+  $('overlay-schnitt').addEventListener('click', () => {
+    const id = $('overlay').dataset.anlage;
+    (anlageVon(id).schnittbild === 'schulenburg' ? window.schulenburgSchnitt : window.schnittbild).oeffnen(id);
+  });
   $('overlay-uebersicht').addEventListener('click', () => window.kaeserei.select($('overlay').dataset.anlage));
-  window.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('schnittbild').open) window.kaeserei.schliessen(); });
+  window.addEventListener('keydown', e => { if (e.key === 'Escape' && !document.querySelector('dialog[open]')) window.kaeserei.schliessen(); });
 
   const start = () => { setzeSpieler(START.x, START.z, START.blick[0], START.blick[1]); document.body.dataset.bereit = 'ja'; };
   if (szene.hasLoaded) start(); else szene.addEventListener('loaded', start);

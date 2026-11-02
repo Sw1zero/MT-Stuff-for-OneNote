@@ -121,3 +121,30 @@
 
 .mk-teilbild { display: block; max-width: 100%; max-height: 160px; margin: 0 auto 10px; }
 .mk-teilbild[hidden] { display: none; }
+
+/* Schnittbild Schulenburgverfahren (schnittbild-schulenburg.js): Zustand je Schritt über data-schritt */
+.mk-schnitt { --sw-milch: #e4eef5; --sw-quark: #f3ecd6; --sw-molke: #d6dc7e; }
+.sw-milch { fill: var(--sw-milch); stroke: #b4bcc3; }
+.sw-quark { fill: var(--sw-quark); stroke: #c9bd98; }
+.sw-molke { fill: var(--sw-molke); }
+.sw-schnitte line { stroke: #b8a978; stroke-width: 2; }
+.sw-sieb { fill: none; stroke: #4a545c; stroke-width: 3; stroke-dasharray: 3 4; }
+.sw-teil:hover .sw-sieb, .sw-teil.sb-aktiv .sw-sieb { stroke: #1d6f99; }
+.sw-luke { fill: none; stroke: #4a545c; stroke-width: 2; stroke-dasharray: 4 3; }
+.sw-rohr { fill: none; stroke: #8a99a6; stroke-width: 8; stroke-linejoin: round; }
+.sw-strich { stroke: #6f7520; }
+.sw-pfeil { fill: none; stroke: var(--blue-light); stroke-width: 4; }
+.sw-spitze { fill: var(--blue-light); }
+.sw-oben { transform: translateY(-300px); transition: transform 1.6s ease-in-out; }
+.sw-pegel { transform: translateY(390px); transition: transform 5s linear; }
+.sw-milch, .sw-gallerte, .sw-schnitte, .sw-quarksichel, .sw-spalt, .sw-leitung, .sw-druck, .sw-ausstoss { opacity: 0; transition: opacity 0.6s; }
+svg[data-schritt="1"] .sw-milch { opacity: 1; }
+svg[data-schritt="2"] .sw-gallerte, svg[data-schritt="2"] .sw-schnitte { opacity: 1; }
+svg[data-schritt="3"] .sw-oben, svg[data-schritt="4"] .sw-oben { transform: none; }
+svg[data-schritt="3"] .sw-quarksichel, svg[data-schritt="4"] .sw-quarksichel, svg[data-schritt="5"] .sw-quarksichel { opacity: 1; }
+svg[data-schritt="4"] .sw-spalt, svg[data-schritt="4"] .sw-leitung, svg[data-schritt="4"] .sw-druck, svg[data-schritt="5"] .sw-ausstoss { opacity: 1; }
+svg[data-schritt="4"] .sw-pegel, svg[data-schritt="5"] .sw-pegel { transform: translateY(200px); }
+svg[data-schritt="4"] .sw-druck .sw-pfeil { animation: sw-druck 5s linear forwards; }
+@keyframes sw-druck { from { stroke-width: 2; } to { stroke-width: 7; } }
+.mk-schritt-nr { margin: 0 0 4px; font-size: 0.9em; color: var(--text-muted); }
+@media (prefers-reduced-motion: reduce) { .sw-oben, .sw-pegel { transition: none; } .sw-druck .sw-pfeil { animation: none; } }

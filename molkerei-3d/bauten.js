@@ -26,7 +26,10 @@ function glbTeile(g, datei, wurzel, hub = {}) {
   const ids = anlageVon(g.dataset.anlage).teile.map(t => t.id);
   m.addEventListener('model-loaded', () => {
     // glTF-Teile (und gleiche Anlagen) teilen sich Materialien: eigene Kopie, sonst leuchtet beim Hervorheben alles mit
-    m.getObject3D('mesh').traverse(o => { if (o.material) o.material = o.material.clone(); });
+    m.getObject3D('mesh').traverse(o => {
+      if (o.material) o.material = o.material.clone();
+      if (o.isMesh) o.castShadow = o.receiveShadow = true; // Schatten nur bei den Blender-Anlagen
+    });
     for (const node of [...m.getObject3D('mesh').getObjectByName(wurzel).children]) {
       if (!ids.includes(node.name)) continue;
       const attrs = { 'data-teil': node.name, class: 'klickbar' };

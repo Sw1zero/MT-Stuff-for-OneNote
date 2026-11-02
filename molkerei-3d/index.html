@@ -12,12 +12,17 @@
   <script src="script.js"></script>
   <script src="bauten.js"></script>
   <script src="schnittbild.js"></script>
+  <script src="schnittbild-schulenburg.js"></script>
 </head>
 <body>
-  <a-scene renderer="antialias: true" background="color: #dfe6ec" cursor="rayOrigin: mouse" raycaster="objects: .klickbar; far: 40"
+  <a-scene renderer="antialias: true" shadow="type: pcfsoft" background="color: #dfe6ec" cursor="rayOrigin: mouse" raycaster="objects: .klickbar; far: 40"
            vr-mode-ui="enabled: false" loading-screen="enabled: false" device-orientation-permission-ui="enabled: false">
     <a-entity light="type: hemisphere; color: #ffffff; groundColor: #b8c0c8; intensity: 2.6"></a-entity>
-    <a-entity light="type: directional; intensity: 1.6" position="-30 60 40"></a-entity>
+    <!-- Schatten nur von den Blender-Anlagen (glbTeile), Kamera deckt das ganze Gebäude ab (100 x 60 m) -->
+    <a-entity id="licht-ziel" position="50 0 30"></a-entity>
+    <a-entity light="type: directional; intensity: 1.6; target: #licht-ziel; castShadow: true; shadowMapWidth: 2048; shadowMapHeight: 2048;
+                     shadowCameraLeft: -70; shadowCameraRight: 70; shadowCameraTop: 70; shadowCameraBottom: -70; shadowCameraFar: 220; shadowBias: -0.0005"
+              position="20 60 70"></a-entity>
     <a-entity id="spieler" gehen>
       <!-- Augenhöhe 1.60 m bei 1.70 m Körpergrösse -->
       <a-entity id="kamera" camera="fov: 70" position="0 1.6 0" look-controls="pointerLockEnabled: false; magicWindowTrackingEnabled: false"></a-entity>
@@ -65,6 +70,21 @@
           <p data-testid="schnittbild-text">Die Milch (weiss) fliesst durch das Einlaufrohr in den Verteiler und durch die Steiglöcher ins Tellerpaket. Dort trennt sie sich: Der Rahm (gelb) wird nach innen verdrängt und vom Rahmgreifer gefördert, die Magermilch (grau) wird nach aussen gedrückt und vom Magermilchgreifer gefördert. Die Schmutzstoffe (braun) werden gegen die Trommelwand gedrückt und bilden ein Schlammdepot.</p>
           <div class="mk-knoepfe"><button type="button" data-testid="schnittbild-entleeren">Teilentleerung auslösen</button><button type="button" data-testid="schnittbild-greifer">Greifer von oben</button></div>
           <p class="mk-hinweis">Schematische Darstellung, nicht massstäblich. Die Farben zeigen, wo sich Milch, Rahm und Magermilch befinden, die Striche die Fliessrichtung. In Wirklichkeit dreht die Trommel, und das Tellerpaket hat 70 bis 130 Teller. Die Teilentleerung läuft zum Zuschauen langsamer ab: In Wirklichkeit ist die Trommel nur rund eine Sekunde offen.</p>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog class="mk-schnitt" data-testid="schnittbild-sw" aria-labelledby="mk-sw-titel">
+      <button type="button" class="mk-schliessen" data-testid="schnittbild-sw-schliessen" aria-label="Schliessen">×</button>
+      <h2 id="mk-sw-titel">Schulenburgverfahren im Querschnitt</h2>
+      <div class="mk-schnitt-inhalt">
+        <svg role="img" aria-label="Querschnitt durch Quarkwanne und Molkenwanne"></svg>
+        <div class="mk-schnitt-info">
+          <p class="mk-schritt-nr" data-testid="sw-nr"></p>
+          <h3 data-testid="sw-titel"></h3>
+          <p data-testid="sw-text"></p>
+          <div class="mk-knoepfe"><button type="button" data-testid="sw-zurueck">Zurück</button><button type="button" data-testid="sw-weiter">Weiter</button></div>
+          <p class="mk-hinweis">Schematische Darstellung, nicht massstäblich. Querschnitt quer zur Wanne: Die Luke liegt an der Stirnseite hinter der Schnittebene. Teile anklicken zeigt ihre Funktion.</p>
         </div>
       </div>
     </dialog>
