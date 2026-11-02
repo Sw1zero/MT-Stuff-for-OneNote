@@ -19,6 +19,26 @@ AFRAME.registerComponent('drehprofil', {
 
 const teil = (g, id, attrs = {}) => el('a-entity', { 'data-teil': id, ...attrs }, g);
 
+// Umgebung zum Spiegeln für die Blender-Anlagen: heller Raum mit Deckenleuchten, darunter der Boden.
+// Ohne sie zeichnet three.js Metall flach in einem Grau, Rundungen und Schrauben verschwinden vor gleichfarbigen Wänden.
+let umgebungsKarte = null;
+function umgebung(renderer) {
+  if (umgebungsKarte) return umgebungsKarte;
+  const c = document.createElement('canvas'); c.width = 512; c.height = 256;
+  const k = c.getContext('2d');
+  const v = k.createLinearGradient(0, 0, 0, 256);
+  [[0, '#f4f6f8'], [0.42, '#c9d2d9'], [0.5, '#7d858c'], [0.58, '#a89c88'], [1, '#6b6255']].forEach(([o, f]) => v.addColorStop(o, f));
+  k.fillStyle = v; k.fillRect(0, 0, 512, 256);
+  k.fillStyle = '#ffffff';
+  for (let x = 16; x < 512; x += 64) k.fillRect(x, 26, 34, 8);
+  const t = new THREE.CanvasTexture(c);
+  t.mapping = THREE.EquirectangularReflectionMapping; t.colorSpace = THREE.SRGBColorSpace;
+  const pm = new THREE.PMREMGenerator(renderer);
+  umgebungsKarte = pm.fromEquirectangular(t).texture;
+  pm.dispose(); t.dispose();
+  return umgebungsKarte;
+}
+
 // In Blender gebaute Anlage (glTF). Gruppen unter dem Knoten wurzel mit einer Teil-id aus anlagen.js werden
 // nach dem Laden eigene Entities mit data-teil (Klick, Hervorheben). hub: Teil-id > "x y z" für data-oeffnen.
 function glbTeile(g, datei, wurzel, hub = {}) {
@@ -26,8 +46,9 @@ function glbTeile(g, datei, wurzel, hub = {}) {
   const ids = anlageVon(g.dataset.anlage).teile.map(t => t.id);
   m.addEventListener('model-loaded', () => {
     // glTF-Teile (und gleiche Anlagen) teilen sich Materialien: eigene Kopie, sonst leuchtet beim Hervorheben alles mit
+    const env = umgebung(g.sceneEl.renderer);
     m.getObject3D('mesh').traverse(o => {
-      if (o.material) o.material = o.material.clone();
+      if (o.material) { o.material = o.material.clone(); o.material.envMap = env; o.material.envMapIntensity = 0.55; o.material.needsUpdate = true; }
       if (o.isMesh) o.castShadow = o.receiveShadow = true; // Schatten nur bei den Blender-Anlagen
     });
     for (const node of [...m.getObject3D('mesh').getObjectByName(wurzel).children]) {
