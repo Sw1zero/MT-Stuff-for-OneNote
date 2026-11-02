@@ -76,6 +76,8 @@ const LEITUNGEN = [
   // Eiswasser zum Lagertank: von unten aus dem Untergeschoss in den Doppelmantel, Vor- und Rücklauf
   { von: 'kaelteanlage', nach: 'lagertank-1', medium: 'kuehlwasser', hoehe: -1 },
   { von: 'lagertank-1', nach: 'kaelteanlage', medium: 'kuehlwasser', ab: 'ruecklauf', hoehe: -1.1 },
+  { von: 'kaelteanlage', nach: 'lagertank-2', medium: 'kuehlwasser', hoehe: -1.2 },
+  { von: 'lagertank-2', nach: 'kaelteanlage', medium: 'kuehlwasser', ab: 'ruecklauf', hoehe: -1.3 },
   // Reinigung
   { von: 'cip', nach: 'lagertank-1', medium: 'cip' }
 ];
@@ -109,14 +111,17 @@ const LAGERTANK = {
     'Die Temperatur entscheidet: Bei 4.5 °C steigt die Keimzahl in 48 Stunden von 10 000 auf 50 000 pro ml, bei 10 °C auf 5 000 000.'
 };
 
+// Kühlwasserstutzen am Ende des Doppelmantels zeigen nach -x: Die Leitung kommt waagrecht heraus und biegt nach unten ab.
+const TANK_ANSCHLUESSE = { milch: [-1.7, 2.35, -0.3], auslauf: [2.4, 0.75, 0], cip: [1.2, 2.35, 0],
+  kuehlwasser: [-2.22, 0.8, -0.25, '-x'], ruecklauf: [-2.22, 0.8, 0.25, '-x'] };
+
 const ANLAGEN = [
   // Milchannahme (a.1)
   { id: 'annahmestation', name: 'Annahmestation', raum: 'annahme', x: 4, z: 10, b: 2, t: 1.5 },
   // Liegender Käserei-Lagertank 10'000 L nach DeLaval DXCE, ohne eigene Kühlung (Eiswasser aus der Kälteanlage).
   // Modell: material/molkerei-3d/lagertank.blend (bzwu), Export modelle/lagertank.glb.
   { id: 'lagertank-1', name: 'Lagertank 1', raum: 'annahme', x: 12, z: 5, b: 4.6, t: 2.1, bau: 'lagertank',
-    anschluesse: { milch: [-1.7, 2.35, -0.3], auslauf: [2.4, 0.75, 0], cip: [1.2, 2.35, 0],
-      kuehlwasser: [-2.26, 0.83, -0.25], ruecklauf: [-2.26, 0.83, 0.25] }, ...LAGERTANK },
+    anschluesse: TANK_ANSCHLUESSE, ...LAGERTANK },
   {
     // Texte: Lehrmittel a.1 «Pumpen» (Legende 1-6), «Zentrifugalpumpe» und Pflege der Pumpen.
     // Modell nach Alfa Laval LKH-35: material/molkerei-3d/zentrifugalpumpe.blend (bzwu), Teil-ids = Gruppennamen dort.
@@ -135,7 +140,7 @@ const ANLAGEN = [
       'Sie ist in Käsereien und Molkereien häufig: Sie fördert schonend, ist einfach und hygienisch gebaut und gut CIP-reinigbar. ' +
       'Sie ist aber nicht selbstansaugend und eignet sich nicht für Produkte mit hoher Viskosität.'
   },
-  { id: 'lagertank-2', name: 'Lagertank 2', raum: 'annahme', x: 12, z: 15, b: 4.6, t: 2.1, bau: 'lagertank', ...LAGERTANK },
+  { id: 'lagertank-2', name: 'Lagertank 2', raum: 'annahme', x: 12, z: 15, b: 4.6, t: 2.1, bau: 'lagertank', anschluesse: TANK_ANSCHLUESSE, ...LAGERTANK },
 
   // Milchbehandlung (a.2, a.4, a.5, b.6)
   {
