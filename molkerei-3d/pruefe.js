@@ -61,7 +61,8 @@ async (page) => {
   // Temperaturanzeige leuchtet nach dem Hervorheben weiter
   const wo = async (anlage, teil, name) => page.evaluate(([a, t, n]) => {
     const kam = document.querySelector('a-scene').camera, p = new THREE.Vector3();
-    document.querySelector(`[data-anlage="${a}"] [data-teil="${t}"]`).object3D.getObjectByName(n).getWorldPosition(p);
+    // Mitte der Hülle: bei neu gebauten Meshes liegt der Ursprung am Boden der Anlage
+    new THREE.Box3().setFromObject(document.querySelector(`[data-anlage="${a}"] [data-teil="${t}"]`).object3D.getObjectByName(n)).getCenter(p);
     p.project(kam);
     return [(p.x + 1) / 2, (1 - p.y) / 2];
   }, [anlage, teil, name]);
