@@ -43,21 +43,10 @@ function textur(groesse, zeichne) {
   return { t, groesse };
 }
 
-function fliesen(n, platte, fuge, streuung) {
-  return (g, px) => {
-    const s = px / n;
-    g.fillStyle = fuge; g.fillRect(0, 0, px, px);
-    for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
-      const v = Math.round((Math.random() - 0.5) * streuung);
-      g.fillStyle = `rgb(${platte.map(k => k + v).join(',')})`;
-      g.fillRect(i * s + 1.5, j * s + 1.5, s - 3, s - 3);
-    }
-  };
-}
-
 const TEXTUREN = {
-  boden: () => textur(0.8, fliesen(4, [236, 230, 222], '#a39d95', 10)),     // Bodenfliesen 20 cm
-  fliese: () => textur(0.6, fliesen(4, [250, 250, 250], '#cfd4d8', 4)),     // Wandplatten 15 cm
+  boden: () => bild(1.8, 'texturen/anti_skid_tiles_weiss_1k.jpg'),          // Poly Haven anti_skid_tiles (CC0), weiss umgefärbt, Fliesen 30 cm, auch Wandplatten
+  kiesbeton: () => bild(2, 'texturen/gravel_concrete_04_diff_1k.jpg'),       // Poly Haven (CC0)
+  stuck: () => bild(1.8, 'texturen/white_stucco_02_weiss_1k.jpg'),           // Poly Haven white_stucco_02 (CC0), aufgehellt, Decke über Fliesenböden
   paneel: () => textur(1, (g, px) => {                                       // Sandwichpaneel 1 m breit
     g.fillStyle = '#eef1f3'; g.fillRect(0, 0, px, px);
     g.fillStyle = '#d3d9de'; g.fillRect(0, 0, 3, px);
@@ -67,27 +56,28 @@ const TEXTUREN = {
     g.fillStyle = '#3a3f44'; g.fillRect(0, 0, px, px);
     g.fillStyle = '#b4bcc3'; for (let i = 0; i < px; i += px / 10) { g.fillRect(i, 0, 5, px); g.fillRect(0, i, px, 3); }
   }),
-  beton: () => textur(2, (g, px) => {
-    g.fillStyle = '#b8b7b2'; g.fillRect(0, 0, px, px);
-    for (let i = 0; i < 4000; i++) {
-      const v = 150 + Math.random() * 70 | 0;
-      g.fillStyle = `rgba(${v},${v},${v - 4},0.35)`;
-      g.fillRect(Math.random() * px, Math.random() * px, 2, 2);
-    }
-  })
+  beton: () => bild(1.8, 'texturen/concrete_wall_009_diff_1k.jpg')          // Poly Haven (CC0), Kachel 1.8 m
 };
+
+function bild(groesse, src) {
+  const t = new THREE.TextureLoader().load(src);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.anisotropy = 8;
+  return { t, groesse };
+}
 const texturCache = {};
 
 // Rechteckige Fläche mit gekachelter Textur, Kachelgrösse unabhängig von der Flächengrösse.
 AFRAME.registerComponent('flaeche', {
-  schema: { breite: { default: 1 }, hoehe: { default: 1 }, muster: { default: 'boden' }, farbe: { default: '#ffffff' } },
+  schema: { breite: { default: 1 }, hoehe: { default: 1 }, muster: { default: 'boden' }, farbe: { default: '#ffffff' }, vorne: { default: false } },
   init() {
     const d = this.data;
     const tex = texturCache[d.muster] || (texturCache[d.muster] = TEXTUREN[d.muster]());
     const geo = new THREE.PlaneGeometry(d.breite, d.hoehe);
     const uv = geo.attributes.uv;
     for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * d.breite / tex.groesse, uv.getY(i) * d.hoehe / tex.groesse);
-    this.el.setObject3D('mesh', new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ map: tex.t, color: d.farbe, roughness: 0.85 })));
+    this.el.setObject3D('mesh', new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ map: tex.t, color: d.farbe, roughness: 0.85, polygonOffset: d.vorne, polygonOffsetFactor: -1, polygonOffsetUnits: -4 }))); // vorne: Wandverkleidung liegt nur 5 mm vor dem Wandkörper, sonst Z-Fighting auf Distanz
   }
 });
 
@@ -187,12 +177,37 @@ function el(tag, attrs, eltern) {
 
 // BAUTEN und Materialien: bauten.js
 
+// Feuchtraum-Wannenleuchten (Vorbild Schuch PROXIMA) an der Decke, in Reihen entlang z.
+// Nur Leuchtkörper mit Eigenleuchten, keine Lichtquellen: das Licht der Szene bleibt, wie es ist.
+const LEUCHTE = { laenge: 1.5, breite: 0.1, hoehe: 0.09, reihe: 4, abstand: 3 };
+function leuchten(szene) {
+  const L = LEUCHTE, orte = [];
+  for (const r of RAEUME) {
+    const y = bodenVon(r) + r.hoehe - L.hoehe / 2;
+    for (let x = r.x0 + L.reihe / 2; x < r.x1; x += L.reihe)
+      for (let z = r.z0 + L.abstand / 2; z < r.z1; z += L.abstand) orte.push([x, y, z]);
+  }
+  const teile = [
+    [new THREE.BoxGeometry(L.breite, L.hoehe * 0.6, L.laenge), new THREE.MeshStandardMaterial({ color: '#c9cdd1', roughness: 0.6 }), L.hoehe * 0.2],          // Gehäuse
+    [new THREE.BoxGeometry(L.breite * 0.9, L.hoehe * 0.4, L.laenge * 0.97), new THREE.MeshStandardMaterial({ color: '#ffffff', emissive: '#fffbf2', emissiveIntensity: 1 }), -L.hoehe * 0.3] // satinierte Wanne
+  ];
+  const m = new THREE.Matrix4();
+  for (const [geo, mat, dy] of teile) {
+    const im = new THREE.InstancedMesh(geo, mat, orte.length);
+    orte.forEach(([x, y, z], i) => im.setMatrixAt(i, m.makeTranslation(x, y + dy, z)));
+    szene.object3D.add(im);
+  }
+  return orte.length;
+}
+
 function baueSzene(szene) {
   for (const r of RAEUME) {
     const w = r.x1 - r.x0, t = r.z1 - r.z0, cx = (r.x0 + r.x1) / 2, cz = (r.z0 + r.z1) / 2, b = bodenVon(r);
-    el('a-entity', { flaeche: `breite: ${w}; hoehe: ${t}; muster: boden; farbe: ${r.farbe}`, rotation: '-90 0 0', position: `${cx} ${b} ${cz}`, 'data-boden': r.id, shadow: 'cast: false; receive: true' }, szene);
-    el('a-plane', { width: w, height: t, rotation: '90 0 0', position: `${cx} ${b + r.hoehe} ${cz}`, material: 'color: #f4f5f6; roughness: 1' }, szene);
+    el('a-entity', { flaeche: `breite: ${w}; hoehe: ${t}; muster: ${r.belag || 'boden'}`, rotation: '-90 0 0', position: `${cx} ${b} ${cz}`, 'data-boden': r.id, shadow: 'cast: false; receive: true' }, szene);
+    // Decke: wie der Boden, wenn er einen eigenen Belag hat (Kiesbeton), sonst Stuck
+    el('a-entity', { flaeche: `breite: ${w}; hoehe: ${t}; muster: ${r.belag || 'stuck'}`, rotation: '90 0 0', position: `${cx} ${b + r.hoehe} ${cz}` }, szene);
   }
+  leuchten(szene);
 
   const alle = waende();
   waendeFest = alle.filter(w => w.y0 === 0);
@@ -213,11 +228,11 @@ function baueSzene(szene) {
       if (!r) continue; // Aussenseite
       const o = w.c + seite * (WAND_DICKE / 2 + 0.005);
       const rot = w.laeuft === 'x' ? (seite > 0 ? 0 : 180) : (seite > 0 ? 90 : -90);
-      const baender = r.wand === 'beton' ? [['beton', 0, r.hoehe]] : [['fliese', 0, 2], ['paneel', 2, r.hoehe]];
+      const baender = r.wand === 'beton' ? [['beton', 0, r.hoehe]] : [['boden', 0, 2], ['paneel', 2, r.hoehe]];
       for (const [muster, y0, y1] of baender) {
         const y = w.boden + (y0 + y1) / 2;
         el('a-entity', {
-          flaeche: `breite: ${breite}; hoehe: ${y1 - y0}; muster: ${muster}`, rotation: `0 ${rot} 0`,
+          flaeche: `breite: ${breite}; hoehe: ${y1 - y0}; muster: ${muster}; vorne: true`, rotation: `0 ${rot} 0`,
           position: w.laeuft === 'x' ? `${mitte} ${y} ${o}` : `${o} ${y} ${mitte}`
         }, szene);
       }

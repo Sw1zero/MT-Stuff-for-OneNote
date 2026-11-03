@@ -4,8 +4,8 @@
 
 const RAEUME = [
   // id, name, Rechteck x0/z0/x1/z1, Deckenhöhe, Bodenfarbe
-  // wand: 'beton' statt Fliesen unten und Paneele oben
-  { id: 'kaesekeller',    name: 'Käsekeller (Untergeschoss)', x0: 0, z0: 0, x1: 20, z1: 20, hoehe: 4, farbe: '#d9cbb5', wand: 'beton', boden: -5 }, // neben dem Salzbad
+  // wand: 'beton' statt Fliesen unten und Paneele oben. belag: Bodenmuster statt weisser Fliesen. farbe nur noch im Grundriss.
+  { id: 'kaesekeller',    name: 'Käsekeller (Untergeschoss)', x0: 0, z0: 0, x1: 20, z1: 20, hoehe: 4, farbe: '#d9cbb5', wand: 'beton', belag: 'kiesbeton', boden: -5 }, // neben dem Salzbad
   { id: 'annahme',        name: 'Milchannahme',            x0: 0,  z0: 20, x1: 20,  z1: 40, hoehe: 6,   farbe: '#cfd8dc' },
   { id: 'labor',          name: 'Kulturen und Labor',      x0: 0,  z0: 40, x1: 20,  z1: 60, hoehe: 3.5, farbe: '#e3e8ef' },
   { id: 'kaeserei',       name: 'Käserei',                 x0: 20, z0: 0,  x1: 40,  z1: 20, hoehe: 5,   farbe: '#e8dcc0' },
@@ -16,8 +16,8 @@ const RAEUME = [
   { id: 'speiseeis',      name: 'Speiseeis',               x0: 40, z0: 40, x1: 60,  z1: 60, hoehe: 5,   farbe: '#dcecf0' },
   { id: 'membran',        name: 'Membrantechnik',          x0: 60, z0: 40, x1: 80,  z1: 60, hoehe: 5,   farbe: '#d4e6dc' },
   // boden: Höhe des Bodens in m (Standard 0). Technik im Untergeschoss unter der Milchbehandlung, vorerst nur über die Raumliste erreichbar.
-  { id: 'technik',        name: 'Technik (Untergeschoss)', x0: 40, z0: 20, x1: 60,  z1: 40, hoehe: 4.5, farbe: '#d0d0d0', wand: 'beton', boden: -5 },
-  { id: 'salzbadraum',    name: 'Salzbad (Untergeschoss)', x0: 20, z0: 0,  x1: 40,  z1: 20, hoehe: 4.5, farbe: '#dfe6e8', boden: -5 }, // unter der Käserei
+  { id: 'technik',        name: 'Technik (Untergeschoss)', x0: 40, z0: 20, x1: 60,  z1: 40, hoehe: 4.5, farbe: '#d0d0d0', wand: 'beton', belag: 'kiesbeton', boden: -5 },
+  { id: 'salzbadraum',    name: 'Salzbad (Untergeschoss)', x0: 20, z0: 0,  x1: 40,  z1: 20, hoehe: 4.5, farbe: '#dfe6e8', belag: 'kiesbeton', boden: -5 }, // unter der Käserei
   { id: 'abfuellung',     name: 'Abfüllung und Kühlraum',  x0: 80, z0: 20, x1: 100, z1: 40, hoehe: 5,   farbe: '#dfe3e6' },
   { id: 'trocknerei',     name: 'Trocknerei',              x0: 80, z0: 40, x1: 100, z1: 60, hoehe: 14,  farbe: '#e9e4dc' } // Sprühturm braucht Höhe
 ];
