@@ -71,6 +71,34 @@ async (page) => {
   await page.mouse.move(box.x + 5, box.y + 5);
   await page.waitForTimeout(200);
   ok(await page.evaluate(() => document.querySelector('[data-anlage="lagertank-1"]').object3D.getObjectByName('wert').material.emissive.getHex() !== 0), 'Temperaturanzeige leuchtet nach dem Hervorheben nicht mehr');
+  // Mannloch und Licht von oben: Klick aufs Licht schaltet ein, Klick auf den Deckel klappt ihn auf und wieder zu
+  await page.evaluate(() => {
+    document.getElementById('spieler').object3D.position.set(11.3, 1.2, 26.6);
+    const lc = document.getElementById('kamera').components['look-controls'];
+    lc.yawObject.rotation.y = 0; lc.pitchObject.rotation.x = -0.6;
+  });
+  await page.waitForTimeout(300);
+  const glasAn = () => page.evaluate(() => document.querySelector('[data-anlage="lagertank-1"]').object3D.getObjectByName('glas').userData.leuchten > 0);
+  ok(!(await glasAn()), 'Tanklicht ist am Anfang an');
+  const klick = async ([x, y]) => { await page.mouse.move(box.x + x * box.width, box.y + y * box.height); await page.waitForTimeout(200); await page.mouse.down(); await page.mouse.up(); };
+  await klick(await wo('lagertank-1', 'licht', 'glas'));
+  ok(await glasAn(), 'Klick aufs Licht schaltet es nicht ein');
+  const deckelWinkel = () => page.evaluate(() => document.querySelector('[data-anlage="lagertank-1"]').object3D.getObjectByName('deckel').parent.quaternion.angleTo(new THREE.Quaternion()));
+  await klick(await wo('lagertank-1', 'mannloch', 'knopf'));
+  ok((await t('overlay-teil').textContent()) === 'Mannloch', 'Klick auf den Deckel zeigt nicht das Mannloch');
+  await page.waitForTimeout(1700);
+  ok(await deckelWinkel() > 1.7, 'Mannloch geht nicht auf');
+  await page.evaluate(() => window.kaeserei.schliessen());
+  await klick(await wo('lagertank-1', 'mannloch', 'kragen'));
+  await page.waitForTimeout(1700);
+  ok(await deckelWinkel() < 0.01, 'Mannloch geht nicht zu');
+  await page.evaluate(() => {
+    window.kaeserei.schliessen();
+    document.getElementById('spieler').object3D.position.set(12.4, 0, 30); // Blick wie beim Rührwerk, für die Pumpe
+    const lc = document.getElementById('kamera').components['look-controls'];
+    lc.yawObject.rotation.y = 0; lc.pitchObject.rotation.x = 0;
+  });
+  await page.waitForTimeout(300);
   // Pumpe nach dem Tank (glTF aus Blender): Klick auf die Motorverkleidung, Leitungen Auslauf > Pumpe und CIP vom Bahnhof
   await page.waitForFunction(() => document.querySelector('[data-anlage="milchpumpe"] [data-teil="elektromotor"]'), null, { timeout: 15000 });
   const pu = await page.evaluate(() => {

@@ -389,7 +389,10 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('mousemove', e => { if (unten && Math.hypot(e.clientX - unten[0], e.clientY - unten[1]) > DRAG_PX) gezogen = true; }, true);
   szene.addEventListener('click', e => {
     const z = ziel(e);
-    if (z && !gezogen) window.kaeserei.select(z.closest('[data-anlage]').dataset.anlage, z.dataset.teil);
+    if (!z || gezogen) return;
+    const g = z.closest('[data-anlage]');
+    window.kaeserei.select(g.dataset.anlage, z.dataset.teil);
+    if (z.dataset.teil) g.emit('teil', { teil: z.dataset.teil }, false); // z.B. Mannloch öffnen, Licht schalten
   });
   szene.addEventListener('mouseenter', e => { const z = ziel(e); if (z) hervorheben(z, true); });
   szene.addEventListener('mouseleave', e => { const z = ziel(e); if (z) hervorheben(z, false); });

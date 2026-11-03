@@ -120,7 +120,8 @@ const LAGERTANK = {
 };
 
 // Kühlwasserstutzen am Ende des Doppelmantels zeigen nach -x: Die Leitung kommt waagrecht heraus und biegt nach unten ab.
-const TANK_ANSCHLUESSE = { milch: [-1.7, 2.35, -0.3], auslauf: [2.4, 0.75, 0], cip: [1.2, 2.35, 0],
+// Milch: Clamp-Ende des Einlaufbogens, der waagrecht nach -x zeigt.
+const TANK_ANSCHLUESSE = { milch: [-1.895, 2.383, -0.3, '-x'],auslauf: [2.4, 0.75, 0], cip: [1.2, 2.35, 0],
   kuehlwasser: [-2.22, 0.8, -0.25, '-x'], ruecklauf: [-2.22, 0.8, 0.25, '-x'] };
 
 const ANLAGEN = [

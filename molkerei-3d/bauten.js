@@ -59,6 +59,67 @@ function glbTeile(g, datei, wurzel, hub = {}) {
     }
   });
 }
+// Lagertank: Klick aufs Mannloch klappt die Sterngriffschrauben nach aussen und dann den Deckel am Scharnier auf,
+// Klick aufs Licht schaltet es ein und aus (Ereignis 'teil' aus script.js). Licht ist anfangs aus.
+const DECKEL_WINKEL = 1.75, SCHRAUBE_WINKEL = 1.2; // rad
+AFRAME.registerComponent('tankluke', {
+  init() {
+    const g = this.el.closest('[data-anlage]');
+    this.g = g; this.stand = 0; this.ziel = 0; this.licht = false;
+    g.addEventListener('model-loaded', () => this.schalten(false));
+    g.addEventListener('teil', e => {
+      if (e.detail.teil === 'mannloch') { this.gelenke = this.gelenke || this.bauen(); this.ziel = 1 - this.ziel; }
+      if (e.detail.teil === 'licht') this.schalten(!this.licht);
+    });
+  },
+  schalten(an) {
+    const o = this.g.object3D.getObjectByName('glas');
+    if (this.farbe === undefined) this.farbe = o.material.emissive.getHex();
+    const hex = an ? this.farbe : 0;
+    o.material.emissive.setHex(hex);
+    o.userData.leuchten = hex; // hervorheben() stellt sonst den alten Zustand wieder her
+    this.licht = an;
+  },
+  // Drehpunkte einmal anlegen: Deckel, Knopf und Dichtung am Scharnierbolzen, jede Schraube an ihrem Fuss
+  bauen() {
+    const node = this.g.querySelector('[data-teil="mannloch"]').getObject3D('mesh');
+    node.updateMatrixWorld(true);
+    const mitte = (n, unten) => {
+      const b = new THREE.Box3().setFromObject(node.getObjectByName(n)), c = b.getCenter(new THREE.Vector3());
+      if (unten) c.y = b.min.y;
+      return node.worldToLocal(c);
+    };
+    const gelenk = (punkt, teile) => {
+      const p = new THREE.Group(); p.position.copy(punkt); node.add(p); p.updateMatrixWorld(true);
+      for (const n of teile) p.attach(node.getObjectByName(n));
+      return p;
+    };
+    const bolzen = mitte('scharnierbolzen'), zentrum = mitte('deckel');
+    // Kragen ist im Modell oben geschlossen: dunkle Öffnung drauf, liegt bei geschlossenem Deckel darunter
+    const kb = new THREE.Box3().setFromObject(node.getObjectByName('kragen'));
+    const loch = new THREE.Mesh(new THREE.CircleGeometry((kb.max.x - kb.min.x) / 2 - 0.03, 48), new THREE.MeshStandardMaterial({ color: 0x15181b, roughness: 1 }));
+    loch.rotation.x = -Math.PI / 2;
+    loch.position.copy(node.worldToLocal(kb.getCenter(new THREE.Vector3()).setY(kb.max.y + 0.002)));
+    node.add(loch);
+    const gelenke = [{ p: gelenk(bolzen, ['deckel', 'knopf', 'dichtung_mannloch']), achse: new THREE.Vector3(0, 0, 1), max: DECKEL_WINKEL, deckel: true }];
+    for (let i = 0; node.getObjectByName('klappschraube_' + i); i++) {
+      const fuss = mitte('klappschraube_' + i, true);
+      const aussen = new THREE.Vector3(fuss.x - zentrum.x, 0, fuss.z - zentrum.z).normalize();
+      // Drehachse = oben × aussen: die Schraubenspitze kippt nach aussen
+      gelenke.push({ p: gelenk(fuss, ['klappschraube_' + i, 'sterngriff_' + i]), achse: new THREE.Vector3(0, 1, 0).cross(aussen), max: SCHRAUBE_WINKEL });
+    }
+    return gelenke;
+  },
+  tick(t, dt) {
+    if (!this.gelenke || this.stand === this.ziel) return;
+    const schritt = matchMedia('(prefers-reduced-motion: reduce)').matches ? 1 : dt / 1500;
+    this.stand = this.ziel > this.stand ? Math.min(this.ziel, this.stand + schritt) : Math.max(this.ziel, this.stand - schritt);
+    // erste Hälfte: Schrauben kippen, zweite Hälfte: Deckel klappt auf (zu in umgekehrter Reihenfolge)
+    const s = THREE.MathUtils.clamp(this.stand * 2, 0, 1), d = THREE.MathUtils.clamp(this.stand * 2 - 1, 0, 1);
+    for (const j of this.gelenke) j.p.quaternion.setFromAxisAngle(j.achse, (j.deckel ? d : s) * j.max);
+  }
+});
+
 const liegend = (g, r, laenge, x, y, z, mat = CHROM) =>
   el('a-cylinder', { radius: r, height: laenge, rotation: '0 0 90', position: `${x} ${y} ${z}`, material: mat, 'segments-radial': 32 }, g);
 const stehend = (g, r, h, x, yUnten, z, mat = CHROM, segmente = 24) =>
@@ -492,6 +553,7 @@ const BAUTEN = {
   // Lagertank: in Blender gebaut (material/molkerei-3d/lagertank.blend in bzwu), hier nur das exportierte Modell
   lagertank(g) {
     glbTeile(g, 'modelle/lagertank.glb', 'lagertank');
+    el('a-entity', { tankluke: '' }, g);
   },
 
   // Schulenburg-Wanne nach Plevnik SLB 2000: in Blender gebaut (material/molkerei-3d/schulenburgwanne.blend in bzwu).
