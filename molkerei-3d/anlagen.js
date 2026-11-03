@@ -283,9 +283,28 @@ const ANLAGEN = [
   { id: 'haertetunnel', name: 'Härtetunnel', raum: 'speiseeis', x: 12, z: 14, b: 8, t: 2.5 },
 
   // Membrantechnik (a.3)
-  { id: 'mikrofiltration', name: 'Mikrofiltration', raum: 'membran', x: 10, z: 5, b: 4, t: 1.5 },
-  { id: 'ultrafiltration', name: 'Ultrafiltration', raum: 'membran', x: 10, z: 10, b: 4, t: 1.5 },
-  { id: 'umkehrosmose', name: 'Umkehrosmose', raum: 'membran', x: 10, z: 15, b: 4, t: 1.5 },
+  { id: 'mikrofiltration', name: 'Mikrofiltration', raum: 'membran', x: 10, z: 5, b: 4.6, t: 2.2 },
+  {
+    // Batch-Anlage nach a.3 «Membranfiltrationsanlage im Batchbetrieb», Proportionen nach Tetra Pak UF system P (nur Massreferenz).
+    // Eigenbau: material/molkerei-3d/membrananlage_bau.py (bzwu), VARIANTE = 'uf'. Texte aus a.3.
+    // Eigene Sätze: Anlagentext (letzte zwei Sätze), vorlauftank (Füllstandsrohr), permeataustritt (Schauglas), retentataustritt (ablassen).
+    id: 'ultrafiltration', name: 'Ultrafiltration', raum: 'membran', x: 10, z: 10, b: 4.6, t: 2.2, bau: 'membran_uf',
+    betrieb: { an: 'Filtration starten', aus: 'Filtration beenden' },
+    schnittbild: 'membran', membran: 'uf',
+    teile: [
+      { id: 'vorlauftank', name: 'Vorlauftank', text: 'Mit der Speisepumpe wird die zu filtrierende Flüssigkeit vom Vorlauftank in den Filtrationskreislauf gepumpt. Am Füllstandsrohr sehen Sie, wie viel Produkt noch im Tank ist.' },
+      { id: 'speisepumpe', name: 'Speisepumpe', text: 'Mit der Speisepumpe wird die zu filtrierende Flüssigkeit vom Vorlauftank in den Filtrationskreislauf gepumpt. Die abgetrennte Permeatmenge wird durch die Speisepumpe mit Flüssigkeit aus dem Vorlauftank ersetzt.' },
+      { id: 'zirkulationspumpe', name: 'Zirkulationspumpe', text: 'Die Zirkulationspumpe erzeugt den für die Filtration benötigten Druck. Das zurückgehaltene Retentat wird wieder der Zirkulationspumpe zugeführt. Das Produkt wird so lange in der Anlage zirkuliert, bis die gewünschte Endkonzentration im Retentat erreicht ist. Während der Zirkulation erwärmt sich das Retentat. Überschüssige Wärme kann über einen Kühler abgeführt werden.' },
+      { id: 'feststofffilter', name: 'Feststoff-Filter', text: 'Zum Schutz der Membran vor Beschädigung durch feste Partikel ist vor dem Membranmodul ein Feststoff-Filter eingebaut.' },
+      { id: 'membranmodul', name: 'Membranmodul (Spiralwickelmodul)', text: 'Spiralwickelmembranen werden oft für Ultrafiltrations- und Umkehrosmoseprozesse eingesetzt. Die Membranen sind aus Kunststoff. Durch die spiralförmige Wickelung bieten sie bei kleinem Platzbedarf eine grosse Filterfläche. Bei der Ultrafiltration liegen die Porengrössen im Bereich von 0,01 bis 0,1 Mikrometer. Die Flüssigkeit strömt entlang der Membran. Dank dieser Fliessrichtung und der höheren Fliessgeschwindigkeit ist die Filterkuchenbildung viel geringer als bei der konventionellen Filtration.' },
+      { id: 'druckhalteventil', name: 'Druckhalteventil', text: 'Eine Pumpe und ein Druckhalteventil erzeugen auf der inneren Seite der Membran einen höheren Druck. Dadurch können Produktbestandteile, die kleiner sind als die Porengrösse der Membran, und Wasser auf die andere Seite der Membran gelangen.' },
+      { id: 'manometer', name: 'Manometer', text: 'Bei der Ultrafiltration beträgt der Druck zwischen einem und zehn bar. Der Druckunterschied zwischen der Produktezufuhr-/Retentatseite und der Permeatseite ist der eigentliche Motor des Trennprozesses. Mit zunehmendem Druckunterschied nimmt die Filtrationsleistung zu. Bei zu hohem Druck oder bei Druckschlägen können die Kunststoffmembranen beschädigt werden.' },
+      { id: 'permeataustritt', name: 'Permeataustritt mit Schauglas', text: 'Die Teile, welche die Membran passiert haben, bilden das Permeat. Im Schauglas kontrollieren Sie, ob das Permeat klar ist. Reisst eine Membran, tritt das Produkt ungefiltert über den Permeataustritt aus der Anlage aus.' },
+      { id: 'retentataustritt', name: 'Retentataustritt', text: 'Das Produkt wird entlang der Membran immer mehr aufkonzentriert. Das Konzentrat wird als Retentat bezeichnet. Ist die gewünschte Endkonzentration erreicht, lassen Sie das Retentat hier ab.' }
+    ],
+    text: 'Durch die Aufkonzentrierung von Proteinen ist die Ultrafiltration ein für die Milchwirtschaft sehr interessanter und verbreitet angewendeter Prozess. Damit können Sie zum Beispiel die Ausbeute von Quark oder Käse erhöhen. Diese Anlage arbeitet im Batchbetrieb, wie sie für kleinere Leistungen eingesetzt wird. Für grössere Leistungen kommen kontinuierliche, mehrstufige Anlagen zum Einsatz. Mit «Filtration starten» sehen Sie, wie sich der Vorlauftank leert und das Permeat durch das Schauglas fliesst. Das Schnittbild zeigt, welche Milchbestandteile durch die Membran gehen.'
+  },
+  { id: 'umkehrosmose', name: 'Umkehrosmose', raum: 'membran', x: 10, z: 15, b: 4.6, t: 2.2 },
 
   // Trocknerei (b.11)
   { id: 'eindampfer', name: 'Eindampfer', raum: 'trocknerei', x: 5, z: 10, b: 3, t: 3 },

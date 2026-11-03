@@ -271,6 +271,52 @@ AFRAME.registerComponent('sackabtropfen', {
   }
 });
 
+// Membrananlage im Betrieb: Die Füllsäule im Füllstandsrohr sinkt und wird gelblicher (Retentat konzentrierter),
+// Permeat tropft durchs Schauglas, das Manometer zeigt den Druck. Nach MB_DAUER Sekunden ist die Endkonzentration erreicht.
+// Lagen wie in membrananlage_bau.py (Blender x, y, z = glTF x, -z, y).
+const MB_DAUER = 25, MB_REST = 0.3, MB_SG = { x: 1.15, z: -0.5, oben: 0.86, unten: 0.62 };
+const MB_DRUCK = { uf: 4 }; // bar, Skala 0 bis 10 bar über 270 Grad
+AFRAME.registerComponent('membranbetrieb', {
+  schema: { verfahren: { default: 'uf' } },
+  init() {
+    const g = this.el.closest('[data-anlage]');
+    this.u = 0; this.an = false;
+    this.ruhig = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this.tropfen = new THREE.InstancedMesh(new THREE.SphereGeometry(0.008, 8, 6), new THREE.MeshBasicMaterial({ color: 0xc9cf7a }), 8);
+    this.tropfen.visible = false;
+    this.el.object3D.add(this.tropfen);
+    this.punkte = Array.from({ length: this.tropfen.count }, (_, i) => ({ t: -i * 0.12 }));
+    g.addEventListener('model-loaded', () => {
+      const o = n => g.object3D.getObjectByName(n);
+      this.saeule = o('fuellsaeule'); this.faden = o('permeatfaden'); this.zeiger = o('manometerzeiger');
+      for (const m of [this.saeule, this.faden]) m.raycast = () => {}; // Klicks gehen aufs Glas
+      this.milch = this.saeule.material.color.clone();
+      this.stand(0);
+    });
+    g.addEventListener('betrieb', e => { this.an = e.detail.an; this.stand(this.an && this.ruhig ? 1 : 0); });
+  },
+  stand(u) {
+    if (!this.saeule) return;
+    this.u = u;
+    this.saeule.scale.y = 1 - (1 - MB_REST) * u;
+    this.saeule.material.color.copy(this.milch).lerp(new THREE.Color(0xf0dc9a), u);
+    this.faden.visible = this.an;
+    this.zeiger.rotation.z = this.an ? -MB_DRUCK[this.data.verfahren] * 27 * Math.PI / 180 : 0;
+    this.tropfen.visible = this.an && !this.ruhig;
+  },
+  tick(t, dt) {
+    if (!this.an || this.ruhig || !this.saeule) return;
+    const s = Math.min(dt, 100) / 1000, m = new THREE.Matrix4(), h = MB_SG.oben - MB_SG.unten;
+    if (this.u < 1) this.stand(Math.min(1, this.u + s / MB_DAUER));
+    for (const [i, p] of this.punkte.entries()) {
+      p.t += s;
+      if (p.t > 0.9) p.t -= 0.96; // im Schauglas fällt das Permeat ununterbrochen
+      this.tropfen.setMatrixAt(i, m.makeTranslation(MB_SG.x, p.t < 0 ? -10 : MB_SG.oben - h * p.t / 0.9, MB_SG.z));
+    }
+    this.tropfen.instanceMatrix.needsUpdate = true;
+  }
+});
+
 const BAUTEN = {
   // Separator nach Fotos references/_inbox/molkerei/zentrifuge_1+2 (SPX), gut 1.6 m hoch.
   // Teile nach Lehrmittel a.2 «Aufbau des Separators». Die Haube lässt sich öffnen (aktion 'haube').
@@ -458,6 +504,12 @@ const BAUTEN = {
   sackverfahren(g) {
     glbTeile(g, 'modelle/abtropfgestell.glb', 'abtropfgestell');
     el('a-entity', { sackabtropfen: '' }, g);
+  },
+
+  // Ultrafiltration (Batch nach a.3, Proportionen nach Tetra Pak UF system P): material/molkerei-3d/membrananlage_bau.py in bzwu.
+  membran_uf(g) {
+    glbTeile(g, 'modelle/membrananlage_uf.glb', 'membrananlage_uf');
+    el('a-entity', { membranbetrieb: 'verfahren: uf' }, g);
   },
 
   // Mehrzweckerhitzer 200 l nach Plevnik SK Classic 200: in Blender gebaut (material/molkerei-3d/mehrzweckerhitzer.blend in bzwu).

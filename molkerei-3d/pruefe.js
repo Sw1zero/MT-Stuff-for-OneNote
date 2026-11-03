@@ -332,6 +332,42 @@ async (page) => {
   ok(sx2 === 1 && my2 === my0, 'Säcke neu füllen stellt nicht zurück');
   await page.evaluate(() => window.kaeserei.schliessen());
 
+  // Ultrafiltration (glTF aus Blender): echter Klick auf den Vorlauftank, Betrieb, Schnittbild
+  await page.locator('[data-raum="membran"]').click();
+  await page.evaluate(() => {
+    document.getElementById('spieler').object3D.position.set(70.5, 0, 53.4); // vor der UF (Mitte 70/50)
+    const lc = document.getElementById('kamera').components['look-controls'];
+    lc.yawObject.rotation.y = 0; lc.pitchObject.rotation.x = -0.15;
+  });
+  await page.waitForFunction(() => document.querySelector('[data-anlage="ultrafiltration"] [data-teil="vorlauftank"]'), null, { timeout: 15000 });
+  await page.waitForTimeout(300);
+  const uf = await page.evaluate(() => {
+    const kam = document.querySelector('a-scene').camera, p = new THREE.Vector3();
+    new THREE.Box3().setFromObject(document.querySelector('[data-anlage="ultrafiltration"]').object3D.getObjectByName('tankmantel')).getCenter(p);
+    p.project(kam);
+    return [(p.x + 1) / 2, (1 - p.y) / 2];
+  });
+  await page.mouse.move(box.x + uf[0] * box.width, box.y + uf[1] * box.height);
+  await page.waitForTimeout(200);
+  await page.mouse.down(); await page.mouse.up();
+  ok((await t('overlay-titel').textContent()) === 'Ultrafiltration' && (await t('overlay-teil').textContent()) === 'Vorlauftank', `Klick auf Vorlauftank zeigt: ${await t('overlay-teil').textContent()}`);
+  const ufStand = () => page.evaluate(() => { const o = document.querySelector('[data-anlage="ultrafiltration"]').object3D; return [o.getObjectByName('fuellsaeule').scale.y, o.getObjectByName('manometerzeiger').rotation.z, o.getObjectByName('permeatfaden').visible]; });
+  await t('overlay-betrieb').click();
+  await page.waitForTimeout(1500);
+  const [fs1, zg1, pf1] = await ufStand();
+  ok(fs1 < 1 && zg1 < 0 && pf1, `UF-Betrieb: Füllstand ${fs1}, Zeiger ${zg1}, Permeat ${pf1}`);
+  ok((await t('overlay-betrieb').textContent()) === 'Filtration beenden', 'Knopf wechselt nicht auf «Filtration beenden»');
+  await t('overlay-betrieb').click();
+  const [fs2, zg2, pf2] = await ufStand();
+  ok(fs2 === 1 && zg2 === 0 && !pf2, 'Filtration beenden stellt nicht zurück');
+  await t('overlay-schnitt').click();
+  ok(await t('schnittbild-mb').isVisible(), 'UF-Schnittbild öffnet nicht');
+  ok((await t('mb-titel').textContent()).startsWith('Ultrafiltration'), 'UF-Schnittbild: falscher Titel');
+  const mb = await page.evaluate(() => window.membranSchnitt.stand());
+  ok(mb.imPermeat.join() === 'laktose,salze,wasser', `UF-Schnittbild: im Permeat ${mb.imPermeat.join()}`);
+  await t('schnittbild-mb-schliessen').click();
+  await page.evaluate(() => window.kaeserei.schliessen());
+
   // Durch den Durchgang Milchbehandlung -> Käserei (Tür bei x=30, z=20)
   await page.evaluate(() => document.getElementById('spieler').object3D.position.set(30, 0, 22));
   // rennen, damit es auch bei wenigen fps auf der VM reicht

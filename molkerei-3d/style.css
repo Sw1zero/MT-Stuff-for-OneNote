@@ -167,3 +167,14 @@ svg[data-trombe="ja"] .rw-trombe { visibility: visible; }
 .mk-rw-brecher { display: block; margin-bottom: 12px; }
 .rw-bahn { fill: none; stroke: #a9cfe2; stroke-width: 2; }
 .rw-teilchen path { fill: var(--blue-dark); }
+
+/* Schnittbild Querstromfiltration (schnittbild-membran.js) */
+.mb-kanal { fill: #fbfaf3; }
+.mb-permeatseite { fill: #f4f6e6; }
+.mb-membran { fill: #6b757d; }
+.mb-pore { fill: #f4f6e6; }
+.mb-wand { stroke: #4a545c; stroke-width: 4; }
+.mb-klein { font-size: 13px; }
+.mb-legende-titel { font-weight: 600; fill: var(--text); }
+.mb-bahn { fill: none; stroke: #a9cfe2; stroke-width: 2; }
+.mb-pfeile path { fill: var(--blue-dark); opacity: 0.55; }
