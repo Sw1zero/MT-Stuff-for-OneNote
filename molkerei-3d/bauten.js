@@ -562,6 +562,13 @@ const BAUTEN = {
     glbTeile(g, 'modelle/schulenburgwanne.glb', 'schulenburgwanne', { molkenwanne: '-0.9', lochsieb: '-0.9' });
   },
 
+  // Quarkseparator nach Westfalia KDA 30: in Blender gebaut (material/molkerei-3d/quarkseparator_bau.py in bzwu).
+  // Haube öffnen: Haube samt Armaturen 1.15 m hoch, Tellerpaket 0.55 m aus der Trommel, Düsen werden sichtbar.
+  quarkseparator(g) {
+    const hub = { haube: '1.15', zulauf: '1.15', schauglas: '1.15', molkenablauf: '1.15', regulierventil: '1.15', manometer: '1.15', tellerpaket: '0.55' };
+    glbTeile(g, 'modelle/quarkseparator.glb', 'quarkseparator', hub);
+  },
+
   // Abtropfgestell für das Sackverfahren: in Blender gebaut (material/molkerei-3d/abtropfgestell_bau.py in bzwu).
   sackverfahren(g) {
     glbTeile(g, 'modelle/abtropfgestell.glb', 'abtropfgestell');

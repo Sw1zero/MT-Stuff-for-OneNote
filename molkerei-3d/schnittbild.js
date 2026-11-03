@@ -18,10 +18,13 @@ const SB_TEILE = [
   ['auffanghaube', ['305,495 345,495 345,665 300,665 300,659 339,659 339,501 305,501'], [345, 600]], // steht still
   ['einlaufrohr', ['14,0 20,0 20,430 14,430', '32,0 38,0 38,158 78,158 78,165 32,165'], [70, 161]]
 ];
-// Teller mit Steigloch bei r 160..180, 10 statt 70 bis 130
+// Teller (r 75 bis 245), 10 statt 70 bis 130. Steigloch nach Phasenanteil: Rahm rund 11 %, darum bei 1/10 der
+// Tellerbreite vom Innenrand (r 92, Loch 82 bis 102). Quarkseparator gleiche Regel: Quark 25 % aussen, Loch bei 3/4.
 const SB_TELLER = Array.from({ length: 10 }, (_, i) => [245, 505 - 16 * i, 75, 360 - 16 * i]);
 const sbTellerY = (t, r) => t[1] + (t[3] - t[1]) * (t[0] - r) / (t[0] - t[2]);
-const SB_SPALT = i => 433 - 16 * i; // Mitte des Tellerspalts i am Steigloch (r 170)
+const SB_LOCH = 92, SB_LOCH_B = 10; // Mitte und halbe Breite des Steiglochs
+const SB_SPALT = (i, r = SB_LOCH) => sbTellerY(SB_TELLER[i], r) - 8; // Mitte des Tellerspalts über Teller i bei r
+const SB_KANAL_OBEN = sbTellerY(SB_TELLER[9], SB_LOCH) + 4; // Steigkanal endet unter dem obersten Teller
 
 // Flüssigkeitsräume, rechte Hälfte. Reihenfolge = Malreihenfolge.
 const SB_ZONEN = [
@@ -30,16 +33,16 @@ const SB_ZONEN = [
   ['magermilch', '38,-20 50,-20 50,112 38,112'],                                      // Ableiter Magermilch
   ['tellerpaket', '46,135 85,135 85,190 200,303 245,361 245,520 240,525 46,470'],     // Verlauf Rahm innen bis Magermilch aussen
   ['rahm', '20,-20 32,-20 32,135 46,135 46,190 20,190'],                              // Rahmgreifer und Ableiter
-  ['milch', '0,-20 14,-20 14,175 38,175 38,477 160,510 160,300 180,300 180,545 70,530 0,530']
+  ['milch', `0,-20 14,-20 14,175 38,175 38,477 ${SB_LOCH - SB_LOCH_B},489 ${SB_LOCH - SB_LOCH_B},${SB_KANAL_OBEN} ${SB_LOCH + SB_LOCH_B},${SB_KANAL_OBEN} ${SB_LOCH + SB_LOCH_B},534 70,530 0,530`]
 ];
-// Fliessrichtung als laufende Striche. h = Tellerspalt am Steigloch.
+// Fliessrichtung als laufende Striche, im Tellerspalt vom Steigloch aus: Rahm kurz nach innen, Magermilch lang nach aussen.
 const SB_STRICHE = [
-  ['milch', [[7, -20], [7, 440], [40, 500], [170, 528], [170, 310]]],
-  ...[1, 4, 7].map(i => ['rahm', [[165, SB_SPALT(i) - 4], [75, SB_SPALT(i) - 81], [60, SB_SPALT(i) - 81], [60, 200], [56, 165], [26, 150], [26, -20]]]),
+  ['milch', [[7, -20], [7, 440], [40, 500], [SB_LOCH, 512], [SB_LOCH, SB_KANAL_OBEN + 8]]],
+  ...[1, 4, 7].map(i => ['rahm', [[SB_LOCH - SB_LOCH_B, SB_SPALT(i, SB_LOCH - SB_LOCH_B)], [75, SB_SPALT(i, 75)], [60, SB_SPALT(i, 75)], [60, 200], [56, 165], [26, 150], [26, -20]]]),
   // Magermilch: aus den Tellerspalten nach aussen, dann gemeinsam an der Wand hoch, um den Scheideteller herum,
   // im Spalt zum Trommeldeckel nach innen und durch den Greifer hinaus. Gemeinsamer Weg nur einmal, sonst überlagern sich die Striche.
-  ...[1, 4, 7].map(i => ['magermilch', [[175, SB_SPALT(i) + 4], [245, SB_SPALT(i) + 64], [262, SB_SPALT(i) + 64]]]),
-  ['magermilch', [[262, SB_SPALT(1) + 64], [262, 380], [225, 324], [205, 290], [150, 223], [100, 165], [100, 125], [80, 116], [44, 105], [44, -20]]]
+  ...[1, 4, 7].map(i => ['magermilch', [[SB_LOCH + SB_LOCH_B, SB_SPALT(i, SB_LOCH + SB_LOCH_B)], [245, SB_SPALT(i, 245)], [262, SB_SPALT(i, 245)]]]),
+  ['magermilch', [[262, SB_SPALT(1, 245)], [262, 380], [225, 324], [205, 290], [150, 223], [100, 165], [100, 125], [80, 116], [44, 105], [44, -20]]]
 ];
 const SB_SCHMUTZ = 18;       // Punkte je Hälfte
 const SB_SCHMUTZ_TEMPO = 40; // px/s
@@ -76,7 +79,7 @@ function baueSchnittbild(svg, teile, zeigeTeil) {
   const defs = svgEl('defs', {}, svg);
   // Tellerpaket: innen Rahm, am Steigloch Milch, aussen Magermilch (wird mit der Hälfte gespiegelt)
   const verlauf = svgEl('linearGradient', { id: 'sb-verlauf', gradientUnits: 'userSpaceOnUse', x1: 46, y1: 0, x2: 245, y2: 0 }, defs);
-  [[0, 'var(--sb-rahm)'], [0.12, 'var(--sb-rahm)'], [0.5, 'var(--sb-milch)'], [0.62, 'var(--sb-milch)'], [0.8, 'var(--sb-mager)'], [1, 'var(--sb-mager)']] // Rahm schmal: wenig Fett
+  [[0, 'var(--sb-rahm)'], [0.12, 'var(--sb-rahm)'], [0.18, 'var(--sb-milch)'], [0.28, 'var(--sb-milch)'], [0.45, 'var(--sb-mager)'], [1, 'var(--sb-mager)']] // Milch am Steigloch (r 82 bis 102), Rahm schmal: wenig Fett
     .forEach(([o, c]) => svgEl('stop', { offset: o, style: `stop-color: ${c}` }, verlauf));
   // Auffüllen: Rechteck, das von unten hochfährt
   const clip = svgEl('clipPath', { id: 'sb-fuellung' }, defs);
@@ -110,8 +113,9 @@ function baueSchnittbild(svg, teile, zeigeTeil) {
     svgEl('polygon', { points: spiegel(p) }, gruppe(id));
   }
   for (const t of SB_TELLER) for (const s of [-1, 1]) {
-    svgEl('line', { x1: s * t[0], y1: t[1], x2: s * 180, y2: sbTellerY(t, 180), class: 'sb-teller' }, gruppe('tellerpaket'));
-    svgEl('line', { x1: s * 160, y1: sbTellerY(t, 160), x2: s * t[2], y2: t[3], class: 'sb-teller' }, gruppe('tellerpaket'));
+    const a = SB_LOCH + SB_LOCH_B, b = SB_LOCH - SB_LOCH_B;
+    svgEl('line', { x1: s * t[0], y1: t[1], x2: s * a, y2: sbTellerY(t, a), class: 'sb-teller' }, gruppe('tellerpaket'));
+    svgEl('line', { x1: s * b, y1: sbTellerY(t, b), x2: s * t[2], y2: t[3], class: 'sb-teller' }, gruppe('tellerpaket'));
   }
   // Schlammaustrittsöffnungen in der Wand, vom Kolbenschieber verschlossen
   for (const s of [-1, 1]) svgEl('rect', { x: s > 0 ? 275 : -300, y: 545, width: 25, height: 9, class: 'sb-oeffnung' }, gruppe('trommelunterteil'));
@@ -155,9 +159,9 @@ function baueSchnittbild(svg, teile, zeigeTeil) {
   const schicht = svgEl('g', { class: 'sb-kugeln' }, svg);
   const schmutz = [];
   const neu = k => {
-    const h = SB_SPALT(Math.floor(Math.random() * 9));
-    k.weg = [[170, h], [245, h + 64], [258 + Math.random() * 12, Math.max(h + 70, 450 + Math.random() * 100)]];
-    k.len = Math.hypot(75, 64) + Math.hypot(k.weg[2][0] - 245, k.weg[2][1] - h - 64);
+    const i = Math.floor(Math.random() * 9), r0 = SB_LOCH + SB_LOCH_B, h = SB_SPALT(i, r0), h2 = SB_SPALT(i, 245);
+    k.weg = [[r0, h], [245, h2], [258 + Math.random() * 12, Math.max(h2 + 6, 450 + Math.random() * 100)]];
+    k.len = Math.hypot(245 - r0, h2 - h) + Math.hypot(k.weg[2][0] - 245, k.weg[2][1] - h2);
     k.s = 0;
   };
   for (let i = 0; i < SB_SCHMUTZ * 2; i++) {
@@ -207,8 +211,9 @@ function baueSchnittbild(svg, teile, zeigeTeil) {
           if (!entleer) { stand[k.seite] = Math.min(SB_DEPOT, stand[k.seite] + 0.3); zeigeDepot(); }
           neu(k);
         }
-        const [a, b] = k.s < Math.hypot(75, 64) ? [k.weg[0], k.weg[1]] : [k.weg[1], k.weg[2]];
-        const s0 = k.s < Math.hypot(75, 64) ? 0 : Math.hypot(75, 64);
+        const l0 = Math.hypot(k.weg[1][0] - k.weg[0][0], k.weg[1][1] - k.weg[0][1]); // erstes Stück: im Tellerspalt
+        const [a, b] = k.s < l0 ? [k.weg[0], k.weg[1]] : [k.weg[1], k.weg[2]];
+        const s0 = k.s < l0 ? 0 : l0;
         const l = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1, f = Math.min((k.s - s0) / l, 1);
         k.el.setAttribute('cx', k.seite * (a[0] + (b[0] - a[0]) * f));
         k.el.setAttribute('cy', a[1] + (b[1] - a[1]) * f);

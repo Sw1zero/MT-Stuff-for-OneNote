@@ -227,7 +227,25 @@ const ANLAGEN = [
 
   // Frischkäserei (b.3–b.5)
   { id: 'weichkaese-formen', name: 'Formtisch Weichkäse', raum: 'frischkaeserei', x: 6, z: 6, b: 6, t: 2 },
-  { id: 'quarkseparator', name: 'Quarkseparator', raum: 'frischkaeserei', x: 14, z: 6, b: 1.5, t: 1.5 },
+  {
+    // Düsenseparator, Masse nach Westfalia KDA 30 (Prospekt 1978), Eigenbau: material/molkerei-3d/quarkseparator_bau.py (bzwu).
+    // Texte: Lehrmittel b.5 «Separieren». Eigene Sätze (KDA-Prospekt): Manometer, Regulierventil, Schauglas, Anlagentext.
+    // Steiglöcher bei 3/4 der Tellerbreite: Quark 25 % ist die schwere Phase und bekommt das äussere Viertel.
+    id: 'quarkseparator', name: 'Quarkseparator', raum: 'frischkaeserei', x: 14, z: 6, b: 1.62, t: 1.12, bau: 'quarkseparator',
+    oeffnen: { auf: 'Haube öffnen', zu: 'Haube schliessen' },
+    teile: [
+      { id: 'zulauf', name: 'Zulauf', text: 'Die Quarkgallerte wird von oben dem Separator zugeführt, im Zentrum nach unten geleitet und steigt von unten durch die Löcher im Tellerpaket nach oben. Über einen Filter vor dem Separator halten Sie grössere Partikel zurück und verhindern so, dass die Düsen verstopfen.' },
+      { id: 'schauglas', name: 'Schauglas', text: 'Im Schauglas beobachten Sie die zufliessende Quarkgallerte.' },
+      { id: 'haube', name: 'Haube', text: 'Der Quark, welcher aus den Düsen austritt, prallt im Auffangraum auf die Separatorhülle.' },
+      { id: 'tellerpaket', name: 'Tellerpaket', text: 'Durch die rotierende Trommel wirken Fliehkräfte. Weil der Quark und die Molke eine unterschiedliche Dichte aufweisen, können diese getrennt werden. Der Quark mit der grösseren Dichte verdrängt die Molke Richtung Zentrum.' },
+      { id: 'duesen', name: 'Düsen', text: 'Der Quark verlässt die Trommel über Düsen. Die Düsen sind auf der Seite der Separatortrommel angebracht. Sie haben einen Durchmesser von einigen Zehntelmillimetern (z. B. 0,6 mm). Über die zugeführte Menge an Quarkgallerte können Sie die Ausbeute und damit auch die Quarktrockenmasse regulieren.' },
+      { id: 'molkenablauf', name: 'Molkenablauf mit Greifer', text: 'Der Quark verdrängt die Molke Richtung Zentrum. Diese verlässt über einen Greifer den Separator.' },
+      { id: 'regulierventil', name: 'Regulierventil', text: 'Mit dem Regulierventil in der Molkenleitung stellen Sie den Gegendruck ein.' },
+      { id: 'manometer', name: 'Manometer', text: 'Das Manometer in der Molkenleitung zeigt den Druck, mit dem der Greifer die Molke aus dem Separator fördert.' },
+      { id: 'quarkablauf', name: 'Quarkablauf', text: 'Der Quark verlässt den Separator und gelangt in ein Vorlaufgefäss. Von dort wird er mit einer Pumpe in den Kühler gefördert.' }
+    ],
+    text: 'Der Quarkseparator trennt die geronnene Quarkmilch in Quark und Molke. Im Separator dauert das nur wenige Sekunden.'
+  },
   {
     // Texte: Lehrmittel b.5 «Gewerbliche Quarkproduktion in einer Wanne (Schulenburgverfahren)». Eigene Sätze: Hubzylinder, Anlagentext.
     // Masse nach Plevnik SLB 2000, Eigenbau: material/molkerei-3d/schulenburgwanne.blend (bzwu). Luke an der Stirnseite +x.

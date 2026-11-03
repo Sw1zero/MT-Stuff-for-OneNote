@@ -279,6 +279,34 @@ async (page) => {
   ok(!(await t('schnittbild-sw').evaluate(d => d.open)) && await t('overlay').isVisible(), 'Esc schliesst Schnittbild nicht oder auch das Overlay');
   await page.evaluate(() => window.kaeserei.schliessen());
 
+  // Quarkseparator (glTF aus Blender, Frischkäserei, Mitte 54/6): Klick auf die Haube, Haube öffnen und schliessen
+  await page.evaluate(() => {
+    document.getElementById('spieler').object3D.position.set(54, 0, 10);
+    const lc = document.getElementById('kamera').components['look-controls'];
+    lc.yawObject.rotation.y = 0; lc.pitchObject.rotation.x = -0.05;
+  });
+  await page.waitForFunction(() => document.querySelector('[data-anlage="quarkseparator"] [data-teil="haube"]'), null, { timeout: 15000 });
+  await page.waitForTimeout(300);
+  const qs = await page.evaluate(() => {
+    const kam = document.querySelector('a-scene').camera, p = new THREE.Vector3();
+    new THREE.Box3().setFromObject(document.querySelector('[data-anlage="quarkseparator"] [data-teil="haube"]').object3D.getObjectByName('haubenmantel')).getCenter(p);
+    p.project(kam);
+    return [(p.x + 1) / 2, (1 - p.y) / 2];
+  });
+  await page.mouse.move(box.x + qs[0] * box.width, box.y + qs[1] * box.height);
+  await page.waitForTimeout(200);
+  await page.mouse.down(); await page.mouse.up();
+  ok((await t('overlay-titel').textContent()) === 'Quarkseparator' && (await t('overlay-teil').textContent()) === 'Haube', `Klick auf die Haube zeigt: ${await t('overlay-teil').textContent()}`);
+  const qsY = id => page.evaluate(i => document.querySelector(`[data-anlage="quarkseparator"] [data-teil="${i}"]`).object3D.position.y, id);
+  await t('overlay-aktion').click();
+  await page.waitForTimeout(1700);
+  ok(await qsY('haube') > 1.14 && await qsY('manometer') > 1.14 && await qsY('tellerpaket') > 0.54 && await qsY('duesen') === 0, 'Haube oder Tellerpaket hebt sich nicht');
+  ok((await t('overlay-aktion').textContent()) === 'Haube schliessen', 'Knopf wechselt nicht auf «Haube schliessen»');
+  await t('overlay-aktion').click();
+  await page.waitForTimeout(1700);
+  ok(await qsY('haube') === 0 && await qsY('tellerpaket') === 0, 'Haube schliesst nicht');
+  await page.evaluate(() => window.kaeserei.schliessen());
+
   // Mehrzweckerhitzer (glTF aus Blender, Sauermilch, Mitte 76/14): Klick in den Kessel auf den Propeller, Rührer wechseln, Betrieb, Schnittbild
   await page.locator('[data-raum="sauermilch"]').click();
   await page.evaluate(() => {
