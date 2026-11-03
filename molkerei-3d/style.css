@@ -178,3 +178,21 @@ svg[data-trombe="ja"] .rw-trombe { visibility: visible; }
 .mb-legende-titel { font-weight: 600; fill: var(--text); }
 .mb-bahn { fill: none; stroke: #a9cfe2; stroke-width: 2; }
 .mb-pfeile path { fill: var(--blue-dark); opacity: 0.55; }
+
+/* Schnittbilder Quarklinie (schnittbild-quark.js): Farben wie Schulenburg (Quark, Molke), Gallerte weiss wie Milch */
+.qs-zone { stroke: none; }
+.qs-zone-gallerte { fill: #ffffff; stroke: #b4bcc3; stroke-width: 1; }
+.qs-zone-molke { fill: var(--sw-molke); }
+.qs-zone-quark { fill: var(--sw-quark); stroke: none; }
+.qs-zone-tellerpaket { fill: url(#qs-verlauf); }
+.qs-strich-gallerte { stroke: #9aa3ab; }
+.qs-strich-molke { stroke: #6f7520; }
+.qs-strich-quark { stroke: #a08850; }
+.qs-trommel { fill: #8a96a0; stroke: #4a545c; stroke-width: 1.2; }
+.qs-duese { fill: #22262a; }
+.qs-auffang { fill: #eef1f3; }
+.qs-gestell { fill: #b9c0c6; stroke: #4a545c; stroke-width: 1.2; }
+.qs-punkt { fill: var(--sw-quark); stroke: #8c7a4a; stroke-width: 1.2; }
+.kp-kolben { fill: #8a96a0; stroke: #4a545c; stroke-width: 1.2; }
+.sb-teil:hover .kp-kolben, .sb-teil.sb-aktiv .kp-kolben { fill: #69a9c9; }
+.kp-welle { fill: #4a545c; }

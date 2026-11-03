@@ -15,6 +15,7 @@
   <script src="schnittbild-schulenburg.js"></script>
   <script src="schnittbild-ruehrwerk.js"></script>
   <script src="schnittbild-membran.js"></script>
+  <script src="schnittbild-quark.js"></script>
 </head>
 <body>
   <a-scene renderer="antialias: true" shadow="type: pcfsoft" background="color: #dfe6ec" cursor="rayOrigin: mouse" raycaster="objects: .klickbar; far: 40"
@@ -72,6 +73,30 @@
           <img class="mk-teilbild" data-testid="schnittbild-bild" alt="" hidden>
           <p data-testid="schnittbild-text">Die Milch (weiss) fliesst durch das Einlaufrohr in den Verteiler und durch die Steiglöcher ins Tellerpaket. Dort trennt sie sich: Der Rahm (gelb) wird nach innen verdrängt und vom Rahmgreifer gefördert, die Magermilch (grau) wird nach aussen gedrückt und vom Magermilchgreifer gefördert. Die Schmutzstoffe (braun) werden gegen die Trommelwand gedrückt und bilden ein Schlammdepot.</p>
           <div class="mk-knoepfe"><button type="button" data-testid="schnittbild-entleeren">Teilentleerung auslösen</button><button type="button" data-testid="schnittbild-greifer">Greifer von oben</button></div>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog class="mk-schnitt" data-testid="schnittbild-qs" aria-labelledby="mk-schnittbild-qs-titel">
+      <button type="button" class="mk-schliessen" data-testid="schnittbild-qs-schliessen" aria-label="Schliessen">×</button>
+      <h2 id="mk-schnittbild-qs-titel">Quarkseparator im Betrieb</h2>
+      <div class="mk-schnitt-inhalt">
+        <svg role="img" aria-label="Trommel des Quarkseparators im Schnitt"></svg>
+        <div class="mk-schnitt-info">
+          <h3 data-testid="schnittbild-qs-titel"></h3>
+          <p data-testid="schnittbild-qs-text"></p>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog class="mk-schnitt" data-testid="schnittbild-kp" aria-labelledby="mk-schnittbild-kp-titel">
+      <button type="button" class="mk-schliessen" data-testid="schnittbild-kp-schliessen" aria-label="Schliessen">×</button>
+      <h2 id="mk-schnittbild-kp-titel">Kreiskolbenpumpe im Betrieb</h2>
+      <div class="mk-schnitt-inhalt">
+        <svg role="img" aria-label="Pumpenkammer der Kreiskolbenpumpe von vorne"></svg>
+        <div class="mk-schnitt-info">
+          <h3 data-testid="schnittbild-kp-titel"></h3>
+          <p data-testid="schnittbild-kp-text"></p>
         </div>
       </div>
     </dialog>

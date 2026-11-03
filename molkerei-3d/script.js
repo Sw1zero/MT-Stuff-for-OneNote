@@ -417,7 +417,7 @@ document.addEventListener('DOMContentLoaded', () => {
   $('overlay-betrieb').addEventListener('click', () => window.kaeserei.betrieb($('overlay').dataset.anlage));
   $('overlay-schnitt').addEventListener('click', () => {
     const id = $('overlay').dataset.anlage;
-    ({ schulenburg: window.schulenburgSchnitt, ruehrwerk: window.ruehrwerkSchnitt, membran: window.membranSchnitt }[anlageVon(id).schnittbild] || window.schnittbild).oeffnen(id);
+    ({ schulenburg: window.schulenburgSchnitt, ruehrwerk: window.ruehrwerkSchnitt, membran: window.membranSchnitt, quark: window.quarkSchnitt, kreiskolben: window.kreiskolbenSchnitt }[anlageVon(id).schnittbild] || window.schnittbild).oeffnen(id);
   });
   $('overlay-wechsel').addEventListener('click', () => window.kaeserei.wechsel($('overlay').dataset.anlage));
   $('overlay-uebersicht').addEventListener('click', () => window.kaeserei.select($('overlay').dataset.anlage));

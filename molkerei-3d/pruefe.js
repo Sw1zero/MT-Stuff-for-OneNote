@@ -305,6 +305,37 @@ async (page) => {
   await t('overlay-aktion').click();
   await page.waitForTimeout(1700);
   ok(await qsY('haube') === 0 && await qsY('tellerpaket') === 0, 'Haube schliesst nicht');
+
+  // Schnittbild Quarkseparator: Teil anklicken, Animation läuft, Esc schliesst nur den Dialog
+  await t('overlay-schnitt').click();
+  ok(await t('schnittbild-qs').evaluate(d => d.open), 'Schnittbild Quarkseparator öffnet nicht');
+  await page.locator('[data-testid="schnittbild-qs"] [data-sb-teil="duesen"] text').click();
+  ok((await t('schnittbild-qs-titel').textContent()) === 'Düsen', `Schnittbild Quarkseparator zeigt: ${await t('schnittbild-qs-titel').textContent()}`);
+  await page.keyboard.press('Escape');
+  ok(!(await t('schnittbild-qs').evaluate(d => d.open)) && await t('overlay').isVisible(), 'Esc schliesst Schnittbild Quarkseparator nicht oder auch das Overlay');
+  await page.evaluate(() => window.kaeserei.schliessen());
+
+  // Vorlaufgefäss und Kreiskolbenpumpe (glTF aus Blender): Teile geladen, Frontdeckel öffnet, Schnittbild Pumpe
+  await page.waitForFunction(() => document.querySelector('[data-anlage="vorlaufgefaess"] [data-teil="bodenventil"]') && document.querySelector('[data-anlage="quarkpumpe"] [data-teil="pumpendeckel"]'), null, { timeout: 15000 }).catch(() => ok(false, 'Vorlaufgefäss oder Pumpe ohne Teile'));
+  await page.evaluate(() => window.kaeserei.select('quarkpumpe'));
+  ok((await t('overlay-titel').textContent()) === 'Kreiskolbenpumpe', 'Overlay Kreiskolbenpumpe öffnet nicht');
+  const kpZ = () => page.evaluate(() => document.querySelector('[data-anlage="quarkpumpe"] [data-teil="pumpendeckel"]').object3D.position.z);
+  await t('overlay-aktion').click();
+  await page.waitForTimeout(1700);
+  ok(Math.abs(await kpZ() - 0.25) < 0.01 && (await t('overlay-aktion').textContent()) === 'Pumpendeckel schliessen', 'Frontdeckel geht nicht auf');
+  await t('overlay-aktion').click();
+  await page.waitForTimeout(1700);
+  ok(Math.abs(await kpZ()) < 0.01, 'Frontdeckel geht nicht zu');
+  await t('overlay-schnitt').click();
+  ok(await t('schnittbild-kp').evaluate(d => d.open), 'Schnittbild Kreiskolbenpumpe öffnet nicht');
+  const kw1 = (await page.evaluate(() => window.kreiskolbenSchnitt.stand())).winkel;
+  await page.locator('[data-testid="schnittbild-kp"] [data-sb-teil="saugstutzen"] text').click();
+  ok((await t('schnittbild-kp-titel').textContent()) === 'Saugstutzen', 'Klick im Schnittbild Pumpe zeigt den Saugstutzen nicht');
+  ok((await page.evaluate(() => window.kreiskolbenSchnitt.stand())).winkel !== kw1, 'Drehkolben im Schnittbild drehen sich nicht');
+  await t('schnittbild-kp-schliessen').click();
+  ok(!(await t('schnittbild-kp').evaluate(d => d.open)), 'X schliesst Schnittbild Pumpe nicht');
+  await page.evaluate(() => window.kaeserei.select('vorlaufgefaess'));
+  ok((await t('overlay-titel').textContent()) === 'Vorlaufgefäss', 'Overlay Vorlaufgefäss öffnet nicht');
   await page.evaluate(() => window.kaeserei.schliessen());
 
   // Mehrzweckerhitzer (glTF aus Blender, Sauermilch, Mitte 76/14): Klick in den Kessel auf den Propeller, Rührer wechseln, Betrieb, Schnittbild

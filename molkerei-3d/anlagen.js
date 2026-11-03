@@ -49,7 +49,8 @@ const MEDIEN = {
   molke: { name: 'Molke', farbe: '#4f9d5a', produkt: true },
   cip: { name: 'CIP-Reinigung', farbe: '#e8892b', produkt: true }, // Farbe vorläufig (Baukasten: «CIP später»), Vorlauf geht über den Bahnhof wie ein Produkt
   heisswasser: { name: 'Heisswasser', farbe: '#cc3333' },
-  kuehlwasser: { name: 'Kühlwasser', farbe: '#3b7dd8' }
+  kuehlwasser: { name: 'Kühlwasser', farbe: '#3b7dd8' },
+  quark: { name: 'Quark', farbe: '#f4efe1', produkt: true }
 };
 const LEITUNG_HOEHE = 3;      // m, unterste Leitung
 const LEITUNG_ABSTAND = 0.08; // m, Höhenversatz pro Leitung, damit sich keine überlagern
@@ -231,7 +232,7 @@ const ANLAGEN = [
     // Düsenseparator, Masse nach Westfalia KDA 30 (Prospekt 1978), Eigenbau: material/molkerei-3d/quarkseparator_bau.py (bzwu).
     // Texte: Lehrmittel b.5 «Separieren». Eigene Sätze (KDA-Prospekt): Manometer, Regulierventil, Schauglas, Anlagentext.
     // Steiglöcher bei 3/4 der Tellerbreite: Quark 25 % ist die schwere Phase und bekommt das äussere Viertel.
-    id: 'quarkseparator', name: 'Quarkseparator', raum: 'frischkaeserei', x: 14, z: 6, b: 1.62, t: 1.12, bau: 'quarkseparator',
+    id: 'quarkseparator', name: 'Quarkseparator', raum: 'frischkaeserei', x: 14, z: 6, b: 1.62, t: 1.12, bau: 'quarkseparator', schnittbild: 'quark',
     oeffnen: { auf: 'Haube öffnen', zu: 'Haube schliessen' },
     teile: [
       { id: 'zulauf', name: 'Zulauf', text: 'Die Quarkgallerte wird von oben dem Separator zugeführt, im Zentrum nach unten geleitet und steigt von unten durch die Löcher im Tellerpaket nach oben. Über einen Filter vor dem Separator halten Sie grössere Partikel zurück und verhindern so, dass die Düsen verstopfen.' },
@@ -245,6 +246,33 @@ const ANLAGEN = [
       { id: 'quarkablauf', name: 'Quarkablauf', text: 'Der Quark verlässt den Separator und gelangt in ein Vorlaufgefäss. Von dort wird er mit einer Pumpe in den Kühler gefördert.' }
     ],
     text: 'Der Quarkseparator trennt die geronnene Quarkmilch in Quark und Molke. Im Separator dauert das nur wenige Sekunden.'
+  },
+  {
+    // Eigene Masse (Ø 0.6 m, Oberkante 1.00 m), Eigenbau: material/molkerei-3d/vorlaufgefaess_bau.py (bzwu). Texte: b.5, a.1 (Klappenventil).
+    // Steht auf der Achse des Separators (z 6.03): das Quarkrohr des Separators fällt in den Einlauf, das Auslaufrohr endet am Saugstutzen der Pumpe.
+    id: 'vorlaufgefaess', name: 'Vorlaufgefäss', raum: 'frischkaeserei', x: 12.75, z: 6.03, b: 0.62, t: 0.62, bau: 'vorlaufgefaess',
+    teile: [
+      { id: 'behaelter', name: 'Vorlaufgefäss', text: 'Der Quark aus dem Separator gelangt in ein Vorlaufgefäss. Von dort wird er mit einer Pumpe in den Kühler gefördert.' },
+      { id: 'bodenventil', name: 'Bodenventil (Klappenventil)', text: 'Klappenventile sind nur als Absperrventil einsetzbar. Sie werden von Hand oder mit Luftdruck (pneumatisch) bedient. Die Dichtung müssen Sie nach betrieblichen Vorgaben kontrollieren und sofort auswechseln, wenn sie beschädigt ist.' }
+    ],
+    text: 'Im Vorlaufgefäss sammelt sich der Quark aus dem Separator. Von dort wird er mit einer Pumpe in den Kühler gefördert.'
+  },
+  {
+    // Kreiskolbenpumpe, Pumpenkopf nach Alfa Laval OptiLobe 43 (DN 80), Eigenbau: material/molkerei-3d/kreiskolbenpumpe_bau.py (bzwu).
+    // Texte: Lehrmittel a.1 «Dreh- oder Kreiskolbenpumpe» und «Regulierung der Fördermengen». Eigene Sätze: Pumpendeckel, Saugstutzen, Grundrahmen, Anlagentext.
+    // Saugstutzen +x zum Vorlaufgefäss, Druckstutzen -x mit Anschluss (Leitung folgt, wenn der Quarkkühler steht).
+    id: 'quarkpumpe', name: 'Kreiskolbenpumpe', raum: 'frischkaeserei', x: 12.19, z: 5.64, b: 0.31, t: 1.0, bau: 'kreiskolbenpumpe', schnittbild: 'kreiskolben',
+    oeffnen: { auf: 'Pumpendeckel öffnen', zu: 'Pumpendeckel schliessen' },
+    anschluesse: { quark: [-0.138, 0.274, 0.39, '-x'] },
+    teile: [
+      { id: 'pumpenkopf', name: 'Pumpenkopf mit Drehkolben', text: 'Die Kreisbewegung der Drehkolben bewirkt auf der Saugseite eine Volumenvergrösserung und damit einen Unterdruck, womit das zu fördernde Produkt in die Pumpe gelangt. Zur Druckseite hin verkleinert sich das Volumen zwischen Drehkolben und Gehäuse, es entsteht ein Überdruck.' },
+      { id: 'pumpendeckel', name: 'Frontdeckel', text: 'Nehmen Sie den Frontdeckel ab, sehen Sie die zwei Drehkolben im Pumpengehäuse.' },
+      { id: 'saugstutzen', name: 'Saugstutzen', text: 'Durch den Unterdruck auf der Saugseite gelangt der Quark aus dem Vorlaufgefäss in die Pumpe.' },
+      { id: 'druckstutzen', name: 'Druckstutzen', text: 'Das zu fördernde Produkt wird zwangsweise aus der Pumpe hinaus in die Druckleitung gepresst. Zwangsweise fördernde Pumpen dürfen Sie nicht drosseln.' },
+      { id: 'getriebemotor', name: 'Getriebemotor', text: 'Die Fördermenge lässt sich stufenlos regulieren, indem die Umdrehungszahl des Elektromotors verändert wird. Dazu braucht es in der Pumpensteuerung einen Frequenzumformer.' },
+      { id: 'grundrahmen', name: 'Grundrahmen', text: 'Pumpe und Getriebemotor sind auf dem Grundrahmen verschraubt. Mit den Stellfüssen richten Sie die Pumpe waagrecht aus.' }
+    ],
+    text: 'Die Kreiskolbenpumpe fördert hochviskose Produkte wie Quark schonend. Sie ermöglicht hohe Drücke und braucht keine Ventile.'
   },
   {
     // Texte: Lehrmittel b.5 «Gewerbliche Quarkproduktion in einer Wanne (Schulenburgverfahren)». Eigene Sätze: Hubzylinder, Anlagentext.

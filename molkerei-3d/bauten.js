@@ -569,6 +569,16 @@ const BAUTEN = {
     glbTeile(g, 'modelle/quarkseparator.glb', 'quarkseparator', hub);
   },
 
+  // Vorlaufgefäss mit Klappenventil (material/molkerei-3d/vorlaufgefaess_bau.py in bzwu)
+  vorlaufgefaess(g) {
+    glbTeile(g, 'modelle/vorlaufgefaess.glb', 'vorlaufgefaess');
+  },
+
+  // Kreiskolbenpumpe nach OptiLobe 43 (material/molkerei-3d/kreiskolbenpumpe_bau.py in bzwu). Frontdeckel öffnen: 0.25 m nach vorne.
+  kreiskolbenpumpe(g) {
+    glbTeile(g, 'modelle/kreiskolbenpumpe.glb', 'kreiskolbenpumpe', { pumpendeckel: '0 0 0.25' });
+  },
+
   // Abtropfgestell für das Sackverfahren: in Blender gebaut (material/molkerei-3d/abtropfgestell_bau.py in bzwu).
   sackverfahren(g) {
     glbTeile(g, 'modelle/abtropfgestell.glb', 'abtropfgestell');
