@@ -41,6 +41,7 @@ const TUEREN = [
 // Leitungen: rechtwinklig (erst entlang x, dann entlang z), jede auf eigener Höhe ab LEITUNG_HOEHE.
 // Farbcode wie beim 3D-Baukasten (Log 26.10.2026).
 // produkt: true = läuft immer über den Rohrbahnhof (BAHNHOF). Versorgung geht direkt.
+// r = Rohrradius in m (sonst ROHR_R), isoliert = matter Isoliermantel in der Medienfarbe statt Chromstahl.
 const MEDIEN = {
   milch: { name: 'Milch', farbe: '#ffffff', produkt: true },
   rahm: { name: 'Rahm', farbe: '#f2d54b', produkt: true },
@@ -48,12 +49,13 @@ const MEDIEN = {
   bruch: { name: 'Bruch', farbe: '#f2d54b', produkt: true },
   molke: { name: 'Molke', farbe: '#4f9d5a', produkt: true },
   cip: { name: 'CIP-Reinigung', farbe: '#e8892b', produkt: true }, // Farbe vorläufig (Baukasten: «CIP später»), Vorlauf geht über den Bahnhof wie ein Produkt
-  heisswasser: { name: 'Heisswasser', farbe: '#cc3333' },
-  kuehlwasser: { name: 'Kühlwasser', farbe: '#3b7dd8' },
+  heisswasser: { name: 'Heisswasser', farbe: '#cc3333', r: 0.045, isoliert: true },
+  kuehlwasser: { name: 'Kühlwasser', farbe: '#3b7dd8', r: 0.045, isoliert: true },
   quark: { name: 'Quark', farbe: '#f4efe1', produkt: true }
 };
 const LEITUNG_HOEHE = 3;      // m, unterste Leitung
-const LEITUNG_ABSTAND = 0.08; // m, Höhenversatz pro Leitung, damit sich keine überlagern
+const LEITUNG_ABSTAND = 0.015; // m, Luft zwischen zwei übereinanderliegenden Leitungen
+const ROHR_R = 0.0265;        // m, Produktleitung DN 50 (Ø 53 mm, DIN 11850). Isolierte Versorgung Ø 9 cm (MEDIEN.r).
 const BAHNHOF = 'rohrbahnhof';
 
 // Prozessschritte von Anlage zu Anlage. Der Umweg über den Bahnhof wird automatisch gezeichnet.
@@ -73,7 +75,9 @@ const LEITUNGEN = [
   // Versorgung
   { von: 'dampfkessel', nach: 'plattenwaermetauscher', medium: 'heisswasser' },
   { von: 'dampfkessel', nach: 'kaesefertiger', medium: 'heisswasser' },
+  { von: 'plattenwaermetauscher', nach: 'dampfkessel', medium: 'heisswasser', ab: 'heisswasser_ruecklauf' },
   { von: 'kaelteanlage', nach: 'plattenwaermetauscher', medium: 'kuehlwasser' },
+  { von: 'plattenwaermetauscher', nach: 'kaelteanlage', medium: 'kuehlwasser', ab: 'kuehlwasser_ruecklauf' },
   // Eiswasser zum Lagertank: von unten aus dem Untergeschoss in den Doppelmantel, Vor- und Rücklauf
   { von: 'kaelteanlage', nach: 'lagertank-1', medium: 'kuehlwasser', hoehe: -1 },
   { von: 'lagertank-1', nach: 'kaelteanlage', medium: 'kuehlwasser', ab: 'ruecklauf', hoehe: -1.1 },
@@ -206,21 +210,22 @@ const ANLAGEN = [
     // Texte aus Lehrmittel a.4 «Plattenapparat», «Plattenpasteur». Eigene Sätze: anschlussplatte_1/2, fuehrungsstange, Dichtungsfarben im Anlagentext.
     id: 'plattenwaermetauscher', name: 'Plattenwärmetauscher', raum: 'behandlung', x: 20, z: 6, b: 2.8, t: 0.8, bau: 'plattenwaermetauscher',
     oeffnen: { auf: 'Apparat öffnen', zu: 'Apparat schliessen', leitungenWeg: true },
-    anschluesse: { milch: [-1.189, 0.4, 0.065, '-x'], pasteurisiert: [-1.189, 1.259, 0.065, '-x'], heisswasser: [-0.838, 1.259, -0.3, '-z'], kuehlwasser: [-0.696, 1.259, -0.3, '-z'] },
+    anschluesse: { milch: [-0.862, 0.4, 0.3, '+z'], pasteurisiert: [-1.189, 1.259, 0.065, '-x'], kuehlwasser: [-1.189, 1.259, -0.065, '-x'], kuehlwasser_ruecklauf: [-1.189, 0.4, -0.065, '-x'],
+      heisswasser: [-0.696, 1.259, -0.3, '-z'], heisswasser_ruecklauf: [-0.696, 0.4, -0.3, '-z'] },
     teile: [
       { id: 'stativplatte', name: 'Stativplatte', text: 'Auf einem Rahmen befinden sich zwischen der Stativ- und der Druckplatte ein oder mehrere Plattenpakete.' },
       { id: 'druckplatte', name: 'Druckplatte', text: 'Messen Sie vor dem Öffnen den Abstand (Spannung) zwischen der Stativ- und der Druckplatte und notieren Sie das Mass.' },
-      { id: 'anschlussplatte_1', name: 'Anschlussplatte', text: 'Die Anschlussplatte trennt das Wärmerückgewinnungspaket vom Erhitzerpaket. Hier wird das Warmwasser für den Erhitzer angeschlossen.' },
-      { id: 'anschlussplatte_2', name: 'Anschlussplatte', text: 'Die Anschlussplatte trennt das Erhitzerpaket vom Kühlpaket. Hier wird das Eiswasser für die Kühlung angeschlossen.' },
+      { id: 'anschlussplatte_1', name: 'Anschlussplatte', text: 'Die Anschlussplatte trennt das Kühlpaket vom Wärmerückgewinnungspaket. Ihre vier Anschlüsse gehören zur Wärmerückgewinnung: vorne fliesst die kalte Rohmilch hinein und vorgewärmt zum Erhitzer hinaus, hinten kommt die heisse Milch vom Heisshalter zurück und fliesst vorgekühlt zum Kühlpaket.' },
+      { id: 'anschlussplatte_2', name: 'Anschlussplatte', text: 'Die Anschlussplatte trennt das Wärmerückgewinnungspaket vom Erhitzerpaket. Ihre vier Anschlüsse gehören zum Erhitzer: vorne fliesst die vorgewärmte Milch hinein und heiss zum Heisshalter hinaus, hinten fliesst das Warmwasser zu und wieder ab.' },
       { id: 'spannbolzen', name: 'Spannbolzen', text: 'Durch die Spannbolzen werden die einzelnen Platten mit ihren Dichtungen gegeneinander gepresst, sodass der Plattenapparat dicht ist. Ziehen Sie die Schrauben der Spannbolzen beim Zusammenbauen gleichmässig fest, bis das ursprünglich gemessene Mass erreicht ist.' },
-      { id: 'anschluesse', name: 'Anschlüsse', text: 'Über die Anschlüsse lassen sich die gewünschten Verbindungen herstellen.' },
+      { id: 'anschluesse', name: 'Anschlüsse', text: 'Über die Anschlüsse lassen sich die gewünschten Verbindungen herstellen. Jedes Paket hat vier Anschlüsse, je einen Zu- und Ablauf für die Milch und für das zweite Medium. Die Anschlüsse an der Stativplatte gehören zum Kühlpaket: Milch und Eiswasser.' },
       { id: 'tragstange', name: 'Tragstange', text: 'Auf der Tragstange können Sie die Platten verschieben, z.B. für Sichtkontrollen oder zum Auswechseln der Dichtungen.' },
       { id: 'fuehrungsstange', name: 'Führungsstange', text: 'Die Führungsstange hält die Platten unten in der Linie, wenn Sie sie auf der Tragstange verschieben.' },
       { id: 'paket_rueckgewinnung', name: 'Wärmerückgewinnungspaket', text: 'Hier wird die kalte Rohmilch von der schon pasteurisierten Milch vorgewärmt (Wärmerückgewinnung). Deshalb wird dieses Plattenpaket auch Milch/Milch-Wärmetauscher oder Wärmerückgewinnungspaket genannt.' },
       { id: 'paket_erhitzer', name: 'Erhitzerpaket', text: 'Mit Hilfe von Warmwasser wird die Milch auf die gewünschte Pasteurisationstemperatur erhitzt.' },
       { id: 'paket_kuehlung', name: 'Kühlpaket', text: 'Im Austauscherpaket gibt das Produkt Wärmeenergie ab, wodurch es vorgekühlt wird. Die Kühlung mit Eiswasser erfolgt anschliessend im Kühlpaket.' }
     ],
-    text: 'Im Plattenwärmetauscher wird eine Flüssigkeit im Durchlaufverfahren (kontinuierlich) erhitzt und/oder gekühlt. Je zwei gerippte Platten bilden einen wenige Millimeter breiten Fliessweg für das Produkt oder das Heiz- bzw. Kühlmedium. Die Dichtungen zeigen die drei Pakete: grün Wärmerückgewinnung, rot Erhitzer, blau Kühlung. Öffnen Sie den Apparat, dann sehen Sie die einzelnen Platten.'
+    text: 'Im Plattenwärmetauscher wird eine Flüssigkeit im Durchlaufverfahren (kontinuierlich) erhitzt und/oder gekühlt. Je zwei gerippte Platten bilden einen wenige Millimeter breiten Fliessweg für das Produkt oder das Heiz- bzw. Kühlmedium. Die Dichtungen zeigen die drei Pakete: blau Kühlung, grün Wärmerückgewinnung in der Mitte, rot Erhitzer. Öffnen Sie den Apparat, dann sehen Sie die einzelnen Platten.'
   },
   { id: 'heisshalter', name: 'Heisshalter', raum: 'behandlung', x: 20, z: 10, b: 2, t: 1 },
   { id: 'homogenisator', name: 'Homogenisator', raum: 'behandlung', x: 30, z: 6, b: 2.5, t: 1.5 },

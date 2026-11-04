@@ -462,7 +462,7 @@ async (page) => {
     const lc = document.getElementById('kamera').components['look-controls'];
     lc.yawObject.rotation.y = 0; lc.pitchObject.rotation.x = -0.1;
   });
-  await page.waitForFunction(() => document.querySelector('[data-anlage="plattenwaermetauscher"] [data-teil="paket_kuehlung"] [data-oeffnen]'), null, { timeout: 15000 }).catch(() => ok(false, 'Plattenwärmetauscher ohne Teile'));
+  await page.waitForFunction(() => document.querySelector('[data-anlage="plattenwaermetauscher"] [data-teil="paket_erhitzer"] [data-oeffnen]'), null, { timeout: 15000 }).catch(() => ok(false, 'Plattenwärmetauscher ohne Teile'));
   // warten, bis die Kamera wirklich dort steht (auf der VM ohne GPU reichen 300 ms nicht)
   await page.waitForFunction(() => { const k = new THREE.Vector3(); document.querySelector('a-scene').camera.getWorldPosition(k); return Math.abs(k.x - 40) < 0.05 && Math.abs(k.z - 29) < 0.05; }, null, { timeout: 10000 });
   const pw = await page.evaluate(() => {
@@ -476,7 +476,7 @@ async (page) => {
   await page.mouse.down(); await page.mouse.up();
   ok((await t('overlay-titel').textContent()) === 'Plattenwärmetauscher' && (await t('overlay-teil').textContent()) === 'Druckplatte', `Klick auf die Druckplatte zeigt: ${await t('overlay-teil').textContent()}`);
   const pwX = sel => page.evaluate(s => document.querySelector(`[data-anlage="plattenwaermetauscher"] ${s}`).object3D.position.x, sel);
-  const letztePlatte = '[data-teil="paket_kuehlung"] [data-oeffnen="0.429 0 0"]'; // Platte 11
+  const letztePlatte = '[data-teil="paket_erhitzer"] [data-oeffnen="0.429 0 0"]'; // Platte 11
   const pwLeitung = () => page.evaluate(() => [...document.querySelectorAll('[data-leitung^="plattenwaermetauscher>"], [data-leitung*=">plattenwaermetauscher:"]')].map(l => l.getAttribute('visible')));
   ok((await pwLeitung()).length > 0, 'Plattenwärmetauscher: keine Leitungen angeschlossen');
   await t('overlay-aktion').click();

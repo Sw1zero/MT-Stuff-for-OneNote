@@ -84,10 +84,9 @@ AFRAME.registerComponent('flaeche', {
 // Rohr zwischen zwei Punkten
 // Leitung durch die Punkte "x y z, x y z, ...": gerade Stücke, an jeder Ecke ein Rohrbogen (Radius ROHR_BOGEN,
 // bei kurzen Stücken kleiner). Punkte, die doppelt sind oder auf einer Geraden liegen, fallen weg.
-// ROHR_R: Leitungen Ø 8 cm, dünner als die Stutzen der Anlagen (Ø 9 cm), damit sie sichtbar im Stutzen stecken.
-const ROHR_R = 0.04, ROHR_BOGEN = 0.15;
+// Radius r je Medium (ROHR_R in anlagen.js): Produkt Ø 5.3 cm blank, Versorgung Ø 9 cm isoliert.
+const ROHR_BOGEN = 0.15;
 // Hülse, wo eine senkrechte Leitung durch den Boden des Erdgeschosses (= Decke des Untergeschosses) geht.
-const HUELSE = new THREE.CylinderGeometry(ROHR_R + 0.025, ROHR_R + 0.025, 0.1, 24);
 const HUELSE_MAT = new THREE.MeshStandardMaterial({ color: '#8a9299', roughness: 0.5, metalness: 0.6 });
 function rohrPunkte(text) {
   const p = [];
@@ -102,11 +101,12 @@ function rohrPunkte(text) {
   return p;
 }
 AFRAME.registerComponent('rohr', {
-  schema: { punkte: { default: '' }, farbe: { default: '#ffffff' } },
+  schema: { punkte: { default: '' }, farbe: { default: '#ffffff' }, r: { default: ROHR_R }, isoliert: { default: false } },
   init() {
     const p = rohrPunkte(this.data.punkte), g = new THREE.Group();
-    const mat = new THREE.MeshStandardMaterial({ color: this.data.farbe, roughness: 0.4, metalness: 0.2 });
-    const stueck = kurve => g.add(new THREE.Mesh(new THREE.TubeGeometry(kurve, kurve.isLineCurve3 ? 1 : 10, ROHR_R, 12, false), mat));
+    const { r: R, isoliert } = this.data;
+    const mat = new THREE.MeshStandardMaterial({ color: this.data.farbe, roughness: isoliert ? 0.85 : 0.4, metalness: isoliert ? 0 : 0.2 });
+    const stueck = kurve => g.add(new THREE.Mesh(new THREE.TubeGeometry(kurve, kurve.isLineCurve3 ? 1 : 10, R, 12, false), mat));
     const zu = (i, j, r) => p[i].clone().add(p[j].clone().sub(p[i]).normalize().multiplyScalar(r));
     let start = p[0];
     for (let i = 1; i < p.length; i++) {
@@ -120,7 +120,7 @@ AFRAME.registerComponent('rohr', {
     for (let i = 1; i < p.length; i++) {
       const u = p[i - 1], v = p[i];
       if (Math.abs(u.x - v.x) < 1e-6 && Math.abs(u.z - v.z) < 1e-6 && Math.min(u.y, v.y) < 0 && Math.max(u.y, v.y) > 0) {
-        const h = new THREE.Mesh(HUELSE, HUELSE_MAT); h.position.set(u.x, 0.02, u.z); h.name = 'huelse'; g.add(h);
+        const h = new THREE.Mesh(new THREE.CylinderGeometry(R + 0.025, R + 0.025, 0.1, 24), HUELSE_MAT); h.position.set(u.x, 0.02, u.z); h.name = 'huelse'; g.add(h);
       }
     }
     this.el.setObject3D('mesh', g);
@@ -243,7 +243,7 @@ function baueSzene(szene) {
   // Aus dem Untergeschoss steigen sie durch die Decke bis auf LEITUNG_HOEHE im Erdgeschoss.
   for (const r of anschluesse()) {
     const punkte = rohrWeg(r).map(v => `${v.x} ${v.y} ${v.z}`).join(', ');
-    el('a-entity', { 'data-leitung': `${r.von}>${r.nach}:${r.medium}`, rohr: `punkte: ${punkte}; farbe: ${MEDIEN[r.medium].farbe}` }, szene);
+    el('a-entity', { 'data-leitung': `${r.von}>${r.nach}:${r.medium}`, rohr: `punkte: ${punkte}; farbe: ${MEDIEN[r.medium].farbe}; r: ${MEDIEN[r.medium].r || ROHR_R}; isoliert: ${!!MEDIEN[r.medium].isoliert}` }, szene);
   }
 
   // Raumschild über jedem Durchgang, auf beiden Seiten mit dem Namen des Raums dahinter.

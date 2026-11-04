@@ -113,9 +113,14 @@ function anschluesse() {
     const v = ((k[id] = (k[id] || 0) + 1) - 1 - (zahl[id] - 1) / 2) * 0.15;
     return an.t > an.b ? { ...p, z: p.z + v } : { ...p, x: p.x + v };
   };
-  // shortcut: jede Leitung auf eigener Höhe (LEITUNG_ABSTAND), damit parallele Stücke sich nicht decken. Ab ~25 Leitungen stossen die obersten an 5-m-Decken: dann Rohrtrassen bündeln.
-  return ROHRE.map((r, i) => ({ ...r, a: punkt(r.von, r.ab || r.medium), b: punkt(r.nach, r.an || r.medium),
-    h: r.hoehe !== undefined ? r.hoehe : LEITUNG_HOEHE + i * LEITUNG_ABSTAND }));
+  // shortcut: jede Leitung auf eigener Höhe, Rohr auf Rohr mit LEITUNG_ABSTAND Luft, damit parallele Stücke sich nicht decken.
+  // Die oberste liegt bei ~4.7 m, unter den 5-m-Decken. Bei weiteren Leitungen: Rohrtrassen bündeln.
+  let h = LEITUNG_HOEHE, rVor = 0;
+  return ROHRE.map(r => {
+    const rr = MEDIEN[r.medium].r || ROHR_R;
+    if (r.hoehe === undefined) { h += rVor && rVor + rr + LEITUNG_ABSTAND; rVor = rr; }
+    return { ...r, a: punkt(r.von, r.ab || r.medium), b: punkt(r.nach, r.an || r.medium), h: r.hoehe !== undefined ? r.hoehe : h };
+  });
 }
 
 // Weg einer Leitung, nur parallel zu den Wänden: hoch, entlang x, entlang z, runter.

@@ -572,8 +572,8 @@ const BAUTEN = {
   // Plattenwärmetauscher (material/molkerei-3d/plattenwaermetauscher_bau.py in bzwu). Öffnen: Pakete und Druckplatte
   // fahren auf der Tragstange zurück (Hub aus dem Bauskript), jede Platte i zusätzlich i * 0.039 m (SPREIZ), damit die Rillen sichtbar werden.
   plattenwaermetauscher(g) {
-    const hub = { paket_rueckgewinnung: '0.03 0 0', anschlussplatte_1: '0.606 0 0', paket_erhitzer: '0.636 0 0',
-      anschlussplatte_2: '1.095 0 0', paket_kuehlung: '1.125 0 0', druckplatte: '1.584 0 0' };
+    const hub = { paket_kuehlung: '0.03 0 0', anschlussplatte_1: '0.489 0 0', paket_rueckgewinnung: '0.519 0 0',
+      anschlussplatte_2: '1.095 0 0', paket_erhitzer: '1.125 0 0', druckplatte: '1.584 0 0' };
     glbTeile(g, 'modelle/plattenwaermetauscher.glb', 'plattenwaermetauscher', hub);
     g.addEventListener('model-loaded', () => { // nach glbTeile (Listener am Modell), die Paket-Entities stehen schon
       for (const p of g.querySelectorAll('[data-teil^="paket_"]'))
