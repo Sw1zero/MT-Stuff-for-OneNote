@@ -18,6 +18,14 @@
     .tool-card.sn-stufe .card-title { font-size: 1.08rem; }
     .sn-ansicht .card-top .badge:not(.badge-type) { display: none; }   /* Modul steht schon im Pfad */
     .sn-pfeil { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); font-size: 1.8rem; color: var(--blue-light); }
+
+    .neu-banner { max-width: 1100px; margin: 16px auto 0; padding: 12px 16px; background: var(--blue-tint); border-left: 4px solid var(--blue-dark); border-radius: var(--radius-md); display: flex; gap: 12px; align-items: flex-start; }
+    .neu-banner[hidden] { display: none; }
+    .neu-banner-text { flex: 1; color: var(--text); font-size: 0.95rem; }
+    .neu-banner-text b { color: var(--blue-dark); }
+    .neu-banner ul { margin: 4px 0 0 1.1rem; padding: 0; }
+    .neu-banner button { min-height: 44px; padding: 0 14px; border: 1px solid var(--blue-dark); border-radius: var(--radius-sm); background: var(--surface); color: var(--blue-dark); font: inherit; cursor: pointer; }
+    @media (max-width: 600px) { .neu-banner { margin: 12px 16px 0; flex-direction: column; } }
   </style>
 </head>
 <body>
@@ -32,6 +40,11 @@
     <img src="assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
   </div>
 </header>
+
+<div class="neu-banner" id="neuBanner" role="status" hidden>
+  <div class="neu-banner-text"><b>Neu in den Lerntools</b><ul id="neuListe"></ul></div>
+  <button type="button" id="neuZu">Gelesen</button>
+</div>
 
 <main class="page-main">
 
@@ -1375,6 +1388,25 @@
 </footer>
 
 <script src="assets/startseite.js?v=69f93a4f"></script>
+<script>
+// Neuigkeiten-Banner: neuer Eintrag oben = Banner erscheint wieder, bis «Gelesen» (pro Browser gemerkt)
+var NEU = [
+  { datum: '2026-11-04', text: 'Challenges: Nach der Auswertung können Sie nur die Posten wiederholen, bei denen Sie nicht die volle Punktzahl erreicht haben.' }
+];
+(function(){
+  var gesehen = '';
+  try { gesehen = localStorage.getItem('mt-neu-gesehen') || ''; } catch (e) {}
+  var offen = NEU.filter(function(n){ return n.datum > gesehen; }).slice(0, 3);
+  if (!offen.length) return;
+  var liste = document.getElementById('neuListe');
+  offen.forEach(function(n){ var li = document.createElement('li'); li.textContent = n.text; liste.appendChild(li); });
+  var banner = document.getElementById('neuBanner'); banner.hidden = false;
+  document.getElementById('neuZu').addEventListener('click', function(){
+    banner.hidden = true;
+    try { localStorage.setItem('mt-neu-gesehen', NEU[0].datum); } catch (e) {}
+  });
+})();
+</script>
 
 </body>
 </html>
