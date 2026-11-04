@@ -243,7 +243,7 @@ function baueSzene(szene) {
   // Aus dem Untergeschoss steigen sie durch die Decke bis auf LEITUNG_HOEHE im Erdgeschoss.
   for (const r of anschluesse()) {
     const punkte = rohrWeg(r).map(v => `${v.x} ${v.y} ${v.z}`).join(', ');
-    el('a-entity', { 'data-leitung': `${r.von}>${r.nach}:${r.medium}`, rohr: `punkte: ${punkte}; farbe: ${MEDIEN[r.medium].farbe}; r: ${MEDIEN[r.medium].r || ROHR_R}; isoliert: ${!!MEDIEN[r.medium].isoliert}` }, szene);
+    el('a-entity', { 'data-leitung': `${r.von}>${r.nach}:${r.medium}`, rohr: `punkte: ${punkte}; farbe: ${r.farbe}; r: ${MEDIEN[r.medium].r || ROHR_R}; isoliert: ${!!MEDIEN[r.medium].isoliert}` }, szene);
   }
 
   // Raumschild über jedem Durchgang, auf beiden Seiten mit dem Namen des Raums dahinter.

@@ -42,6 +42,8 @@ const TUEREN = [
 // Farbcode wie beim 3D-Baukasten (Log 26.10.2026).
 // produkt: true = läuft immer über den Rohrbahnhof (BAHNHOF). Versorgung geht direkt.
 // r = Rohrradius in m (sonst ROHR_R), isoliert = matter Isoliermantel in der Medienfarbe statt Chromstahl.
+// Versorgung (isoliert): farbe = Vorlauf dunkel, ruecklauf = Rücklauf hell (Leitung mit ab '…ruecklauf').
+// Sie läuft immer im Untergeschoss und kommt direkt an der Anlage durch den Boden (geometrie.js anschluesse).
 const MEDIEN = {
   milch: { name: 'Milch', farbe: '#ffffff', produkt: true },
   rahm: { name: 'Rahm', farbe: '#f2d54b', produkt: true },
@@ -49,8 +51,8 @@ const MEDIEN = {
   bruch: { name: 'Bruch', farbe: '#f2d54b', produkt: true },
   molke: { name: 'Molke', farbe: '#4f9d5a', produkt: true },
   cip: { name: 'CIP-Reinigung', farbe: '#e8892b', produkt: true }, // Farbe vorläufig (Baukasten: «CIP später»), Vorlauf geht über den Bahnhof wie ein Produkt
-  heisswasser: { name: 'Heisswasser', farbe: '#cc3333', r: 0.045, isoliert: true },
-  kuehlwasser: { name: 'Kühlwasser', farbe: '#3b7dd8', r: 0.045, isoliert: true },
+  heisswasser: { name: 'Heisswasser', farbe: '#9e1f1f', ruecklauf: '#e58a8a', r: 0.045, isoliert: true },
+  kuehlwasser: { name: 'Kühlwasser', farbe: '#1d4f9e', ruecklauf: '#8dbbf0', r: 0.045, isoliert: true },
   quark: { name: 'Quark', farbe: '#f4efe1', produkt: true }
 };
 const LEITUNG_HOEHE = 3;      // m, unterste Leitung
@@ -84,10 +86,10 @@ const LEITUNGEN = [
   { von: 'kaelteanlage', nach: 'plattenwaermetauscher', medium: 'kuehlwasser' },
   { von: 'plattenwaermetauscher', nach: 'kaelteanlage', medium: 'kuehlwasser', ab: 'kuehlwasser_ruecklauf' },
   // Eiswasser zum Lagertank: von unten aus dem Untergeschoss in den Doppelmantel, Vor- und Rücklauf
-  { von: 'kaelteanlage', nach: 'lagertank-1', medium: 'kuehlwasser', hoehe: -1 },
-  { von: 'lagertank-1', nach: 'kaelteanlage', medium: 'kuehlwasser', ab: 'ruecklauf', hoehe: -1.1 },
-  { von: 'kaelteanlage', nach: 'lagertank-2', medium: 'kuehlwasser', hoehe: -1.2 },
-  { von: 'lagertank-2', nach: 'kaelteanlage', medium: 'kuehlwasser', ab: 'ruecklauf', hoehe: -1.3 },
+  { von: 'kaelteanlage', nach: 'lagertank-1', medium: 'kuehlwasser' },
+  { von: 'lagertank-1', nach: 'kaelteanlage', medium: 'kuehlwasser', ab: 'ruecklauf' },
+  { von: 'kaelteanlage', nach: 'lagertank-2', medium: 'kuehlwasser' },
+  { von: 'lagertank-2', nach: 'kaelteanlage', medium: 'kuehlwasser', ab: 'ruecklauf' },
   // Reinigung
   { von: 'cip', nach: 'lagertank-1', medium: 'cip' }
 ];
@@ -216,12 +218,12 @@ const ANLAGEN = [
   {
     // Plattenpasteur mit drei Paketen, Masse nach Alfa Laval Front 6 (Datenblatt), Eigenbau: material/molkerei-3d/plattenwaermetauscher_bau.py (bzwu).
     // Texte aus Lehrmittel a.4 «Plattenapparat», «Plattenpasteur». Eigene Sätze: anschlussplatte_1/2, fuehrungsstange, Dichtungsfarben im Anlagentext.
-    id: 'plattenwaermetauscher', name: 'Plattenwärmetauscher', raum: 'behandlung', x: 20, z: 6, b: 2.8, t: 0.8, bau: 'plattenwaermetauscher', schnittbild: 'pwt', // Gegenstromprinzip: schnittbild-pwt.js
-    oeffnen: { auf: 'Apparat öffnen', zu: 'Apparat schliessen', leitungenWeg: true },
+    id: 'plattenwaermetauscher', name: 'Plattenwärmetauscher', raum: 'behandlung', x: 19.355, z: 6, b: 1.3, t: 0.8, bau: 'plattenwaermetauscher', schnittbild: 'pwt', // Gegenstromprinzip: schnittbild-pwt.js
     // Kühlpaket: Milch hinten (-z), Eiswasser vorne. Rohrschlaufen zwischen den Paketen sind im Modell (Gruppe rohrschlaufen).
-    anschluesse: { milch: [-0.774, 0.4, 0.3, '+z'], pasteurisiert: [-1.101, 1.259, -0.065, '-x'], kuehlwasser: [-1.101, 1.259, 0.065, '-x'], kuehlwasser_ruecklauf: [-1.101, 0.4, 0.065, '-x'],
-      erhitzt: [-0.608, 1.259, 0.3, '+z'], heisshalter: [-0.774, 1.259, -0.3, '-z'],
-      heisswasser: [-0.608, 1.259, -0.3, '-z'], heisswasser_ruecklauf: [-0.608, 0.4, -0.3, '-z'] },
+    // Vorlauf oben über dem Rücklauf: 5. Wert = längere Gerade, damit beide senkrecht nach unten nebeneinander laufen.
+    anschluesse: { milch: [-0.129, 0.4, 0.3, '+z'], pasteurisiert: [-0.456, 1.259, -0.065, '-x'], kuehlwasser: [-0.456, 1.259, 0.065, '-x', 0.45], kuehlwasser_ruecklauf: [-0.456, 0.4, 0.065, '-x'],
+      erhitzt: [0.157, 1.259, 0.3, '+z'], heisshalter: [-0.129, 1.259, -0.3, '-z'],
+      heisswasser: [0.157, 1.259, -0.3, '-z', 0.45], heisswasser_ruecklauf: [0.157, 0.4, -0.3, '-z'] },
     teile: [
       { id: 'stativplatte', name: 'Stativplatte', text: 'Auf einem Rahmen befinden sich zwischen der Stativ- und der Druckplatte ein oder mehrere Plattenpakete.' },
       { id: 'druckplatte', name: 'Druckplatte', text: 'Messen Sie vor dem Öffnen den Abstand (Spannung) zwischen der Stativ- und der Druckplatte und notieren Sie das Mass.' },
@@ -236,7 +238,7 @@ const ANLAGEN = [
       { id: 'paket_kuehlung', name: 'Kühlpaket', text: 'Im Austauscherpaket gibt das Produkt Wärmeenergie ab, wodurch es vorgekühlt wird. Die Kühlung mit Eiswasser erfolgt anschliessend im Kühlpaket.' },
       { id: 'temperatursensor', name: 'Temperatursensor nach Erhitzer', text: 'Der Temperatursensor, der unmittelbar nach dem Erhitzer eingebaut ist, misst die aktuelle Temperatur und meldet diese dem Regler. Dieser vergleicht den Ist-Wert mit dem Soll-Wert (gewünschte Pasteurisationstemperatur). Ist der Ist-Wert tiefer als der Sollwert, lässt das Dampfregulierventil mehr Dampf durchströmen, dadurch wird das Warmwasser und als Folge davon das Produkt höher erhitzt.' }
     ],
-    text: 'Im Plattenwärmetauscher wird eine Flüssigkeit im Durchlaufverfahren (kontinuierlich) erhitzt und/oder gekühlt. Je zwei gerippte Platten bilden einen wenige Millimeter breiten Fliessweg für das Produkt oder das Heiz- bzw. Kühlmedium. Die Dichtungen zeigen die drei Pakete: blau Kühlung, grün Wärmerückgewinnung in der Mitte, rot Erhitzer. Öffnen Sie den Apparat, dann sehen Sie die einzelnen Platten.'
+    text: 'Im Plattenwärmetauscher wird eine Flüssigkeit im Durchlaufverfahren (kontinuierlich) erhitzt und/oder gekühlt. Je zwei gerippte Platten bilden einen wenige Millimeter breiten Fliessweg für das Produkt oder das Heiz- bzw. Kühlmedium. Die Dichtungen zeigen die drei Pakete: blau Kühlung, grün Wärmerückgewinnung in der Mitte, rot Erhitzer.'
   },
   {
     // Vorlaufgefäss des Plattenpasteurs (a.4 Nr. 1 und 2), Variante 'pasteur' von material/molkerei-3d/vorlaufgefaess_bau.py (bzwu).
@@ -261,7 +263,7 @@ const ANLAGEN = [
   {
     // Rohrheisshalter nach Alfa-Laval-Prozesstafel Pasteurisation, Eigenbau: material/molkerei-3d/heisshalter_bau.py (bzwu).
     // 5000 l/h, 15 s, DN 50: 7 Läufe à 1.6 m. Texte: a.4 (Nr. 8, 9, 10). Eigene Sätze: rohrschlange (zweiter Satz), Anlagentext (letzter Satz), umschaltventil (Feder, Philipp 04.11.). Sitzventil: a.1, Funktionskontrolle: a.4.
-    id: 'heisshalter', name: 'Heisshalter', raum: 'behandlung', x: 20.715, z: 2.5, b: 2.2, t: 0.5, bau: 'heisshalter',
+    id: 'heisshalter', name: 'Heisshalter', raum: 'behandlung', x: 21.44, z: 6, b: 2.2, t: 0.5, bau: 'heisshalter',
     anschluesse: { milch: [-1.015, 0.3, 0.222, '+z'], heisshalter: [0.885, 1.33, 0.172, '+z'], rueckfuehrung: [1.085, 1.05, 0, '+x'] },
     teile: [
       { id: 'rohrschlange', name: 'Heisshalter', text: 'Der Heisshalter gewährleistet, dass die Milch die notwendige Zeit auf Pasteurisationstemperatur heiss gehalten wird. Die Milch fliesst unten hinein und steigt durch die Rohrschlange nach oben.' },
