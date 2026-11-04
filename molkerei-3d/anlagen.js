@@ -158,7 +158,7 @@ const ANLAGEN = [
     // Texte: Lehrmittel a.1 «Pumpen» (Legende 1-6), «Zentrifugalpumpe» und Pflege der Pumpen.
     // Modell nach Alfa Laval LKH-35: material/molkerei-3d/zentrifugalpumpe.blend (bzwu), Teil-ids = Gruppennamen dort.
     id: 'milchpumpe', name: 'Zentrifugalpumpe', raum: 'annahme', x: 15.6, z: 5, b: 0.95, t: 0.5, bau: 'pumpe',
-    anschluesse: { saug: [-0.455, 0.274, 0, '-x'], druck: [-0.374, 0.524, 0.119] },
+    anschluesse: { saug: [-0.455, 0.274, 0, '-x'], druck: [-0.3535, 0.524, 0.1225] },
     oeffnen: { auf: 'Explosionsansicht', zu: 'Zusammenbauen', leitungenWeg: true },
     teile: PUMPE_TEILE,
     text: 'Die Zentrifugalpumpe fördert die Milch aus dem Lagertank 1 zum Rohrbahnhof. ' +
@@ -256,7 +256,7 @@ const ANLAGEN = [
   {
     // Zweite Zentrifugalpumpe (a.4 Nr. 3), gleiches Modell wie die Milchpumpe.
     id: 'pasteurpumpe', name: 'Zentrifugalpumpe', raum: 'behandlung', x: 19.85, z: 7.6, b: 0.95, t: 0.5, bau: 'pumpe',
-    anschluesse: { saug: [-0.455, 0.274, 0, '-x'], druck: [-0.374, 0.524, 0.119] },
+    anschluesse: { saug: [-0.455, 0.274, 0, '-x'], druck: [-0.3535, 0.524, 0.1225] },
     oeffnen: { auf: 'Explosionsansicht', zu: 'Zusammenbauen', leitungenWeg: true },
     teile: PUMPE_TEILE.map(t => t.id === 'druckstutzen' ? { ...t, text: t.text.replace('Richtung Rohrbahnhof', 'zum Plattenwärmetauscher') } : t),
     text: 'Die Pumpe fördert die Milch aus dem Vorlaufgefäss in das erste Plattenwärmetauscherpaket, das Wärmerückgewinnungspaket.'
