@@ -39,18 +39,35 @@ function umgebung(renderer) {
   return umgebungsKarte;
 }
 
+// glTF-Teile (und gleiche Anlagen) teilen sich Materialien: eigene Kopie, sonst leuchtet beim Hervorheben alles mit
+function glbVorbereiten(obj, env) {
+  obj.traverse(o => {
+    if (o.material) { o.material = o.material.clone(); o.material.envMap = env; o.material.envMapIntensity = 0.55; o.material.needsUpdate = true; }
+    if (o.isMesh) o.castShadow = o.receiveShadow = true; // Schatten nur bei den Blender-Anlagen
+  });
+}
+
+// Platzhalter modell_<datei>[__zusatz] (Empty in Blender) bekommt modelle/<datei>.glb als Kind: jede Anlage gibt es
+// nur einmal als Modell (z.B. die Zentrifugalpumpe in Schulenburg-Wanne und Membrananlage), Änderungen ziehen überall mit.
+const glbLager = {};
+function glbEinsetzen(obj, env) {
+  const platz = [];
+  obj.traverse(o => { const t = /^modell_(.+?)(?:__|\.|$)/.exec(o.name); if (t) platz.push([o, t[1]]); });
+  for (const [o, datei] of platz) {
+    glbLager[datei] = glbLager[datei] || new Promise((ok, fehler) => new THREE.GLTFLoader().load(`modelle/${datei}.glb`, ok, undefined, fehler));
+    glbLager[datei].then(gltf => { const k = gltf.scene.clone(true); glbVorbereiten(k, env); o.add(k); });
+  }
+}
+
 // In Blender gebaute Anlage (glTF). Gruppen unter dem Knoten wurzel mit einer Teil-id aus anlagen.js werden
 // nach dem Laden eigene Entities mit data-teil (Klick, Hervorheben). hub: Teil-id > "x y z" für data-oeffnen.
 function glbTeile(g, datei, wurzel, hub = {}) {
   const m = el('a-entity', { 'gltf-model': datei }, g);
   const ids = anlageVon(g.dataset.anlage).teile.map(t => t.id);
   m.addEventListener('model-loaded', () => {
-    // glTF-Teile (und gleiche Anlagen) teilen sich Materialien: eigene Kopie, sonst leuchtet beim Hervorheben alles mit
     const env = umgebung(g.sceneEl.renderer);
-    m.getObject3D('mesh').traverse(o => {
-      if (o.material) { o.material = o.material.clone(); o.material.envMap = env; o.material.envMapIntensity = 0.55; o.material.needsUpdate = true; }
-      if (o.isMesh) o.castShadow = o.receiveShadow = true; // Schatten nur bei den Blender-Anlagen
-    });
+    glbVorbereiten(m.getObject3D('mesh'), env);
+    glbEinsetzen(m.getObject3D('mesh'), env);
     for (const node of [...m.getObject3D('mesh').getObjectByName(wurzel).children]) {
       if (!ids.includes(node.name)) continue;
       const attrs = { 'data-teil': node.name, class: 'klickbar' };
