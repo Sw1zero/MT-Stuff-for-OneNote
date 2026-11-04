@@ -456,6 +456,38 @@ async (page) => {
   await t('schnittbild-mb-schliessen').click();
   await page.evaluate(() => window.kaeserei.schliessen());
 
+  // Plattenwärmetauscher (glTF aus Blender, Milchbehandlung, Mitte 40/26): Klick auf die Druckplatte, öffnen mit gespreizten Platten
+  await page.evaluate(() => {
+    document.getElementById('spieler').object3D.position.set(40, 0, 29);
+    const lc = document.getElementById('kamera').components['look-controls'];
+    lc.yawObject.rotation.y = 0; lc.pitchObject.rotation.x = -0.1;
+  });
+  await page.waitForFunction(() => document.querySelector('[data-anlage="plattenwaermetauscher"] [data-teil="paket_kuehlung"] [data-oeffnen]'), null, { timeout: 15000 }).catch(() => ok(false, 'Plattenwärmetauscher ohne Teile'));
+  // warten, bis die Kamera wirklich dort steht (auf der VM ohne GPU reichen 300 ms nicht)
+  await page.waitForFunction(() => { const k = new THREE.Vector3(); document.querySelector('a-scene').camera.getWorldPosition(k); return Math.abs(k.x - 40) < 0.05 && Math.abs(k.z - 29) < 0.05; }, null, { timeout: 10000 });
+  const pw = await page.evaluate(() => {
+    const kam = document.querySelector('a-scene').camera, p = new THREE.Vector3();
+    new THREE.Box3().setFromObject(document.querySelector('[data-anlage="plattenwaermetauscher"]').object3D.getObjectByName('druckplattenkoerper')).getCenter(p);
+    p.project(kam);
+    return [(p.x + 1) / 2, (1 - p.y) / 2];
+  });
+  await page.mouse.move(box.x + pw[0] * box.width, box.y + pw[1] * box.height);
+  await page.waitForTimeout(200);
+  await page.mouse.down(); await page.mouse.up();
+  ok((await t('overlay-titel').textContent()) === 'Plattenwärmetauscher' && (await t('overlay-teil').textContent()) === 'Druckplatte', `Klick auf die Druckplatte zeigt: ${await t('overlay-teil').textContent()}`);
+  const pwX = sel => page.evaluate(s => document.querySelector(`[data-anlage="plattenwaermetauscher"] ${s}`).object3D.position.x, sel);
+  const letztePlatte = '[data-teil="paket_kuehlung"] [data-oeffnen="0.429 0 0"]'; // Platte 11
+  const pwLeitung = () => page.evaluate(() => [...document.querySelectorAll('[data-leitung^="plattenwaermetauscher>"], [data-leitung*=">plattenwaermetauscher:"]')].map(l => l.getAttribute('visible')));
+  ok((await pwLeitung()).length > 0, 'Plattenwärmetauscher: keine Leitungen angeschlossen');
+  await t('overlay-aktion').click();
+  await page.waitForTimeout(1700);
+  ok(Math.abs(await pwX('[data-teil="druckplatte"]') - 1.584) < 0.01 && Math.abs(await pwX(letztePlatte) - 0.429) < 0.01, 'Plattenwärmetauscher: Druckplatte oder Platten fahren nicht auf');
+  ok((await pwLeitung()).every(v => v === false), 'Plattenwärmetauscher: Leitungen bleiben beim Öffnen');
+  await t('overlay-aktion').click();
+  await page.waitForTimeout(1700);
+  ok(Math.abs(await pwX('[data-teil="druckplatte"]')) < 0.01 && Math.abs(await pwX(letztePlatte)) < 0.01, 'Plattenwärmetauscher schliesst nicht');
+  await page.evaluate(() => window.kaeserei.schliessen());
+
   // Durch den Durchgang Milchbehandlung -> Käserei (Tür bei x=30, z=20)
   await page.evaluate(() => document.getElementById('spieler').object3D.position.set(30, 0, 22));
   // rennen, damit es auch bei wenigen fps auf der VM reicht

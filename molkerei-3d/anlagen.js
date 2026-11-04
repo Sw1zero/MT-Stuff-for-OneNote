@@ -64,10 +64,10 @@ const LEITUNGEN = [
   { von: 'annahmestation', nach: 'lagertank-1', medium: 'milch' },
   { von: 'lagertank-1', nach: 'milchpumpe', medium: 'milch', ab: 'auslauf', an: 'saug', direkt: true, hoehe: 0.75 },
   { von: 'milchpumpe', nach: 'plattenwaermetauscher', medium: 'milch', ab: 'druck' },
-  { von: 'plattenwaermetauscher', nach: 'separator', medium: 'milch' },
+  { von: 'plattenwaermetauscher', nach: 'separator', medium: 'milch', ab: 'pasteurisiert' },
   { von: 'separator', nach: 'rahmreifer', medium: 'rahm' },
   { von: 'separator', nach: 'kaesefertiger', medium: 'magermilch' },
-  { von: 'plattenwaermetauscher', nach: 'kaesefertiger', medium: 'milch' },
+  { von: 'plattenwaermetauscher', nach: 'kaesefertiger', medium: 'milch', ab: 'pasteurisiert' },
   { von: 'kaesefertiger', nach: 'vorpresswanne', medium: 'bruch' },
   { von: 'vorpresswanne', nach: 'molketank', medium: 'molke' },
   // Versorgung
@@ -201,7 +201,27 @@ const ANLAGEN = [
     id: 'rohrbahnhof', name: 'Rohrbahnhof', raum: 'behandlung', x: 0.5, z: 4, b: 0.4, t: 2.4, bau: 'bahnhof'
   },
   { id: 'baktofuge', name: 'Baktofuge', raum: 'behandlung', x: 8, z: 13, b: 1.5, t: 1.5 },
-  { id: 'plattenwaermetauscher', name: 'Plattenwärmetauscher', raum: 'behandlung', x: 20, z: 6, b: 3, t: 1 },
+  {
+    // Plattenpasteur mit drei Paketen, Masse nach Alfa Laval Front 6 (Datenblatt), Eigenbau: material/molkerei-3d/plattenwaermetauscher_bau.py (bzwu).
+    // Texte aus Lehrmittel a.4 «Plattenapparat», «Plattenpasteur». Eigene Sätze: anschlussplatte_1/2, fuehrungsstange, Dichtungsfarben im Anlagentext.
+    id: 'plattenwaermetauscher', name: 'Plattenwärmetauscher', raum: 'behandlung', x: 20, z: 6, b: 2.8, t: 0.8, bau: 'plattenwaermetauscher',
+    oeffnen: { auf: 'Apparat öffnen', zu: 'Apparat schliessen', leitungenWeg: true },
+    anschluesse: { milch: [-1.189, 0.4, 0.065, '-x'], pasteurisiert: [-1.189, 1.259, 0.065, '-x'], heisswasser: [-0.838, 1.259, -0.3, '-z'], kuehlwasser: [-0.696, 1.259, -0.3, '-z'] },
+    teile: [
+      { id: 'stativplatte', name: 'Stativplatte', text: 'Auf einem Rahmen befinden sich zwischen der Stativ- und der Druckplatte ein oder mehrere Plattenpakete.' },
+      { id: 'druckplatte', name: 'Druckplatte', text: 'Messen Sie vor dem Öffnen den Abstand (Spannung) zwischen der Stativ- und der Druckplatte und notieren Sie das Mass.' },
+      { id: 'anschlussplatte_1', name: 'Anschlussplatte', text: 'Die Anschlussplatte trennt das Wärmerückgewinnungspaket vom Erhitzerpaket. Hier wird das Warmwasser für den Erhitzer angeschlossen.' },
+      { id: 'anschlussplatte_2', name: 'Anschlussplatte', text: 'Die Anschlussplatte trennt das Erhitzerpaket vom Kühlpaket. Hier wird das Eiswasser für die Kühlung angeschlossen.' },
+      { id: 'spannbolzen', name: 'Spannbolzen', text: 'Durch die Spannbolzen werden die einzelnen Platten mit ihren Dichtungen gegeneinander gepresst, sodass der Plattenapparat dicht ist. Ziehen Sie die Schrauben der Spannbolzen beim Zusammenbauen gleichmässig fest, bis das ursprünglich gemessene Mass erreicht ist.' },
+      { id: 'anschluesse', name: 'Anschlüsse', text: 'Über die Anschlüsse lassen sich die gewünschten Verbindungen herstellen.' },
+      { id: 'tragstange', name: 'Tragstange', text: 'Auf der Tragstange können Sie die Platten verschieben, z.B. für Sichtkontrollen oder zum Auswechseln der Dichtungen.' },
+      { id: 'fuehrungsstange', name: 'Führungsstange', text: 'Die Führungsstange hält die Platten unten in der Linie, wenn Sie sie auf der Tragstange verschieben.' },
+      { id: 'paket_rueckgewinnung', name: 'Wärmerückgewinnungspaket', text: 'Hier wird die kalte Rohmilch von der schon pasteurisierten Milch vorgewärmt (Wärmerückgewinnung). Deshalb wird dieses Plattenpaket auch Milch/Milch-Wärmetauscher oder Wärmerückgewinnungspaket genannt.' },
+      { id: 'paket_erhitzer', name: 'Erhitzerpaket', text: 'Mit Hilfe von Warmwasser wird die Milch auf die gewünschte Pasteurisationstemperatur erhitzt.' },
+      { id: 'paket_kuehlung', name: 'Kühlpaket', text: 'Im Austauscherpaket gibt das Produkt Wärmeenergie ab, wodurch es vorgekühlt wird. Die Kühlung mit Eiswasser erfolgt anschliessend im Kühlpaket.' }
+    ],
+    text: 'Im Plattenwärmetauscher wird eine Flüssigkeit im Durchlaufverfahren (kontinuierlich) erhitzt und/oder gekühlt. Je zwei gerippte Platten bilden einen wenige Millimeter breiten Fliessweg für das Produkt oder das Heiz- bzw. Kühlmedium. Die Dichtungen zeigen die drei Pakete: grün Wärmerückgewinnung, rot Erhitzer, blau Kühlung. Öffnen Sie den Apparat, dann sehen Sie die einzelnen Platten.'
+  },
   { id: 'heisshalter', name: 'Heisshalter', raum: 'behandlung', x: 20, z: 10, b: 2, t: 1 },
   { id: 'homogenisator', name: 'Homogenisator', raum: 'behandlung', x: 30, z: 6, b: 2.5, t: 1.5 },
   { id: 'uht', name: 'UHT-Anlage', raum: 'behandlung', x: 44, z: 6, b: 6, t: 2.5 },
