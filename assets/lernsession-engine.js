@@ -25,7 +25,7 @@
        finish.backLink: false blendet den "Alle Lerntools"-Link aus (Default true)
      LSEngine.initState() – setzt N/current/solved/earned/maxPts
      LSEngine.buildAll() / .showCard(which) / .updateNav() / .renderProgress()
-     LSEngine.goNext() / .goPrev() / .jumpTo(i) / .restart()
+     LSEngine.goNext() / .goPrev() / .jumpTo(i) / .restart() / .retryWrong() (Challenge: nur Posten ohne volle Punktzahl)
      LSEngine.findIdx(id) / .shuffle(a) / .shuffleIdx(n)
      LSEngine.buildPdf/.buildVideo/.buildSlides/.buildTF/.buildGaps/.buildQuiz/
        .buildLabelType/.buildLabelChoose/.buildExplain/.buildDecide/.buildErrors/
@@ -892,8 +892,38 @@
   function goNext(){ if(current<N){ if(!solved[current]) return; current++; if(current<N){ showCard(current); updateNav(); } else { showFinish(); } } }
   function goPrev(){ if(current===0) return; if(current>=N) current=N-1; else current--; showCard(current); document.getElementById('nextBtn').style.visibility='visible'; document.getElementById('nextBtn').disabled=false; updateNav(); }
 
+  // Posten ohne volle Punktzahl (auch Erklären-Karten mit «Nochmal üben» und unvollständiger Selbstcheck)
+  function fehlerPosten(){
+    var f=[]; for(var i=0;i<N;i++){ if(maxPts[i]>0 && earned[i]<maxPts[i]) f.push(STATIONS[i]); } return f;
+  }
+  var alleStationen=null, wiederholung=false;
+
   function showFinish(){
     var cfg = finishCfg || {};
+    var fehler = MODE==='challenge' ? fehlerPosten() : [];
+    var fehlerBtn = fehler.length ? '<button class="btn btn-primary" onclick="LSEngine.retryWrong()" style="margin-bottom:10px;">Nur Fehler wiederholen ('+fehler.length+' offen)</button><br>' : '';
+    var backLinkHtml = (cfg.backLink===false) ? '' : '<a class="back-link" href="../index.html" style="display:block;margin-top:14px;">← Alle Lerntools</a>';
+    if(wiederholung){
+      // keine neue Note: nur was jetzt korrigiert ist und was nochmals gemacht werden muss
+      var liste='<ul class="score-breakdown">';
+      for(var wi=0;wi<N;wi++){
+        var ok = !(maxPts[wi]>0 && earned[wi]<maxPts[wi]);
+        liste+='<li><span>'+STATIONS[wi].title+'</span><span>'+(ok?'✓ korrigiert':'✗ nochmals')+'</span></li>';
+      }
+      liste+='</ul>';
+      document.getElementById('finishBody').innerHTML=
+        '<div class="station-kicker">Fehler wiederholt</div>'+
+        '<div class="big-score">'+(N-fehler.length)+' / '+N+'</div>'+
+        '<div class="score-sub">'+(fehler.length?'jetzt korrigiert, '+fehler.length+' nochmals üben':'Alles korrigiert')+'</div>'+
+        liste+fehlerBtn+
+        '<button class="btn '+(fehler.length?'btn-ghost':'btn-primary')+'" onclick="LSEngine.restart()">Ganze Prüfung neu starten</button>'+
+        backLinkHtml;
+      showCard('finish');
+      document.getElementById('nextBtn').style.visibility='hidden';
+      document.getElementById('prevBtn').style.visibility='visible';
+      renderProgress();
+      return;
+    }
     var total=0, max=0, expGood=0, expTotal=0;
     for(var i=0;i<N;i++){
       if(STATIONS[i].type==='explain'){ expGood+=earned[i]; expTotal+=maxPts[i]; }
@@ -920,7 +950,6 @@
     }
     var headerLabel = cfg.headerLabel ? cfg.headerLabel(MODE) : (MODE==='challenge'?'Prüfung beendet':'Geschafft');
     var closingHtml = cfg.closingHtml || '';
-    var backLinkHtml = (cfg.backLink===false) ? '' : '<a class="back-link" href="../index.html" style="display:block;margin-top:14px;">← Alle Lerntools</a>';
     document.getElementById('finishBody').innerHTML=
       '<div class="station-kicker">'+headerLabel+'</div>'+
       headline+
@@ -928,7 +957,8 @@
       explainNote+
       breakdown+
       closingHtml+
-      '<button class="btn btn-primary" onclick="LSEngine.restart()">Nochmals starten</button>'+
+      fehlerBtn+
+      '<button class="btn '+(fehler.length?'btn-ghost':'btn-primary')+'" onclick="LSEngine.restart()">Nochmals starten</button>'+
       backLinkHtml;
     showCard('finish');
     document.getElementById('nextBtn').style.visibility='hidden';
@@ -936,11 +966,21 @@
     renderProgress();
   }
 
-  function restart(){
-    current=0;
-    for(var i=0;i<N;i++){ solved[i]=false; earned[i]=0; }
+  function neuAufbauen(liste){
+    win.STATIONS=liste; initState();
     document.getElementById('nextBtn').style.visibility='visible';
     buildAll(); showCard(0); updateNav();
+  }
+  function restart(){
+    wiederholung=false;
+    neuAufbauen(alleStationen || STATIONS);
+  }
+  // Neuer Durchgang nur mit den Posten ohne volle Punktzahl, Aufgaben neu gemischt
+  function retryWrong(){
+    var fehler=fehlerPosten(); if(!fehler.length) return;
+    if(!alleStationen) alleStationen=STATIONS;
+    wiederholung=true;
+    neuAufbauen(fehler);
   }
 
   /* ---------- Testschnittstelle für pruefe_tools.js ----------
@@ -971,6 +1011,7 @@
     goNext: goNext,
     goPrev: goPrev,
     restart: restart,
+    retryWrong: retryWrong,
     buildPdf: buildPdf,
     buildVideo: buildVideo,
     buildSlides: buildSlides,
