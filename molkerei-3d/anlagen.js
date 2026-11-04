@@ -63,22 +63,25 @@ const BAHNHOF = 'rohrbahnhof';
 // Prozessschritte von Anlage zu Anlage. Der Umweg über den Bahnhof wird automatisch gezeichnet.
 // Optional: ab/an = Name des Anschlusses an der Anlage (sonst das Medium), direkt = nicht über den Bahnhof,
 // hoehe = Höhe der Leitung in m statt eigener Höhe ab LEITUNG_HOEHE (negativ = im Untergeschoss).
+// Zuführungen über den Bahnhof vorerst gekappt (Philipp, 04.11.2026): Anlagen stehen allein, nur Leitungen innerhalb
+// einer Anlagengruppe (direkt) und die Versorgung bleiben. Später wieder einsetzen:
+// { von: 'annahmestation', nach: 'lagertank-1', medium: 'milch' },
+// { von: 'milchpumpe', nach: 'vorlaufgefaess-pasteur', medium: 'milch', ab: 'druck' },
+// { von: 'plattenwaermetauscher', nach: 'separator', medium: 'milch', ab: 'pasteurisiert' },
+// { von: 'separator', nach: 'rahmreifer', medium: 'rahm' },
+// { von: 'separator', nach: 'kaesefertiger', medium: 'magermilch' },
+// { von: 'plattenwaermetauscher', nach: 'kaesefertiger', medium: 'milch', ab: 'pasteurisiert' },
+// { von: 'kaesefertiger', nach: 'vorpresswanne', medium: 'bruch' },
+// { von: 'vorpresswanne', nach: 'molketank', medium: 'molke' },
+// { von: 'cip', nach: 'lagertank-1', medium: 'cip' }
 const LEITUNGEN = [
   // Käserei-Linie (Philipp, 01.11.2026)
-  { von: 'annahmestation', nach: 'lagertank-1', medium: 'milch' },
   { von: 'lagertank-1', nach: 'milchpumpe', medium: 'milch', ab: 'auslauf', an: 'saug', direkt: true, hoehe: 0.75 },
-  { von: 'milchpumpe', nach: 'vorlaufgefaess-pasteur', medium: 'milch', ab: 'druck' },
   // Plattenpasteur (a.4): Vorlaufgefäss, Pumpe, PWT, Heisshalter. Rückführung vom Umschaltventil ins Vorlaufgefäss.
   { von: 'pasteurpumpe', nach: 'plattenwaermetauscher', medium: 'milch', ab: 'druck', direkt: true, hoehe: 1.15 },
   { von: 'plattenwaermetauscher', nach: 'heisshalter', medium: 'milch', ab: 'erhitzt', direkt: true, hoehe: 1.7 },
   { von: 'heisshalter', nach: 'plattenwaermetauscher', medium: 'milch', ab: 'heisshalter', an: 'heisshalter', direkt: true, hoehe: 1.85 },
   { von: 'heisshalter', nach: 'vorlaufgefaess-pasteur', medium: 'milch', ab: 'rueckfuehrung', an: 'rueckfuehrung', direkt: true, hoehe: 2 },
-  { von: 'plattenwaermetauscher', nach: 'separator', medium: 'milch', ab: 'pasteurisiert' },
-  { von: 'separator', nach: 'rahmreifer', medium: 'rahm' },
-  { von: 'separator', nach: 'kaesefertiger', medium: 'magermilch' },
-  { von: 'plattenwaermetauscher', nach: 'kaesefertiger', medium: 'milch', ab: 'pasteurisiert' },
-  { von: 'kaesefertiger', nach: 'vorpresswanne', medium: 'bruch' },
-  { von: 'vorpresswanne', nach: 'molketank', medium: 'molke' },
   // Versorgung
   { von: 'dampfkessel', nach: 'plattenwaermetauscher', medium: 'heisswasser' },
   { von: 'dampfkessel', nach: 'kaesefertiger', medium: 'heisswasser' },
@@ -89,9 +92,7 @@ const LEITUNGEN = [
   { von: 'kaelteanlage', nach: 'lagertank-1', medium: 'kuehlwasser' },
   { von: 'lagertank-1', nach: 'kaelteanlage', medium: 'kuehlwasser', ab: 'ruecklauf' },
   { von: 'kaelteanlage', nach: 'lagertank-2', medium: 'kuehlwasser' },
-  { von: 'lagertank-2', nach: 'kaelteanlage', medium: 'kuehlwasser', ab: 'ruecklauf' },
-  // Reinigung
-  { von: 'cip', nach: 'lagertank-1', medium: 'cip' }
+  { von: 'lagertank-2', nach: 'kaelteanlage', medium: 'kuehlwasser', ab: 'ruecklauf' }
 ];
 
 // Begehbare Metallpodeste neben Anlagen. x/z = Mitte des Podests relativ zum Raum wie bei den Anlagen, b = Länge (x), t = Tiefe (z),
