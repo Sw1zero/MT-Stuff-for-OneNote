@@ -260,13 +260,13 @@ const ANLAGEN = [
   },
   {
     // Rohrheisshalter nach Alfa-Laval-Prozesstafel Pasteurisation, Eigenbau: material/molkerei-3d/heisshalter_bau.py (bzwu).
-    // 5000 l/h, 15 s, DN 50: 7 Läufe à 1.6 m. Texte: a.4 (Nr. 8, 9, 10). Eigene Sätze: rohrschlange (zweiter Satz), Anlagentext (letzter Satz).
+    // 5000 l/h, 15 s, DN 50: 7 Läufe à 1.6 m. Texte: a.4 (Nr. 8, 9, 10). Eigene Sätze: rohrschlange (zweiter Satz), Anlagentext (letzter Satz), umschaltventil (Feder, Philipp 04.11.). Sitzventil: a.1, Funktionskontrolle: a.4.
     id: 'heisshalter', name: 'Heisshalter', raum: 'behandlung', x: 20.715, z: 2.5, b: 2.2, t: 0.5, bau: 'heisshalter',
     anschluesse: { milch: [-1.015, 0.3, 0.222, '+z'], heisshalter: [0.885, 1.33, 0.172, '+z'], rueckfuehrung: [1.085, 1.05, 0, '+x'] },
     teile: [
       { id: 'rohrschlange', name: 'Heisshalter', text: 'Der Heisshalter gewährleistet, dass die Milch die notwendige Zeit auf Pasteurisationstemperatur heiss gehalten wird. Die Milch fliesst unten hinein und steigt durch die Rohrschlange nach oben.' },
       { id: 'temperatursensor', name: 'Temperatursensor nach Heisshalter', text: 'Fällt die vom Temperatursensor gemessene Temperatur am Ende des Heisshalters unter 72 °C, sendet der Regler/die Steuerung ein Signal an das Umschaltventil. Bei der Pasteurisation von Konsummilch und Konsumrahm ist vorgeschrieben, dass die Erhitzungs- und Kühltemperatur sowie die Stellung des Umschaltventils kontinuierlich registriert werden.' },
-      { id: 'umschaltventil', name: 'Umschaltventil', text: 'Die Milch gelangt über das Umschaltventil, das das Produkt bei zu tiefer Pasteurisationstemperatur zurück ins Vorlaufgefäss leiten würde, ins Austauscherpaket. Dadurch wird verhindert, dass ungenügend pasteurisierte Milch den Pasteur verlassen kann.' }
+      { id: 'umschaltventil', name: 'Umschaltventil', text: 'Die Milch gelangt über das Umschaltventil, das das Produkt bei zu tiefer Pasteurisationstemperatur zurück ins Vorlaufgefäss leiten würde, ins Austauscherpaket. Dadurch wird verhindert, dass ungenügend pasteurisierte Milch den Pasteur verlassen kann. Das Umschaltventil ist ein pneumatisches Sitzventil, gebaut als Wechselventil. Fällt die Druckluft aus, drückt die Feder im Antrieb das Ventil in die Stellung zum Vorlaufgefäss. Kontrollieren Sie die Funktion regelmässig, zum Beispiel vor dem Ausfahren: Reduzieren Sie die Wärmezufuhr. Wenn am Ende des Heisshalters 72 °C unterschritten werden, muss das Umschaltventil das Produkt ins Vorlaufgefäss leiten, und die Anlage muss einen Alarm ausgeben.' }
     ],
     text: 'Der Heisshalter gewährleistet, dass die Milch die notwendige Zeit auf Pasteurisationstemperatur heiss gehalten wird. Fällt die Temperatur am Ende des Heisshalters unter 72 °C, wird die ungenügend pasteurisierte Milch in das Vorlaufgefäss zurückgeleitet. Bei 5000 Litern pro Stunde und 15 Sekunden Heisshaltezeit braucht es rund 10 Meter Rohr.'
   },
