@@ -196,3 +196,15 @@ svg[data-trombe="ja"] .rw-trombe { visibility: visible; }
 .kp-kolben { fill: #8a96a0; stroke: #4a545c; stroke-width: 1.2; }
 .sb-teil:hover .kp-kolben, .sb-teil.sb-aktiv .kp-kolben { fill: #69a9c9; }
 .kp-welle { fill: #4a545c; }
+
+/* Schnittbild Plattenwärmetauscher (schnittbild-pwt.js) */
+.pwt-platte { fill: none; stroke: #4a545c; stroke-width: 3; stroke-linejoin: round; }
+.pwt-dichtung { opacity: 0.85; }
+.pwt-name { fill: #1f2428; font-size: 14px; paint-order: stroke; stroke: rgba(255,255,255,0.7); stroke-width: 3px; }
+.pwt-strich { fill: none; stroke: #22262a; stroke-width: 2; stroke-dasharray: 7 11; animation: sb-fliessen 0.9s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .pwt-strich { animation: none; } }
+.pwt-diagramm { fill: #fbfaf3; stroke: #4a545c; }
+.pwt-raster { stroke: #d3d9de; }
+.pwt-kurve { fill: none; stroke: #22262a; stroke-width: 2.5; }
+.pwt-kurve-d { stroke-dasharray: 8 5; }
+.pwt-wert { font-size: 14px; fill: var(--text); }

@@ -487,6 +487,17 @@ async (page) => {
   await t('overlay-aktion').click();
   await page.waitForTimeout(1700);
   ok(Math.abs(await pwX('[data-teil="druckplatte"]')) < 0.01 && Math.abs(await pwX(letztePlatte)) < 0.01, 'Plattenwärmetauscher schliesst nicht');
+  // Schnittbild Gegenstrom: Rückgewinnung erreicht im Gegenstrom 62 °C, im Gleichstrom nur die Mischtemperatur 38 °C
+  await t('overlay-schnitt').click();
+  ok(await t('schnittbild-pwt').evaluate(d => d.open), 'Schnittbild Plattenwärmetauscher öffnet nicht');
+  ok((await page.evaluate(() => window.pwtSchnitt.stand())).milchAus === 62, 'Schnittbild PWT: Rückgewinnung im Gegenstrom nicht 62 °C');
+  await t('pwt-gegen').click();
+  ok((await page.evaluate(() => window.pwtSchnitt.stand())).milchAus === 38 && (await t('pwt-titel').textContent()).includes('Gleichstrom'), 'Schnittbild PWT: Gleichstrom nicht 38 °C');
+  await page.locator('[data-pwt="paket_kuehlung"]').click();
+  ok((await t('pwt-text').textContent()).includes('Eiswasser') && (await page.locator('[data-pwt="paket_kuehlung"]').getAttribute('aria-pressed')) === 'true', 'Schnittbild PWT: Kühlpaket wird nicht gezeigt');
+  await t('pwt-gegen').click();
+  await page.keyboard.press('Escape');
+  ok(!(await t('schnittbild-pwt').evaluate(d => d.open)) && await t('overlay').isVisible(), 'Esc schliesst Schnittbild PWT nicht oder auch das Overlay');
   await page.evaluate(() => window.kaeserei.schliessen());
 
   // Heisshalter (glTF aus Blender, Mitte 40.7/22.5): echter Klick auf das Umschaltventil; Vorlaufgefäss und Pumpe des Pasteurs geladen

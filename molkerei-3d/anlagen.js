@@ -216,7 +216,7 @@ const ANLAGEN = [
   {
     // Plattenpasteur mit drei Paketen, Masse nach Alfa Laval Front 6 (Datenblatt), Eigenbau: material/molkerei-3d/plattenwaermetauscher_bau.py (bzwu).
     // Texte aus Lehrmittel a.4 «Plattenapparat», «Plattenpasteur». Eigene Sätze: anschlussplatte_1/2, fuehrungsstange, Dichtungsfarben im Anlagentext.
-    id: 'plattenwaermetauscher', name: 'Plattenwärmetauscher', raum: 'behandlung', x: 20, z: 6, b: 2.8, t: 0.8, bau: 'plattenwaermetauscher',
+    id: 'plattenwaermetauscher', name: 'Plattenwärmetauscher', raum: 'behandlung', x: 20, z: 6, b: 2.8, t: 0.8, bau: 'plattenwaermetauscher', schnittbild: 'pwt', // Gegenstromprinzip: schnittbild-pwt.js
     oeffnen: { auf: 'Apparat öffnen', zu: 'Apparat schliessen', leitungenWeg: true },
     // Kühlpaket: Milch hinten (-z), Eiswasser vorne. Rohrschlaufen zwischen den Paketen sind im Modell (Gruppe rohrschlaufen).
     anschluesse: { milch: [-0.774, 0.4, 0.3, '+z'], pasteurisiert: [-1.101, 1.259, -0.065, '-x'], kuehlwasser: [-1.101, 1.259, 0.065, '-x'], kuehlwasser_ruecklauf: [-1.101, 0.4, 0.065, '-x'],
