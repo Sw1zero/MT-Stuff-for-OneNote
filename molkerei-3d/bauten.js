@@ -2,14 +2,12 @@
 // Teile mit data-teil sind einzeln anklickbar, Name und Text stehen in anlagen.js unter teile.
 // Braucht el() aus script.js.
 
-const METALL = 'color: #c3ccd4; metalness: 0.6; roughness: 0.35';
-const CHROM = 'color: #d3d8dc; metalness: 0.45; roughness: 0.28';
-const MATT = 'color: #b9c0c6; metalness: 0.35; roughness: 0.5';
+const METALL = stahl('metall'), CHROM = stahl('chrom'), MATT = stahl('matt'); // Werte: STAHL in script.js
 const SCHWARZ = 'color: #22262a; roughness: 0.6';
 
 // Drehkörper aus einem Profil "r y, r y, ..." (wie an der Drehbank)
 AFRAME.registerComponent('drehprofil', {
-  schema: { punkte: { type: 'string' }, farbe: { default: '#d3d8dc' }, metall: { default: 0.45 }, rau: { default: 0.28 } },
+  schema: { punkte: { type: 'string' }, farbe: { default: STAHL.chrom.farbe }, metall: { default: 1 }, rau: { default: STAHL.chrom.rau } },
   init() {
     const pts = this.data.punkte.split(',').map(p => { const [r, y] = p.trim().split(/\s+/).map(Number); return new THREE.Vector2(r, y); });
     const mat = new THREE.MeshStandardMaterial({ color: this.data.farbe, metalness: this.data.metall, roughness: this.data.rau, side: THREE.DoubleSide });
@@ -19,7 +17,7 @@ AFRAME.registerComponent('drehprofil', {
 
 const teil = (g, id, attrs = {}) => el('a-entity', { 'data-teil': id, ...attrs }, g);
 
-// Umgebung zum Spiegeln für die Blender-Anlagen: heller Raum mit Deckenleuchten, darunter der Boden.
+// Umgebung zum Spiegeln: heller Raum mit Deckenleuchten, darunter der Boden.
 // Ohne sie zeichnet three.js Metall flach in einem Grau, Rundungen und Schrauben verschwinden vor gleichfarbigen Wänden.
 let umgebungsKarte = null;
 function umgebung(renderer) {
@@ -39,23 +37,34 @@ function umgebung(renderer) {
   return umgebungsKarte;
 }
 
+// Nur Chromstahl (metalness 1, aus STAHL) spiegelt. Als scene.environment hellt die Umgebung auch Wände und Boden auf (Boden 255).
+// shortcut: läuft beim Start (script.js) und für jedes GLB; Stahl, der später per Code entsteht, spiegelt nicht, dann hier ein Event anhängen.
+function spiegeln(obj) {
+  const env = umgebung(AFRAME.scenes[0].renderer);
+  obj.traverse(o => { const m = o.material; if (m && m.metalness === 1 && !m.envMap) { m.envMap = env; m.envMapIntensity = SPIEGELUNG; m.needsUpdate = true; } });
+}
+
 // glTF-Teile (und gleiche Anlagen) teilen sich Materialien: eigene Kopie, sonst leuchtet beim Hervorheben alles mit
-function glbVorbereiten(obj, env) {
+function glbVorbereiten(obj) {
   obj.traverse(o => {
-    if (o.material) { o.material = o.material.clone(); o.material.envMap = env; o.material.envMapIntensity = 0.55; o.material.needsUpdate = true; }
+    if (o.material) {
+      const m = o.material = o.material.clone(), s = STAHL[m.name];
+      if (s) { m.metalness = 1; m.roughness = s.rau; if (s.farbe) m.color.set(s.farbe); }
+    }
     if (o.isMesh) o.castShadow = o.receiveShadow = true; // Schatten nur bei den Blender-Anlagen
   });
+  spiegeln(obj);
 }
 
 // Platzhalter modell_<datei>[__zusatz] (Empty in Blender) bekommt modelle/<datei>.glb als Kind: jede Anlage gibt es
 // nur einmal als Modell (z.B. die Zentrifugalpumpe in Schulenburg-Wanne und Membrananlage), Änderungen ziehen überall mit.
 const glbLager = {};
-function glbEinsetzen(obj, env) {
+function glbEinsetzen(obj) {
   const platz = [];
   obj.traverse(o => { const t = /^modell_(.+?)(?:__|\.|$)/.exec(o.name); if (t) platz.push([o, t[1]]); });
   for (const [o, datei] of platz) {
     glbLager[datei] = glbLager[datei] || new Promise((ok, fehler) => new THREE.GLTFLoader().load(`modelle/${datei}.glb`, ok, undefined, fehler));
-    glbLager[datei].then(gltf => { const k = gltf.scene.clone(true); glbVorbereiten(k, env); o.add(k); });
+    glbLager[datei].then(gltf => { const k = gltf.scene.clone(true); glbVorbereiten(k); o.add(k); });
   }
 }
 
@@ -65,9 +74,8 @@ function glbTeile(g, datei, wurzel, hub = {}) {
   const m = el('a-entity', { 'gltf-model': datei }, g);
   const ids = anlageVon(g.dataset.anlage).teile.map(t => t.id);
   m.addEventListener('model-loaded', () => {
-    const env = umgebung(g.sceneEl.renderer);
-    glbVorbereiten(m.getObject3D('mesh'), env);
-    glbEinsetzen(m.getObject3D('mesh'), env);
+    glbVorbereiten(m.getObject3D('mesh'));
+    glbEinsetzen(m.getObject3D('mesh'));
     for (const node of [...m.getObject3D('mesh').getObjectByName(wurzel).children]) {
       if (!ids.includes(node.name)) continue;
       const attrs = { 'data-teil': node.name, class: 'klickbar' };
@@ -411,7 +419,7 @@ const BAUTEN = {
       stehend(unter, 0.055, 0.02, x, 0, z, SCHWARZ);
     }
     kasten(unter, 0.25, 0.16, 0.25, -0.55, 0.22, 0, MATT);                 // Motorträger
-    el('a-entity', { drehprofil: 'punkte: 0.27 0.22, 0.27 0.25, 0.22 0.27, 0.22 0.36, 0.25 0.37, 0.25 0.39, 0 0.39', farbe: '#b9c0c6', metall: 0.35, rau: 0.5 }, unter); // Gussfuss rund
+    el('a-entity', { drehprofil: 'punkte: 0.27 0.22, 0.27 0.25, 0.22 0.27, 0.22 0.36, 0.25 0.37, 0.25 0.39, 0 0.39', farbe: STAHL.matt.farbe, metall: 1, rau: STAHL.matt.rau }, unter); // Gussfuss rund
     for (let i = 0; i < 6; i++) {
       const w = i * Math.PI / 3;
       stehend(unter, 0.014, 0.02, 0.245 * Math.cos(w), 0.25, 0.245 * Math.sin(w), CHROM, 6);
@@ -421,7 +429,7 @@ const BAUTEN = {
     const motor = teil(m, 'elektromotor');
     liegend(motor, 0.2, 0.7, -0.675, 0.57, 0);
     for (const x of [-1.0, -0.35]) liegend(motor, 0.206, 0.015, x, 0.57, 0, MATT);
-    el('a-entity', { drehprofil: 'punkte: 0 -0.06, 0.08 -0.055, 0.17 -0.04, 0.2 -0.01, 0.205 0', farbe: '#b9c0c6', metall: 0.35, rau: 0.5, rotation: '0 0 -90', position: '-1.025 0.57 0' }, motor);
+    el('a-entity', { drehprofil: 'punkte: 0 -0.06, 0.08 -0.055, 0.17 -0.04, 0.2 -0.01, 0.205 0', farbe: STAHL.matt.farbe, metall: 1, rau: STAHL.matt.rau, rotation: '0 0 -90', position: '-1.025 0.57 0' }, motor);
     for (let s = 0; s < 3; s++) for (let r = 0; r < 4; r++) {
       kasten(motor, 0.07, 0.012, 0.012, -0.9 + s * 0.09, 0.44 + r * 0.025, 0.155 + r * 0.012, SCHWARZ);
     }
@@ -647,7 +655,7 @@ const BAUTEN = {
 // Begehbares Metallpodest mit Treppe (Daten: PODESTE in anlagen.js, Lage und Höhen: podestGeo/hoeheAn in geometrie.js).
 // Stützen mit Fussplatten, Gitterrost, Diagonalen unter der Lauffläche, Geländer mit Hand- und Knieleiste und Fussleiste.
 const DREH = { '+x': 0, '-z': 90, '-x': 180, '+z': -90 }; // Drehung um y, damit lokal +x nach aussen zeigt
-const DUNKEL = 'color: #3a4047; metalness: 0.6; roughness: 0.4';
+const DUNKEL = stahl('dunkel');
 const grad = r => r * 180 / Math.PI;
 function kiste(e, w, h, d, pos, rot = '0 0 0', mat = METALL) {
   return el('a-box', { width: w, height: h, depth: d, position: pos, rotation: rot, material: mat, shadow: 'cast: true; receive: true' }, e);

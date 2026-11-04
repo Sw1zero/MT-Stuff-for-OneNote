@@ -8,6 +8,16 @@ const DRAG_PX = 5;   // ab dieser Mausbewegung ist es Umschauen, kein Klick
 
 const THREE = AFRAME.THREE;
 
+// Chromstahl, einzige Quelle: Code-Bauten über stahl(), Blender-Anlagen über den Materialnamen (glbVorbereiten in bauten.js).
+// Farben = sRGB der Blender-Grundfarben, platte und sieb färbt ihre Textur. Metall immer 1, daran erkennt spiegeln() den Stahl.
+const STAHL = {
+  chrom: { farbe: '#d3d8dc', rau: 0.28 }, matt: { farbe: '#b9c0c6', rau: 0.5 }, schraube: { farbe: '#7c8186', rau: 0.4 },
+  metall: { farbe: '#c3ccd4', rau: 0.35 }, dunkel: { farbe: '#3a4047', rau: 0.4 }, huelse: { farbe: '#8a9299', rau: 0.5 },
+  platte: { rau: 0.3 }, sieb: { rau: 0.6 }
+};
+const stahl = n => `color: ${STAHL[n].farbe}; metalness: 1; roughness: ${STAHL[n].rau}`;
+const SPIEGELUNG = 0.9; // Stärke der Umgebung auf Chromstahl (spiegeln in bauten.js)
+
 // Text als Fläche: A-Frame-Schriften haben keine Umlaute, darum Canvas-Textur.
 AFRAME.registerComponent('beschriftung', {
   schema: { text: { type: 'string' }, hoehe: { default: 0.5 }, farbe: { default: '#134061' }, grund: { default: '' } },
@@ -87,7 +97,7 @@ AFRAME.registerComponent('flaeche', {
 // Radius r je Medium (ROHR_R in anlagen.js): Produkt Ø 5.3 cm blank, Versorgung Ø 9 cm isoliert.
 const ROHR_BOGEN = 0.15;
 // Hülse, wo eine senkrechte Leitung durch den Boden des Erdgeschosses (= Decke des Untergeschosses) geht.
-const HUELSE_MAT = new THREE.MeshStandardMaterial({ color: '#8a9299', roughness: 0.5, metalness: 0.6 });
+const HUELSE_MAT = new THREE.MeshStandardMaterial({ color: STAHL.huelse.farbe, roughness: STAHL.huelse.rau, metalness: 1 });
 function rohrPunkte(text) {
   const p = [];
   for (const v of text.split(',').map(s => new THREE.Vector3(...s.trim().split(/\s+/).map(Number)))) {
@@ -105,7 +115,8 @@ AFRAME.registerComponent('rohr', {
   init() {
     const p = rohrPunkte(this.data.punkte), g = new THREE.Group();
     const { r: R, isoliert } = this.data;
-    const mat = new THREE.MeshStandardMaterial({ color: this.data.farbe, roughness: isoliert ? 0.85 : 0.4, metalness: isoliert ? 0 : 0.2 });
+    const mat = isoliert ? new THREE.MeshStandardMaterial({ color: this.data.farbe, roughness: 0.85, metalness: 0 })
+      : new THREE.MeshStandardMaterial({ color: STAHL.chrom.farbe, roughness: STAHL.chrom.rau, metalness: 1 }); // Produktrohr blank wie in der echten Anlage, MEDIEN.farbe färbt nur die isolierte Versorgung
     const stueck = kurve => g.add(new THREE.Mesh(new THREE.TubeGeometry(kurve, kurve.isLineCurve3 ? 1 : 10, R, 12, false), mat));
     const zu = (i, j, r) => p[i].clone().add(p[j].clone().sub(p[i]).normalize().multiplyScalar(r));
     let start = p[0];
@@ -423,6 +434,6 @@ document.addEventListener('DOMContentLoaded', () => {
   $('overlay-uebersicht').addEventListener('click', () => window.kaeserei.select($('overlay').dataset.anlage));
   window.addEventListener('keydown', e => { if (e.key === 'Escape' && !document.querySelector('dialog[open]')) window.kaeserei.schliessen(); });
 
-  const start = () => { setzeSpieler(START.x, START.z, START.blick[0], START.blick[1]); document.body.dataset.bereit = 'ja'; };
+  const start = () => { setzeSpieler(START.x, START.z, START.blick[0], START.blick[1]); spiegeln(document.querySelector('a-scene').object3D); document.body.dataset.bereit = 'ja'; };
   if (szene.hasLoaded) start(); else szene.addEventListener('loaded', start);
 });
