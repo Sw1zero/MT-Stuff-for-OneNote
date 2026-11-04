@@ -483,9 +483,33 @@ async (page) => {
   await page.waitForTimeout(1700);
   ok(Math.abs(await pwX('[data-teil="druckplatte"]') - 1.584) < 0.01 && Math.abs(await pwX(letztePlatte) - 0.429) < 0.01, 'Plattenwärmetauscher: Druckplatte oder Platten fahren nicht auf');
   ok((await pwLeitung()).every(v => v === false), 'Plattenwärmetauscher: Leitungen bleiben beim Öffnen');
+  ok(await page.evaluate(() => document.querySelector('[data-anlage="plattenwaermetauscher"] [data-mitleitung]').getAttribute('visible')) === false, 'Plattenwärmetauscher: Rohrschlaufen bleiben beim Öffnen');
   await t('overlay-aktion').click();
   await page.waitForTimeout(1700);
   ok(Math.abs(await pwX('[data-teil="druckplatte"]')) < 0.01 && Math.abs(await pwX(letztePlatte)) < 0.01, 'Plattenwärmetauscher schliesst nicht');
+  await page.evaluate(() => window.kaeserei.schliessen());
+
+  // Heisshalter (glTF aus Blender, Mitte 40.7/22.5): echter Klick auf das Umschaltventil; Vorlaufgefäss und Pumpe des Pasteurs geladen
+  await page.evaluate(() => {
+    document.getElementById('spieler').object3D.position.set(40.7, 0, 24.7);
+    const lc = document.getElementById('kamera').components['look-controls'];
+    lc.yawObject.rotation.y = 0; lc.pitchObject.rotation.x = -0.3;
+  });
+  await page.waitForFunction(() => document.querySelector('[data-anlage="heisshalter"] [data-teil="umschaltventil"]') && document.querySelector('[data-anlage="vorlaufgefaess-pasteur"] [data-teil="schwimmer"]')
+    && document.querySelector('[data-anlage="pasteurpumpe"] [data-teil="druckstutzen"]'), null, { timeout: 15000 }).catch(() => ok(false, 'Heisshalter, Vorlaufgefäss oder Pasteurpumpe ohne Teile'));
+  await page.waitForFunction(() => { const k = new THREE.Vector3(); document.querySelector('a-scene').camera.getWorldPosition(k); return Math.abs(k.z - 24.7) < 0.05; }, null, { timeout: 10000 });
+  const hh = await page.evaluate(() => {
+    const kam = document.querySelector('a-scene').camera, p = new THREE.Vector3();
+    new THREE.Box3().setFromObject(document.querySelector('[data-anlage="heisshalter"]').object3D.getObjectByName('antriebszylinder')).getCenter(p);
+    p.project(kam);
+    return [(p.x + 1) / 2, (1 - p.y) / 2];
+  });
+  await page.mouse.move(box.x + hh[0] * box.width, box.y + hh[1] * box.height);
+  await page.waitForTimeout(200);
+  await page.mouse.down(); await page.mouse.up();
+  ok((await t('overlay-titel').textContent()) === 'Heisshalter' && (await t('overlay-teil').textContent()) === 'Umschaltventil', `Klick auf das Umschaltventil zeigt: ${await t('overlay-titel').textContent()} / ${await t('overlay-teil').textContent()}`);
+  ok(await page.evaluate(() => ['plattenwaermetauscher>heisshalter:milch', 'heisshalter>plattenwaermetauscher:milch', 'heisshalter>vorlaufgefaess-pasteur:milch', 'pasteurpumpe>plattenwaermetauscher:milch']
+    .every(l => document.querySelector(`[data-leitung="${l}"]`))), 'Pasteur: Leitungen fehlen');
   await page.evaluate(() => window.kaeserei.schliessen());
 
   // Durch den Durchgang Milchbehandlung -> Käserei (Tür bei x=30, z=20)

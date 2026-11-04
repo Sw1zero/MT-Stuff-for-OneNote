@@ -350,7 +350,7 @@ window.kaeserei = {
     }
     // Abgekoppelte Anlage (z.B. Pumpen-Explosion): Leitungen sofort weg, nach dem Zusammenbauen wieder da
     if (anlageVon(id).oeffnen.leitungenWeg) {
-      const zeigen = () => { for (const l of document.querySelectorAll(`[data-leitung^="${id}>"], [data-leitung*=">${id}:"]`)) l.setAttribute('visible', !g.dataset.offen); };
+      const zeigen = () => { for (const l of document.querySelectorAll(`[data-leitung^="${id}>"], [data-leitung*=">${id}:"], [data-anlage="${id}"] [data-mitleitung]`)) l.setAttribute('visible', !g.dataset.offen); };
       if (auf) zeigen(); else setTimeout(zeigen, dur);
     }
     if ($('overlay').dataset.anlage === id && !$('overlay').hidden) window.kaeserei.select(id, $('overlay').dataset.teil || undefined);

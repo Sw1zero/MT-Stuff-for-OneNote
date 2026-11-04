@@ -65,7 +65,12 @@ const LEITUNGEN = [
   // Käserei-Linie (Philipp, 01.11.2026)
   { von: 'annahmestation', nach: 'lagertank-1', medium: 'milch' },
   { von: 'lagertank-1', nach: 'milchpumpe', medium: 'milch', ab: 'auslauf', an: 'saug', direkt: true, hoehe: 0.75 },
-  { von: 'milchpumpe', nach: 'plattenwaermetauscher', medium: 'milch', ab: 'druck' },
+  { von: 'milchpumpe', nach: 'vorlaufgefaess-pasteur', medium: 'milch', ab: 'druck' },
+  // Plattenpasteur (a.4): Vorlaufgefäss, Pumpe, PWT, Heisshalter. Rückführung vom Umschaltventil ins Vorlaufgefäss.
+  { von: 'pasteurpumpe', nach: 'plattenwaermetauscher', medium: 'milch', ab: 'druck', direkt: true, hoehe: 1.15 },
+  { von: 'plattenwaermetauscher', nach: 'heisshalter', medium: 'milch', ab: 'erhitzt', direkt: true, hoehe: 1.7 },
+  { von: 'heisshalter', nach: 'plattenwaermetauscher', medium: 'milch', ab: 'heisshalter', an: 'heisshalter', direkt: true, hoehe: 1.85 },
+  { von: 'heisshalter', nach: 'vorlaufgefaess-pasteur', medium: 'milch', ab: 'rueckfuehrung', an: 'rueckfuehrung', direkt: true, hoehe: 2 },
   { von: 'plattenwaermetauscher', nach: 'separator', medium: 'milch', ab: 'pasteurisiert' },
   { von: 'separator', nach: 'rahmreifer', medium: 'rahm' },
   { von: 'separator', nach: 'kaesefertiger', medium: 'magermilch' },
@@ -129,6 +134,16 @@ const LAGERTANK = {
 const TANK_ANSCHLUESSE = { milch: [-1.895, 2.383, -0.3, '-x'],auslauf: [2.4, 0.75, 0], cip: [1.2, 2.35, 0],
   kuehlwasser: [-2.22, 0.8, -0.25, '-x'], ruecklauf: [-2.22, 0.8, 0.25, '-x'] };
 
+// Zentrifugalpumpe (Milchpumpe und Pasteurpumpe): Texte aus Lehrmittel a.1 «Pumpen», Teil-ids = Gruppennamen in zentrifugalpumpe.blend.
+const PUMPE_TEILE = [
+  { id: 'laufrad', name: 'Laufrad', text: 'Das Laufrad versetzt die Milch in Rotation, die Zentrifugalkraft beschleunigt sie nach aussen. Mit einem speziellen Laufrad und Gehäuse kann die Zentrifugalpumpe auch Käsebruch fördern. Lassen Sie die Pumpe nie leer laufen, das schädigt das Laufrad.' },
+  { id: 'gleitringdichtung', name: 'Gleitringdichtung', text: 'Die Gleitringdichtung dichtet das Pumpengehäuse dort ab, wo die Welle des Motors hineinführt. Lassen Sie die Pumpe nie leer laufen, das schädigt die Gleitringdichtung. Kontrollieren Sie die Dichtigkeit und ersetzen Sie immer alle Gleitringdichtungen, periodisch oder bei Undichtheit.' },
+  { id: 'elektromotor', name: 'Elektromotor', text: 'Der Elektromotor treibt das Laufrad im Pumpengehäuse an.' },
+  { id: 'saugstutzen', name: 'Saugstutzen', text: 'Durch den Saugstutzen in der Mitte des Gehäuses fliesst die Milch in Achsrichtung (axial) dem Laufrad zu. Die Zentrifugalpumpe ist nicht selbstansaugend: Die Milch muss ihr zufliessen. Darum steht die Pumpe tiefer als der Auslaufstutzen des Tanks.' },
+  { id: 'pumpengehaeuse', name: 'Pumpengehäuse', text: 'Im Pumpengehäuse versetzt das Laufrad die Milch in Rotation, die Zentrifugalkraft beschleunigt sie nach aussen. Die Pumpe schöpft nur, wenn Gehäuse und Saugleitung vollständig mit Flüssigkeit gefüllt sind.' },
+  { id: 'druckstutzen', name: 'Druckstutzen', text: 'Am Pumpengehäuse und vor allem beim Druckstutzen wird die Geschwindigkeitsenergie in Druckenergie umgewandelt. Die Milch verlässt die Pumpe mit höherem Druck Richtung Rohrbahnhof.' }
+];
+
 const ANLAGEN = [
   // Milchannahme (a.1)
   { id: 'annahmestation', name: 'Annahmestation', raum: 'annahme', x: 4, z: 10, b: 2, t: 1.5 },
@@ -142,14 +157,7 @@ const ANLAGEN = [
     id: 'milchpumpe', name: 'Zentrifugalpumpe', raum: 'annahme', x: 15.6, z: 5, b: 0.95, t: 0.5, bau: 'pumpe',
     anschluesse: { saug: [-0.455, 0.274, 0, '-x'], druck: [-0.374, 0.524, 0.119] },
     oeffnen: { auf: 'Explosionsansicht', zu: 'Zusammenbauen', leitungenWeg: true },
-    teile: [
-      { id: 'laufrad', name: 'Laufrad', text: 'Das Laufrad versetzt die Milch in Rotation, die Zentrifugalkraft beschleunigt sie nach aussen. Mit einem speziellen Laufrad und Gehäuse kann die Zentrifugalpumpe auch Käsebruch fördern. Lassen Sie die Pumpe nie leer laufen, das schädigt das Laufrad.' },
-      { id: 'gleitringdichtung', name: 'Gleitringdichtung', text: 'Die Gleitringdichtung dichtet das Pumpengehäuse dort ab, wo die Welle des Motors hineinführt. Lassen Sie die Pumpe nie leer laufen, das schädigt die Gleitringdichtung. Kontrollieren Sie die Dichtigkeit und ersetzen Sie immer alle Gleitringdichtungen, periodisch oder bei Undichtheit.' },
-      { id: 'elektromotor', name: 'Elektromotor', text: 'Der Elektromotor treibt das Laufrad im Pumpengehäuse an.' },
-      { id: 'saugstutzen', name: 'Saugstutzen', text: 'Durch den Saugstutzen in der Mitte des Gehäuses fliesst die Milch in Achsrichtung (axial) dem Laufrad zu. Die Zentrifugalpumpe ist nicht selbstansaugend: Die Milch muss ihr zufliessen. Darum steht die Pumpe tiefer als der Auslaufstutzen des Tanks.' },
-      { id: 'pumpengehaeuse', name: 'Pumpengehäuse', text: 'Im Pumpengehäuse versetzt das Laufrad die Milch in Rotation, die Zentrifugalkraft beschleunigt sie nach aussen. Die Pumpe schöpft nur, wenn Gehäuse und Saugleitung vollständig mit Flüssigkeit gefüllt sind.' },
-      { id: 'druckstutzen', name: 'Druckstutzen', text: 'Am Pumpengehäuse und vor allem beim Druckstutzen wird die Geschwindigkeitsenergie in Druckenergie umgewandelt. Die Milch verlässt die Pumpe mit höherem Druck Richtung Rohrbahnhof.' }
-    ],
+    teile: PUMPE_TEILE,
     text: 'Die Zentrifugalpumpe fördert die Milch aus dem Lagertank 1 zum Rohrbahnhof. ' +
       'Sie ist in Käsereien und Molkereien häufig: Sie fördert schonend, ist einfach und hygienisch gebaut und gut CIP-reinigbar. ' +
       'Sie ist aber nicht selbstansaugend und eignet sich nicht für Produkte mit hoher Viskosität.'
@@ -210,8 +218,10 @@ const ANLAGEN = [
     // Texte aus Lehrmittel a.4 «Plattenapparat», «Plattenpasteur». Eigene Sätze: anschlussplatte_1/2, fuehrungsstange, Dichtungsfarben im Anlagentext.
     id: 'plattenwaermetauscher', name: 'Plattenwärmetauscher', raum: 'behandlung', x: 20, z: 6, b: 2.8, t: 0.8, bau: 'plattenwaermetauscher',
     oeffnen: { auf: 'Apparat öffnen', zu: 'Apparat schliessen', leitungenWeg: true },
-    anschluesse: { milch: [-0.862, 0.4, 0.3, '+z'], pasteurisiert: [-1.189, 1.259, 0.065, '-x'], kuehlwasser: [-1.189, 1.259, -0.065, '-x'], kuehlwasser_ruecklauf: [-1.189, 0.4, -0.065, '-x'],
-      heisswasser: [-0.696, 1.259, -0.3, '-z'], heisswasser_ruecklauf: [-0.696, 0.4, -0.3, '-z'] },
+    // Kühlpaket: Milch hinten (-z), Eiswasser vorne. Rohrschlaufen zwischen den Paketen sind im Modell (Gruppe rohrschlaufen).
+    anschluesse: { milch: [-0.774, 0.4, 0.3, '+z'], pasteurisiert: [-1.101, 1.259, -0.065, '-x'], kuehlwasser: [-1.101, 1.259, 0.065, '-x'], kuehlwasser_ruecklauf: [-1.101, 0.4, 0.065, '-x'],
+      erhitzt: [-0.608, 1.259, 0.3, '+z'], heisshalter: [-0.774, 1.259, -0.3, '-z'],
+      heisswasser: [-0.608, 1.259, -0.3, '-z'], heisswasser_ruecklauf: [-0.608, 0.4, -0.3, '-z'] },
     teile: [
       { id: 'stativplatte', name: 'Stativplatte', text: 'Auf einem Rahmen befinden sich zwischen der Stativ- und der Druckplatte ein oder mehrere Plattenpakete.' },
       { id: 'druckplatte', name: 'Druckplatte', text: 'Messen Sie vor dem Öffnen den Abstand (Spannung) zwischen der Stativ- und der Druckplatte und notieren Sie das Mass.' },
@@ -223,11 +233,43 @@ const ANLAGEN = [
       { id: 'fuehrungsstange', name: 'Führungsstange', text: 'Die Führungsstange hält die Platten unten in der Linie, wenn Sie sie auf der Tragstange verschieben.' },
       { id: 'paket_rueckgewinnung', name: 'Wärmerückgewinnungspaket', text: 'Hier wird die kalte Rohmilch von der schon pasteurisierten Milch vorgewärmt (Wärmerückgewinnung). Deshalb wird dieses Plattenpaket auch Milch/Milch-Wärmetauscher oder Wärmerückgewinnungspaket genannt.' },
       { id: 'paket_erhitzer', name: 'Erhitzerpaket', text: 'Mit Hilfe von Warmwasser wird die Milch auf die gewünschte Pasteurisationstemperatur erhitzt.' },
-      { id: 'paket_kuehlung', name: 'Kühlpaket', text: 'Im Austauscherpaket gibt das Produkt Wärmeenergie ab, wodurch es vorgekühlt wird. Die Kühlung mit Eiswasser erfolgt anschliessend im Kühlpaket.' }
+      { id: 'paket_kuehlung', name: 'Kühlpaket', text: 'Im Austauscherpaket gibt das Produkt Wärmeenergie ab, wodurch es vorgekühlt wird. Die Kühlung mit Eiswasser erfolgt anschliessend im Kühlpaket.' },
+      { id: 'temperatursensor', name: 'Temperatursensor nach Erhitzer', text: 'Der Temperatursensor, der unmittelbar nach dem Erhitzer eingebaut ist, misst die aktuelle Temperatur und meldet diese dem Regler. Dieser vergleicht den Ist-Wert mit dem Soll-Wert (gewünschte Pasteurisationstemperatur). Ist der Ist-Wert tiefer als der Sollwert, lässt das Dampfregulierventil mehr Dampf durchströmen, dadurch wird das Warmwasser und als Folge davon das Produkt höher erhitzt.' }
     ],
     text: 'Im Plattenwärmetauscher wird eine Flüssigkeit im Durchlaufverfahren (kontinuierlich) erhitzt und/oder gekühlt. Je zwei gerippte Platten bilden einen wenige Millimeter breiten Fliessweg für das Produkt oder das Heiz- bzw. Kühlmedium. Die Dichtungen zeigen die drei Pakete: blau Kühlung, grün Wärmerückgewinnung in der Mitte, rot Erhitzer. Öffnen Sie den Apparat, dann sehen Sie die einzelnen Platten.'
   },
-  { id: 'heisshalter', name: 'Heisshalter', raum: 'behandlung', x: 20, z: 10, b: 2, t: 1 },
+  {
+    // Vorlaufgefäss des Plattenpasteurs (a.4 Nr. 1 und 2), Variante 'pasteur' von material/molkerei-3d/vorlaufgefaess_bau.py (bzwu).
+    // Auslaufrohr endet am Saugstutzen der Pasteurpumpe (+x). Eigene Sätze: schwimmer (zweiter Satz).
+    id: 'vorlaufgefaess-pasteur', name: 'Vorlaufgefäss', raum: 'behandlung', x: 18.975, z: 7.6, b: 0.62, t: 0.62, bau: 'vorlaufgefaess_pasteur',
+    anschluesse: { milch: [0.17, 1.07, -0.1], rueckfuehrung: [-0.17, 1.07, -0.1] },
+    teile: [
+      { id: 'behaelter', name: 'Vorlaufgefäss', text: 'Ins Vorlaufgefäss fliesst die kalte Rohmilch. Fällt die Temperatur am Ende des Heisshalters unter 72 °C, wird die ungenügend pasteurisierte Milch in das Vorlaufgefäss zurückgeleitet.' },
+      { id: 'schwimmer', name: 'Schwimmer', text: 'Der Zufluss der kalten Rohmilch in das Vorlaufbassin wird über den Schwimmer reguliert. Steigt der Milchspiegel, hebt die Kugel den Hebel und schliesst den Zulauf.' },
+      { id: 'bodenventil', name: 'Bodenventil (Klappenventil)', text: 'Klappenventile sind nur als Absperrventil einsetzbar. Sie werden von Hand oder mit Luftdruck (pneumatisch) bedient. Die Dichtung müssen Sie nach betrieblichen Vorgaben kontrollieren und sofort auswechseln, wenn sie beschädigt ist.' }
+    ],
+    text: 'Der Zufluss der kalten Rohmilch in das Vorlaufbassin wird über den Schwimmer reguliert. Die Pumpe fördert die Milch in das erste Plattenwärmetauscherpaket.'
+  },
+  {
+    // Zweite Zentrifugalpumpe (a.4 Nr. 3), gleiches Modell wie die Milchpumpe.
+    id: 'pasteurpumpe', name: 'Zentrifugalpumpe', raum: 'behandlung', x: 19.85, z: 7.6, b: 0.95, t: 0.5, bau: 'pumpe',
+    anschluesse: { saug: [-0.455, 0.274, 0, '-x'], druck: [-0.374, 0.524, 0.119] },
+    oeffnen: { auf: 'Explosionsansicht', zu: 'Zusammenbauen', leitungenWeg: true },
+    teile: PUMPE_TEILE.map(t => t.id === 'druckstutzen' ? { ...t, text: t.text.replace('Richtung Rohrbahnhof', 'zum Plattenwärmetauscher') } : t),
+    text: 'Die Pumpe fördert die Milch aus dem Vorlaufgefäss in das erste Plattenwärmetauscherpaket, das Wärmerückgewinnungspaket.'
+  },
+  {
+    // Rohrheisshalter nach Alfa-Laval-Prozesstafel Pasteurisation, Eigenbau: material/molkerei-3d/heisshalter_bau.py (bzwu).
+    // 5000 l/h, 15 s, DN 50: 7 Läufe à 1.6 m. Texte: a.4 (Nr. 8, 9, 10). Eigene Sätze: rohrschlange (zweiter Satz), Anlagentext (letzter Satz).
+    id: 'heisshalter', name: 'Heisshalter', raum: 'behandlung', x: 20.715, z: 2.5, b: 2.2, t: 0.5, bau: 'heisshalter',
+    anschluesse: { milch: [-1.015, 0.3, 0.222, '+z'], heisshalter: [0.885, 1.33, 0.172, '+z'], rueckfuehrung: [1.085, 1.05, 0, '+x'] },
+    teile: [
+      { id: 'rohrschlange', name: 'Heisshalter', text: 'Der Heisshalter gewährleistet, dass die Milch die notwendige Zeit auf Pasteurisationstemperatur heiss gehalten wird. Die Milch fliesst unten hinein und steigt durch die Rohrschlange nach oben.' },
+      { id: 'temperatursensor', name: 'Temperatursensor nach Heisshalter', text: 'Fällt die vom Temperatursensor gemessene Temperatur am Ende des Heisshalters unter 72 °C, sendet der Regler/die Steuerung ein Signal an das Umschaltventil. Bei der Pasteurisation von Konsummilch und Konsumrahm ist vorgeschrieben, dass die Erhitzungs- und Kühltemperatur sowie die Stellung des Umschaltventils kontinuierlich registriert werden.' },
+      { id: 'umschaltventil', name: 'Umschaltventil', text: 'Die Milch gelangt über das Umschaltventil, das das Produkt bei zu tiefer Pasteurisationstemperatur zurück ins Vorlaufgefäss leiten würde, ins Austauscherpaket. Dadurch wird verhindert, dass ungenügend pasteurisierte Milch den Pasteur verlassen kann.' }
+    ],
+    text: 'Der Heisshalter gewährleistet, dass die Milch die notwendige Zeit auf Pasteurisationstemperatur heiss gehalten wird. Fällt die Temperatur am Ende des Heisshalters unter 72 °C, wird die ungenügend pasteurisierte Milch in das Vorlaufgefäss zurückgeleitet. Bei 5000 Litern pro Stunde und 15 Sekunden Heisshaltezeit braucht es rund 10 Meter Rohr.'
+  },
   { id: 'homogenisator', name: 'Homogenisator', raum: 'behandlung', x: 30, z: 6, b: 2.5, t: 1.5 },
   { id: 'uht', name: 'UHT-Anlage', raum: 'behandlung', x: 44, z: 6, b: 6, t: 2.5 },
 

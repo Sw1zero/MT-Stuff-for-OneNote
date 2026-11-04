@@ -573,13 +573,26 @@ const BAUTEN = {
   // fahren auf der Tragstange zurück (Hub aus dem Bauskript), jede Platte i zusätzlich i * 0.039 m (SPREIZ), damit die Rillen sichtbar werden.
   plattenwaermetauscher(g) {
     const hub = { paket_kuehlung: '0.03 0 0', anschlussplatte_1: '0.489 0 0', paket_rueckgewinnung: '0.519 0 0',
-      anschlussplatte_2: '1.095 0 0', paket_erhitzer: '1.125 0 0', druckplatte: '1.584 0 0' };
+      anschlussplatte_2: '1.095 0 0', temperatursensor: '1.095 0 0', paket_erhitzer: '1.125 0 0', druckplatte: '1.584 0 0' };
     glbTeile(g, 'modelle/plattenwaermetauscher.glb', 'plattenwaermetauscher', hub);
     g.addEventListener('model-loaded', () => { // nach glbTeile (Listener am Modell), die Paket-Entities stehen schon
       for (const p of g.querySelectorAll('[data-teil^="paket_"]'))
         for (const o of [...p.getObject3D('mesh').children])
           el('a-entity', { 'data-oeffnen': `${(+o.name.split('_').pop() * 0.039).toFixed(3)} 0 0`, class: 'klickbar' }, p).setObject3D('mesh', o);
+      // Rohrschlaufen zwischen den Paketen verschwinden beim Öffnen wie die Leitungen (script.js oeffnen)
+      const s = g.querySelector('[gltf-model]').getObject3D('mesh').getObjectByName('rohrschlaufen');
+      el('a-entity', { 'data-mitleitung': '' }, g).setObject3D('mesh', s);
     });
+  },
+
+  // Vorlaufgefäss des Plattenpasteurs mit Schwimmer (vorlaufgefaess_bau.py, VARIANTE 'pasteur')
+  vorlaufgefaess_pasteur(g) {
+    glbTeile(g, 'modelle/vorlaufgefaess_pasteur.glb', 'vorlaufgefaess_pasteur');
+  },
+
+  // Rohrheisshalter mit Temperatursensor und Umschaltventil (material/molkerei-3d/heisshalter_bau.py in bzwu)
+  heisshalter(g) {
+    glbTeile(g, 'modelle/heisshalter.glb', 'heisshalter');
   },
 
   // Vorlaufgefäss mit Klappenventil (material/molkerei-3d/vorlaufgefaess_bau.py in bzwu)
