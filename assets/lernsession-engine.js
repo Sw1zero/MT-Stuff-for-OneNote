@@ -588,7 +588,9 @@
 
   function buildChain(block, t, finishTask) {
     var picked = [];
-    var order = shuffleIdx(t.frags.length);
+    var order;
+    do { order = shuffleIdx(t.frags.length); }  // nie schon richtig sortiert anbieten, wie im Sortierer
+    while (order.length > 1 && order.every(function(v, k) { return v === k; }));
     var wrap = document.createElement('div');
     wrap.innerHTML = '<div class="rs-hint">Tippen Sie die Sätze in der richtigen Reihenfolge an.</div>' +
       '<ol class="rs-chain"></ol><div class="rs-pool"></div>' +
