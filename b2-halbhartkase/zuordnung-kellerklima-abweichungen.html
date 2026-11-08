@@ -30,11 +30,11 @@
 Zuordnung.init({
   stufen: ['zuordnen', 'anklicken', 'eintippen'],
   gruppen: [
-    { key: 'temp', label: 'Temperatur zu hoch', keys: ['temperatur zu hoch', 'temperatur', 'zu warm'] },
+    { key: 'temp', label: 'Temperatur zu hoch', keys: ['temperatur zu hoch', 'zu warm'] },
     { key: 'feuchthoch', label: 'Luftfeuchtigkeit zu hoch', keys: ['luftfeuchtigkeit zu hoch', 'feuchtigkeit zu hoch', 'feuchte zu hoch'] },
     { key: 'feuchttief', label: 'Luftfeuchtigkeit zu tief', keys: ['luftfeuchtigkeit zu tief', 'feuchtigkeit zu tief', 'feuchte zu tief'] },
     { key: 'luftschwach', label: 'Luftumwälzung zu schwach', keys: ['luftumwälzung zu schwach', 'luft zu schwach', 'zu schwach', 'stehende luft'] },
-    { key: 'beide', label: 'Feuchtigkeit zu tief und Luftumwälzung zu stark', keys: ['beide', 'beides'] }
+    { key: 'beide', label: 'Feuchtigkeit zu tief und Luftumwälzung zu stark', keys: ['beide', 'beides', 'luftumwälzung zu stark', 'luft zu stark', 'zu stark'] }
   ],
   karten: [
     { text: 'Der Teig wird weicher und verläuft, es gibt mehr unförmige Randstücke', gruppe: 'temp' },
@@ -46,7 +46,6 @@ Zuordnung.init({
     { text: 'Es entstehen Luftschichten mit verschiedener Temperatur und Feuchtigkeit', gruppe: 'luftschwach' },
     { text: 'Die Reifung im Keller wird sehr ungleichmässig', gruppe: 'luftschwach' },
     { text: 'Die Rindenbildung nimmt zu', gruppe: 'beide' },
-    { text: 'Die Schmierintervalle werden kürzer', gruppe: 'beide' },
     { text: 'Die Lichtung wird verstärkt', gruppe: 'beide' }
   ],
   intro: {
