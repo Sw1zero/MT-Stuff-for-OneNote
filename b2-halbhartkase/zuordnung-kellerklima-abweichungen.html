@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kellerklima: Abweichung und Folge</title>
+  <link rel="stylesheet" href="../style.css?v=d6d6b61d">
+</head>
+<body>
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · b.2</span>
+    <h1>Kellerklima: Abweichung und Folge</h1>
+    <p>Welche Abweichung im Reifungskeller führt zu welcher Folge für den Schmierkäse? (Lehrmittel b.2, S. 15–16)</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+<main class="z-wrap">
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+  <div id="zuordnung"></div>
+</main>
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+<script src="../assets/zuordnung.js?v=046b71c5"></script>
+<script>
+Zuordnung.init({
+  stufen: ['zuordnen', 'anklicken', 'eintippen'],
+  gruppen: [
+    { key: 'temp', label: 'Temperatur zu hoch', keys: ['temperatur zu hoch', 'temperatur', 'zu warm'] },
+    { key: 'feuchthoch', label: 'Luftfeuchtigkeit zu hoch', keys: ['luftfeuchtigkeit zu hoch', 'feuchtigkeit zu hoch', 'feuchte zu hoch'] },
+    { key: 'feuchttief', label: 'Luftfeuchtigkeit zu tief', keys: ['luftfeuchtigkeit zu tief', 'feuchtigkeit zu tief', 'feuchte zu tief'] },
+    { key: 'luftschwach', label: 'Luftumwälzung zu schwach', keys: ['luftumwälzung zu schwach', 'luft zu schwach', 'zu schwach', 'stehende luft'] },
+    { key: 'beide', label: 'Feuchtigkeit zu tief und Luftumwälzung zu stark', keys: ['beide', 'beides'] }
+  ],
+  karten: [
+    { text: 'Der Teig wird weicher und verläuft, es gibt mehr unförmige Randstücke', gruppe: 'temp' },
+    { text: 'Die Schmiereflora entwickelt sich intensiver', gruppe: 'temp' },
+    { text: 'Der Narben wird aufgeweicht und kann «durchliegen»', gruppe: 'feuchthoch' },
+    { text: 'Die Schmiere wird glänzend, salzig und klebrig', gruppe: 'feuchthoch' },
+    { text: 'Die Käse können nicht mehr abtrocknen', gruppe: 'feuchthoch' },
+    { text: 'Der Teig wird fester', gruppe: 'feuchttief' },
+    { text: 'Es entstehen Luftschichten mit verschiedener Temperatur und Feuchtigkeit', gruppe: 'luftschwach' },
+    { text: 'Die Reifung im Keller wird sehr ungleichmässig', gruppe: 'luftschwach' },
+    { text: 'Die Rindenbildung nimmt zu', gruppe: 'beide' },
+    { text: 'Die Schmierintervalle werden kürzer', gruppe: 'beide' },
+    { text: 'Die Lichtung wird verstärkt', gruppe: 'beide' }
+  ],
+  intro: {
+    zuordnen: 'Tippen Sie auf die Abweichung, zu der die Folge unten gehört, oder ziehen Sie die Karte dorthin. Einzelne Folgen gelten für zwei Abweichungen zugleich.',
+    anklicken: 'Klicken Sie pro Folge an, welche Abweichung im Keller sie verursacht.',
+    eintippen: 'Schreiben Sie zu jeder Folge die Abweichung im Keller, zum Beispiel «Temperatur zu hoch» oder «beide».'
+  }
+});
+</script>
+</body>
+</html>

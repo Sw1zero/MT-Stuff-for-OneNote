@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz b.2 – Schmieren und Pflege</title>
+  <link rel="stylesheet" href="../style.css?v=d6d6b61d">
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · b.2</span>
+    <h1>Schmieren und Pflege</h1>
+    <p>Häufigkeit, Wenden, Befeuchten, Hygiene beim Schmierkäse (Lehrmittel b.2, S. 16–19)</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="q-wrap">
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+  <div id="quiz"></div>
+</main>
+
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+
+<script src="../assets/quiz.js?v=6c3e9a7b"></script>
+<script>
+  const QUESTIONS = [
+    {"badge": "Häufigkeit", "question": "Wie oft schmieren Sie junge Käse in den ersten 10 bis 15 Tagen?", "answers": ["Täglich, bis eine flächendeckende Schmiere sichtbar ist", "Alle 2 bis 3 Tage", "Einmal pro Woche", "Gar nicht, die Käse müssen zuerst abtrocknen"], "correct": 0, "explanation": "Junge Käse schmieren Sie täglich, bis die Schmiere flächendeckend sichtbar ist. Danach reduzieren Sie je nach Abtrocknen auf alle 2 bis 3 Tage."},
+    {"badge": "Häufigkeit", "question": "Wann dürfen Sie einen Käse schmieren?", "answers": ["Sobald er aus dem Salzbad kommt", "Wenn er so weit abgetrocknet ist, dass er nach dem Wenden nicht auf der Unterlage klebt", "Nur wenn er nass glänzt", "Immer zur gleichen Uhrzeit, unabhängig vom Zustand"], "correct": 1, "explanation": "Vor jedem Schmieren müssen die Käse soweit abgetrocknet sein, dass sie nach dem Wenden nicht auf der Unterlage kleben. Das Beobachten des Abtrocknens legt das Intervall fest."},
+    {"badge": "Wenden", "question": "Welche Seite schmieren Sie, und was tun Sie vorher?", "answers": ["Beide Seiten, ohne vorher zu wenden", "Nur die Unterseite, der Käse bleibt liegen", "Die nach oben gewendete Seite, nach dem Wenden", "Die Seite, die schon am meisten Schmiere hat"], "correct": 2, "explanation": "Vor jeder Schmierebehandlung wenden Sie die Käse. Schmieren dürfen Sie nur die nach oben gewendete Seite."},
+    {"badge": "Wenden", "question": "Weshalb schmieren Sie die Unterseite nicht?", "answers": ["Die Unterseite hat keine Schmiereflora.", "Nasse Unterseiten kleben fest, beim nächsten Wenden würde die Schmiere abgerissen.", "Die Unterseite wird beim Wenden von selbst nass.", "Das Schmierwasser läuft sonst in den Teig."], "correct": 1, "explanation": "Nasse Unterseiten kleben auf der Unterlage fest. Beim nächsten Wenden reisst die Schmiere ab."},
+    {"badge": "Befeuchten", "question": "Was bedeutet «Schmieren heisst feuchthalten, nicht waschen»?", "answers": ["Sie dürfen nur mit trockener Bürste arbeiten.", "Die Schmiere soll am Käse herunterlaufen, damit sie sich verteilt.", "Sie waschen die Käse mit viel Wasser sauber.", "Die dosierte Schmierewassermenge erhöht kurz den aw-Wert an der Oberfläche, das fördert die Schmiereflora."], "correct": 3, "explanation": "Mit der richtigen Wassermenge steigt der aw-Wert der Käseoberfläche vorübergehend. Das begünstigt die Schmiereflora. Zu viel Wasser wäscht die Schmiere ab."},
+    {"badge": "Befeuchten", "question": "Was passiert bei zu hoher Schmierewassermenge?", "answers": ["Der Käse bekommt mehr Rinde und einen festeren Teig.", "Die Schmiere wird abgewaschen, es entstehen durchnässte Stellen, die Weissschmierigkeit und Fäulnis fördern.", "Die Schmiereflora entwickelt sich schneller.", "Der aw-Wert an der Oberfläche sinkt."], "correct": 1, "explanation": "Zu viel Wasser wäscht die Schmiere ab und durchnässt Stellen. Dort entstehen Weissschmierigkeit und Fäulnis. Mehr Rinde und festerer Teig sind die Folge von zu trockenem Schmieren."},
+    {"badge": "Befeuchten", "question": "Die Käse sind innert zwei Tagen wieder mit Schimmel überzogen. Was tun Sie?", "answers": ["5 bis 10 % Kochsalz ins Schmierwasser geben und kürzere Intervalle wählen", "Das Schmierwasser ohne Salz verwenden und seltener schmieren", "Die Käse stärker bürsten", "Die Luftfeuchtigkeit im Keller senken"], "correct": 0, "explanation": "Die Käse trocknen zu rasch ab. Kochsalz im Schmierwasser (ca. 5 bis 10 %) und kürzere Schmierintervalle verhindern das."},
+    {"badge": "Infektionskreislauf", "question": "Was ist der Vorteil, aber auch das Risiko des Retourschmierens (von älteren auf junge Käse)?", "answers": ["Vorteil: keine Keime werden übertragen. Risiko: die Schmiere entwickelt sich langsam.", "Vorteil: die Schmiere entwickelt sich sehr schnell, ohne Schmierekultur. Risiko: unerwünschte Keime werden auf die jungen Käse verschleppt.", "Vorteil: der Infektionskreislauf wird unterbrochen. Risiko: es braucht Schmierekulturen.", "Es gibt weder Vorteil noch Risiko."], "correct": 1, "explanation": "Retourschmieren bringt die Schmiere schnell auf junge Käse, verschleppt aber auch unerwünschte Keime. Vorwärtsschmieren (jung auf alt) unterbricht den Infektionskreislauf, braucht aber Schmierekulturen."},
+    {"badge": "Hygiene", "question": "Wo stellen Sie die Käsebretter ab?", "answers": ["Auf den Kellerboden, solange er sauber aussieht", "Nur in Bretter- oder Käsegestellen, nie auf den Boden", "Auf dem Tisch neben dem Wasserbehälter", "Auf dem Boden, wenn eine Gummimatte darunterliegt"], "correct": 1, "explanation": "Feuchte Kellerböden sind das grösste Infektionsrisiko, weil das Schuhwerk fremde Keime einschleppt. Bretter gehören nur in Bretter- oder Käsegestelle."},
+    {"badge": "Hygiene", "question": "Wie reinigen Sie Holzbretter nach dem Schmieren?", "answers": ["Mit Desinfektionsmittel, damit sie keimfrei sind", "Mit Chlorlösung im Tauchbad", "Gar nicht, Holz ist von Natur aus keimfrei", "Nur mit Hitze (Keimreduktion), nie mit Desinfektionsmittel"], "correct": 3, "explanation": "Desinfektionsmittelreste im porösen Holz stören die Schmierebildung und den Geschmack. Bei Holz ist nur eine Keimreduktion durch Hitze möglich."}
+  ];
+
+  Quiz.init({
+    questions: QUESTIONS,
+    subMessages: {
+      excellent: "Alle Fragen richtig. Sie pflegen Schmierkäse sicher.",
+      retry: "Lesen Sie im Lehrmittel b.2 den Abschnitt über die Pflege von Schmierkäsen (S. 16–19) nochmals und versuchen Sie es erneut."
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sortierer b.2 – Schmierebildung</title>
+  <link rel="stylesheet" href="../style.css?v=d6d6b61d">
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · b.2</span>
+    <h1>Schmierebildung in 3 Phasen</h1>
+    <p>Bringen Sie die Vorgänge auf und im Schmierkäse in die richtige Reihenfolge.</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="s-wrap">
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+  <div id="sortierer"></div>
+</main>
+
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+
+<script src="../assets/sortierer.js?v=40e5baa8"></script>
+<script>
+Sortierer.init({
+  steps: [
+    { text: 'Säuretolerante Hefen vergären die Milchsäure', detail: 'Phase 1: an der Käseoberfläche' },
+    { text: 'Der pH-Wert an der Oberfläche steigt langsam', detail: 'Der Milchsäuregehalt an der Oberfläche sinkt' },
+    { text: 'Milchsäure wandert aus dem Käsezentrum in die Randzone', detail: 'Phase 2' },
+    { text: 'Der Käseteig entsäuert sich, der pH-Wert steigt im ganzen Käse', detail: 'Eiweissabbauende Enzyme werden aktiviert, die Reifung läuft schneller' },
+    { text: 'Mikrokokken und Bakterium linens wachsen auf der Oberfläche', detail: 'Phase 3: der hohe pH-Wert schafft optimale Bedingungen' },
+    { text: 'Ihre Eiweissabbauprodukte prägen das Aroma des Käses', detail: 'Die drei Phasen laufen mit zunehmender Reifung nebeneinander' }
+  ],
+  intro: 'Die drei Phasen der Schmierebildung starten nacheinander. Ordnen Sie die sechs Vorgänge von oben (zuerst) nach unten (zuletzt).'
+});
+</script>
+</body>
+</html>
