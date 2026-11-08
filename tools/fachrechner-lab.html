@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lab berechnen</title>
+  <link rel="stylesheet" href="../style.css?v=d6d6b61d">
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Rechner</span>
+    <h1>Fachrechner Lab</h1>
+    <p>Labungszeit · Labmenge · Gerinnungszeit · Milchmenge</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+  <a class="back-link" href="../index.html">← Alle Lerntools</a>
+  <div id="rechner"></div>
+</main>
+
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+
+<script src="../assets/rechner.js?v=532d2e94"></script>
+<script>
+var pick = Rechner.pick, z = Rechner.zahl;
+
+/* Rechenregel wie LS_b.2_lab-berechnungen-1/-2: Labmenge proportional zur Milchmenge,
+   Gerinnungszeit umgekehrt proportional zur Labmenge. «ca.»-Resultate: 1 % Toleranz für gerundete Zwischenresultate. */
+function feld(label, einheit, wert) { return { label: label, einheit: einheit, wert: wert, tol: Math.abs(wert) * 0.01 + 0.05 }; }
+
+function bereich(von, bis, schritt) { var a = []; for (var x = von; x <= bis + 1e-9; x += schritt) a.push(Math.round(x * 100) / 100); return a; }
+var ZEITEN = bereich(20, 40, 1);
+var KLEIN = bereich(1000, 6000, 100);      // Milch in l, Lab in ml
+var GROSS = bereich(10000, 20000, 500);    // Milch in l, Lab in l
+
+/* Ausgangslage: Lab 15 bis 30 ml pro 100 l Milch */
+function lage() {
+  var gross = Math.random() < 0.5, milch = pick(gross ? GROSS : KLEIN), dosis = pick(bereich(15, 30, 1));
+  var lab = milch * dosis / 100;  // ml
+  return gross ? { gross: true, milch: milch, lab: Math.round(lab / 100) / 10, e: 'l', zeit: pick(ZEITEN) }
+               : { gross: false, milch: milch, lab: Math.round(lab / 10) * 10, e: 'ml', zeit: pick(ZEITEN) };
+}
+function neueMilch(a) {
+  var m;
+  do { m = pick(a.gross ? GROSS : KLEIN); } while (m === a.milch);
+  return m;
+}
+function neueZeit(a) {
+  var t;
+  do { t = pick(ZEITEN); } while (t === a.zeit);
+  return t;
+}
+function neuesLab(a) {
+  var f, l;
+  do { f = pick([0.6, 0.7, 0.75, 0.8, 0.9, 1.1, 1.2, 1.25, 1.5, 2]); l = a.gross ? Math.round(a.lab * f * 10) / 10 : Math.round(a.lab * f / 10) * 10; } while (l === a.lab);
+  return l;
+}
+function mehr(neu, alt) { return neu > alt ? 'Mehr' : 'Weniger'; }
+function ausgang(a) {
+  return 'Mit <strong>' + z(a.lab) + ' ' + a.e + '</strong> Lab gerinnen <strong>' + z(a.milch) + ' Liter</strong> Milch in <strong>' + a.zeit + ' Minuten</strong>.';
+}
+
+function genLabungszeit() {
+  var fl = pick(bereich(10, 18, 1)), f = pick([2, 2.2, 2.5]), lz = fl * f;
+  return {
+    text: 'Die Flockungszeit beträgt <strong>' + fl + ' Minuten</strong>. Der Faktor ist <strong>' + z(f) + '</strong>. Wie lang ist die Labungszeit?',
+    felder: [{ label: 'Labungszeit', einheit: 'min', wert: lz }],
+    weg: ['Labungszeit = Flockungszeit × Faktor', 'Labungszeit = ' + fl + ' min × ' + z(f) + ' = <strong>' + z(lz) + ' Minuten</strong>']
+  };
+}
+
+function genLabmenge() {
+  var a = lage(), gleicheMilch = Math.random() < 0.25, m2 = gleicheMilch ? a.milch : neueMilch(a), t2 = neueZeit(a);
+  var zw = a.lab * m2 / a.milch, l2 = zw * a.zeit / t2, weg = [];
+  if (!gleicheMilch) weg.push(mehr(m2, a.milch) + ' Milch, darum ' + (m2 > a.milch ? 'mehr' : 'weniger') + ' Lab: ' + z(a.lab) + ' ' + a.e + ' × ' + z(m2) + ' / ' + z(a.milch) + ' = ' + z(zw) + ' ' + a.e);
+  else weg.push('Gleiche Milchmenge.');
+  weg.push(mehr(t2, a.zeit) + ' Zeit, darum ' + (t2 > a.zeit ? 'weniger' : 'mehr') + ' Lab: ' + z(zw) + ' ' + a.e + ' × ' + a.zeit + ' / ' + t2 + ' = <strong>' + z(l2, a.gross ? 2 : 1) + ' ' + a.e + '</strong>');
+  return {
+    text: ausgang(a) + ' Wie viel Lab brauchen Sie für <strong>' + z(m2) + ' Liter</strong> Milch, wenn diese in <strong>' + t2 + ' Minuten</strong> gerinnen sollen?',
+    felder: [feld('Labmenge', a.e, l2)],
+    weg: weg
+  };
+}
+
+function genZeit() {
+  var a = lage(), m2 = neueMilch(a), l2 = neuesLab(a);
+  var zw = a.zeit * m2 / a.milch, t2 = zw * a.lab / l2;
+  return {
+    text: ausgang(a) + ' Wie lange brauchen <strong>' + z(m2) + ' Liter</strong> Milch mit <strong>' + z(l2) + ' ' + a.e + '</strong> Lab?',
+    felder: [feld('Gerinnungszeit', 'min', t2)],
+    weg: [mehr(m2, a.milch) + ' Milch, darum ' + (m2 > a.milch ? 'langsamer' : 'schneller') + ': ' + a.zeit + ' min × ' + z(m2) + ' / ' + z(a.milch) + ' = ' + z(zw, 1) + ' min',
+      mehr(l2, a.lab) + ' Lab, darum ' + (l2 > a.lab ? 'schneller' : 'langsamer') + ': ' + z(zw, 1) + ' min × ' + z(a.lab) + ' / ' + z(l2) + ' = <strong>ca. ' + z(t2, 1) + ' Minuten</strong>']
+  };
+}
+
+function genMilch() {
+  var a = lage(), l2 = neuesLab(a), gleicheZeit = Math.random() < 0.25, t2 = gleicheZeit ? a.zeit : neueZeit(a);
+  var zw = a.milch * l2 / a.lab, m2 = zw * t2 / a.zeit;
+  var weg = [mehr(l2, a.lab) + ' Lab, darum ' + (l2 > a.lab ? 'mehr' : 'weniger') + ' Milch: ' + z(a.milch) + ' l × ' + z(l2) + ' / ' + z(a.lab) + ' = ' + z(zw, 0) + ' l'];
+  weg.push(gleicheZeit ? 'Gleiche Zeit, also <strong>' + z(m2, 0) + ' Liter</strong>.'
+    : mehr(t2, a.zeit) + ' Zeit, darum ' + (t2 > a.zeit ? 'mehr' : 'weniger') + ' Milch: ' + z(zw, 0) + ' l × ' + t2 + ' / ' + a.zeit + ' = <strong>ca. ' + z(m2, 0) + ' Liter</strong>');
+  return {
+    text: ausgang(a) + ' Wie viel Milch gerinnt mit <strong>' + z(l2) + ' ' + a.e + '</strong> Lab in <strong>' + t2 + ' Minuten</strong>?',
+    felder: [feld('Milchmenge', 'l', m2)],
+    weg: weg
+  };
+}
+
+var HILFE = { titel: 'Rechenregel', html:
+  '<p><strong>Labungszeit</strong> = Flockungszeit × Faktor (2 bis 2.5).</p>' +
+  '<p><strong>Mehr Milch</strong> braucht mehr Lab oder mehr Zeit.</p>' +
+  '<p><strong>Mehr Lab</strong> macht die Gerinnung schneller, weniger Lab langsamer.</p>' +
+  '<p>Immer in zwei Schritten rechnen (Dreisatz): zuerst die Milchmenge oder die Labmenge anpassen, dann die Zeit. Bei jedem Schritt überlegen: wird das Resultat grösser oder kleiner?</p>' };
+
+Rechner.init({
+  kategorien: [
+    { name: 'Labungszeit', aufgaben: [genLabungszeit] },
+    { name: 'Labmenge', aufgaben: [genLabmenge] },
+    { name: 'Gerinnungszeit', aufgaben: [genZeit] },
+    { name: 'Milchmenge', aufgaben: [genMilch] }
+  ],
+  hilfe: HILFE
+});
+</script>
+</body>
+</html>
