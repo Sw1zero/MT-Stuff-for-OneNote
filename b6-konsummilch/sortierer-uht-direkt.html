@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sortierer b.6 – UHT-Milch direkt</title>
+  <link rel="stylesheet" href="../style.css?v=d6d6b61d">
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · b.6</span>
+    <h1>UHT-Milch direkt</h1>
+    <p>Bringen Sie die Schritte der direkten UHT-Behandlung in die richtige Reihenfolge.</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="s-wrap">
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+  <div id="sortierer"></div>
+</main>
+
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+
+<script src="../assets/sortierer.js?v=40e5baa8"></script>
+<script>
+Sortierer.init({
+  intro: 'Bringen Sie die Schritte der direkten UHT-Behandlung in die richtige Reihenfolge (oben = zuerst).',
+  steps: [
+    { text: 'Rohmilch vorwärmen', detail: 'Auf 55 °C' },
+    { text: 'Separieren und standardisieren' },
+    { text: 'Im Röhrenwärmetauscher aufwärmen', detail: 'Auf ca. 82 °C' },
+    { text: 'Dampf einspritzen', detail: 'Der Dampfinjektor erhitzt die Milch sehr schnell auf ca. 145 °C' },
+    { text: 'Heisshalten', detail: 'Einige Sekunden' },
+    { text: 'Im Expansionsgefäss entspannen', detail: 'Unter Vakuum, die Milch kühlt auf ca. 80 °C ab, Geruchsstoffe und Gase werden abgeführt' },
+    { text: 'Homogenisieren', detail: 'Zweistufig im Sterilhomogenisator' },
+    { text: 'Auf ca. 20 °C kühlen', detail: 'Im Röhrenwärmetauscher, die Wärme geht über Wasser an die kalte Milch zurück' },
+    { text: 'Aseptisch abfüllen', detail: 'Aus dem Steriltank oder direkt auf die aseptische Abfüllmaschine' }
+  ]
+});
+</script>
+</body>
+</html>

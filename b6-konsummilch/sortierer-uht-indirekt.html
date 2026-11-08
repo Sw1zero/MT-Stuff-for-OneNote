@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sortierer b.6 – UHT-Milch indirekt</title>
+  <link rel="stylesheet" href="../style.css?v=d6d6b61d">
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · b.6</span>
+    <h1>UHT-Milch indirekt</h1>
+    <p>Bringen Sie die Schritte der indirekten UHT-Behandlung in die richtige Reihenfolge.</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="s-wrap">
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+  <div id="sortierer"></div>
+</main>
+
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+
+<script src="../assets/sortierer.js?v=40e5baa8"></script>
+<script>
+Sortierer.init({
+  intro: 'Bringen Sie die Schritte der indirekten UHT-Behandlung in die richtige Reihenfolge (oben = zuerst).',
+  steps: [
+    { text: 'Rohmilch vorwärmen', detail: 'Auf 55 °C' },
+    { text: 'Separieren und standardisieren' },
+    { text: 'Aufwärmen', detail: 'Auf ca. 75 °C' },
+    { text: 'Homogenisieren', detail: 'Der Homogenisator bringt das Produkt zusätzlich auf Überdruck' },
+    { text: 'Erhitzen und Heisshalten', detail: 'Auf ca. 140 °C, einige Sekunden' },
+    { text: 'Auf ca. 20 °C kühlen', detail: 'Das Wasser nimmt die Wärme der Milch auf (Wärmerückgewinnung)' },
+    { text: 'Aseptisch abfüllen', detail: 'Über das Druckhalteventil in den Steriltank oder auf die aseptische Abfüllmaschine' }
+  ]
+});
+</script>
+</body>
+</html>
