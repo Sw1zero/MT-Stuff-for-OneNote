@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tabellen-Lücken – Wärmebehandlung Konsummilch</title>
+  <link rel="stylesheet" href="../style.css?v=d6d6b61d">
+</head>
+<body>
+<header class="bzwu-header">
+  <div class="header-text">
+  <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · b.6</span>
+  <h1>Tabellen-Lücken</h1>
+  <p>Pastmilch, ESL-Milch und UHT-Milch im Vergleich</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+<main class="z-wrap">
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+  <div id="zuordnung"></div>
+</main>
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+<script src="../assets/zuordnung.js?v=046b71c5"></script>
+<script>
+Zuordnung.init({
+  stufen: ['zuordnen', 'anklicken', 'eintippen'],
+  tabellen: [
+    {
+      spalten: ['Verfahren', 'Erhitzungstemperatur', 'Heisshaltezeit', 'Haltbarkeit'],
+      zeilen: [
+        ['Pastmilch (kontinuierlich)',
+          { text: '74 °C', keys: ['74'] },
+          { text: '15 s', keys: ['15 s', '15s', '15 sek'] },
+          { text: '8 bis 10 Tage', keys: ['8 bis 10', '8 10', 'acht bis zehn'] }],
+        ['ESL-Milch, mikrofiltriert (Pasteurisation)',
+          { text: '74 °C', keys: ['74'] },
+          { text: '15 s', keys: ['15 s', '15s', '15 sek'] },
+          { text: 'bis 30 Tage', keys: ['30 tage', '30tage'] }],
+        ['ESL-Milch, doppelbaktofugiert (Pasteurisation)',
+          { text: '74 °C', keys: ['74'] },
+          { text: '15 s', keys: ['15 s', '15s', '15 sek'] },
+          { text: 'rund 15 Tage', keys: ['15 tage', '15tage'] }],
+        ['UHT-Milch',
+          { text: 'mindestens 135 °C', keys: ['135', '140', '145'] },
+          { text: 'einige Sekunden', keys: ['einige', 'wenige'] },
+          { text: 'mehrere Monate ohne Kühlung', keys: ['monat'] }]
+      ]
+    }
+  ],
+  intro: {
+    zuordnen: 'Legen Sie zu jedem Verfahren die passende Erhitzungstemperatur, Heisshaltezeit und Haltbarkeit in die Lücken oder tippen Sie Karte und Lücke nacheinander an.',
+    anklicken: 'Wählen Sie pro Lücke den passenden Wert.',
+    eintippen: 'Schreiben Sie pro Lücke den passenden Wert auf, z. B. «74 °C» oder «15 s».'
+  }
+});
+</script>
+</body>
+</html>
