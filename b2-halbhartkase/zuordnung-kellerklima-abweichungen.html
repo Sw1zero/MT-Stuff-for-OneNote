@@ -30,28 +30,29 @@
 Zuordnung.init({
   stufen: ['zuordnen', 'anklicken', 'eintippen'],
   gruppen: [
-    { key: 'temp', label: 'Temperatur zu hoch', keys: ['temperatur zu hoch', 'zu warm'] },
-    { key: 'feuchthoch', label: 'Luftfeuchtigkeit zu hoch', keys: ['luftfeuchtigkeit zu hoch', 'feuchtigkeit zu hoch', 'feuchte zu hoch'] },
-    { key: 'feuchttief', label: 'Luftfeuchtigkeit zu tief', keys: ['luftfeuchtigkeit zu tief', 'feuchtigkeit zu tief', 'feuchte zu tief'] },
-    { key: 'luftschwach', label: 'Luftumwälzung zu schwach', keys: ['luftumwälzung zu schwach', 'luft zu schwach', 'zu schwach', 'stehende luft'] },
-    { key: 'beide', label: 'Feuchtigkeit zu tief und Luftumwälzung zu stark', keys: ['beide', 'beides', 'luftumwälzung zu stark', 'luft zu stark', 'zu stark'] }
+    { key: 'temp', label: 'Temperatur zu hoch', keys: ['temperatur zu hoch', 'hohe temperatur', 'zu hohe temperatur', 'zu warm', 'warm'] },
+    { key: 'feuchthoch', label: 'Luftfeuchtigkeit zu hoch', keys: ['luftfeuchtigkeit zu hoch', 'feuchtigkeit zu hoch', 'feuchte zu hoch', 'hohe luftfeuchtigkeit', 'hohe feuchtigkeit', 'zu feucht'] },
+    { key: 'feuchttief', label: 'Luftfeuchtigkeit zu tief', keys: ['luftfeuchtigkeit zu tief', 'feuchtigkeit zu tief', 'feuchte zu tief', 'tiefe luftfeuchtigkeit', 'tiefe feuchtigkeit', 'zu niedrig', 'zu trocken'] },
+    { key: 'luftschwach', label: 'Luftumwälzung zu schwach', keys: ['luftumwälzung zu schwach', 'luft zu schwach', 'luft schwach', 'wenig luft', 'luftumwälzung zu gering', 'stehende luft'] },
+    { key: 'beide', label: 'Beides: Luftfeuchtigkeit zu tief oder Luftumwälzung zu stark', keys: ['beide', 'beides', 'tief oder luft'] }
   ],
   karten: [
     { text: 'Der Teig wird weicher und verläuft, es gibt mehr unförmige Randstücke', gruppe: 'temp' },
     { text: 'Die Proteolyse (Eiweissabbau) läuft schneller ab', gruppe: 'temp' },
-    { text: 'Der Narben wird aufgeweicht und kann «durchliegen»', gruppe: 'feuchthoch' },
+    { text: 'Der Narben (Käseoberfläche) wird aufgeweicht und kann «durchliegen»', gruppe: 'feuchthoch' },
     { text: 'Die Schmiere wird glänzend, salzig und klebrig', gruppe: 'feuchthoch' },
     { text: 'Die Käse können nicht mehr abtrocknen', gruppe: 'feuchthoch' },
     { text: 'Der Teig wird fester', gruppe: 'feuchttief' },
     { text: 'Es entstehen Luftschichten mit verschiedener Temperatur und Feuchtigkeit', gruppe: 'luftschwach' },
     { text: 'Die Reifung im Keller wird sehr ungleichmässig', gruppe: 'luftschwach' },
     { text: 'Die Rindenbildung nimmt zu', gruppe: 'beide' },
-    { text: 'Die Lichtung wird verstärkt', gruppe: 'beide' }
+    { text: 'Die Leichtung (Gewichtsverlust) nimmt zu', gruppe: 'beide' },
+    { text: 'Die Leichtung (Gewichtsverlust) nimmt ab', gruppe: 'feuchthoch' }
   ],
   intro: {
-    zuordnen: 'Tippen Sie auf die Abweichung, zu der die Folge unten gehört, oder ziehen Sie die Karte dorthin. Einzelne Folgen gelten für zwei Abweichungen zugleich.',
+    zuordnen: 'Tippen Sie auf die Abweichung, zu der die Folge unten gehört, oder ziehen Sie die Karte dorthin. Einzelne Folgen gelten für zwei Abweichungen (Gruppe «Beides»). Schnelleres Abtrocknen und häufigeres Schmieren kommen bei mehreren Abweichungen vor und fehlen darum hier.',
     anklicken: 'Klicken Sie pro Folge an, welche Abweichung im Keller sie verursacht.',
-    eintippen: 'Schreiben Sie zu jeder Folge die Abweichung im Keller, zum Beispiel «Temperatur zu hoch» oder «beide».'
+    eintippen: 'Schreiben Sie zu jeder Folge die Abweichung im Keller, zum Beispiel «Temperatur zu hoch» oder «beides».'
   }
 });
 </script>
