@@ -261,7 +261,7 @@ AFRAME.registerComponent('ruehrerwechsel', {
     this.g = g; this.winkel = 0; this.an = false;
     this.ruhig = matchMedia('(prefers-reduced-motion: reduce)').matches;
     this.alle = [...new Set(anlageVon(g.dataset.anlage).wechsel.varianten.flat())];
-    this.teilchen = new THREE.InstancedMesh(new THREE.SphereGeometry(0.011, 8, 6), new THREE.MeshBasicMaterial({ color: 0x1d6f99 }), 160);
+    this.teilchen = new THREE.InstancedMesh(new THREE.SphereGeometry(0.011, 8, 6), new THREE.MeshBasicMaterial({ color: Z('haupt') }), 160);
     this.teilchen.visible = false;
     this.el.object3D.add(this.teilchen);
     g.addEventListener('model-loaded', () => this.zeigen(anlageVon(g.dataset.anlage).wechsel.varianten[+g.dataset.variante || 0]));

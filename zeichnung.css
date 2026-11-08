@@ -1,0 +1,57 @@
+/* Zeichnungsfarben für Schnittbilder (Molkerei 3D) und Schemas (Präsentationen).
+   Eine Quelle für beide. Aufbau in drei Gruppen:
+   1. Rollen aus dem CD (../style.css): was hervorgehoben, gewarnt, beschriftet wird.
+   2. Metall: die Anlage selbst, bewusst neutral grau, damit die Medien auffallen.
+   3. Sachfarben: ein Stoff hat überall dieselbe Farbe (Rahm im Separator = Rahm im Schema).
+   Schemas sind eigenständige SVGs (img, WeasyPrint): sie können diese Datei nicht laden
+   und tragen die Hex-Werte direkt ein. schema_check.py meldet Farben, die hier fehlen.
+   JS (3D-Szene, Grundriss, Schnittbilder) liest die Werte mit Z('name') aus anlagen.js. */
+
+:root {
+  /* 1. Rollen (CD) */
+  --z-haupt:        #134061; /* Hauptelement, Haupttext, aktives Teil */
+  --z-flaeche:      #69A9C9; /* Flächen, Nebenlinien, Bänder, Hover */
+  --z-warnung:      #CC3333; /* nur Warnung, Grenzwert, Fehler, die eine Wirkung */
+  --z-hilfe:        #484846; /* Achsen, Hilfslinien, Bildbezeichnung */
+  --z-text:         #1a202c; /* Beschriftung */
+
+  /* 2. Metall (Anlage, Wände, Teile) */
+  --z-metall-hell:  #b9c0c6; /* Mantel, Gestell, Teil im Ruhezustand */
+  --z-metall:       #8a96a0; /* Trommel, Rührer, Kolben */
+  --z-metall-dunkel:#4a545c; /* Konturen, Teller, Wellen */
+  --z-innen:        #eef1f3; /* leerer Innenraum, Luft */
+  --z-oeffnung:     #22262a; /* Düsen, Bohrungen, Strömungspfeile auf Metall */
+
+  /* 3. Sachfarben: Milch und Produkte */
+  --z-milch:        #ffffff; /* Milch, Gallerte; immer mit Kontur --z-metall-hell */
+  --z-rahm:         #f2d54b; /* Rahm, Fett */
+  --z-rahm-dunkel:  #a8860a; /* Strömung und Kontur auf Rahm */
+  --z-magermilch:   #c9dce6; /* leicht bläulich, sonst wie Stahl */
+  --z-quark:        #f3ecd6;
+  --z-quark-dunkel: #a08850; /* Strömung, Kontur, Schnitte */
+  --z-kaeseteig:    #fdf3d0; /* Käseteig, Bruch */
+  --z-molke:        #d6dc7e;
+  --z-molke-dunkel: #6f7520;
+  --z-schlamm:      #7a5a3a;
+
+  /*    Sachfarben: Inhaltsstoffe (Membran, Zusammensetzung) */
+  --z-kasein:       #8c7a6b;
+  --z-molkenprotein:#3b6fb6;
+  --z-laktose:      #e08a2c;
+  --z-salze:        #b03a5b;
+  --z-wasser:       #5fb3d9;
+
+  /*    Sachfarben: Wärmeträger (PWT, Erhitzer) */
+  --z-heiss:        #e0662c; /* Warmwasser, Heisswasser, Dampf; Orange, damit Rot der Warnung bleibt */
+  --z-heiss-hell:   #f2b08f; /* Rücklauf */
+  --z-kalt:         #3b6fb6; /* Eiswasser, Kühlsole; gleich wie Molkenproteine, nie im selben Bild */
+  --z-kalt-hell:    #8dbbf0; /* Rücklauf */
+  --z-rueckgewinn:  #3f9a4e; /* Wärmerückgewinnung */
+
+  /* Strich und Bewegung (Schnittbild-Massstab; Schema 1100 px: siehe praesentation/SKILL.md) */
+  --z-strich-kontur: 1.2px;
+  --z-strich-wand:   4px;
+  --z-fluss-dash:    7 11;  /* Strömungsstrich, läuft mit z-fliessen */
+  --z-fluss-dauer:   0.9s;
+}
+

@@ -6,9 +6,9 @@
 // Eintrittstemperaturen sind Beispielwerte (Lehrmittel nennt nur 72 °C), k = Wärmeübergang je Plattenlänge,
 // so gewählt, dass im Gegenstrom typische Austrittswerte entstehen. km Milch, kd Medium (kleiner = mehr Mediumstrom).
 const PWT_PAKETE = {
-  paket_rueckgewinnung: { kurz: 'Rückgewinnung', farbe: '#3f9a4e', milch: 'Rohmilch', milchEin: 4, medium: 'Pastmilch', mediumEin: 72, km: 5.7, kd: 5.7 },
-  paket_erhitzer: { kurz: 'Erhitzer', farbe: '#c8473b', milch: 'Milch', milchEin: 62, medium: 'Warmwasser', mediumEin: 76, km: 2.0, kd: 1.0 },
-  paket_kuehlung: { kurz: 'Kühlung', farbe: '#3b6fb6', milch: 'Pastmilch', milchEin: 14, medium: 'Eiswasser', mediumEin: 1, km: 2.1, kd: 1.05 }
+  paket_rueckgewinnung: { kurz: 'Rückgewinnung', farbe: Z('rueckgewinn'), milch: 'Rohmilch', milchEin: 4, medium: 'Pastmilch', mediumEin: 72, km: 5.7, kd: 5.7 },
+  paket_erhitzer: { kurz: 'Erhitzer', farbe: Z('heiss'), milch: 'Milch', milchEin: 62, medium: 'Warmwasser', mediumEin: 76, km: 2.0, kd: 1.0 },
+  paket_kuehlung: { kurz: 'Kühlung', farbe: Z('kalt'), milch: 'Pastmilch', milchEin: 14, medium: 'Eiswasser', mediumEin: 1, km: 2.1, kd: 1.05 }
 };
 const PWT_N = 100;              // Rechenschritte über die Plattenlänge
 const PWT_Y = [60, 360];        // Plattenoberkante, -unterkante; Milch fliesst von unten nach oben
@@ -43,7 +43,7 @@ function bauePwt(svg) {
   svg.setAttribute('viewBox', '0 0 720 430');
   const [oben, unten] = PWT_Y, x0 = 50, spalt = 52, n = 6; // 6 Spalten, abwechselnd Milch und Medium
   const defs = svgEl('defs', {}, svg);
-  svgEl('path', { d: 'M0,0 L8,4 L0,8 Z', fill: '#22262a' }, svgEl('marker', { id: 'pwt-pfeil', viewBox: '0 0 8 8', refX: 4, refY: 4, markerWidth: 7, markerHeight: 7, orient: 'auto' }, defs));
+  svgEl('path', { d: 'M0,0 L8,4 L0,8 Z', fill: Z('oeffnung') }, svgEl('marker', { id: 'pwt-pfeil', viewBox: '0 0 8 8', refX: 4, refY: 4, markerWidth: 7, markerHeight: 7, orient: 'auto' }, defs));
   const verlauf = art => svgEl('linearGradient', { id: `pwt-${art}`, x1: 0, y1: 1, x2: 0, y2: 0 }, defs);
   const vg = { m: verlauf('m'), d: verlauf('d') };
   const text = (x, y, t, a = {}, eltern = svg) => { const e = svgEl('text', { x, y, class: 'sb-medium', ...a }, eltern); e.textContent = t; return e; };

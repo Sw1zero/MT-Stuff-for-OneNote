@@ -39,7 +39,7 @@ function baueQuarkseparator(svg, zeigeTeil) {
   const defs = svgEl('defs', {}, svg);
   const verlauf = svgEl('linearGradient', { id: 'qs-verlauf', gradientUnits: 'userSpaceOnUse', x1: 92, y1: 0, x2: 250, y2: 0 }, defs);
   const l = (QS_LOCH - 92) / 158, b = QS_LOCH_B / 158;
-  [[0, 'var(--sw-molke)'], [l - b - 0.12, 'var(--sw-molke)'], [l - b, '#ffffff'], [l + b, '#ffffff'], [l + b + 0.06, 'var(--sw-quark)'], [1, 'var(--sw-quark)']]
+  [[0, 'var(--z-molke)'], [l - b - 0.12, 'var(--z-molke)'], [l - b, 'var(--z-milch)'], [l + b, 'var(--z-milch)'], [l + b + 0.06, 'var(--z-quark)'], [1, 'var(--z-quark)']]
     .forEach(([o, c]) => svgEl('stop', { offset: o, style: `stop-color: ${c}` }, verlauf));
   const mk = svgEl('marker', { id: 'qs-spitze', viewBox: '0 0 10 10', refX: 5, refY: 5, markerWidth: 6, markerHeight: 6, orient: 'auto' }, defs);
   svgEl('path', { d: 'M0,0 L10,5 L0,10 z', class: 'sb-spitze' }, mk);

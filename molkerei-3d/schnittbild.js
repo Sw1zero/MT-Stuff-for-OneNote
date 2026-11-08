@@ -79,7 +79,7 @@ function baueSchnittbild(svg, teile, zeigeTeil) {
   const defs = svgEl('defs', {}, svg);
   // Tellerpaket: innen Rahm, am Steigloch Milch, aussen Magermilch (wird mit der Hälfte gespiegelt)
   const verlauf = svgEl('linearGradient', { id: 'sb-verlauf', gradientUnits: 'userSpaceOnUse', x1: 46, y1: 0, x2: 245, y2: 0 }, defs);
-  [[0, 'var(--sb-rahm)'], [0.12, 'var(--sb-rahm)'], [0.18, 'var(--sb-milch)'], [0.28, 'var(--sb-milch)'], [0.45, 'var(--sb-mager)'], [1, 'var(--sb-mager)']] // Milch am Steigloch (r 82 bis 102), Rahm schmal: wenig Fett
+  [[0, 'var(--z-rahm)'], [0.12, 'var(--z-rahm)'], [0.18, 'var(--z-milch)'], [0.28, 'var(--z-milch)'], [0.45, 'var(--z-magermilch)'], [1, 'var(--z-magermilch)']] // Milch am Steigloch (r 82 bis 102), Rahm schmal: wenig Fett
     .forEach(([o, c]) => svgEl('stop', { offset: o, style: `stop-color: ${c}` }, verlauf));
   // Auffüllen: Rechteck, das von unten hochfährt
   const clip = svgEl('clipPath', { id: 'sb-fuellung' }, defs);

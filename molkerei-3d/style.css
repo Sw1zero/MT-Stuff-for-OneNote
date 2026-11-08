@@ -72,30 +72,29 @@
 .mk-schnitt-info h3 { margin: 0 0 8px; color: var(--blue-light); font-size: 1.05rem; }
 .mk-schnitt-info p { margin: 0 0 0.6em; line-height: 1.55; color: var(--text); }
 .mk-schnitt .mk-hinweis { font-size: 0.9em; font-style: italic; color: var(--text-muted); }
-.mk-schnitt { --sb-milch: #ffffff; --sb-rahm: #f2d54b; --sb-mager: #a3acb4; }
-.sb-leer { fill: #d3d9de; }
+.sb-leer { fill: var(--z-innen); }
 .sb-zone { stroke: none; }
-.sb-zone-milch { fill: var(--sb-milch); stroke: #b4bcc3; stroke-width: 1; }
-.sb-zone-rahm { fill: var(--sb-rahm); }
-.sb-zone-magermilch { fill: var(--sb-mager); }
+.sb-zone-milch { fill: var(--z-milch); stroke: var(--z-metall-hell); stroke-width: 1; }
+.sb-zone-rahm { fill: var(--z-rahm); }
+.sb-zone-magermilch { fill: var(--z-magermilch); }
 .sb-zone-tellerpaket { fill: url(#sb-verlauf); }
-.sb-strich { fill: none; stroke-width: 2; stroke-dasharray: 7 11; stroke-linejoin: round; animation: sb-fliessen 0.9s linear infinite; }
-.sb-strich-milch { stroke: #9aa3ab; }
-.sb-strich-rahm { stroke: #a8860a; }
-.sb-strich-magermilch { stroke: #4d565e; }
+.sb-strich { fill: none; stroke-width: 2; stroke-dasharray: var(--z-fluss-dash); stroke-linejoin: round; animation: sb-fliessen var(--z-fluss-dauer) linear infinite; }
+.sb-strich-milch { stroke: var(--z-metall); }
+.sb-strich-rahm { stroke: var(--z-rahm-dunkel); }
+.sb-strich-magermilch { stroke: var(--z-metall-dunkel); }
 @keyframes sb-fliessen { to { stroke-dashoffset: -18; } }
 @media (prefers-reduced-motion: reduce) { .sb-strich { animation: none; } }
-.sb-teil { cursor: pointer; fill: #b9c0c6; stroke: #4a545c; stroke-width: 1.2; }
-.sb-teil:hover, .sb-teil:focus-visible, .sb-teil.sb-aktiv { fill: #69a9c9; outline: none; }
-.sb-teil:hover .sb-teller, .sb-teil.sb-aktiv .sb-teller, .sb-teil:hover .sb-linie, .sb-teil.sb-aktiv .sb-linie { stroke: #1d6f99; }
-.sb-teller { stroke: #4a545c; stroke-width: 4; stroke-linecap: round; }
-.sb-oeffnung { fill: #22262a; }
-.sb-linie { fill: none; stroke: #7b858d; stroke-width: 1; }
+.sb-teil { cursor: pointer; fill: var(--z-metall-hell); stroke: var(--z-metall-dunkel); stroke-width: var(--z-strich-kontur); }
+.sb-teil:hover, .sb-teil:focus-visible, .sb-teil.sb-aktiv { fill: var(--z-flaeche); outline: none; }
+.sb-teil:hover .sb-teller, .sb-teil.sb-aktiv .sb-teller, .sb-teil:hover .sb-linie, .sb-teil.sb-aktiv .sb-linie { stroke: var(--z-haupt); }
+.sb-teller { stroke: var(--z-metall-dunkel); stroke-width: var(--z-strich-wand); stroke-linecap: round; }
+.sb-oeffnung { fill: var(--z-oeffnung); }
+.sb-linie { fill: none; stroke: var(--z-metall); stroke-width: 1; }
 .sb-text { fill: var(--text); stroke: none; font-size: 17px; }
-.sb-teil:hover .sb-text, .sb-teil.sb-aktiv .sb-text { fill: #1d6f99; font-weight: 600; }
+.sb-teil:hover .sb-text, .sb-teil.sb-aktiv .sb-text { fill: var(--z-haupt); font-weight: 600; }
 .sb-medium { fill: var(--text-muted); font-size: 16px; }
-.sb-schlamm { fill: #7a5a3a; }
-.sb-wasser { fill: #8ec9e6; }
+.sb-schlamm { fill: var(--z-schlamm); }
+.sb-wasser { fill: var(--z-wasser); }
 .mk-schnitt[data-ansicht="greifer"] .mk-schnitt-inhalt > svg { display: none; }
 .mk-greifer[hidden] { display: none; }
 .mk-greifer svg { width: 100%; height: auto; max-height: calc(100vh - 220px); }
@@ -104,15 +103,15 @@
 .mk-greifer label span { font-weight: 400; color: var(--text-muted); }
 .mk-greifer-status { margin: 8px 0 0; padding: 8px 12px; border-radius: var(--radius-sm); background: var(--blue-tint); color: var(--text); }
 .mk-greifer-status:not([data-zustand="gut"]) { background: #fbe6d4; color: #7a3a0a; }
-.sb-kammerwand { fill: #b9c0c6; stroke: #4a545c; stroke-width: 1.2; }
-.sb-luft { fill: #eef1f3; transition: r 0.4s; }
-.sb-ring { fill: none; stroke: #4d565e; stroke-width: 2; stroke-dasharray: 10 22; animation: sb-drehen 4s linear infinite; }
+.sb-kammerwand { fill: var(--z-metall-hell); stroke: var(--z-metall-dunkel); stroke-width: var(--z-strich-kontur); }
+.sb-luft { fill: var(--z-innen); transition: r 0.4s; }
+.sb-ring { fill: none; stroke: var(--z-metall-dunkel); stroke-width: 2; stroke-dasharray: 10 22; animation: sb-drehen 4s linear infinite; }
 @keyframes sb-drehen { to { transform: rotate(360deg); } }
-.sb-greifer { fill: #b9c0c6; fill-opacity: 0.55; stroke: #4a545c; stroke-width: 1.5; }
-.sb-kanal { fill: none; stroke: #4a545c; stroke-width: 12; stroke-linecap: round; }
+.sb-greifer { fill: var(--z-metall-hell); fill-opacity: 0.55; stroke: var(--z-metall-dunkel); stroke-width: 1.5; }
+.sb-kanal { fill: none; stroke: var(--z-metall-dunkel); stroke-width: 12; stroke-linecap: round; }
 .sb-trocken .sb-strich { display: none; }
 .mk-greifer .sb-strich-magermilch { stroke: #fff; }
-.sb-ableiter { fill: var(--sb-mager); stroke: #4a545c; stroke-width: 1.5; }
+.sb-ableiter { fill: var(--z-magermilch); stroke: var(--z-metall-dunkel); stroke-width: 1.5; }
 @media (prefers-reduced-motion: reduce) { .sb-ring { animation: none; } }
 .sb-kugeln { pointer-events: none; }
 .sb-dreh { fill: none; stroke: var(--blue-light); stroke-width: 3; }
@@ -123,17 +122,16 @@
 .mk-teilbild[hidden] { display: none; }
 
 /* Schnittbild Schulenburgverfahren (schnittbild-schulenburg.js): Zustand je Schritt über data-schritt */
-.mk-schnitt { --sw-milch: #e4eef5; --sw-quark: #f3ecd6; --sw-molke: #d6dc7e; }
-.sw-milch { fill: var(--sw-milch); stroke: #b4bcc3; }
-.sw-quark { fill: var(--sw-quark); stroke: #c9bd98; }
-.sw-molke { fill: var(--sw-molke); }
-.sw-schnitte line { stroke: #b8a978; stroke-width: 2; }
-.sw-sieb { fill: none; stroke: #4a545c; stroke-width: 3; stroke-dasharray: 3 4; }
-.sw-teil:hover .sw-sieb, .sw-teil.sb-aktiv .sw-sieb { stroke: #1d6f99; }
-.sw-luke { fill: none; stroke: #4a545c; stroke-width: 2; stroke-dasharray: 4 3; }
-.sw-rohr { fill: none; stroke: #8a99a6; stroke-width: 8; stroke-linejoin: round; }
-.sw-strich { stroke: #6f7520; }
-.sw-pfeil { fill: none; stroke: var(--blue-light); stroke-width: 4; }
+.sw-milch { fill: var(--z-milch); stroke: var(--z-metall-hell); }
+.sw-quark { fill: var(--z-quark); stroke: var(--z-quark-dunkel); }
+.sw-molke { fill: var(--z-molke); }
+.sw-schnitte line { stroke: var(--z-quark-dunkel); stroke-width: 2; }
+.sw-sieb { fill: none; stroke: var(--z-metall-dunkel); stroke-width: 3; stroke-dasharray: 3 4; }
+.sw-teil:hover .sw-sieb, .sw-teil.sb-aktiv .sw-sieb { stroke: var(--z-haupt); }
+.sw-luke { fill: none; stroke: var(--z-metall-dunkel); stroke-width: 2; stroke-dasharray: 4 3; }
+.sw-rohr { fill: none; stroke: var(--z-metall); stroke-width: 8; stroke-linejoin: round; }
+.sw-strich { stroke: var(--z-molke-dunkel); }
+.sw-pfeil { fill: none; stroke: var(--blue-light); stroke-width: var(--z-strich-wand); }
 .sw-spitze { fill: var(--blue-light); }
 .sw-oben { transform: translateY(-300px); transition: transform 1.6s ease-in-out; }
 .sw-pegel { transform: translateY(390px); transition: transform 5s linear; }
@@ -150,61 +148,61 @@ svg[data-schritt="4"] .sw-druck .sw-pfeil { animation: sw-druck 5s linear forwar
 @media (prefers-reduced-motion: reduce) { .sw-oben, .sw-pegel { transition: none; } .sw-druck .sw-pfeil { animation: none; } }
 
 /* Schnittbild Strömungsformen (schnittbild-ruehrwerk.js) */
-.rw-mantel { fill: #b9c0c6; stroke: #4a545c; stroke-width: 1.2; }
-.rw-innen { fill: #eef1f3; }
-.rw-milch { fill: #fbfaf3; stroke: #b4bcc3; stroke-width: 1; }
-.rw-welle { stroke: #4a545c; stroke-width: 6; }
-.rw-ruehrer { fill: #8a96a0; stroke: #4a545c; stroke-width: 1.2; }
-.rw-schaufel { fill: #4a545c; }
-.rw-buegel { fill: none; stroke: #4a545c; stroke-width: 6; stroke-linejoin: round; }
-.rw-messer { stroke: #6b757d; stroke-width: 1.5; }
-.rw-nabe { fill: #4a545c; }
-.rw-brecher { fill: #7b858d; }
-.rw-trombe { fill: #b3261e; font-size: 17px; font-weight: 600; visibility: hidden; }
+.rw-mantel { fill: var(--z-metall-hell); stroke: var(--z-metall-dunkel); stroke-width: var(--z-strich-kontur); }
+.rw-innen { fill: var(--z-innen); }
+.rw-milch { fill: var(--z-milch); stroke: var(--z-metall-hell); stroke-width: 1; }
+.rw-welle { stroke: var(--z-metall-dunkel); stroke-width: 6; }
+.rw-ruehrer { fill: var(--z-metall); stroke: var(--z-metall-dunkel); stroke-width: var(--z-strich-kontur); }
+.rw-schaufel { fill: var(--z-metall-dunkel); }
+.rw-buegel { fill: none; stroke: var(--z-metall-dunkel); stroke-width: 6; stroke-linejoin: round; }
+.rw-messer { stroke: var(--z-metall-dunkel); stroke-width: 1.5; }
+.rw-nabe { fill: var(--z-metall-dunkel); }
+.rw-brecher { fill: var(--z-metall); }
+.rw-trombe { fill: var(--z-warnung); font-size: 17px; font-weight: 600; visibility: hidden; }
 svg[data-trombe="ja"] .rw-trombe { visibility: visible; }
 .mk-rw-wahl { margin: 0 0 10px; }
 .mk-rw-wahl button[aria-pressed="false"] { background: #fff; color: var(--blue-dark); }
 .mk-rw-brecher { display: block; margin-bottom: 12px; }
-.rw-bahn { fill: none; stroke: #a9cfe2; stroke-width: 2; }
+.rw-bahn { fill: none; stroke: var(--z-flaeche); stroke-width: 2; }
 .rw-teilchen path { fill: var(--blue-dark); }
 
 /* Schnittbild Querstromfiltration (schnittbild-membran.js) */
-.mb-kanal { fill: #fbfaf3; }
-.mb-permeatseite { fill: #f4f6e6; }
-.mb-membran { fill: #6b757d; }
-.mb-pore { fill: #f4f6e6; }
-.mb-wand { stroke: #4a545c; stroke-width: 4; }
+.mb-kanal { fill: var(--z-milch); }
+.mb-permeatseite { fill: var(--z-innen); }
+.mb-membran { fill: var(--z-metall-dunkel); }
+.mb-pore { fill: var(--z-innen); }
+.mb-wand { stroke: var(--z-metall-dunkel); stroke-width: var(--z-strich-wand); }
 .mb-klein { font-size: 13px; }
 .mb-legende-titel { font-weight: 600; fill: var(--text); }
-.mb-bahn { fill: none; stroke: #a9cfe2; stroke-width: 2; }
+.mb-bahn { fill: none; stroke: var(--z-flaeche); stroke-width: 2; }
 .mb-pfeile path { fill: var(--blue-dark); opacity: 0.55; }
 
 /* Schnittbilder Quarklinie (schnittbild-quark.js): Farben wie Schulenburg (Quark, Molke), Gallerte weiss wie Milch */
 .qs-zone { stroke: none; }
-.qs-zone-gallerte { fill: #ffffff; stroke: #b4bcc3; stroke-width: 1; }
-.qs-zone-molke { fill: var(--sw-molke); }
-.qs-zone-quark { fill: var(--sw-quark); stroke: none; }
+.qs-zone-gallerte { fill: var(--z-milch); stroke: var(--z-metall-hell); stroke-width: 1; }
+.qs-zone-molke { fill: var(--z-molke); }
+.qs-zone-quark { fill: var(--z-quark); stroke: none; }
 .qs-zone-tellerpaket { fill: url(#qs-verlauf); }
-.qs-strich-gallerte { stroke: #9aa3ab; }
-.qs-strich-molke { stroke: #6f7520; }
-.qs-strich-quark { stroke: #a08850; }
-.qs-trommel { fill: #8a96a0; stroke: #4a545c; stroke-width: 1.2; }
-.qs-duese { fill: #22262a; }
-.qs-auffang { fill: #eef1f3; }
-.qs-gestell { fill: #b9c0c6; stroke: #4a545c; stroke-width: 1.2; }
-.qs-punkt { fill: var(--sw-quark); stroke: #8c7a4a; stroke-width: 1.2; }
-.kp-kolben { fill: #8a96a0; stroke: #4a545c; stroke-width: 1.2; }
-.sb-teil:hover .kp-kolben, .sb-teil.sb-aktiv .kp-kolben { fill: #69a9c9; }
-.kp-welle { fill: #4a545c; }
+.qs-strich-gallerte { stroke: var(--z-metall); }
+.qs-strich-molke { stroke: var(--z-molke-dunkel); }
+.qs-strich-quark { stroke: var(--z-quark-dunkel); }
+.qs-trommel { fill: var(--z-metall); stroke: var(--z-metall-dunkel); stroke-width: var(--z-strich-kontur); }
+.qs-duese { fill: var(--z-oeffnung); }
+.qs-auffang { fill: var(--z-innen); }
+.qs-gestell { fill: var(--z-metall-hell); stroke: var(--z-metall-dunkel); stroke-width: var(--z-strich-kontur); }
+.qs-punkt { fill: var(--z-quark); stroke: var(--z-quark-dunkel); stroke-width: var(--z-strich-kontur); }
+.kp-kolben { fill: var(--z-metall); stroke: var(--z-metall-dunkel); stroke-width: var(--z-strich-kontur); }
+.sb-teil:hover .kp-kolben, .sb-teil.sb-aktiv .kp-kolben { fill: var(--z-flaeche); }
+.kp-welle { fill: var(--z-metall-dunkel); }
 
 /* Schnittbild Plattenwärmetauscher (schnittbild-pwt.js) */
-.pwt-platte { fill: none; stroke: #4a545c; stroke-width: 3; stroke-linejoin: round; }
+.pwt-platte { fill: none; stroke: var(--z-metall-dunkel); stroke-width: 3; stroke-linejoin: round; }
 .pwt-dichtung { opacity: 0.85; }
-.pwt-name { fill: #1f2428; font-size: 14px; paint-order: stroke; stroke: rgba(255,255,255,0.7); stroke-width: 3px; }
-.pwt-strich { fill: none; stroke: #22262a; stroke-width: 2; stroke-dasharray: 7 11; animation: sb-fliessen 0.9s linear infinite; }
+.pwt-name { fill: var(--z-text); font-size: 14px; paint-order: stroke; stroke: rgba(255,255,255,0.7); stroke-width: 3px; }
+.pwt-strich { fill: none; stroke: var(--z-oeffnung); stroke-width: 2; stroke-dasharray: var(--z-fluss-dash); animation: sb-fliessen var(--z-fluss-dauer) linear infinite; }
 @media (prefers-reduced-motion: reduce) { .pwt-strich { animation: none; } }
-.pwt-diagramm { fill: #fbfaf3; stroke: #4a545c; }
-.pwt-raster { stroke: #d3d9de; }
-.pwt-kurve { fill: none; stroke: #22262a; stroke-width: 2.5; }
+.pwt-diagramm { fill: var(--z-milch); stroke: var(--z-metall-dunkel); }
+.pwt-raster { stroke: var(--z-innen); }
+.pwt-kurve { fill: none; stroke: var(--z-oeffnung); stroke-width: 2.5; }
 .pwt-kurve-d { stroke-dasharray: 8 5; }
 .pwt-wert { font-size: 14px; fill: var(--text); }

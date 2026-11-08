@@ -6,12 +6,12 @@
 
 const MB_K = { l: 70, r: 650, oben: 75, membran: 200, unten: 214, boden: 300 }; // Kanal, Membran, Permeatseite
 const MB_STOFFE = {
-  fett: { name: 'Fett', r: 10, farbe: '#f2d54b', n: 5 },
-  kasein: { name: 'Kasein', r: 6.5, farbe: '#8c7a6b', n: 10 },
-  molkenprotein: { name: 'Molkenproteine', r: 4, farbe: '#3b6fb6', n: 10 },
-  laktose: { name: 'Laktose', r: 4, farbe: '#e08a2c', n: 10, form: 'raute' },
-  salze: { name: 'Salze', r: 2.8, farbe: '#b03a5b', n: 10, form: 'quadrat' },
-  wasser: { name: 'Wasser', r: 2.2, farbe: '#5fb3d9', n: 18 }
+  fett: { name: 'Fett', r: 10, farbe: Z('rahm'), n: 5 },
+  kasein: { name: 'Kasein', r: 6.5, farbe: Z('kasein'), n: 10 },
+  molkenprotein: { name: 'Molkenproteine', r: 4, farbe: Z('molkenprotein'), n: 10 },
+  laktose: { name: 'Laktose', r: 4, farbe: Z('laktose'), n: 10, form: 'raute' },
+  salze: { name: 'Salze', r: 2.8, farbe: Z('salze'), n: 10, form: 'quadrat' },
+  wasser: { name: 'Wasser', r: 2.2, farbe: Z('wasser'), n: 18 }
 };
 // Eigene Sätze nach a.3 «Prinzip der Membranfiltration» und «Ultrafiltration».
 const MB_VERFAHREN = {

@@ -2,6 +2,13 @@
 // Masse in Metern. x nach rechts (Osten), z nach unten im Grundriss (Süden).
 // VORLÄUFIG: Grundriss-Vorschlag, wartet auf Philipps Korrektur.
 
+// Zeichnungsfarbe aus ../zeichnung.css (muss vor diesem Skript eingebunden sein), z.B. Z('rahm')
+const Z = name => {
+  const c = getComputedStyle(document.documentElement).getPropertyValue('--z-' + name).trim();
+  if (!c) throw new Error('Farbe fehlt in zeichnung.css: --z-' + name);
+  return c;
+};
+
 const RAEUME = [
   // id, name, Rechteck x0/z0/x1/z1, Deckenhöhe, Bodenfarbe
   // wand: 'beton' statt Fliesen unten und Paneele oben. belag: Bodenmuster statt weisser Fliesen. farbe nur noch im Grundriss.
@@ -45,15 +52,15 @@ const TUEREN = [
 // Versorgung (isoliert): farbe = Vorlauf dunkel, ruecklauf = Rücklauf hell (Leitung mit ab '…ruecklauf').
 // Sie läuft immer im Untergeschoss und kommt direkt an der Anlage durch den Boden (geometrie.js anschluesse).
 const MEDIEN = {
-  milch: { name: 'Milch', farbe: '#ffffff', produkt: true },
-  rahm: { name: 'Rahm', farbe: '#f2d54b', produkt: true },
-  magermilch: { name: 'Magermilch', farbe: '#9aa3ab', produkt: true },
-  bruch: { name: 'Bruch', farbe: '#f2d54b', produkt: true },
-  molke: { name: 'Molke', farbe: '#4f9d5a', produkt: true },
+  milch: { name: 'Milch', farbe: Z('milch'), produkt: true },
+  rahm: { name: 'Rahm', farbe: Z('rahm'), produkt: true },
+  magermilch: { name: 'Magermilch', farbe: Z('magermilch'), produkt: true },
+  bruch: { name: 'Bruch', farbe: Z('kaeseteig'), produkt: true },
+  molke: { name: 'Molke', farbe: Z('molke'), produkt: true },
   cip: { name: 'CIP-Reinigung', farbe: '#e8892b', produkt: true }, // Farbe vorläufig (Baukasten: «CIP später»), Vorlauf geht über den Bahnhof wie ein Produkt
-  heisswasser: { name: 'Heisswasser', farbe: '#9e1f1f', ruecklauf: '#e58a8a', r: 0.045, isoliert: true },
-  kuehlwasser: { name: 'Kühlwasser', farbe: '#1d4f9e', ruecklauf: '#8dbbf0', r: 0.045, isoliert: true },
-  quark: { name: 'Quark', farbe: '#f4efe1', produkt: true }
+  heisswasser: { name: 'Heisswasser', farbe: Z('heiss'), ruecklauf: Z('heiss-hell'), r: 0.045, isoliert: true },
+  kuehlwasser: { name: 'Kühlwasser', farbe: Z('kalt'), ruecklauf: Z('kalt-hell'), r: 0.045, isoliert: true },
+  quark: { name: 'Quark', farbe: Z('quark'), produkt: true }
 };
 const LEITUNG_HOEHE = 3;      // m, unterste Leitung
 const LEITUNG_ABSTAND = 0.015; // m, Luft zwischen zwei übereinanderliegenden Leitungen
