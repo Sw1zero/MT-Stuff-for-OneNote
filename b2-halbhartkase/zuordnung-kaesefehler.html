@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Käsefehler: Ursache zum Fehler</title>
+  <link rel="stylesheet" href="../style.css?v=d6d6b61d">
+</head>
+<body>
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · b.2</span>
+    <h1>Käsefehler: Ursache zum Fehler</h1>
+    <p>Welche Ursache gehört zu welchem Käsefehler? (Lehrmittel b.2, S. 22–25)</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+<main class="z-wrap">
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+  <div id="zuordnung"></div>
+</main>
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+<script src="../assets/zuordnung.js?v=046b71c5"></script>
+<script>
+Zuordnung.init({
+  stufen: ['zuordnen', 'anklicken', 'eintippen'],
+  gruppen: [
+    { key: 'blind', label: 'Blinde oder sparsame Lochung', keys: ['blind', 'sparsame lochung', 'blinde lochung', 'blinde oder sparsame lochung'] },
+    { key: 'nisser', label: 'Nisserige Lochung', keys: ['nisserig', 'nisserige lochung'] },
+    { key: 'gross', label: 'Zu grosse Löcher und Nachgärung', keys: ['zu grosse löcher', 'nachgärung', 'grosse löcher', 'zu grosse löcher und nachgärung'] },
+    { key: 'schm', label: 'Fehlerhafte Schmiere', keys: ['fehlerhafte schmiere'] },
+    { key: 'entw', label: 'Schlechte Schmiere-Entwicklung', keys: ['schlechte schmiere-entwicklung', 'schlechte schmiereentwicklung', 'schlechte entwicklung', 'schmiere entwicklung', 'schmiereentwicklung'] },
+    { key: 'fest', label: 'Fester, wenig elastischer Teig', keys: ['fester teig', 'fester wenig elastischer teig', 'fest'] },
+    { key: 'weich', label: 'Weicher Teig', keys: ['weicher teig', 'weich'] },
+    { key: 'gesch', label: 'Geschmacksabweichungen', keys: ['geschmacksabweichung', 'geschmacksabweichungen', 'geschmack'] },
+    { key: 'kroete', label: 'Schrumpfiger Narben (krötenhäutig)', keys: ['schrumpfiger narben', 'krötenhäutig', 'krötenhäutiger narben', 'schrumpfig', 'krötenhaut', 'kroetenhaut'] }
+  ],
+  karten: [
+    { text: 'Zu wenig aktive, CO2-bildende Kulturen', gruppe: 'blind' },
+    { text: 'Fehlende Lochansatzstellen im Käseteig', gruppe: 'blind' },
+    { text: 'Ungenügender Gasdruck im Käse', gruppe: 'blind' },
+    { text: 'Starkes Wachstum von Colibakterien, die unkontrolliert Gas bilden', gruppe: 'nisser' },
+    { text: 'Lufteintrag über das Bruchwaschwasser', gruppe: 'nisser' },
+    { text: 'Fehlender Sirtenspiegel in den Formen', gruppe: 'nisser' },
+    { text: 'Buttersäurebakterien vergären Milchsäure zu Wasserstoffgas (Silage, belastetes Trinkwasser)', gruppe: 'gross' },
+    { text: 'Propionsäurebakterien vergären Milchsäure zu CO2 (Thermisationstemperatur nicht erreicht)', gruppe: 'gross' },
+    { text: 'Zu schnelles Abkühlen bei unvollständigem Milchzuckerabbau (Nachnetzen)', gruppe: 'schm' },
+    { text: 'Ungenügende Aktivität der Milchsäurebakterien (Überalterung der Kulturen)', gruppe: 'schm' },
+    { text: 'Fettschwitzen vor der Salzbehandlung (Fettfilm)', gruppe: 'entw' },
+    { text: 'Austrocknen der Rinde durch zu wenig Schmieren', gruppe: 'entw' },
+    { text: 'Zu starkes Wachstum von Geotrichum', gruppe: 'entw' },
+    { text: 'Milchzucker ungenügend verdünnt', gruppe: 'fest' },
+    { text: 'pH unter 5,1 im 20-stündigen Käse', gruppe: 'fest' },
+    { text: 'Kalzium löst sich aus dem Kaseingerüst', gruppe: 'fest' },
+    { text: 'Zu hoher Fettgehalt', gruppe: 'weich' },
+    { text: 'Zu kurze Salzbaddauer', gruppe: 'weich' },
+    { text: 'Medikamente oder Zitzentauchmittel in der Milch', gruppe: 'gesch' },
+    { text: 'Fettspaltung (Lipase, mechanische Schädigung)', gruppe: 'gesch' },
+    { text: 'Überreife', gruppe: 'gesch' },
+    { text: 'Zu kaltes Salzbad', gruppe: 'kroete' },
+    { text: 'Schlecht durchlässige Formen (mangelhafte Entsirtung)', gruppe: 'kroete' },
+    { text: 'Häufiger Wechsel nasser gegen trockene Bretter', gruppe: 'kroete' }
+  ],
+  intro: {
+    zuordnen: 'Tippen Sie auf den Käsefehler, zu dem die Ursache unten gehört, oder ziehen Sie die Karte dorthin.',
+    anklicken: 'Klicken Sie pro Ursache an, welchen Käsefehler sie verursacht.',
+    eintippen: 'Schreiben Sie zu jeder Ursache den Käsefehler, zum Beispiel «Weicher Teig» oder «Nisserige Lochung».'
+  }
+});
+</script>
+</body>
+</html>
