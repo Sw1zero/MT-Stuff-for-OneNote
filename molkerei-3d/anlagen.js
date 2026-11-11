@@ -89,26 +89,28 @@ const LEITUNGEN = [
   { von: 'plattenwaermetauscher', nach: 'heisshalter', medium: 'milch', ab: 'erhitzt', direkt: true, hoehe: 1.7 },
   { von: 'heisshalter', nach: 'plattenwaermetauscher', medium: 'milch', ab: 'heisshalter', an: 'heisshalter', direkt: true, hoehe: 1.85 },
   { von: 'heisshalter', nach: 'vorlaufgefaess-pasteur', medium: 'milch', ab: 'rueckfuehrung', an: 'rueckfuehrung', direkt: true, hoehe: 2 },
-  // Pastmilchanlage b.6 (Lehrmittel b.6, Legende 1 bis 16), alle direkt (Rohrbahnhof gekappt). Höhe 0.5 = flach zwischen den Ventilen, höhere Werte = Überführungen.
-  { von: 'milchpumpe-b6', nach: 'pwt-b6', medium: 'milch', ab: 'druck', an: 'milch', direkt: true, hoehe: 0.9 },
-  { von: 'pwt-b6', nach: 'durchflussregler', medium: 'milch', ab: 'vorgewaermt', an: 'ein', direkt: true, hoehe: 1.45 },
-  { von: 'durchflussregler', nach: 'separator-b6', medium: 'milch', ab: 'aus', an: 'milch', direkt: true, hoehe: 2.0 },
-  { von: 'separator-b6', nach: 'konstantdruckventil', medium: 'magermilch', ab: 'magermilch', an: 'ein', direkt: true, hoehe: 2.4 },
-  { von: 'separator-b6', nach: 'dichtemessgeraet', medium: 'rahm', ab: 'rahm', an: 'ein', direkt: true, hoehe: 1.5 },
-  { von: 'dichtemessgeraet', nach: 'durchflussmessgeraet-2', medium: 'rahm', ab: 'aus', an: 'ein', direkt: true, hoehe: 0.5 },
-  { von: 'durchflussmessgeraet-2', nach: 'regelventil-milch', medium: 'rahm', ab: 'aus', an: 'ein', direkt: true, hoehe: 0.5 },
-  { von: 'regelventil-milch', nach: 'regelventil-rahm', medium: 'rahm', ab: 'aus', an: 'ein', direkt: true, hoehe: 1.6 },
-  { von: 'regelventil-milch', nach: 'absperrventil', medium: 'rahm', ab: 'aus', an: 'ein', direkt: true, hoehe: 0.5 },
-  { von: 'absperrventil', nach: 'durchflussmessgeraet-3', medium: 'rahm', ab: 'aus', an: 'ein', direkt: true, hoehe: 0.5 },
-  { von: 'durchflussmessgeraet-3', nach: 'rueckschlagventil', medium: 'rahm', ab: 'aus', an: 'ein', direkt: true, hoehe: 0.5 },
-  { von: 'rueckschlagventil', nach: 'homogenisator', medium: 'rahm', ab: 'aus', an: 'ein', direkt: true, hoehe: 0.6 },
-  { von: 'homogenisator', nach: 'durchflussmessgeraet-1', medium: 'rahm', ab: 'aus', an: 'ein', direkt: true, hoehe: 1.0 },
-  { von: 'konstantdruckventil', nach: 'durchflussmessgeraet-1', medium: 'magermilch', ab: 'aus', an: 'ein', direkt: true, hoehe: 0.7 },
-  { von: 'durchflussmessgeraet-1', nach: 'pwt-b6', medium: 'milch', ab: 'aus', an: 'standardisiert', direkt: true, hoehe: 0.45 },
-  { von: 'pwt-b6', nach: 'heisshalter-b6', medium: 'milch', ab: 'erhitzt', an: 'milch', direkt: true, hoehe: 1.8 },
-  { von: 'heisshalter-b6', nach: 'druckerhoehungspumpe', medium: 'milch', ab: 'heisshalter', an: 'saug', direkt: true, hoehe: 2.2 },
-  { von: 'druckerhoehungspumpe', nach: 'pwt-b6', medium: 'milch', ab: 'druck', an: 'heisshalter', direkt: true, hoehe: 1.6 },
-  { von: 'heisshalter-b6', nach: 'vorlaufgefaess-b6', medium: 'milch', ab: 'rueckfuehrung', an: 'rueckfuehrung', direkt: true, hoehe: 2.6 },
+  // Pastmilchanlage b.6 (Lehrmittel b.6, Legende 1 bis 16), alle direkt (Rohrbahnhof gekappt). fluss: Farbhülle beim Knopf «Produktfluss zeigen» (Anlagensteuerung). Höhe 0.5 = flach zwischen den Ventilen, höhere Werte = Überführungen.
+  { von: 'milchpumpe-b6', nach: 'pwt-b6', medium: 'milch', ab: 'druck', an: 'milch', direkt: true, fluss: true, hoehe: 0.9 },
+  { von: 'pwt-b6', nach: 'durchflussregler', medium: 'milch', ab: 'vorgewaermt', an: 'ein', direkt: true, fluss: true, hoehe: 1.6 },
+  { von: 'durchflussregler', nach: 'separator-b6', medium: 'milch', ab: 'aus', an: 'milch', direkt: true, fluss: true, hoehe: 2.1 },
+  { von: 'separator-b6', nach: 'konstantdruckventil', medium: 'magermilch', ab: 'magermilch', an: 'ein', direkt: true, fluss: true, hoehe: 2.4 },
+  // Standardisierungsstrecke: alle Armaturen auf einer Achse (z 6.0, Rohrachse 0.5 m), gerade verbunden, Abstand je 0.65 m
+  { von: 'separator-b6', nach: 'dichtemessgeraet', medium: 'rahm', ab: 'rahm', an: 'ein', direkt: true, fluss: true, hoehe: 1.7 },
+  { von: 'dichtemessgeraet', nach: 'durchflussmessgeraet-2', medium: 'rahm', ab: 'aus', an: 'ein', direkt: true, fluss: true, hoehe: 1.05 },
+  { von: 'durchflussmessgeraet-2', nach: 'regelventil-milch', medium: 'rahm', ab: 'aus', an: 'ein', direkt: true, fluss: true, hoehe: 0.5 },
+  { von: 'regelventil-milch', nach: 'absperrventil', medium: 'rahm', ab: 'aus', an: 'ein', direkt: true, fluss: true, hoehe: 0.5 },
+  { von: 'regelventil-milch', nach: 'regelventil-rahm', medium: 'rahm', ab: 'abzweig', an: 'ein', direkt: true, fluss: true, hoehe: 0.5 },
+  { von: 'absperrventil', nach: 'durchflussmessgeraet-3', medium: 'rahm', ab: 'aus', an: 'ein', direkt: true, fluss: true, hoehe: 0.5 },
+  { von: 'durchflussmessgeraet-3', nach: 'rueckschlagventil', medium: 'rahm', ab: 'aus', an: 'ein', direkt: true, fluss: true, hoehe: 0.5 },
+  { von: 'rueckschlagventil', nach: 'homogenisator', medium: 'rahm', ab: 'aus', an: 'ein', direkt: true, fluss: true, hoehe: 0.2 }, // unter der Rücklaufstrecke durch
+  // Rücklaufstrecke (z 4.5): homogenisierter Rahm, Magermilch mündet von unten (T-Stück), über 7 zurück in den PWT
+  { von: 'homogenisator', nach: 'durchflussmessgeraet-1', medium: 'rahm', ab: 'aus', an: 'ein', direkt: true, fluss: true, hoehe: 0.5 },
+  { von: 'konstantdruckventil', nach: 'durchflussmessgeraet-1', medium: 'magermilch', ab: 'aus', an: 'zulauf', direkt: true, fluss: true, hoehe: 0.12 },
+  { von: 'durchflussmessgeraet-1', nach: 'pwt-b6', medium: 'milch', ab: 'aus', an: 'standardisiert', direkt: true, fluss: true, hoehe: 0.9 },
+  { von: 'pwt-b6', nach: 'heisshalter-b6', medium: 'milch', ab: 'erhitzt', an: 'milch', direkt: true, fluss: true, hoehe: 1.8 },
+  { von: 'heisshalter-b6', nach: 'druckerhoehungspumpe', medium: 'milch', ab: 'heisshalter', an: 'saug', direkt: true, fluss: true, hoehe: 2.2 },
+  { von: 'druckerhoehungspumpe', nach: 'pwt-b6', medium: 'milch', ab: 'druck', an: 'heisshalter', direkt: true, fluss: true, hoehe: 1.6 },
+  { von: 'heisshalter-b6', nach: 'vorlaufgefaess-b6', medium: 'milch', ab: 'rueckfuehrung', an: 'rueckfuehrung', direkt: true, fluss: true, hoehe: 2.6 },
   { von: 'dampfkessel', nach: 'pwt-b6', medium: 'heisswasser' },
   { von: 'pwt-b6', nach: 'dampfkessel', medium: 'heisswasser', ab: 'heisswasser_ruecklauf' },
   { von: 'kaelteanlage', nach: 'pwt-b6', medium: 'kuehlwasser' },
@@ -323,15 +325,16 @@ const ANLAGEN_ROH = [
   // Rohrachse der Ventile auf 0.50 m (Platzhalter bis zur Leitungshöhe der Anlage). Texte: a.1 (Ventile, Rückschlagventil), a.2 (Regel- und
   // Konstantdruckventil). Eigene Sätze zum Gegenlesen: Stellungsregler, Laterne, Membrangehäuse, Dichtung.
   {
-    id: 'regelventil-rahm', name: 'Regelventil', raum: 'behandlung', x: 57.1, z: 5.85, b: 0.45, t: 0.45, bau: 'regelventil',
+    id: 'regelventil-rahm', name: 'Regelventil', raum: 'behandlung', x: 53.4, z: 6.9, b: 0.45, t: 0.45, bau: 'regelventil',
     anschluesse: { ein: [-0.085, 0.5, 0, '-x'], aus: [0.085, 0.5, 0, '+x'] },
     teile: REGELVENTIL_TEILE,
     text: 'Das Regelventil (9) stellt den Durchfluss so ein, dass der Fettgehalt den gewünschten Wert erreicht und möglichst konstant bleibt. ' +
       'Der pneumatische Stellantrieb bewegt den Ventilkegel, der Stellungsregler setzt das Signal der Steuerung in die richtige Hubstellung um.'
   },
   {
-    id: 'regelventil-milch', name: 'Regelventil', raum: 'behandlung', x: 52.3, z: 5.8, b: 0.45, t: 0.45, bau: 'regelventil',
-    anschluesse: { ein: [-0.085, 0.5, 0, '-x'], aus: [0.085, 0.5, 0, '+x'] },
+    id: 'regelventil-milch', name: 'Regelventil', raum: 'behandlung', x: 51.895, z: 6, b: 0.45, t: 0.45, bau: 'regelventil',
+    // abzweig: T-Stück in der Leitung zum Absperrventil, Abzweig zum zweiten Regelventil (Schema b.6)
+    anschluesse: { ein: [-0.085, 0.5, 0, '-x'], aus: [0.085, 0.5, 0, '+x'], abzweig: [0.535, 0.5, 0, '+z'] },
     teile: REGELVENTIL_TEILE,
     text: 'Das Regelventil (9) stellt den Durchfluss so ein, dass der Fettgehalt den gewünschten Wert erreicht und möglichst konstant bleibt. ' +
       'Der pneumatische Stellantrieb bewegt den Ventilkegel, der Stellungsregler setzt das Signal der Steuerung in die richtige Hubstellung um.'
@@ -344,7 +347,7 @@ const ANLAGEN_ROH = [
       'Misst es zu viel oder zu wenig, verstellt der Regler das Ventil.'
   },
   {
-    id: 'konstantdruckventil', name: 'Konstantdruckventil', raum: 'behandlung', x: 49.6, z: 5.3, b: 0.5, t: 0.5, bau: 'konstantdruckventil',
+    id: 'konstantdruckventil', name: 'Konstantdruckventil', raum: 'behandlung', x: 53.6, z: 5.2, b: 0.5, t: 0.5, bau: 'konstantdruckventil',
     anschluesse: { ein: [-0.115, 0.5, 0, '-x'], aus: [0, 0.37, 0] },
     teile: [
       { id: 'ventilgehaeuse', name: 'Ventilgehäuse', text: 'Die Milch tritt seitlich ins Ventilgehäuse ein und verlässt es nach unten. Das Konstantdruckventil hält den Druck vor dem Ventil konstant, in der Anlage den Gegendruck auf der Magermilchseite des Separators.' },
@@ -354,7 +357,7 @@ const ANLAGEN_ROH = [
     text: 'Das Konstantdruckventil (6) hält den Gegendruck auf der Magermilchseite des Separators konstant. Eine Membran reagiert sofort auf jede Druckänderung und verstellt den Ventilkegel.'
   },
   {
-    id: 'absperrventil', name: 'Absperrventil', raum: 'behandlung', x: 53.6, z: 5.95, b: 0.4, t: 0.4, bau: 'absperrventil',
+    id: 'absperrventil', name: 'Absperrventil', raum: 'behandlung', x: 52.965, z: 6, b: 0.4, t: 0.4, bau: 'absperrventil',
     anschluesse: { ein: [-0.085, 0.5, 0, '-x'], aus: [0.085, 0.5, 0, '+x'] },
     teile: [
       { id: 'ventilgehaeuse', name: 'Klappenventil', text: 'Klappenventile sind nur als Absperrventil einsetzbar. Die Dichtung müssen Sie nach betrieblichen Vorgaben kontrollieren und sofort auswechseln, wenn sie beschädigt ist.' },
@@ -363,7 +366,7 @@ const ANLAGEN_ROH = [
     text: 'Das Absperrventil (10) unterbricht den Produktfluss. Es ist ein pneumatisch bedientes Klappenventil.'
   },
   {
-    id: 'rueckschlagventil', name: 'Rückschlagventil', raum: 'behandlung', x: 55.2, z: 5.85, b: 0.4, t: 0.4, bau: 'rueckschlagventil',
+    id: 'rueckschlagventil', name: 'Rückschlagventil', raum: 'behandlung', x: 54.685, z: 6, b: 0.4, t: 0.4, bau: 'rueckschlagventil',
     anschluesse: { ein: [-0.115, 0.5, 0, '-x'], aus: [0.115, 0.5, 0, '+x'] },
     teile: [
       { id: 'ventilgehaeuse', name: 'Rückschlagventil', text: 'Das Rückschlagventil ist federbelastet und lässt die Milch nur in eine Richtung fliessen. Es verhindert den Rückfluss und schützt so Pumpen und Anlagenteile.' }
@@ -373,32 +376,33 @@ const ANLAGEN_ROH = [
   // Durchflussmessgerät (Nr. 7, 3x): MID nach Endress+Hauser Promag H 100, DN 50 (material/molkerei-3d/durchflussmessgeraet_bau.py, nur Masse).
   // Texte: Lehrmittel a.1 «Magnetisch induktive Durchflusszähler (MID)». Eigener Satz zum Gegenlesen: Messumformer (Kopf, Kabel).
   {
-    id: 'durchflussmessgeraet-1', name: 'Durchflussmessgerät (MID)', raum: 'behandlung', x: 52.0, z: 4.5, b: 0.45, t: 0.4, bau: 'durchflussmessgeraet',
-    anschluesse: { ein: [0.11, 0.5, 0, '+x'], aus: [-0.11, 0.5, 0, '-x'] }, // Fluss nach Westen zum PWT
+    id: 'durchflussmessgeraet-1', name: 'Durchflussmessgerät (MID)', raum: 'behandlung', x: 52.6, z: 4.5, b: 0.45, t: 0.4, bau: 'durchflussmessgeraet',
+    // Fluss nach Westen zum PWT. zulauf: T-Stück 1 m östlich, dort mündet die Magermilch von unten in den homogenisierten Rahm.
+    anschluesse: { ein: [0.11, 0.5, 0, '+x'], aus: [-0.11, 0.5, 0, '-x'], zulauf: [1.0, 0.5, 0] },
     teile: DURCHFLUSS_TEILE,
-    text: 'Das Durchflussmessgerät (7) misst die Fliessgeschwindigkeit der Milch im Messrohr und berechnet daraus bei bekanntem Rohrquerschnitt das Volumen. Es hat keine beweglichen Teile, verursacht keinen Druckverlust und ist CIP-fähig.'
+    text: 'Das Durchflussmessgerät (7) misst die Fliessgeschwindigkeit der Milch im Messrohr und berechnet daraus bei bekanntem Rohrquerschnitt das Volumen. Es hat keine beweglichen Teile, verursacht keinen Druckverlust und ist CIP-fähig. ' +
+      'Vor diesem Messgerät kommen der homogenisierte Rahm aus dem Homogenisator und die Magermilch aus dem Konstantdruckventil wieder zusammen (Teilstromhomogenisation).'
   },
   {
-    id: 'durchflussmessgeraet-2', name: 'Durchflussmessgerät (MID)', raum: 'behandlung', x: 51.5, z: 6.4, b: 0.45, t: 0.4, bau: 'durchflussmessgeraet',
+    id: 'durchflussmessgeraet-2', name: 'Durchflussmessgerät (MID)', raum: 'behandlung', x: 51.05, z: 6, b: 0.45, t: 0.4, bau: 'durchflussmessgeraet',
     anschluesse: { ein: [-0.11, 0.5, 0, '-x'], aus: [0.11, 0.5, 0, '+x'] },
     teile: DURCHFLUSS_TEILE,
     text: 'Das Durchflussmessgerät (7) misst die Fliessgeschwindigkeit der Milch im Messrohr und berechnet daraus bei bekanntem Rohrquerschnitt das Volumen. Es hat keine beweglichen Teile, verursacht keinen Druckverlust und ist CIP-fähig.'
   },
   {
-    id: 'durchflussmessgeraet-3', name: 'Durchflussmessgerät (MID)', raum: 'behandlung', x: 54.4, z: 5.85, b: 0.45, t: 0.4, bau: 'durchflussmessgeraet',
+    id: 'durchflussmessgeraet-3', name: 'Durchflussmessgerät (MID)', raum: 'behandlung', x: 53.81, z: 6, b: 0.45, t: 0.4, bau: 'durchflussmessgeraet',
     anschluesse: { ein: [-0.11, 0.5, 0, '-x'], aus: [0.11, 0.5, 0, '+x'] },
     teile: DURCHFLUSS_TEILE,
     text: 'Das Durchflussmessgerät (7) misst die Fliessgeschwindigkeit der Milch im Messrohr und berechnet daraus bei bekanntem Rohrquerschnitt das Volumen. Es hat keine beweglichen Teile, verursacht keinen Druckverlust und ist CIP-fähig.'
   },
-  // Dichtemessgerät (Nr. 8): Eigenbau ohne Herstellervorlage (Philipp 11.11.2026), material/molkerei-3d/dichtemessgeraet_bau.py (bzwu).
-  // Text a.2 («Messgerät bestimmt die Dichte und schliesst auf den Fettgehalt»). Eigene Sätze zum Gegenlesen: Sensorkopf, Anzeige (1030 kg/m³ ist ein Anzeigewert, nicht aus dem Lehrmittel).
+  // Dichtemessgerät (Nr. 8): Eigenbau ohne Herstellervorlage, senkrechte Messsäule wie im Schema b.6, material/molkerei-3d/dichtemessgeraet_bau.py (bzwu).
+  // Text a.2 («Messgerät bestimmt die Dichte und schliesst auf den Fettgehalt»). Eigene Sätze zum Gegenlesen: Messsäule (Luftblasen), Anzeige (970 kg/m³ geschätzt für Rahm 35.5 % bei ca. 55 °C, 1030 kg/m³ Milch, beide nicht aus dem Lehrmittel).
   {
-    id: 'dichtemessgeraet', name: 'Dichtemessgerät', raum: 'behandlung', x: 50.7, z: 7.3, b: 0.4, t: 0.4, bau: 'dichtemessgeraet',
-    anschluesse: { ein: [-0.115, 0.5, 0, '-x'], aus: [0.115, 0.5, 0, '+x'] },
+    id: 'dichtemessgeraet', name: 'Dichtemessgerät', raum: 'behandlung', x: 49.9, z: 6, b: 0.4, t: 0.4, bau: 'dichtemessgeraet',
+    anschluesse: { ein: [-0.115, 0.25, 0, '-x'], aus: [0.115, 1.05, 0, '+x'] },
     teile: [
-      { id: 'messrohr', name: 'Messrohr', text: 'Die Milch fliesst durch das Rohrstück am Sensor vorbei. Der Sensor sitzt in einem Stutzen direkt im Produktstrom.' },
-      { id: 'sensorkopf', name: 'Sensorkopf', text: 'Der Sensorkopf taucht in die Milch und misst deren Dichte. Aus der Dichte kann auf den Fettgehalt geschlossen werden.' },
-      { id: 'anzeige', name: 'Anzeige', text: 'Die Anzeige zeigt die gemessene Dichte der Milch, hier rund 1030 kg/m³. Die Steuerung nutzt den Wert, um den Fettgehalt zu regeln.' }
+      { id: 'messrohr', name: 'Messsäule', text: 'Der Rahm fliesst unten in die Messsäule und steigt nach oben. So bleiben keine Luftblasen im Messrohr, die den Messwert verfälschen würden. In der Säule wird die Dichte gemessen. Aus der Dichte kann auf den Fettgehalt geschlossen werden.' },
+      { id: 'anzeige', name: 'Messumformer mit Anzeige', text: 'Die Anzeige zeigt die gemessene Dichte, hier rund 970 kg/m³: Rahm ist leichter als Milch (rund 1030 kg/m³), weil er mehr Fett enthält. Der Messumformer gibt den Wert an die Steuerung weiter, die damit den Fettgehalt regelt.' }
     ],
     text: 'Das Dichtemessgerät (8) bestimmt die Dichte der Milch und schliesst so auf den Fettgehalt. Mit dem Wert regelt die Steuerung das Regelventil.'
   },
@@ -406,6 +410,7 @@ const ANLAGEN_ROH = [
   // Text: Lehrmittel b.6 «Die korrekte Pasteurisation nachweisen». Eigene Sätze zum Gegenlesen: Gehäuse, Display, Leuchtmelder (Werte 74.0 °C und «Pasteurisation OK» sind Anzeigebeispiele).
   {
     id: 'anlagensteuerung', name: 'Anlagensteuerung', raum: 'behandlung', x: 43.7, z: 7.4, b: 0.85, t: 0.5, bau: 'schaltschrank',
+    betrieb: { an: 'Produktfluss zeigen', aus: 'Produktfluss ausblenden' }, // Farben wie im Schema b.6, nur Leitungen mit fluss: true
     teile: [
       { id: 'gehaeuse', name: 'Schaltschrank', text: 'Im Schaltschrank sitzen die Steuerung und die Elektronik der Anlage. Sie verbindet Messgeräte, Regler und Ventile.' },
       { id: 'display', name: 'Display', text: 'Das Display zeigt die aktuellen Werte der Anlage, hier die Temperatur am Ende des Heisshalters. Fällt sie unter 72 °C, wird die Milch zurück ins Vorlaufgefäss geleitet.' },
@@ -449,7 +454,7 @@ const ANLAGEN_ROH = [
   },
   // Homogenisator (b.6 Nr. 12, a.5 Legende 1-10): offenes Schnittmodell, Eigenbau nach Philipps Bildern (Tetra-Pak-Homogenisator, material/efz/a.5/images)
   // ohne Hersteller-CAD und ohne Herstellermasse, material/molkerei-3d/homogenisator_bau.py (bzwu). Texte: Lehrmittel a.5 «Die Funktion des Homogenisators erklären»,
-  // «Zweistufige Homogenisation». Eigene Sätze zum Gegenlesen: Kurbelwellengehäuse (Satz zur Kurbelwelle), Getriebe, Elektromotor, Hydrauliksystem (zweiter Satz).
+  // «Zweistufige Homogenisation». Eigene Sätze zum Gegenlesen: Kurbelwellengehäuse (Satz zur Kurbelwelle), Getriebe, Elektromotor, Hydrauliksystem (zweiter Satz), Anlagentext «In dieser Anlage wird nur der Rahm homogenisiert». Teilstrom-Sätze danach: a.5 «Voll- und Teilstromhomogenisation».
   {
     id: 'homogenisator', name: 'Homogenisator', raum: 'behandlung', x: 56.8, z: 3.6, b: 2.5, t: 1.6, bau: 'homogenisator',
     // Stutzen fehlen im Modell: Anschlüsse an den Enden von Saugsammler (ein) und Druckverteiler (aus), vorn (+z)
@@ -469,7 +474,9 @@ const ANLAGEN_ROH = [
       { id: 'hydrauliksystem', name: 'Hydrauliksystem', text: 'Das Hydrauliksystem dient der Einstellung des Homogenisationsdruckes. Je höher der Öldruck auf die Stempel der Homogenisierventile, desto enger ist der Spalt.' },
       { id: 'ueberdruckventil', name: 'Überdruckventil', text: 'Baut sich nach dem Homogenisator ein zu hoher Druck auf, zum Beispiel weil die Produkteleitung versehentlich abgesperrt wird, spricht das Überdruckventil an und verhindert dadurch einen Schaden.' }
     ],
-    text: 'Ein Elektromotor treibt über Keilriemen, ein Getriebe und die Kurbelwelle eine Hochdruck-Kolbenpumpe an. Der Homogenisierkopf mit Stempel, Sitz und Prallring zerkleinert die Fettkügelchen. Heben Sie die Verkleidung ab, sehen Sie die Teile.'
+    text: 'Ein Elektromotor treibt über Keilriemen, ein Getriebe und die Kurbelwelle eine Hochdruck-Kolbenpumpe an. Der Homogenisierkopf mit Stempel, Sitz und Prallring zerkleinert die Fettkügelchen. ' +
+      'In dieser Anlage wird nur der Rahm homogenisiert, nicht die ganze Milch. Bei der Vollstromhomogenisierung wird die gesamte Milch homogenisiert, beim Teilstromverfahren nur der Rahm mit wenig Magermilch. Vorteile des Teilstromverfahrens sind der geringere Energieverbrauch für die Homogenisation und dass ein kleinerer, kostengünstigerer Homogenisator eingesetzt werden kann. ' +
+      'Heben Sie die Verkleidung ab, sehen Sie die Teile.'
   },
   { id: 'uht', name: 'UHT-Anlage', raum: 'behandlung', x: 50, z: 15, b: 6, t: 2.5 },
 
@@ -663,7 +670,7 @@ const B6_KOPIEN = [
       anschluesse: { ...ANLAGEN_ROH.find(a => a.id === 'plattenwaermetauscher').anschluesse, vorgewaermt: [-0.129, 1.259, 0.3, '+z'], standardisiert: [0.157, 0.4, 0.3, '+z'] }
     }],
     ['separator', 'separator-b6', 47.9, 7.05],
-    ['heisshalter', 'heisshalter-b6', 52.2, 3.4],
+    ['heisshalter', 'heisshalter-b6', 52.2, 3.478], // z: Einlauf fluchtet mit dem PWT-Auslauf (erhitzt), kein Versatz in der Leitung
     ['pasteurpumpe', 'druckerhoehungspumpe', 50.7, 1.7, {
       name: 'Druckerhöhungspumpe', // eigener Satz zum Gegenlesen: im Lehrmittel steht nur die Legende
       text: 'Die Druckerhöhungspumpe fördert die heisse Milch nach dem Heisshalter zurück durch den Plattenwärmetauscher. So bleibt der Druck der pasteurisierten Milch höher als der Druck der Rohmilch.'

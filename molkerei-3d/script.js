@@ -110,6 +110,20 @@ function rohrPunkte(text) {
   }
   return p;
 }
+// Gerade Stücke und Bögen einer Leitung (gemeinsam für das Rohr und die Farbhülle des Produktflusses)
+function rohrKurven(p) {
+  const k = [], zu = (i, j, r) => p[i].clone().add(p[j].clone().sub(p[i]).normalize().multiplyScalar(r));
+  let start = p[0];
+  for (let i = 1; i < p.length; i++) {
+    if (i === p.length - 1) { k.push(new THREE.LineCurve3(start, p[i])); break; }
+    const r = Math.min(ROHR_BOGEN, p[i].distanceTo(p[i - 1]) / 2, p[i].distanceTo(p[i + 1]) / 2);
+    const vor = zu(i, i - 1, r), nach = zu(i, i + 1, r);
+    if (vor.distanceTo(start) > 1e-3) k.push(new THREE.LineCurve3(start, vor));
+    k.push(new THREE.QuadraticBezierCurve3(vor, p[i], nach));
+    start = nach;
+  }
+  return k;
+}
 AFRAME.registerComponent('rohr', {
   schema: { punkte: { default: '' }, farbe: { default: '#ffffff' }, r: { default: ROHR_R }, isoliert: { default: false } },
   init() {
@@ -117,17 +131,7 @@ AFRAME.registerComponent('rohr', {
     const { r: R, isoliert } = this.data;
     const mat = isoliert ? new THREE.MeshStandardMaterial({ color: this.data.farbe, roughness: 0.85, metalness: 0 })
       : new THREE.MeshStandardMaterial({ color: STAHL.chrom.farbe, roughness: STAHL.chrom.rau, metalness: 1 }); // Produktrohr blank wie in der echten Anlage, MEDIEN.farbe färbt nur die isolierte Versorgung
-    const stueck = kurve => g.add(new THREE.Mesh(new THREE.TubeGeometry(kurve, kurve.isLineCurve3 ? 1 : 10, R, 12, false), mat));
-    const zu = (i, j, r) => p[i].clone().add(p[j].clone().sub(p[i]).normalize().multiplyScalar(r));
-    let start = p[0];
-    for (let i = 1; i < p.length; i++) {
-      if (i === p.length - 1) { stueck(new THREE.LineCurve3(start, p[i])); break; }
-      const r = Math.min(ROHR_BOGEN, p[i].distanceTo(p[i - 1]) / 2, p[i].distanceTo(p[i + 1]) / 2);
-      const vor = zu(i, i - 1, r), nach = zu(i, i + 1, r);
-      if (vor.distanceTo(start) > 1e-3) stueck(new THREE.LineCurve3(start, vor));
-      stueck(new THREE.QuadraticBezierCurve3(vor, p[i], nach));
-      start = nach;
-    }
+    for (const kurve of rohrKurven(p)) g.add(new THREE.Mesh(new THREE.TubeGeometry(kurve, kurve.isLineCurve3 ? 1 : 10, R, 12, false), mat));
     for (let i = 1; i < p.length; i++) {
       const u = p[i - 1], v = p[i];
       if (Math.abs(u.x - v.x) < 1e-6 && Math.abs(u.z - v.z) < 1e-6 && Math.min(u.y, v.y) < 0 && Math.max(u.y, v.y) > 0) {
@@ -361,7 +365,7 @@ window.kaeserei = {
     }
     // Abgekoppelte Anlage (z.B. Pumpen-Explosion): Leitungen sofort weg, nach dem Zusammenbauen wieder da
     if (anlageVon(id).oeffnen.leitungenWeg) {
-      const zeigen = () => { for (const l of document.querySelectorAll(`[data-leitung^="${id}>"], [data-leitung*=">${id}:"], [data-anlage="${id}"] [data-mitleitung]`)) l.setAttribute('visible', !g.dataset.offen); };
+      const zeigen = () => { for (const l of document.querySelectorAll(`[data-leitung^="${id}>"], [data-leitung*=">${id}:"], [data-fluss^="${id}>"], [data-fluss*=">${id}:"], [data-anlage="${id}"] [data-mitleitung]`)) l.setAttribute('visible', !g.dataset.offen); };
       if (auf) zeigen(); else setTimeout(zeigen, dur);
     }
     if ($('overlay').dataset.anlage === id && !$('overlay').hidden) window.kaeserei.select(id, $('overlay').dataset.teil || undefined);

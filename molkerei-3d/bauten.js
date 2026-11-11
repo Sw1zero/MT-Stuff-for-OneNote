@@ -202,6 +202,47 @@ const SEP_GESCHNITTEN = ['gestellhaube', 'gestelloberteil', 'trommelunterteil', 
 const SEP_DREHEND = ['trommelunterteil', 'kolbenschieber', 'verteiler', 'tellerpaket', 'scheideteller', 'dichtring',
   'trommeldeckel', 'trommelverschlussring', 'greiferkammerdeckel', 'greiferkammerverschlussring']; // Greifer stehen still
 
+// Produktfluss: halbtransparente Hülle in der Schemafarbe (Lehrmittel b.6) über jeder Leitung mit fluss: true,
+// wandernde Pfeile in Fliessrichtung (von > nach). Hängt an der Szene, nicht an der Anlage, darum Weltkoordinaten.
+const FLUSS_FARBEN = { milch: '#3f86cf', rahm: '#f4cc00', magermilch: '#a9cdea' }; // aus dem Schema b.6 abgelesen
+const FLUSS_PFEIL = 0.4;   // m, Abstand der Pfeile
+const FLUSS_TEMPO = 0.5;   // m/s
+AFRAME.registerComponent('produktfluss', {
+  init() {
+    this.texturen = [];
+    this.el.closest('[data-anlage]').addEventListener('betrieb', e => this.schalten(e.detail.an));
+  },
+  bauen() {
+    const szene = this.el.sceneEl;
+    this.gruppe = el('a-entity', { 'data-produktfluss': '' }, szene);
+    for (const r of anschluesse().filter(r => r.fluss)) {
+      const c = document.createElement('canvas'); c.width = 64; c.height = 8;
+      const x = c.getContext('2d'), farbe = FLUSS_FARBEN[r.medium];
+      if (!farbe) throw new Error('Keine Schemafarbe für ' + r.medium);
+      x.fillStyle = farbe; x.fillRect(0, 0, 64, 8);
+      x.fillStyle = 'rgba(255,255,255,0.75)'; x.beginPath(); x.moveTo(30, 0); x.lineTo(46, 4); x.lineTo(30, 8); x.lineTo(38, 4); x.fill(); // Pfeil in +u = Fliessrichtung
+      const pfad = new THREE.CurvePath();
+      for (const k of rohrKurven(rohrPunkte(rohrWeg(r).map(v => `${v.x} ${v.y} ${v.z}`).join(', ')))) pfad.add(k);
+      const L = pfad.getLength(), t = new THREE.CanvasTexture(c);
+      t.wrapS = THREE.RepeatWrapping; t.repeat.set(L / FLUSS_PFEIL, 1); t.colorSpace = THREE.SRGBColorSpace;
+      this.texturen.push(t);
+      const m = new THREE.Mesh(new THREE.TubeGeometry(pfad, Math.max(8, Math.ceil(L * 24)), ROHR_R * 1.7, 12, false),
+        new THREE.MeshBasicMaterial({ map: t, transparent: true, opacity: 0.6, depthWrite: false }));
+      el('a-entity', { 'data-fluss': `${r.von}>${r.nach}:${r.medium}` }, this.gruppe).setObject3D('mesh', m);
+    }
+  },
+  schalten(an) {
+    if (an && !this.gruppe) this.bauen();
+    if (this.gruppe) this.gruppe.setAttribute('visible', an);
+    this.an = an;
+  },
+  tick(t, dt) {
+    if (!this.an) return;
+    const d = dt / 1000 * FLUSS_TEMPO / FLUSS_PFEIL;
+    for (const tx of this.texturen) tx.offset.x -= d;
+  }
+});
+
 AFRAME.registerComponent('separatorbetrieb', {
   init() {
     this.an = false; this.winkel = 0;
@@ -618,7 +659,8 @@ const BAUTEN = {
   rueckschlagventil(g) { glbTeile(g, 'modelle/rueckschlagventil.glb', 'rueckschlagventil'); },
   durchflussmessgeraet(g) { glbTeile(g, 'modelle/durchflussmessgeraet.glb', 'durchflussmessgeraet'); },
   dichtemessgeraet(g) { glbTeile(g, 'modelle/dichtemessgeraet.glb', 'dichtemessgeraet'); },
-  schaltschrank(g) { glbTeile(g, 'modelle/schaltschrank.glb', 'schaltschrank'); },
+  // Schaltschrank der Pastmilchanlage b.6: Knopf «Produktfluss zeigen» (Betrieb) blendet die Farbhüllen über den Leitungen ein
+  schaltschrank(g) { glbTeile(g, 'modelle/schaltschrank.glb', 'schaltschrank'); el('a-entity', { produktfluss: '' }, g); },
   dampfumformer(g) { glbTeile(g, 'modelle/dampfumformer.glb', 'dampfumformer'); },
   // Homogenisator: Verkleidung (mit Schutzscheibe) hebt sich 1.9 m ab. Das Glas ist durchsichtig und fängt keine Klicks ab, sonst wären die Teile dahinter nie anklickbar.
   homogenisator(g) {
