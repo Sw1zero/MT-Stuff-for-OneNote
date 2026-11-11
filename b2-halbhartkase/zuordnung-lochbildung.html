@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lochbildung: Voraussetzungen</title>
+  <link rel="stylesheet" href="../style.css?v=d6d6b61d">
+</head>
+<body>
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · b.2</span>
+    <h1>Lochbildung: Voraussetzungen</h1>
+    <p>Zu welcher Voraussetzung der Lochbildung gehört die Aussage? (Lehrmittel b.2, S. 20)</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+<main class="z-wrap">
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+  <div id="zuordnung"></div>
+</main>
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+<script src="../assets/zuordnung.js?v=046b71c5"></script>
+<script>
+Zuordnung.init({
+  stufen: ['zuordnen', 'anklicken', 'eintippen'],
+  gruppen: [
+    { key: 'teig', label: 'Dehnbarer, elastischer Teig', keys: ['dehnbarer teig', 'elastischer teig', 'dehnbarer elastischer teig', 'teig'] },
+    { key: 'gas', label: 'Genügend Gasdruck', keys: ['gasdruck', 'genügend gasdruck', 'genuegend gasdruck', 'gas'] },
+    { key: 'ansatz', label: 'Lochansatzstellen', keys: ['lochansatzstellen', 'lochansatzstelle', 'ansatzstellen'] }
+  ],
+  karten: [
+    { text: 'Wasserzusatz in Milch und Bruch', gruppe: 'teig' },
+    { text: 'Regulierung des Milchzuckers und somit der Milchsäurekonzentration', gruppe: 'teig' },
+    { text: 'Wassergehalt im Käse', gruppe: 'teig' },
+    { text: 'Heterofermentative MSB', gruppe: 'gas' },
+    { text: 'Kohlensäuregas', gruppe: 'gas' },
+    { text: 'Luft oder Staubteilchen', gruppe: 'ansatz' },
+    { text: 'Schwachstellen im Käseteig', gruppe: 'ansatz' },
+    { text: 'Heublumenpulver als Ersatz für «zu saubere» Milch', gruppe: 'ansatz' }
+  ],
+  intro: {
+    zuordnen: 'Tippen Sie auf die Voraussetzung, zu der die Aussage unten gehört, oder ziehen Sie die Karte dorthin.',
+    anklicken: 'Klicken Sie pro Aussage an, zu welcher Voraussetzung der Lochbildung sie gehört.',
+    eintippen: 'Schreiben Sie zu jeder Aussage die Voraussetzung, zum Beispiel «Genügend Gasdruck».'
+  }
+});
+</script>
+</body>
+</html>
