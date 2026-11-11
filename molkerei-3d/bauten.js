@@ -70,12 +70,13 @@ function glbEinsetzen(obj) {
 
 // In Blender gebaute Anlage (glTF). Gruppen unter dem Knoten wurzel mit einer Teil-id aus anlagen.js werden
 // nach dem Laden eigene Entities mit data-teil (Klick, Hervorheben). hub: Teil-id > "x y z" für data-oeffnen.
-function glbTeile(g, datei, wurzel, hub = {}) {
+function glbTeile(g, datei, wurzel, hub = {}, weg = []) {
   const m = el('a-entity', { 'gltf-model': datei }, g);
   const ids = anlageVon(g.dataset.anlage).teile.map(t => t.id);
   m.addEventListener('model-loaded', () => {
     glbVorbereiten(m.getObject3D('mesh'));
     glbEinsetzen(m.getObject3D('mesh'));
+    for (const n of weg) m.getObject3D('mesh').getObjectByName(n).visible = false;
     for (const node of [...m.getObject3D('mesh').getObjectByName(wurzel).children]) {
       if (!ids.includes(node.name)) continue;
       const attrs = { 'data-teil': node.name, class: 'klickbar' };
@@ -596,7 +597,8 @@ const BAUTEN = {
 
   // Plattenwärmetauscher (material/molkerei-3d/plattenwaermetauscher_bau.py in bzwu), ohne Öffnen
   plattenwaermetauscher(g) {
-    glbTeile(g, 'modelle/plattenwaermetauscher.glb', 'plattenwaermetauscher');
+    // ohneSchlaufe: Milch zwischen Rückgewinnung und Erhitzer läuft aussen (Separator in b.6), die Schlaufe im Modell entfällt
+    glbTeile(g, 'modelle/plattenwaermetauscher.glb', 'plattenwaermetauscher', {}, anlageVon(g.dataset.anlage).ohneSchlaufe ? ['schlaufe_erhitzer'] : []);
   },
 
   // Vorlaufgefäss des Plattenpasteurs mit Schwimmer (vorlaufgefaess_bau.py, VARIANTE 'pasteur')
@@ -608,6 +610,25 @@ const BAUTEN = {
   heisshalter(g) {
     glbTeile(g, 'modelle/heisshalter.glb', 'heisshalter');
   },
+
+  // Ventile der Pastmilchanlage b.6 (material/molkerei-3d/<ventil>_bau.py in bzwu), ohne Öffnen
+  regelventil(g) { glbTeile(g, 'modelle/regelventil.glb', 'regelventil'); },
+  konstantdruckventil(g) { glbTeile(g, 'modelle/konstantdruckventil.glb', 'konstantdruckventil'); },
+  absperrventil(g) { glbTeile(g, 'modelle/absperrventil.glb', 'absperrventil'); },
+  rueckschlagventil(g) { glbTeile(g, 'modelle/rueckschlagventil.glb', 'rueckschlagventil'); },
+  durchflussmessgeraet(g) { glbTeile(g, 'modelle/durchflussmessgeraet.glb', 'durchflussmessgeraet'); },
+  dichtemessgeraet(g) { glbTeile(g, 'modelle/dichtemessgeraet.glb', 'dichtemessgeraet'); },
+  schaltschrank(g) { glbTeile(g, 'modelle/schaltschrank.glb', 'schaltschrank'); },
+  dampfumformer(g) { glbTeile(g, 'modelle/dampfumformer.glb', 'dampfumformer'); },
+  // Homogenisator: Verkleidung (mit Schutzscheibe) hebt sich 1.9 m ab. Das Glas ist durchsichtig und fängt keine Klicks ab, sonst wären die Teile dahinter nie anklickbar.
+  homogenisator(g) {
+    glbTeile(g, 'modelle/homogenisator.glb', 'homogenisator', { verkleidung: '1.9' });
+    g.querySelector('[gltf-model]').addEventListener('model-loaded', () => {
+      const glas = g.object3D.getObjectByName('schutzscheibe_glas');
+      if (glas) glas.raycast = () => {};
+    });
+  },
+  dampfregulierventil(g) { glbTeile(g, 'modelle/dampfregulierventil.glb', 'dampfregulierventil'); },
 
   // Vorlaufgefäss mit Klappenventil (material/molkerei-3d/vorlaufgefaess_bau.py in bzwu)
   vorlaufgefaess(g) {

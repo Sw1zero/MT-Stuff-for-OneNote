@@ -17,23 +17,30 @@ function raumAn(x, z, boden = 0) {
   return RAEUME.find(r => bodenVon(r) === boden && x >= r.x0 && x < r.x1 && z >= r.z0 && z < r.z1);
 }
 
+// Türmitte: Mitte der gemeinsamen Wand, oder mFest (dritter Wert in TUEREN), wenn die Tür ganz in die Wand passt.
+function mitte(aId, bId, von, bis, mFest) {
+  if (mFest === undefined) return (von + bis) / 2;
+  if (mFest - TUER_BREITE / 2 < von || mFest + TUER_BREITE / 2 > bis) throw new Error(`Tür ausserhalb der Wand: ${aId} / ${bId}`);
+  return mFest;
+}
+
 // Durchgang zwischen zwei Räumen: Mitte ihrer gemeinsamen Wand.
 // laeuft 'z' = Wand entlang z bei x = c, laeuft 'x' = Wand entlang x bei z = c. m = Lage der Türmitte auf der Wand.
-function tuer(aId, bId) {
+function tuer(aId, bId, mFest) {
   const a = raumVon(aId), b = raumVon(bId);
   if (bodenVon(a) !== bodenVon(b)) throw new Error(`Durchgang zwischen Geschossen: ${aId} / ${bId}`);
   if (a.x1 === b.x0 || a.x0 === b.x1) {
     const von = Math.max(a.z0, b.z0), bis = Math.min(a.z1, b.z1);
-    if (bis - von >= TUER_BREITE) return { a: aId, b: bId, laeuft: 'z', c: a.x1 === b.x0 ? a.x1 : a.x0, m: (von + bis) / 2 };
+    if (bis - von >= TUER_BREITE) return { a: aId, b: bId, laeuft: 'z', c: a.x1 === b.x0 ? a.x1 : a.x0, m: mitte(aId, bId, von, bis, mFest) };
   }
   if (a.z1 === b.z0 || a.z0 === b.z1) {
     const von = Math.max(a.x0, b.x0), bis = Math.min(a.x1, b.x1);
-    if (bis - von >= TUER_BREITE) return { a: aId, b: bId, laeuft: 'x', c: a.z1 === b.z0 ? a.z1 : a.z0, m: (von + bis) / 2 };
+    if (bis - von >= TUER_BREITE) return { a: aId, b: bId, laeuft: 'x', c: a.z1 === b.z0 ? a.z1 : a.z0, m: mitte(aId, bId, von, bis, mFest) };
   }
   throw new Error(`Keine gemeinsame Wand für einen Durchgang: ${aId} / ${bId}`);
 }
 
-const DURCHGAENGE = TUEREN.map(([a, b]) => tuer(a, b));
+const DURCHGAENGE = TUEREN.map(([a, b, m]) => tuer(a, b, m));
 
 // Wandstücke {laeuft, c, a, b, y0, hoehe, boden}. y0 > 0 = Sturz über einem Durchgang. y0/hoehe relativ zum Geschossboden.
 // Gemeinsame Wände werden nur einmal erzeugt, mit der Höhe des höheren Raums. Jedes Geschoss für sich.
