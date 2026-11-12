@@ -452,16 +452,16 @@ const ANLAGEN_ROH = [
     teile: [],
     text: 'Die Umwälzpumpe (13) bringt das Warmwasser auf den Erhitzer. Dort gibt es seine Wärme an die Milch ab und fliesst zurück zum Dampf/Wasserumformer.'
   },
-  // Homogenisator (b.6 Nr. 12, a.5 Legende 1-10): offenes Schnittmodell, Eigenbau nach Philipps Bildern (Tetra-Pak-Homogenisator, material/efz/a.5/images)
-  // ohne Hersteller-CAD und ohne Herstellermasse, material/molkerei-3d/homogenisator_bau.py (bzwu). Texte: Lehrmittel a.5 «Die Funktion des Homogenisators erklären»,
+  // Homogenisator (b.6 Nr. 12, a.5 Legende 1-10): Eigenbau nach dem Aufbau im Interpump-Video (nur Formvorlage), Masse Philipp 12.11.2026 (B 1.43, T 1.78, H 1.75),
+  // zweistufig, material/molkerei-3d/homogenisator_bau.py (bzwu). Verkleidung umschliesst die ganze Maschine (Philipp 12.11.2026). Texte: Lehrmittel a.5 «Die Funktion des Homogenisators erklären»,
   // «Zweistufige Homogenisation». Eigene Sätze zum Gegenlesen: Kurbelwellengehäuse (Satz zur Kurbelwelle), Getriebe, Elektromotor, Hydrauliksystem (zweiter Satz), Anlagentext «In dieser Anlage wird nur der Rahm homogenisiert». Teilstrom-Sätze danach: a.5 «Voll- und Teilstromhomogenisation».
   {
-    id: 'homogenisator', name: 'Homogenisator', raum: 'behandlung', x: 56.8, z: 3.6, b: 2.5, t: 1.6, bau: 'homogenisator',
-    // Stutzen fehlen im Modell: Anschlüsse an den Enden von Saugsammler (ein) und Druckverteiler (aus), vorn (+z)
-    anschluesse: { ein: [-1.1, 0.2, 0.62, '+z'], aus: [-0.85, 0.82, 0.45, '+z', 0.45] },
+    id: 'homogenisator', name: 'Homogenisator', raum: 'behandlung', x: 56.8, z: 3.25, b: 1.43, t: 1.78, bau: 'homogenisator',
+    // Einlauf am Saugsammler, Auslauf rechts neben der Schutzscheibe, beide DN 50 durch die Front nach vorn (+z). z 3.25: Auslauf + 0.3 m Gerade = Rücklaufstrecke z 4.5
+    anschluesse: { ein: [0.46, 0.26, 0.95, '+z'], aus: [0.64, 0.75, 0.95, '+z'] },
     oeffnen: { auf: 'Verkleidung abheben', zu: 'Zusammenbauen', leitungenWeg: true },
     teile: [
-      { id: 'verkleidung', name: 'Verkleidung mit Schutzscheibe', text: 'Die Verkleidung schützt das Bedienungspersonal vor den bewegten Teilen wie Keilriemenantrieb und Kolben. Durch die Schutzscheibe sehen Sie auf den Pumpenblock. Am Bedienpult stehen Display, Leuchtmelder, Not-Aus und die Manometer.' },
+      { id: 'verkleidung', name: 'Verkleidung mit Schutzscheibe', text: 'Die Verkleidung schützt das Bedienungspersonal vor den bewegten Teilen wie Keilriemenantrieb und Kolben. Durch die Schutzscheibe sehen Sie auf den Pumpenblock. An der Front stehen Display, Leuchtmelder, Not-Aus und die Manometer.' },
       { id: 'kurbelwellengehaeuse', name: 'Kurbelwellengehäuse', text: 'Im Kurbelwellengehäuse wandelt die Kurbelwelle die Drehbewegung in die Hin- und Herbewegung der Kolben um. Die einzelnen Kolben arbeiten versetzt zueinander, dadurch wird ein gleichmässigerer Produktefluss erreicht.' },
       { id: 'kolben', name: 'Kolben', text: 'Je nach Stundenleistung hat die Hochdruck-Kolbenpumpe zwei, drei oder fünf Kolben. Zwischen Kolben und Zylinder braucht es eine entsprechende Abdichtung, die mit Wasser (bei aseptischen Homogenisatoren mit Dampfkondensat) gekühlt und geschmiert werden muss.' },
       { id: 'zylinderblock', name: 'Zylinderblock', text: 'Die Kolbenpumpe erzeugt je nach Druckeinstellung am Homogenisierventil einen Druck von ca. 100 bis 300 bar.' },
@@ -669,7 +669,13 @@ const B6_KOPIEN = [
       ohneSchlaufe: true, // vorgewaermt/standardisiert = Enden der entfallenen Schlaufe: Milch geht über 3 und den Separator
       anschluesse: { ...ANLAGEN_ROH.find(a => a.id === 'plattenwaermetauscher').anschluesse, vorgewaermt: [-0.129, 1.259, 0.3, '+z'], standardisiert: [0.157, 0.4, 0.3, '+z'] }
     }],
-    ['separator', 'separator-b6', 47.9, 7.05],
+    ['separator', 'separator-b6', 47.9, 7.05, {
+      // Gegendruck hält hier das Konstantdruckventil (6), Fett regeln die Regelventile (9): eigene Sätze, Philipp 12.11.2026
+      text: ANLAGEN_ROH.find(a => a.id === 'separator').text.replace(/Mit der Rahmschraube.*$/,
+        'In dieser Anlage stellen die Regelventile (9) den Fettgehalt automatisch ein. Die Steuerung rechnet ihn aus den Werten von Dichtemessgerät (8) und Durchflussmessgeräten (7).'),
+      teile: ANLAGEN_ROH.find(a => a.id === 'separator').teile.map(t => t.id !== 'magermilchschraube' ? t : { ...t,
+        text: 'Mit der Magermilchschraube regulieren Sie von Hand den Gegendruck im Separator. In dieser Anlage übernimmt das Konstantdruckventil (6) diese Aufgabe automatisch, die Magermilchschraube bleibt offen.' })
+    }],
     ['heisshalter', 'heisshalter-b6', 52.2, 3.478], // z: Einlauf fluchtet mit dem PWT-Auslauf (erhitzt), kein Versatz in der Leitung
     ['pasteurpumpe', 'druckerhoehungspumpe', 50.7, 1.7, {
       name: 'Druckerhöhungspumpe', // eigener Satz zum Gegenlesen: im Lehrmittel steht nur die Legende
