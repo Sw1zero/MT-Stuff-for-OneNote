@@ -194,6 +194,20 @@ const DURCHFLUSS_TEILE = [
   { id: 'messumformer', name: 'Messumformer', text: 'Der Verstärker im Messumformer verstärkt die Spannung der Elektroden und rechnet sie in Liter pro Zeiteinheit oder in gezählte Liter um. Das Gerät braucht Fremdenergie, darum führt ein Kabel zum Kopf.' }
 ];
 
+// Multiröhrenwärmetauscher (UHT-indirekt 3a/3b/3c): Teil-ids = Gruppen in multiroehrenwaermetauscher.blend.
+// Texte mantel, rohrbuendel aus Lehrmittel a.4 «Multiröhrenwärmetauscher», die übrigen eigene Sätze (Philipp gegenlesen).
+const MRWT_TEILE = [
+  { id: 'mantel', name: 'Mantelrohr', text: 'In einem äusseren Rohr, dem Mantelrohr, befinden sich viele kleinere Röhren. Im Zwischenraum zwischen dem Mantelrohr und den kleineren Röhren fliesst im Gegenstrom das Heiz- oder Kühlmedium.' },
+  { id: 'rohrbuendel', name: 'Produktröhren', text: 'In den kleineren Röhren strömt das Produkt. Auch beim Multiröhrenwärmetauscher können die Rohre gerippt sein.' },
+  { id: 'rohrboeden', name: 'Rohrboden', text: 'Im Rohrboden stecken die Enden der Produktröhren. Er trennt das Produkt vom Wasser im Mantelrohr.' },
+  { id: 'umlenkkopf', name: 'Umlenkkopf mit Rohrbogen', text: 'Der Umlenkkopf sammelt das Produkt aus den Röhren. Über den Rohrbogen fliesst es in das nächste Mantelrohr.' },
+  { id: 'produktstutzen_ein', name: 'Produkteintritt', text: 'Hier tritt die Milch oben in das Modul ein und fliesst durch die drei Mantelrohre von oben nach unten.' },
+  { id: 'produktstutzen_aus', name: 'Produktaustritt', text: 'Hier verlässt die Milch das Modul. Das Steigrohr führt sie vom untersten Mantelrohr nach oben.' },
+  { id: 'wasser', name: 'Wasserzulauf', text: 'Hier fliesst das Wasser in das unterste Mantelrohr. Es strömt von unten nach oben, gegen die Milch (Gegenstrom).' },
+  { id: 'wasser_ruecklauf', name: 'Wasserablauf', text: 'Hier verlässt das Wasser das oberste Mantelrohr.' },
+  { id: 'tragrahmen', name: 'Tragrahmen', text: 'Der Tragrahmen hält die Mantelrohre. Mit den Verstellfüssen wird das Modul waagrecht ausgerichtet.' }
+];
+
 const ANLAGEN_ROH = [
   // Milchannahme (a.1)
   { id: 'annahmestation', name: 'Annahmestation', raum: 'annahme', x: 4, z: 10, b: 2, t: 1.5 },
@@ -478,7 +492,20 @@ const ANLAGEN_ROH = [
       'In dieser Anlage wird nur der Rahm homogenisiert, nicht die ganze Milch. Bei der Vollstromhomogenisierung wird die gesamte Milch homogenisiert, beim Teilstromverfahren nur der Rahm mit wenig Magermilch. Vorteile des Teilstromverfahrens sind der geringere Energieverbrauch für die Homogenisation und dass ein kleinerer, kostengünstigerer Homogenisator eingesetzt werden kann. ' +
       'Heben Sie die Verkleidung ab, sehen Sie die Teile.'
   },
-  { id: 'uht', name: 'UHT-Anlage', raum: 'behandlung', x: 50, z: 15, b: 6, t: 2.5 },
+  // UHT-indirekt (b.6, Schema Lehrmittel S. 20): Multiröhrenwärmetauscher 3 als drei gleiche Module 3a/3b/3c, gegenüber der Past-Anlage.
+  // Modell material/molkerei-3d/multiroehrenwaermetauscher_bau.py (bzwu), Vorderseite schaut zum Gang (-z), Wasser hinten.
+  // x vorläufig, Aufstellung der ganzen Linie folgt mit Homogenisator (4), Heisshalter (5) und Umformer (6).
+  ...[['3a', 38, 'Vorwärmer', 'In der Vorwärmer-Abteilung (3a) wärmt das Wasser aus dem Erhitzer die kalte Milch auf ca. 75 °C vor. ' +
+      'Danach fliesst die Milch zum Homogenisator (4), der sie auch auf den für die UHT-Erhitzung geeigneten Überdruck bringt.'],
+    ['3b', 43, 'Erhitzer', 'In der Erhitzer-Abteilung (3b) erhitzt das heisse Wasser aus dem Dampf/Wasserumformer (6) die homogenisierte Milch auf ca. 140 °C. ' +
+      'In der Heisshaltestrecke (5) bleibt sie ca. 5 Sekunden auf dieser Temperatur.'],
+    ['3c', 48, 'Kühler', 'In der Kühlabteilung (3c) nimmt Wasser die Wärme der erhitzten Milch auf. Das Wasser erwärmt sich dabei. Die Wärme wird so aus der Milch zurück gewonnen. ' +
+      'Die Milch kühlt auf ca. 20 °C ab und gelangt über das Druckhalteventil (7) in den Steriltank (8) oder auf die aseptische Abfüllmaschine (9).']
+  ].map(([nr, x, rolle, text]) => ({
+    id: 'mrwt-' + nr, name: `Röhrenwärmetauscher ${nr}: ${rolle}`, raum: 'behandlung', x, z: 14.5, b: 3.2, t: 0.5, bau: 'multiroehrenwaermetauscher',
+    anschluesse: { produkt_ein: [-1.346, 2.09, 0], produkt_aus: [1.566, 2.09, 0], wasser: [0.78, 0.65, 0.24, '+z'], wasser_ruecklauf: [-0.78, 1.65, 0.24, '+z'] },
+    teile: MRWT_TEILE, text
+  })),
 
   // Käserei (b.1, b.2)
   {

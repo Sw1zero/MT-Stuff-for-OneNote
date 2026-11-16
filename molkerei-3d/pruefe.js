@@ -517,6 +517,27 @@ async (page) => {
     .every(l => document.querySelector(`[data-leitung="${l}"]`))), 'Pasteur: Leitungen fehlen');
   await page.evaluate(() => window.kaeserei.schliessen());
 
+  // UHT-indirekt: Multiröhrenwärmetauscher 3b (Mitte 63/34.5, Vorderseite zum Gang -z), echter Klick auf das obere Mantelrohr
+  await page.evaluate(() => {
+    document.getElementById('spieler').object3D.position.set(63, 0, 31.5);
+    const lc = document.getElementById('kamera').components['look-controls'];
+    lc.yawObject.rotation.y = Math.PI; lc.pitchObject.rotation.x = 0;
+  });
+  await page.waitForFunction(() => document.querySelector('[data-anlage="mrwt-3b"] [data-teil="mantel"]') && document.querySelector('[data-anlage="mrwt-3a"] [data-teil="rohrbuendel"]')
+    && document.querySelector('[data-anlage="mrwt-3c"] [data-teil="wasser"]'), null, { timeout: 15000 }).catch(() => ok(false, 'Röhrenwärmetauscher 3a/3b/3c ohne Teile'));
+  await page.waitForFunction(() => { const k = new THREE.Vector3(); document.querySelector('a-scene').camera.getWorldPosition(k); return Math.abs(k.z - 31.5) < 0.05; }, null, { timeout: 10000 });
+  const mr = await page.evaluate(() => {
+    const kam = document.querySelector('a-scene').camera, p = new THREE.Vector3();
+    new THREE.Box3().setFromObject(document.querySelector('[data-anlage="mrwt-3b"]').object3D.getObjectByName('mantel_oben')).getCenter(p);
+    p.project(kam);
+    return [(p.x + 1) / 2, (1 - p.y) / 2];
+  });
+  await page.mouse.move(box.x + mr[0] * box.width, box.y + mr[1] * box.height);
+  await page.waitForTimeout(200);
+  await page.mouse.down(); await page.mouse.up();
+  ok((await t('overlay-titel').textContent()) === 'Röhrenwärmetauscher 3b: Erhitzer' && (await t('overlay-teil').textContent()) === 'Mantelrohr', `Klick auf das Mantelrohr zeigt: ${await t('overlay-titel').textContent()} / ${await t('overlay-teil').textContent()}`);
+  await page.evaluate(() => window.kaeserei.schliessen());
+
   // Durch den Durchgang Milchbehandlung -> Käserei (Tür bei x=30, z=20)
   await page.evaluate(() => document.getElementById('spieler').object3D.position.set(30, 0, 22));
   // rennen, damit es auch bei wenigen fps auf der VM reicht

@@ -642,6 +642,11 @@ const BAUTEN = {
     glbTeile(g, 'modelle/plattenwaermetauscher.glb', 'plattenwaermetauscher', {}, anlageVon(g.dataset.anlage).ohneSchlaufe ? ['schlaufe_erhitzer'] : []);
   },
 
+  // Multiröhrenwärmetauscher, ein Modul, steht als 3a/3b/3c (multiroehrenwaermetauscher_bau.py in bzwu), ohne Öffnen
+  multiroehrenwaermetauscher(g) {
+    glbTeile(g, 'modelle/multiroehrenwaermetauscher.glb', 'multiroehrenwaermetauscher');
+  },
+
   // Vorlaufgefäss des Plattenpasteurs mit Schwimmer (vorlaufgefaess_bau.py, VARIANTE 'pasteur')
   vorlaufgefaess_pasteur(g) {
     glbTeile(g, 'modelle/vorlaufgefaess_pasteur.glb', 'vorlaufgefaess_pasteur');
