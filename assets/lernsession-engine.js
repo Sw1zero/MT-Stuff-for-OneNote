@@ -487,8 +487,8 @@
     var block = document.createElement('div');
     block.className = 'q-block';
     var h = '';
-    st.options.forEach(function(op, oi) {
-      h += '<button class="opt" data-o="' + oi + '">' + op.t + '</button>';
+    shuffleIdx(st.options.length).forEach(function(oi) {
+      h += '<button class="opt" data-o="' + oi + '">' + st.options[oi].t + '</button>';
     });
     h += '<div class="q-feedback" id="decfb-' + idx + '" role="status"></div>';
     block.innerHTML = h;
