@@ -30,7 +30,7 @@
 </footer>
 
 <script src="../assets/rechner.js?v=532d2e94"></script>
-<script src="../assets/mischungskreuz.js?v=2e9d7f15"></script>
+<script src="../assets/mischungskreuz.js?v=75b3792d"></script>
 <script>
 var pick = Rechner.pick, z = Rechner.zahl;
 
@@ -52,13 +52,6 @@ function genFrucht() {
   return Mischungskreuz.aufgabe({ nameA: zutat, a: 100, nameB: 'Nature-Jogurt', b: 0, c: c, gesucht: 'mengen', menge: M,
     text: 'Sie wollen <strong>' + z(M) + ' kg</strong> Fruchtjogurt mit <strong>' + z(c) + ' %</strong> ' + zutat + ' herstellen (' + zutat +
       ' = 100 %, Nature-Jogurt = 0 %). Wie viel kg ' + zutat + ' und wie viel kg Nature-Jogurt brauchen Sie?' });
-}
-
-function genAnteil() {
-  var a = pick(Q_VOLL), b = pick(Q_MAGER), c = pick(Q_ZIEL);
-  return Mischungskreuz.aufgabe({ nameA: 'Vollmilch', a: a, nameB: 'Magermilch', b: b, c: c, gesucht: 'anteile',
-    text: 'Vollmilch (<strong>' + z(a) + ' %</strong>) und Magermilch (<strong>' + z(b) + ' %</strong>) werden zu Jogurtmilch mit <strong>' +
-      z(c) + ' %</strong> Fett gemischt. Wie gross ist der Anteil jeder Komponente an der Mischung in %?' });
 }
 
 var POOL = [
@@ -92,8 +85,7 @@ Mischungskreuz.seite({
     kategorien: [
       { name: 'Gesamtmenge bekannt', aufgaben: [genFett, genGesamt] },
       { name: 'Eine Menge bekannt', aufgaben: [genBekannt] },
-      { name: 'Frucht oder Zucker', aufgaben: [genFrucht] },
-      { name: 'Mischungsverhältnis', aufgaben: [genAnteil] }
+      { name: 'Frucht oder Zucker', aufgaben: [genFrucht] }
     ],
   hilfe: { titel: 'So geht das Mischungskreuz', html:
     '<ol><li>Links oben Komponente A mit ihrem Wert, links unten Komponente B.</li>' +
