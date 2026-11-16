@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Einflussfaktoren auf die Vermehrung (a.8)</title>
+  <link rel="stylesheet" href="../style.css?v=d6d6b61d">
+  <script src="../assets/lernsession-engine.js?v=7935af65"></script>
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+  <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · a.8</span>
+  <h1 id="pageTitle">Einflussfaktoren auf die Vermehrung</h1>
+  <p id="subtitle">Ernährung, Temperatur, Sauerstoff, pH, aw-Wert</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="page-main">
+  <a class="back-link" href="../index.html">← Alle Lerntools</a>
+
+  <div class="ls-wrap">
+    <div class="ls-meta" id="lsMeta"></div>
+    <div class="ls-select-hint"><span class="ls-select-badge">👆 Posten antippen. Frei wählbar, keine feste Reihenfolge.</span></div>
+    <div class="ls-dots" id="lsDots"></div>
+    <div id="stage"></div>
+    <div class="ls-nav">
+      <button class="btn btn-ghost" id="prevBtn" onclick="LSEngine.goPrev()">← Zurück</button>
+      <span class="spacer"></span>
+      <button class="btn btn-primary" id="nextBtn" onclick="LSEngine.goNext()">Weiter →</button>
+    </div>
+  </div>
+</main>
+
+<footer class="bzwu-footer">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm</footer>
+
+<script>
+/* ============================================================
+   a.8 Einflussfaktoren auf die Vermehrung der Mikroorganismen.
+   Quelle: Lehrmittel a.8, Kapitel «Einflussfaktoren» (Ernährung,
+   Enzyme, Temperatur, Sauerstoff, pH-Wert, aw-Wert, Gesellschaft).
+   Eine Datei, zwei Modi:
+   ?mode=lernpfad (Standard): mit Folien, Übungen.
+   ?mode=challenge: ohne Folien, direkt auf den Punkt.
+   ============================================================ */
+var MODE = /[?&]mode=challenge/.test(location.search) ? 'challenge' : 'lernpfad';
+
+var T3 = ['psychrotroph','mesophil','thermophil'];
+var ALL = [
+  /* ---------- 1 Ernährung und Enzyme ---------- */
+  { kicker:'Folien · Ernährung', title:'Was Mikroorganismen zum Leben brauchen', type:'slides',
+    lead:'Lesen Sie alle Folien, danach prüfen Sie sich.',
+    slides:[
+      { icon:'🍽️', color:'#92400e', bg:'#fff7ed',
+        title:'Nährstoffe und ihre Aufgabe',
+        body:'<ul><li><b>Zucker:</b> Energiequelle</li><li><b>Fette:</b> Energiequelle und Baustoff</li><li><b>Eiweiss:</b> Baustoff</li><li><b>Salze und Spurenelemente:</b> Schutz- und Aufbaustoff</li><li><b>Wasser:</b> Lösungs- und Transportmittel für die Nährstoffe, in und ausserhalb der Zelle</li></ul><p>Durch den Abbau der Nährstoffe gewinnt die Zelle Energie und Grundbausteine. Nicht benötigte Abbauprodukte scheidet sie wieder aus.</p>'
+      },
+      { icon:'✂️', color:'#1e4e8c', bg:'#dbeeff',
+        title:'Enzyme: Exo und Endo',
+        body:'<p><b>Exoenzyme</b> wirken <b>ausserhalb</b> der Bakterienzelle. Sie bereiten die Nährstoffe für den Transport in die Zelle vor.</p><p><b>Endoenzyme</b> wirken <b>in</b> der Bakterienzelle. Sie spalten die Nährstoffe auf und wandeln sie teilweise in zelleigene Substanzen um.</p><div class="factbox">Merkhilfe: Exo = Exit (hinaus), Endo = im Haus.</div>'
+      }
+    ] },
+  { kicker:'Tabelle', title:'Nährstoffe und ihre Aufgabe', id:'naehrstoffe_table', type:'table',
+    lead:'Welche Aufgabe hat der Stoff für die Mikroorganismen?',
+    stmtHeader:'Stoff', pickHeader:'Aufgabe',
+    rows:[
+      { text:'Zucker', opts:['Energiequelle','Baustoff','Schutz- und Aufbaustoff','Lösungs- und Transportmittel'], correct:0 },
+      { text:'Eiweiss', opts:['Energiequelle','Baustoff','Schutz- und Aufbaustoff','Lösungs- und Transportmittel'], correct:1 },
+      { text:'Salze', opts:['Energiequelle','Baustoff','Schutz- und Aufbaustoff','Lösungs- und Transportmittel'], correct:2 },
+      { text:'Wasser', opts:['Energiequelle','Baustoff','Schutz- und Aufbaustoff','Lösungs- und Transportmittel'], correct:3 }
+    ] },
+  { kicker:'Wahr oder Falsch', title:'Enzyme', id:'enzyme_tf', type:'tf',
+    lead:'Stimmt die Aussage?',
+    items:[
+      { s:'Exoenzyme wirken ausserhalb der Bakterienzelle.', a:true, e:'Sie bereiten die Nährstoffe für den Transport in die Zelle vor.' },
+      { s:'Endoenzyme spalten die Nährstoffe ausserhalb der Zelle auf.', a:false, e:'Endoenzyme wirken in der Zelle. Draussen wirken die Exoenzyme.' },
+      { s:'Wasser dient den Mikroorganismen als Lösungs- und Transportmittel.', a:true, e:'Und zwar in und ausserhalb der Zelle.' },
+      { s:'Eiweiss ist für Mikroorganismen die wichtigste Energiequelle.', a:false, e:'Energiequelle sind Zucker und Fette. Eiweiss ist Baustoff.' }
+    ] },
+
+  /* ---------- 2 Temperatur ---------- */
+  { kicker:'Folien · Temperatur', title:'Temperatur: vier Eckpunkte, drei Klassen', type:'slides',
+    lead:'Lesen Sie alle Folien, danach prüfen Sie sich.',
+    slides:[
+      { icon:'🌡️', color:'#b91c1c', bg:'#fef2f2',
+        title:'Die vier Eckpunkte',
+        body:'<ul><li><b>Optimum:</b> hier entwickeln sich die Mikroorganismen am besten → Bebrütungsschrank</li><li><b>Minimum:</b> darunter keine Vermehrung mehr → Kulturen im Kühlschrank</li><li><b>Maximum:</b> darüber keine Vermehrung mehr</li><li><b>Letaltemperatur:</b> liegt oberhalb des Maximums, ab hier werden sie abgetötet → Sterilisation der Kulturen-Milch</li></ul><img src="images/a.8_Temperatur-Eckpunkte.svg" alt="Vermehrung in Abhängigkeit von der Temperatur mit Minimum, Optimum, Maximum und Letaltemperatur">'
+      },
+      { icon:'📊', color:'#15803d', bg:'#dcfce7',
+        title:'Drei Temperaturklassen im Vergleich',
+        body:'<img src="images/a.8_Temperaturklassen.svg" alt="Minimum, Optimum und Maximum der drei Temperaturklassen mit Beispielen auf einer Temperaturachse">'
+      },
+      { icon:'📋', color:'#15803d', bg:'#dcfce7',
+        title:'Die Klassen als Tabelle',
+        body:'<table style="width:100%;border-collapse:collapse;font-size:0.85rem"><tr><th></th><th>psychrotroph</th><th>mesophil</th><th>thermophil</th></tr><tr><td>Minimum</td><td>unter 7 °C</td><td>10 bis 20 °C</td><td>20 bis 30 °C</td></tr><tr><td>Optimum</td><td>20 bis 30 °C</td><td>20 bis 30 °C</td><td>37 bis 45 °C</td></tr><tr><td>Maximum</td><td>35 bis 45 °C</td><td>35 bis 45 °C</td><td>50 bis 60 °C</td></tr><tr><td>Beispiele</td><td>Pseudomonas, Proteus, viele Schimmel (Weissschimmel der Tomme)</td><td>Laktokokkus lactis, Propionsäurebakterien (Emmentaler)</td><td>Streptococcus thermophilus, Lb. delbrueckii ssp. lactis, Coliforme (Joghurt)</td></tr></table>'
+      },
+      { icon:'⚠️', color:'#92400e', bg:'#fff7ed',
+        title:'Psychrotroph heisst nicht kälteliebend',
+        body:'<p>Psychrotroph bedeutet: Der Organismus <b>kann</b> bei tiefer Temperatur wachsen. Er bevorzugt sie aber nicht. Die meisten psychrotrophen sind mesophil, es gibt sogar thermophile.</p><p>In der Milchwirtschaft werden die Temperaturbereiche anders zugeordnet als in der allgemeinen Mikrobiologie.</p>'
+      }
+    ] },
+  { kicker:'Tabelle', title:'Temperaturklassen zuordnen', id:'temp_table', type:'table',
+    lead:'Zu welcher Temperaturklasse passt die Angabe?',
+    stmtHeader:'Angabe', pickHeader:'Klasse',
+    rows:[
+      { text:'Optimum 37 bis 45 °C', opts:T3, correct:2 },
+      { text:'Minimum unter 7 °C', opts:T3, correct:0 },
+      { text:'Maximum 50 bis 60 °C', opts:T3, correct:2 },
+      { text:'Propionsäurebakterien im Emmentaler', opts:T3, correct:1 },
+      { text:'Coliforme', opts:T3, correct:2 },
+      { text:'Pseudomonas', opts:T3, correct:0 }
+    ] },
+  { kicker:'Entscheidung', title:'Kulturen im Kühlschrank lagern', id:'temp_decide', type:'decide',
+    lead:'Sie lagern Kulturen im Kühlschrank. <b>Welchen Eckpunkt nutzen Sie damit?</b>',
+    options:[
+      { t:'Das Temperaturoptimum', correct:false,
+        fb:'Im Optimum vermehren sich die Mikroorganismen am besten. Das ist der Bebrütungsschrank, nicht der Kühlschrank.' },
+      { t:'Das Temperaturminimum', correct:true,
+        fb:'Richtig! Unterhalb des Minimums vermehren sich die Mikroorganismen nicht mehr. Die Kultur bleibt erhalten, ohne sich zu vermehren.' },
+      { t:'Die Letaltemperatur', correct:false,
+        fb:'Die Letaltemperatur liegt oberhalb des Maximums. Dort werden Mikroorganismen abgetötet, z. B. bei der Sterilisation der Kulturen-Milch.' }
+    ] },
+
+  /* ---------- 3 Sauerstoff ---------- */
+  { kicker:'Folien · Sauerstoff', title:'Sauerstoff: aerob, anaerob, fakultativ', type:'slides',
+    lead:'Für die einen lebensnotwendig, für andere Gift.',
+    slides:[
+      { icon:'💨', color:'#1e4e8c', bg:'#dbeeff',
+        title:'Drei Gruppen',
+        body:'<ul><li><b>Aerob</b> (luftliebend): Schimmelpilze, viele Bakterien, u. a. Bazillen</li><li><b>Anaerob</b> (luftscheu): Clostridien, die meisten Propionsäurebakterien, Bifidusbakterien</li><li><b>Fakultativ anaerob</b> (mit oder ohne Sauerstoff): Colibakterien, gewisse Milchsäurebakterien (Streptokokken, Laktokokken), Hefen</li></ul><p>Laktobazillen benötigen fast anaerobe Verhältnisse.</p>'
+      },
+      { icon:'🧀', color:'#6b21a8', bg:'#f3e8ff',
+        title:'Beispiel Camembert',
+        body:'<p>Schüttet man die Schimmelkultur in die Verarbeitungsmilch, wächst der Schimmelpilz trotzdem <b>nur an der Oberfläche</b> und nicht im Käseinnern.</p><div class="factbox">Grund: Schimmelpilze sind <b>aerob</b>. Im Käseinnern fehlt der Sauerstoff.</div>'
+      }
+    ] },
+  { kicker:'Tabelle', title:'Sauerstoffbedarf zuordnen', id:'o2_table', type:'table',
+    lead:'Wie verhält sich der Mikroorganismus gegenüber Sauerstoff?',
+    stmtHeader:'Mikroorganismus', pickHeader:'Gruppe',
+    rows:[
+      { text:'Schimmelpilze', opts:['aerob','anaerob','fakultativ anaerob'], correct:0 },
+      { text:'Clostridien', opts:['aerob','anaerob','fakultativ anaerob'], correct:1 },
+      { text:'Hefen', opts:['aerob','anaerob','fakultativ anaerob'], correct:2 },
+      { text:'Propionsäurebakterien (die meisten)', opts:['aerob','anaerob','fakultativ anaerob'], correct:1 },
+      { text:'Colibakterien', opts:['aerob','anaerob','fakultativ anaerob'], correct:2 },
+      { text:'Bazillen (viele)', opts:['aerob','anaerob','fakultativ anaerob'], correct:0 }
+    ] },
+  { kicker:'Entscheidung', title:'Schimmel im Camembert', id:'o2_decide', type:'decide',
+    lead:'Die Schimmelkultur wird in die Verarbeitungsmilch gegeben. Der Schimmel wächst aber nur an der Oberfläche des Camembert. <b>Weshalb?</b>',
+    options:[
+      { t:'Schimmelpilze sind anaerob und meiden die Luft.', correct:false,
+        fb:'Umgekehrt: Anaerob sind z. B. Clostridien. Schimmelpilze sind aerob.' },
+      { t:'Im Käseinnern ist es zu warm für Schimmelpilze.', correct:false,
+        fb:'Es geht nicht um die Temperatur, sondern um den Sauerstoff.' },
+      { t:'Schimmelpilze sind aerob und brauchen Sauerstoff.', correct:true,
+        fb:'Richtig! Im Käseinnern fehlt der Sauerstoff, darum wächst der Schimmel nur aussen.' }
+    ] },
+
+  /* ---------- 4 pH und aw ---------- */
+  { kicker:'Folien · pH-Wert', title:'pH-Wert', type:'slides',
+    lead:'Auch beim pH gibt es Minimum, Optimum und Maximum.',
+    slides:[
+      { icon:'🧪', color:'#6b21a8', bg:'#f3e8ff',
+        title:'Optimale pH-Bereiche',
+        body:'<ul><li>Die meisten Bakterien: pH um 7 (fast neutral)</li><li><b>Streptokokken/Laktokokken:</b> pH 6,0 bis 6,8</li><li><b>Laktobazillen:</b> pH 5,1 bis 5,5</li><li><b>Hefen und Schimmelpilze:</b> pH 5,0 bis 6,5, sehr tolerant im Sauren (bis ca. pH 2,0)</li></ul>'
+      },
+      { icon:'🛡️', color:'#15803d', bg:'#dcfce7',
+        title:'Tiefer pH schützt',
+        body:'<p>Sauermilchprodukte (z. B. Joghurt) und Käse haben einen relativ tiefen pH und sind darum gut haltbar. Der tiefe pH verhindert die Entwicklung schädlicher Keime, z. B. Enterobacteriaceen.</p><p>Auch der pH (Reifegrad) der Verarbeitungsmilch bestimmt, wie schnell sich zugegebene Kulturen vermehren.</p>'
+      }
+    ] },
+  { kicker:'Lückentext', title:'pH-Wert', id:'ph_gaps', type:'gaps',
+    lead:'Füllen Sie die Lücken.',
+    parts:[
+      'Die meisten Bakterien bevorzugen einen pH um ',
+      { opts:['7','4','10'], correct:0 },
+      '. Streptokokken und Laktokokken haben ihr Optimum bei pH ',
+      { opts:['6,0 bis 6,8','5,1 bis 5,5','2,0 bis 3,0'], correct:0 },
+      ', Laktobazillen bei pH ',
+      { opts:['5,1 bis 5,5','6,0 bis 6,8','7,5 bis 8,5'], correct:0 },
+      '. Hefen und Schimmelpilze sind im sauren Bereich sehr ',
+      { opts:['tolerant','empfindlich','inaktiv'], correct:0 },
+      '. Joghurt und Käse sind gut haltbar, weil der tiefe pH die Entwicklung schädlicher ',
+      { opts:['Keime verhindert','Enzyme aktiviert','Kulturen abtötet'], correct:0 },
+      '.'
+    ] },
+  { kicker:'Folien · aw-Wert', title:'Wasseraktivität (aw-Wert)', type:'slides',
+    lead:'Nur freies Wasser steht den Mikroorganismen zur Verfügung.',
+    slides:[
+      { icon:'💧', color:'#1e4e8c', bg:'#dbeeff',
+        title:'Freies und gebundenes Wasser',
+        body:'<p><b>Gebundenes Wasser</b> ist an gelöste Moleküle gebunden (z. B. Zucker). <b>Freies Wasser</b> ist allein für die Mikroorganismen verfügbar.</p><p>Der aw-Wert gibt den Anteil des freien Wassers an: <b>destilliertes Wasser = 1</b>, völlig ausgetrocknete Substanz = 0.</p>'
+      },
+      { icon:'📉', color:'#92400e', bg:'#fff7ed',
+        title:'aw-Wert senken hemmt das Wachstum',
+        body:'<ul><li>unter <b>0,91</b>: Wachstum vieler Bakterien gehemmt</li><li>unter <b>0,8</b>: auch die meisten Hefen und Schimmelpilze wachsen nicht mehr</li></ul><p><b>So senken Sie den aw-Wert:</b> durch Wasserentzug (Kondensmilch, Magermilchpulver) oder durch mehr gelöste Stoffe (Zucker im Fruchtgrundstoff, Käse im Salzbad).</p>'
+      },
+      { icon:'🥛', color:'#6b21a8', bg:'#f3e8ff',
+        title:'Beispiele',
+        body:'<ul><li>Vollmilchpulver: 0,2</li><li>Gesüsste Kondensmilch: 0,83 · alter Käse: 0,87</li><li>Schnittkäse: 0,95 · Milch: 0,99</li></ul><p>Minimale aw-Werte: Schimmelpilze 0,80 · Staphylococcus aureus 0,86 · Milchsäurebakterien 0,91 · Salmonellen, Bacillus 0,95 · Escherichia coli 0,96</p>'
+      }
+    ] },
+  { kicker:'Quiz', title:'aw-Wert', id:'aw_quiz', type:'quiz',
+    lead:'Wählen Sie die richtige Antwort.',
+    questions:[
+      { q:'Welchen aw-Wert hat destilliertes Wasser?', opts:['1','0,5','0'], correct:0 },
+      { q:'Ab welchem aw-Wert wachsen die meisten Hefen und Schimmelpilze nicht mehr?', opts:['unter 0,8','unter 0,95','unter 0,99'], correct:0 },
+      { q:'Wie wirkt das Salzbad auf den Käse?', opts:['Es senkt den aw-Wert, weil die Konzentration gelöster Stoffe steigt.','Es erhöht den aw-Wert, weil mehr Wasser in den Käse gelangt.','Es verändert den aw-Wert nicht.'], correct:0 },
+      { q:'Welche Produkte haben einen tiefen aw-Wert durch Wasserentzug?', opts:['Kondensmilch und Magermilchpulver','Frischmilch und Rahm','Joghurt und Quark'], correct:0 },
+      { q:'Welcher dieser Mikroorganismen braucht den höchsten aw-Wert zum Wachsen?', opts:['Escherichia coli','Schimmelpilze','Milchsäurebakterien'], correct:0 }
+    ] },
+
+  /* ---------- 5 Gesellschaft ---------- */
+  { kicker:'Folien · Gesellschaft', title:'Mikroorganismen beeinflussen sich', type:'slides',
+    lead:'In Milch und Lebensmitteln leben meist mehrere Arten zusammen.',
+    slides:[
+      { icon:'🤝', color:'#15803d', bg:'#dcfce7',
+        title:'Symbiose, Antibiose, Metabiose',
+        body:'<ul><li><b>Symbiose:</b> gegenseitig positive Beeinflussung, beide profitieren. Joghurt: Streptokokken liefern Aminosäuren für die Laktobazillen und umgekehrt.</li><li><b>Antibiose</b> (Antagonismus): ein Partner wird gehemmt. Die Milchsäure hemmt die Enterobakterien. Manche bilden Bakteriozine oder Antibiotika.</li><li><b>Metabiose:</b> Einer bereitet den Boden für nachfolgende vor. Hefen entsäuern die Käseoberfläche und fördern so Edelschimmel.</li></ul>'
+      }
+    ] },
+  { kicker:'Tabelle', title:'Beispiele zuordnen', id:'ges_table', type:'table',
+    lead:'Welche Beziehung beschreibt das Beispiel?',
+    stmtHeader:'Beispiel', pickHeader:'Beziehung',
+    rows:[
+      { text:'Streptokokken und Laktobazillen im Joghurt liefern sich gegenseitig Aminosäuren.', opts:['Symbiose','Antibiose','Metabiose'], correct:0 },
+      { text:'Die Milchsäure hemmt das Wachstum der Enterobakterien.', opts:['Symbiose','Antibiose','Metabiose'], correct:1 },
+      { text:'Hefen entsäuern die Käseoberfläche und fördern dadurch Edelschimmelkulturen.', opts:['Symbiose','Antibiose','Metabiose'], correct:2 },
+      { text:'Ein Mikroorganismus bildet Bakteriozine, die andere hemmen.', opts:['Symbiose','Antibiose','Metabiose'], correct:1 }
+    ] },
+
+  /* ---------- 6 Anwenden ---------- */
+  { kicker:'Fehlersuche', title:'Lernnotizen prüfen', id:'fehler', type:'errors',
+    lead:'In diesen Lernnotizen haben sich Fehler eingeschlichen. <b>Klicken Sie alle falschen Angaben an</b>, dann werten Sie aus.',
+    items:[
+      { label:'Exoenzyme wirken',                value:'in der Bakterienzelle', wrong:true,  corr:'ausserhalb der Bakterienzelle' },
+      { label:'Schimmelpilze sind',              value:'aerob',                 wrong:false },
+      { label:'Clostridien sind',                value:'aerob',                 wrong:true,  corr:'anaerob' },
+      { label:'Optimaler pH der Laktobazillen:', value:'6,0 bis 6,8',           wrong:true,  corr:'5,1 bis 5,5' },
+      { label:'Die Letaltemperatur liegt',       value:'oberhalb des Maximums', wrong:false },
+      { label:'Das Salzbad',                     value:'erhöht den aw-Wert',    wrong:true,  corr:'senkt den aw-Wert' }
+    ] },
+  { kicker:'Begründen', title:'Ursache und Wirkung', id:'reason', type:'reason',
+    lead:'Trainieren Sie die Erklär-Fragen: <b>Ursache → Wirkung</b>.',
+    tasks:[
+      { kind:'chain',
+        q:'Bringen Sie die Sätze in die richtige Reihenfolge: Weshalb hemmt das Salzbad das Wachstum von Mikroorganismen?',
+        frags:[
+          'Das Salz löst sich im Wasser des Käses.',
+          'Die Konzentration der gelösten Stoffe steigt, mehr Wasser wird gebunden.',
+          'Dadurch sinkt der Anteil des freien Wassers, der aw-Wert wird tiefer.',
+          'Den Mikroorganismen fehlt freies Wasser, ihr Wachstum wird gehemmt.'
+        ] },
+      { kind:'free',
+        q:'Erklären Sie, weshalb Joghurt und Käse gut haltbar sind.',
+        model:'Sauermilchprodukte und Käse haben einen relativ tiefen pH-Wert. Der tiefe pH verhindert die Entwicklung schädlicher Keime, z. B. von Enterobacteriaceen. Darum sind die Produkte gut haltbar.',
+        checks:['Ich nenne den tiefen pH-Wert.','Ich nenne die Folge: schädliche Keime (z. B. Enterobacteriaceen) entwickeln sich nicht.','Ich verbinde das mit der guten Haltbarkeit.'] },
+      { kind:'free',
+        q:'Erklären Sie, weshalb der Schimmel beim Camembert nur an der Oberfläche wächst, obwohl die Kultur in die Milch gegeben wird.',
+        model:'Schimmelpilze sind aerob, sie brauchen Sauerstoff. Im Käseinnern fehlt der Sauerstoff, darum wachsen sie nur an der Oberfläche.',
+        checks:['Ich nenne den Begriff aerob.','Ich sage, dass Schimmelpilze Sauerstoff brauchen.','Ich sage, dass im Käseinnern der Sauerstoff fehlt.'] }
+    ] },
+  { kicker:'Abschluss', title:'Quer durch die Einflussfaktoren', id:'boss', boss:true, type:'quiz',
+    lead:'Gemischte Fragen zum Schluss.',
+    questions:[
+      { q:'Welcher Punkt gehört laut Lehrmittel nicht zu den Einflussfaktoren auf die Vermehrung?', opts:['Farbe der Verpackung','Ernährung','Wasseraktivität (aw-Wert)'], correct:0 },
+      { q:'Was bedeutet «psychrotroph»?', opts:['Der Organismus kann auch bei tiefer Temperatur wachsen, bevorzugt sie aber nicht.','Der Organismus braucht tiefe Temperaturen zum Wachsen.','Der Organismus stirbt unter 7 °C ab.'], correct:0 },
+      { q:'Welche Temperaturklasse hat das Optimum 37 bis 45 °C?', opts:['thermophil','mesophil','psychrotroph'], correct:0 },
+      { q:'Welche Mikroorganismen sind fakultativ anaerob?', opts:['Hefen und Colibakterien','Schimmelpilze und Bazillen','Clostridien und Bifidusbakterien'], correct:0 },
+      { q:'Wo wirken Endoenzyme?', opts:['In der Bakterienzelle','Ausserhalb der Bakterienzelle','Nur in der Milch'], correct:0 },
+      { q:'Bei welchem pH liegt das Optimum der Laktobazillen?', opts:['5,1 bis 5,5','6,0 bis 6,8','7,0 bis 7,5'], correct:0 },
+      { q:'Wie senken Sie den aw-Wert eines Produkts?', opts:['Wasser entziehen oder gelöste Stoffe erhöhen','Wasser zugeben','Das Produkt erwärmen'], correct:0 },
+      { q:'Die Hefen entsäuern die Käseoberfläche und fördern Edelschimmel. Wie heisst diese Beziehung?', opts:['Metabiose','Symbiose','Antibiose'], correct:0 }
+    ] }
+];
+
+/* Challenge = ohne Folien */
+var STATIONS = ALL.filter(function(s){ return MODE === 'challenge' ? (s.type !== 'info' && s.type !== 'pdf' && s.type !== 'slides') : true; });
+
+LSEngine.configure({
+  unitLabel: 'Posten',
+  modeBanner: {
+    pageTitle: function(mode){ return 'Einflussfaktoren – ' + (mode==='challenge'?'Challenge':'Lernpfad'); },
+    subtitle: function(mode){ return mode==='challenge'
+      ? 'Prüfungsmodus, ohne Folien, direkt auf den Punkt'
+      : 'Folien und Übungen zu Ernährung, Temperatur, Sauerstoff, pH und aw-Wert'; },
+    docTitle: function(mode){ return 'Einflussfaktoren – ' + (mode==='challenge'?'Challenge':'Lernpfad') + ' (a.8)'; }
+  }
+});
+
+LSEngine.initState();
+
+function buildBody(idx, st){
+  if(st.type==='slides')  LSEngine.buildSlides(idx, st);
+  if(st.type==='tf')      LSEngine.buildTF(idx, st);
+  if(st.type==='gaps')    LSEngine.buildGaps(idx, st);
+  if(st.type==='table')   LSEngine.buildTable(idx, st);
+  if(st.type==='quiz')    LSEngine.buildQuiz(idx, st);
+  if(st.type==='decide')  LSEngine.buildDecide(idx, st);
+  if(st.type==='errors')  LSEngine.buildErrors(idx, st);
+  if(st.type==='reason')  LSEngine.buildReason(idx, st);
+}
+
+LSEngine.buildAll(); LSEngine.showCard(0); LSEngine.updateNav();
+</script>
+</body>
+</html>
