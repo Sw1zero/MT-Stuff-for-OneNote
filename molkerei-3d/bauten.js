@@ -647,6 +647,12 @@ const BAUTEN = {
     glbTeile(g, 'modelle/multiroehrenwaermetauscher.glb', 'multiroehrenwaermetauscher');
   },
 
+  // Platzhalter als Kasten (Steriltank, Abfüllmaschine), Höhe h aus anlagen.js
+  kasten(g) {
+    const an = anlageVon(g.dataset.anlage);
+    el('a-box', { width: an.b, height: an.h, depth: an.t, position: `0 ${an.h / 2} 0`, material: CHROM }, g);
+  },
+
   // Vorlaufgefäss des Plattenpasteurs mit Schwimmer (vorlaufgefaess_bau.py, VARIANTE 'pasteur')
   vorlaufgefaess_pasteur(g) {
     glbTeile(g, 'modelle/vorlaufgefaess_pasteur.glb', 'vorlaufgefaess_pasteur');

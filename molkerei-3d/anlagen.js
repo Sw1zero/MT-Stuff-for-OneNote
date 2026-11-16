@@ -115,6 +115,22 @@ const LEITUNGEN = [
   { von: 'pwt-b6', nach: 'dampfkessel', medium: 'heisswasser', ab: 'heisswasser_ruecklauf' },
   { von: 'kaelteanlage', nach: 'pwt-b6', medium: 'kuehlwasser' },
   { von: 'pwt-b6', nach: 'kaelteanlage', medium: 'kuehlwasser', ab: 'kuehlwasser_ruecklauf' },
+  // UHT-indirekt (Lehrmittel b.6 S. 20): Milch 1-2-3a-4-3b-5-3c-7-8/9, Höhen über den Produktstutzen (2.09 m) der Wärmetauscher.
+  { von: 'milchpumpe-uht', nach: 'mrwt-3a', medium: 'milch', ab: 'druck', an: 'produkt_ein', direkt: true, hoehe: 2.5 },
+  { von: 'mrwt-3a', nach: 'homogenisator-uht', medium: 'milch', ab: 'produkt_aus', an: 'ein', direkt: true, hoehe: 2.5 },
+  { von: 'homogenisator-uht', nach: 'mrwt-3b', medium: 'milch', ab: 'aus', an: 'produkt_ein', direkt: true, hoehe: 2.65 },
+  { von: 'mrwt-3b', nach: 'heisshalter-uht', medium: 'milch', ab: 'produkt_aus', an: 'milch', direkt: true, hoehe: 2.5 },
+  { von: 'heisshalter-uht', nach: 'mrwt-3c', medium: 'milch', ab: 'heisshalter', an: 'produkt_ein', direkt: true, hoehe: 2.65 },
+  { von: 'heisshalter-uht', nach: 'vorlaufgefaess-uht', medium: 'milch', ab: 'rueckfuehrung', an: 'rueckfuehrung', direkt: true, hoehe: 2.8 },
+  { von: 'mrwt-3c', nach: 'druckhalteventil', medium: 'milch', ab: 'produkt_aus', an: 'ein', direkt: true, hoehe: 2.5 },
+  { von: 'druckhalteventil', nach: 'steriltank', medium: 'milch', ab: 'aus', direkt: true, hoehe: 0.2 },
+  { von: 'druckhalteventil', nach: 'abfuellmaschine', medium: 'milch', ab: 'aus', direkt: true, hoehe: 0.35 },
+  // Wasserkreislauf UHT im Gegenstrom: 3c nimmt Wärme auf, Umformer heizt nach, 3b und 3a geben ab, zurück über Ausgleichsgefäss und Pumpe
+  { von: 'mrwt-3c', nach: 'dampfumformer-uht', medium: 'heisswasser', ab: 'wasser_ruecklauf', an: 'ruecklauf' },
+  { von: 'dampfumformer-uht', nach: 'mrwt-3b', medium: 'heisswasser', ab: 'vorlauf', an: 'wasser' },
+  { von: 'mrwt-3b', nach: 'mrwt-3a', medium: 'heisswasser', ab: 'wasser_ruecklauf', an: 'wasser' },
+  { von: 'mrwt-3a', nach: 'ausgleichsgefaess-uht', medium: 'heisswasser', ab: 'wasser_ruecklauf', an: 'milch' },
+  { von: 'wasserpumpe-uht', nach: 'mrwt-3c', medium: 'heisswasser', ab: 'druck', an: 'wasser' },
   // Versorgung
   { von: 'dampfkessel', nach: 'plattenwaermetauscher', medium: 'heisswasser' },
   { von: 'dampfkessel', nach: 'kaesefertiger', medium: 'heisswasser' },
@@ -494,18 +510,25 @@ const ANLAGEN_ROH = [
   },
   // UHT-indirekt (b.6, Schema Lehrmittel S. 20): Multiröhrenwärmetauscher 3 als drei gleiche Module 3a/3b/3c, gegenüber der Past-Anlage.
   // Modell material/molkerei-3d/multiroehrenwaermetauscher_bau.py (bzwu), Vorderseite schaut zum Gang (-z), Wasser hinten.
-  // x vorläufig, Aufstellung der ganzen Linie folgt mit Homogenisator (4), Heisshalter (5) und Umformer (6).
-  ...[['3a', 38, 'Vorwärmer', 'In der Vorwärmer-Abteilung (3a) wärmt das Wasser aus dem Erhitzer die kalte Milch auf ca. 75 °C vor. ' +
+  // Übrige Teile der Linie: UHT_KOPIEN (Ende der Datei), Steriltank und Abfüllmaschine als Kasten.
+  ...[['3a', 37.5, 'Vorwärmer', 'In der Vorwärmer-Abteilung (3a) wärmt das Wasser aus dem Erhitzer die kalte Milch auf ca. 75 °C vor. ' +
       'Danach fliesst die Milch zum Homogenisator (4), der sie auch auf den für die UHT-Erhitzung geeigneten Überdruck bringt.'],
-    ['3b', 43, 'Erhitzer', 'In der Erhitzer-Abteilung (3b) erhitzt das heisse Wasser aus dem Dampf/Wasserumformer (6) die homogenisierte Milch auf ca. 140 °C. ' +
+    ['3b', 43.6, 'Erhitzer', 'In der Erhitzer-Abteilung (3b) erhitzt das heisse Wasser aus dem Dampf/Wasserumformer (6) die homogenisierte Milch auf ca. 140 °C. ' +
       'In der Heisshaltestrecke (5) bleibt sie ca. 5 Sekunden auf dieser Temperatur.'],
-    ['3c', 48, 'Kühler', 'In der Kühlabteilung (3c) nimmt Wasser die Wärme der erhitzten Milch auf. Das Wasser erwärmt sich dabei. Die Wärme wird so aus der Milch zurück gewonnen. ' +
+    ['3c', 49.5, 'Kühler', 'In der Kühlabteilung (3c) nimmt Wasser die Wärme der erhitzten Milch auf. Das Wasser erwärmt sich dabei. Die Wärme wird so aus der Milch zurück gewonnen. ' +
       'Die Milch kühlt auf ca. 20 °C ab und gelangt über das Druckhalteventil (7) in den Steriltank (8) oder auf die aseptische Abfüllmaschine (9).']
   ].map(([nr, x, rolle, text]) => ({
     id: 'mrwt-' + nr, name: `Röhrenwärmetauscher ${nr}: ${rolle}`, raum: 'behandlung', x, z: 14.5, b: 3.2, t: 0.5, bau: 'multiroehrenwaermetauscher',
     anschluesse: { produkt_ein: [-1.346, 2.09, 0], produkt_aus: [1.566, 2.09, 0], wasser: [0.78, 0.65, 0.24, '+z'], wasser_ruecklauf: [-0.78, 1.65, 0.24, '+z'] },
     teile: MRWT_TEILE, text
   })),
+  // Steriltank (8) und Abfüllmaschine (9) vorerst als Kasten (Entscheid 16.11.2026). Texte Lehrmittel b.6 S. 19/20, Satz zur Abfüllmaschine eigener.
+  { id: 'steriltank', name: 'Steriltank', raum: 'behandlung', x: 54.5, z: 14.5, b: 2.5, t: 2.5, h: 3.5, bau: 'kasten',
+    anschluesse: { milch: [-1.25, 0.5, 0, '-x'] },
+    text: 'Die gekühlte Milch gelangt in den mit Sterilluft überfluteten Steriltank (8) oder direkt auf die aseptische Abfüllmaschine (9).' },
+  { id: 'abfuellmaschine', name: 'Aseptische Abfüllmaschine', raum: 'behandlung', x: 58, z: 14.5, b: 3, t: 2, h: 2.8, bau: 'kasten',
+    anschluesse: { milch: [-1.5, 1.2, 0, '-x'] },
+    text: 'Die aseptische Abfüllmaschine (9) füllt die UHT-Milch keimfrei in die Packungen ab.' },
 
   // Käserei (b.1, b.2)
   {
@@ -709,4 +732,59 @@ const B6_KOPIEN = [
       text: 'Die Druckerhöhungspumpe fördert die heisse Milch nach dem Heisshalter zurück durch den Plattenwärmetauscher. So bleibt der Druck der pasteurisierten Milch höher als der Druck der Rohmilch.'
     }]
 ].map(([von, id, x, z, mehr]) => ({ ...ANLAGEN_ROH.find(a => a.id === von), id, x, z, ...mehr }));
-const ANLAGEN = [...ANLAGEN_ROH, ...B6_KOPIEN];
+// UHT-indirekt (Lehrmittel b.6 S. 20), Südseite gegenüber der Past-Anlage, Fluss West nach Ost, Vorderseite zum Gang (gedreht).
+// Vorlaufgefäss liegt gedreht östlich der Pumpe (Auslaufrohr endet am Saugstutzen). Wasserkreislauf hinten: Pumpe mit Ausgleichsgefäss
+// (im Schema ohne Nummer) und Umformer (6). Umschaltventil am Heisshalter führt zurück ins Vorlaufgefäss (im Schema nicht gezeigt,
+// Philipp 16.11.2026). Eigene Sätze zum Gegenlesen: alle Texte unten ausser Umformer-Anlagentext und Homogenisator-Überdruck (Lehrmittel).
+const UHT_KOPIEN = [
+  ['pasteurpumpe', 'milchpumpe-uht', 34.2, 14.5, {
+    name: 'Milchpumpe', text: 'Die Milchpumpe (2) fördert die Milch aus dem Vorlaufgefäss (1) in die Vorwärmer-Abteilung (3a) des Röhrenwärmetauschers.',
+    teileText: { druckstutzen: t => t.replace('Richtung Rohrbahnhof', 'zum Röhrenwärmetauscher') }
+  }],
+  ['vorlaufgefaess-pasteur', 'vorlaufgefaess-uht', 35.075, 14.5, {
+    text: 'Ins Vorlaufgefäss (1) fliesst die Rohmilch. Die Milchpumpe (2) fördert sie in die Vorwärmer-Abteilung (3a) des Röhrenwärmetauschers.',
+    teileText: { behaelter: () => 'Ins Vorlaufgefäss fliesst die Rohmilch. Erreicht die Milch am Ende des Heisshalters die Erhitzungstemperatur nicht, wird sie in das Vorlaufgefäss zurückgeleitet.' }
+  }],
+  ['homogenisator', 'homogenisator-uht', 40.8, 14.5, {
+    text: ANLAGEN_ROH.find(a => a.id === 'homogenisator').text.replace(/In dieser Anlage wird nur der Rahm.*?(?=Heben Sie)/,
+      'In der UHT-Anlage wird die ganze Milch homogenisiert (Vollstromhomogenisierung). Der Homogenisator (4) hat neben der Homogenisation die Aufgabe, das Produkt auf den für die UHT-Erhitzung geeigneten Überdruck zu bringen. ')
+  }],
+  ['heisshalter', 'heisshalter-uht', 46.6, 14.5, {
+    text: 'Im Heisshalter (5) bleibt die Milch ca. 5 Sekunden auf ca. 140 °C. Erreicht sie am Ende des Heisshalters die Solltemperatur nicht, leitet das Umschaltventil sie zurück ins Vorlaufgefäss.',
+    teileText: {
+      rohrschlange: () => 'Der Heisshalter gewährleistet, dass die Milch die notwendige Zeit auf UHT-Temperatur heiss gehalten wird. Die Milch fliesst unten hinein und steigt durch die Rohrschlange nach oben.',
+      temperatursensor: () => 'Fällt die vom Temperatursensor gemessene Temperatur am Ende des Heisshalters unter den Sollwert, sendet die Steuerung ein Signal an das Umschaltventil.',
+      umschaltventil: () => 'Das Umschaltventil leitet die Milch bei zu tiefer Temperatur zurück ins Vorlaufgefäss. So gelangt keine ungenügend erhitzte Milch zur Kühlung und Abfüllung. Fällt die Druckluft aus, drückt die Feder im Antrieb das Ventil in die Stellung zum Vorlaufgefäss.'
+    }
+  }],
+  ['konstantdruckventil', 'druckhalteventil', 52, 14.5, {
+    gedreht: false, name: 'Druckhalteventil',
+    text: 'Über das Druckhalteventil (7) gelangt die gekühlte Milch in den Steriltank (8) oder auf die aseptische Abfüllmaschine (9). Es hält den Druck in der Anlage hoch, damit die Milch bei 140 °C nicht siedet.',
+    teileText: { ventilgehaeuse: () => 'Die Milch tritt seitlich ins Ventilgehäuse ein und verlässt es nach unten. Das Druckhalteventil hält den Druck vor dem Ventil konstant, hier den Druck in den Röhren des Wärmetauschers.' }
+  }],
+  ['dampfumformer', 'dampfumformer-uht', 46.6, 16.8, {
+    name: 'Dampf/Wasserumformer',
+    text: 'Das vorerwärmte Wasser aus der Kühlabteilung (3c) erhält im Dampf/Wasserumformer (6) zusätzliche Wärmeenergie. Die Wärme im Wasser wird im Erhitzer (3b) und Vorwärmer (3a) an die neu zugeführte Milch abgegeben.',
+    teileText: {
+      behaelter: () => 'Im Dampf/Wasserumformer erhält das Wasser wieder Wärmeenergie, die es im Erhitzer (3b) und im Vorwärmer (3a) an die Milch abgegeben hat.',
+      warmwasserstutzen: () => 'Unten tritt das Wasser aus der Kühlabteilung (3c) ein, oben verlässt es erwärmt den Umformer zum Erhitzer (3b).'
+    }
+  }],
+  ['pasteurpumpe', 'wasserpumpe-uht', 40.4, 17.2, {
+    name: 'Wasserpumpe',
+    text: 'Die Wasserpumpe fördert das Wasser aus dem Ausgleichsgefäss in die Kühlabteilung (3c). Dort nimmt es die Wärme der erhitzten Milch auf. Das Wasser läuft im Kreislauf.',
+    teileText: { druckstutzen: t => t.replace('Richtung Rohrbahnhof', 'zur Kühlabteilung (3c)').replace('Die Milch', 'Das Wasser') }
+  }],
+  ['vorlaufgefaess-pasteur', 'ausgleichsgefaess-uht', 41.275, 17.2, {
+    name: 'Ausgleichsgefäss Wasser',
+    text: 'Ins Ausgleichsgefäss fliesst das Wasser aus dem Vorwärmer (3a) zurück. Die Wasserpumpe fördert es wieder in die Kühlabteilung (3c).',
+    teileText: {
+      behaelter: () => 'Ins Ausgleichsgefäss fliesst das abgekühlte Wasser aus dem Vorwärmer (3a) zurück.',
+      schwimmer: () => 'Der Schwimmer hält den Wasserstand im Ausgleichsgefäss konstant.'
+    }
+  }]
+].map(([von, id, x, z, { teileText = {}, ...mehr }]) => {
+  const q = ANLAGEN_ROH.find(a => a.id === von);
+  return { ...q, id, x, z, gedreht: true, ...mehr, teile: q.teile.map(t => teileText[t.id] ? { ...t, text: teileText[t.id](t.text) } : t) };
+});
+const ANLAGEN = [...ANLAGEN_ROH, ...B6_KOPIEN, ...UHT_KOPIEN];

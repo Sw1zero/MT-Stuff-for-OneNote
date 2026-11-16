@@ -116,7 +116,9 @@ function anschluesse() {
   const punkt = (id, name) => {
     const an = anlageVon(id), p = anlagePunkt(an);
     const fest = an.anschluesse && an.anschluesse[name];
-    if (fest) return { x: p.x + fest[0], y: p.y, z: p.z + fest[2], hoch: fest[1], richtung: fest[3], gerade: fest[4] };
+    // gedreht: Anlage um 180° gedreht (Vorderseite -z), Anschlüsse drehen mit
+    const s = an.gedreht ? -1 : 1, dreh = { '-x': '+x', '+x': '-x', '-z': '+z', '+z': '-z' };
+    if (fest) return { x: p.x + s * fest[0], y: p.y, z: p.z + s * fest[2], hoch: fest[1], richtung: an.gedreht ? dreh[fest[3]] || fest[3] : fest[3], gerade: fest[4] };
     const v = ((k[id] = (k[id] || 0) + 1) - 1 - (zahl[id] - 1) / 2) * 0.15;
     return an.t > an.b ? { ...p, z: p.z + v } : { ...p, x: p.x + v };
   };

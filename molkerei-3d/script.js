@@ -277,7 +277,7 @@ function baueSzene(szene) {
 
   for (const an of ANLAGEN) {
     const r = raumVon(an.raum);
-    const g = el('a-entity', { 'data-anlage': an.id, position: `${r.x0 + an.x} ${bodenVon(r)} ${r.z0 + an.z}` }, szene);
+    const g = el('a-entity', { 'data-anlage': an.id, position: `${r.x0 + an.x} ${bodenVon(r)} ${r.z0 + an.z}`, rotation: an.gedreht ? '0 180 0' : '0 0 0' }, szene);
     if (an.bau) {
       BAUTEN[an.bau](g);
     } else {
