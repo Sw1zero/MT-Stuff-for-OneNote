@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Escape Room – Pastmilch freigeben</title>
-  <link rel="stylesheet" href="../style.css?v=efeeec8d">
+  <link rel="stylesheet" href="../style.css?v=c1ebcebd">
 </head>
 <body>
 <header class="bzwu-header">
@@ -25,7 +25,7 @@
 <footer class="bzwu-footer">
   BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
 </footer>
-<script src="../assets/escape-room.js?v=5ba2041f"></script>
+<script src="../assets/escape-room.js?v=f02ea431"></script>
 <script>
 // Fachquelle aller Werte: lehrmittel/efz/b.6 - Konsummilch herstellen.md (Seiten = PDF-Seiten), Belege in material/efz/b.6/escape-room/QUELLEN_b6_escape-room.md
 var z2 = function (n) { return EscapeRoom.zahl(n); };
@@ -136,7 +136,7 @@ function raum(z) {
       ansicht: {"src": "images/pastanlage_a.webp", "alt": "Pastanlage: Plattenwärmetauscher, Heisshalter, Homogenisator und Schaltschrank mit Schreiber", "hotspots": [{"titel": "Heisshalter, Typenschild", "x": 15.8, "y": 36.3, "b": 27.5, "h": 38.6, "dok": "typenschild"}, {"titel": "Homogenisator", "x": 51.4, "y": 35.0, "b": 22.7, "h": 40.7, "schloss": "s3"}, {"titel": "Wärmetauscher, Temperaturanzeige", "x": 0, "y": 41.2, "b": 14.3, "h": 36.9, "dok": "temperatur"}, {"titel": "Steuerpult", "x": 81.1, "y": 34.2, "b": 10.4, "h": 33.7, "schloss": "s4"}, {"titel": "Schreiberstreifen", "x": 84.5, "y": 51.7, "b": 6.0, "h": 6.1, "dok": "schreiber"}, {"titel": "Anlagenschema", "x": 54.2, "y": 24.9, "b": 7.9, "h": 11.2, "dok": "legende"}, {"titel": "Warnschild", "x": 23.3, "y": 29.0, "b": 4.6, "h": 5.7, "dok": "warnschild"}, {"titel": "Spülprotokoll", "x": 68.5, "y": 62.6, "b": 5.4, "h": 13.3, "dok": "spuel"}]},
       szene: '<p>Die Anlage ist mit Wasser gefüllt und keimarm gemacht. Hier hat die Qualitätssicherung in der Nacht gesperrt. An der Wand hängt das Anlagenschema.</p>' },
     { id: 'labor', name: 'Labor', uhr: '06:20', plan: { x: 35, y: 22, b: 30, h: 18 }, oeffnetMit: ['s2', 's3', 's4'],
-      ansicht: {"src": "images/labor_a.webp", "alt": "Labor: Probenschrank mit Proben, Laborbericht an der Wand, Laborbank mit Telefon", "hotspots": [{"titel": "Probenschrank", "x": 72.2, "y": 25.7, "b": 22.3, "h": 72.5, "schloss": "s5"}, {"titel": "Laborbericht", "x": 38.9, "y": 30.5, "b": 8.1, "h": 19.4, "dok": "labor"}, {"titel": "Telefon, Anrufbeantworter", "x": 54.3, "y": 58.4, "b": 5.0, "h": 4.5, "dok": "mb3"}]},
+      ansicht: {"src": "images/labor_a.webp", "alt": "Labor: Probenschrank mit Proben, Laborbericht an der Wand, Laborbank mit Waage, Reagenzglasgestell und Telefon", "hotspots": [{"titel": "Probenschrank", "x": 72.2, "y": 25.7, "b": 22.3, "h": 72.5, "schloss": "s5"}, {"titel": "Laborbericht", "x": 38.9, "y": 30.5, "b": 8.1, "h": 19.4, "dok": "labor"}, {"titel": "Waage", "x": 3.4, "y": 57.5, "b": 14.5, "h": 6.1, "dok": "fett"}, {"titel": "Reagenzglasgestell", "x": 22.8, "y": 56.4, "b": 8.3, "h": 6.4, "dok": "hemm"}, {"titel": "Telefon, Anrufbeantworter", "x": 54.3, "y": 58.4, "b": 5.0, "h": 4.5, "dok": "mb3"}]},
       szene: '<p>Im Labor stehen drei Proben im Kühlschrank. Der Probenschrank öffnet nur, wenn die Proben richtig geordnet sind. Am Telefon blinkt der Anrufbeantworter.</p>' },
     { id: 'kuehl', name: 'Kühlraum', uhr: '06:45', plan: { x: 35, y: 44, b: 30, h: 18 }, oeffnetMit: ['s5'],
       ansicht: {"src": "images/kuehlraum_a.webp", "alt": "Kühlraum: Paletten mit Milchkisten, Reklamation und Freigabe-Terminal an der Wand, Streifenvorhang", "hotspots": [{"titel": "Reklamation", "x": 55.3, "y": 37.0, "b": 7.1, "h": 17.8, "dok": "klage"}, {"titel": "Freigabe-Terminal", "x": 64.5, "y": 36.7, "b": 9.2, "h": 21.2, "schloss": "s6"}]},
@@ -171,6 +171,8 @@ function raum(z) {
     { id: 'schreiber', ort: 'past', titel: 'Schreiberstreifen Heisshalter', html: EscapeRoom.kurve(punkte, { min: 69, max: 76.5, linien: [70, 73, 76], einheit: '°C', label: 'Temperatur am Ende des Heisshalters, Sollwert 74 °C' }) },
     { id: 'labor', ort: 'labor', titel: 'Laborbericht Erhitzungsnachweis', html: dokument('Laborbericht',
       tabelle(['Probe', 'Probenahme', 'Phosphatase', 'Peroxidase'], proben.map(function (p) { return ['Nr. ' + p[0], p[1], p[2], p[3]]; }))) },
+    { id: 'fett', ort: 'labor', titel: 'Wägeprotokoll Fettbestimmung von gestern', html: dokument('Fettbestimmung von gestern', tabelle(['Probe', 'Fettgehalt'], [['Vollmilch Tank 1', '4.1 %'], ['Magermilch Tank 2', '0.05 %'], ['Rahm Tank 3', '35.2 %']])) },
+    { id: 'hemm', ort: 'labor', titel: 'Hemmstofftest Rohmilch', html: dokument('Hemmstofftest Rohmilch von heute früh', tabelle(['Tour', 'Ergebnis'], [['Tour 1', 'negativ'], ['Tour 2', 'negativ'], ['Tour 3', 'negativ']])) },
     { id: 'klage', ort: 'kuehl', titel: 'Reklamation', html: dokument('Reklamation eines Ladens', '<p>' + mg.klage + '</p><p>Bitte Ursache melden.</p>') }
   ];
 

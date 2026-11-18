@@ -11,7 +11,7 @@
    z ist ein Zufall mit festem Seed pro Durchlauf: z.r(), z.int(a, b), z.pick(l), z.mische(l), z.codes(n) (10..99), z.ziffern(n) (1..9)
    orte:       [{ id, name, uhr?, plan: { x, y, b, h } (Grundriss 0..100 × 0..64), szene: 'html', bild?: { src, alt, quelle? }, oeffnetMit?: [schlossIds],
                  ansicht?: { src, alt, hotspots: [{ titel, x, y, b, h (Prozent), dok: dokumentId | schloss: schlossId }] } }]   // Szene mit anklickbaren Objekten, ersetzt bild und die Dokumentliste
-   dokumente:  [{ id, ort, titel, html }]   // im Raum aufklappen, danach in der Mappe von überall abrufbar
+   dokumente:  [{ id, ort, titel, html }]   // im Raum aufklappen oder per Hotspot öffnen
    schloesser: [{ id, ort, titel, aufgabe: 'html', ziel, quelle, notiz, loesung: 'html', hinweise: ['Stufe 1', 'Stufe 2'],
                   felder: [{ label, einheit?, art?: 'zahl' | 'zeit' | 'code', wert, tol?, irrtum?: [{ wert, tol?, text }], fremd?: { ziffer: text } }],
                   wahl?: { label, richtig: 'Text', falsch: [{ text, warum }] },              // Karten mit Zufallscode 10..99
@@ -126,7 +126,7 @@ var EscapeRoom = (function () {
   function erledigt(o) { var l = schloesserIn(o); return l.length > 0 && l.every(function (s) { return st.geloest[s.id]; }); }
   function anzahlGeloest() { return welt.schloesser.filter(function (s) { return st.geloest[s.id]; }).length; }
 
-  /* ---------- Raumplan und Mappe ---------- */
+  /* ---------- Raumplan ---------- */
   function plan() {
     var r = welt.orte.map(function (o) {
       var p = o.plan, offen = istOffen(o), klasse = !offen ? 'zu' : erledigt(o) ? 'fertig' : 'offen';
@@ -135,27 +135,11 @@ var EscapeRoom = (function () {
         '<text x="' + (p.x + p.b / 2) + '" y="' + (p.y + p.h / 2) + '" text-anchor="middle">' + o.name + '</text>' +
         '<text x="' + (p.x + p.b / 2) + '" y="' + (p.y + p.h / 2 + 4.5) + '" text-anchor="middle" class="er-zustand">' + (!offen ? 'gesperrt' : erledigt(o) ? '✓ erledigt' : o.id === aktOrt ? 'Sie sind hier' : 'offen') + '</text></g>';
     }).join('');
-    var knoepfe = welt.orte.map(function (o) {
-      var offen = istOffen(o);
-      return '<button type="button" class="lk-chip' + (o.id === aktOrt ? ' active' : '') + '" data-ort="' + o.id + '"' + (offen ? '' : ' disabled') +
-        (o.id === aktOrt ? ' aria-current="location"' : '') + '>' + o.name + '<span> ' + (!offen ? 'gesperrt' : erledigt(o) ? '✓' : '') + '</span></button>';
-    }).join('');
     return '<div class="er-plan"><svg viewBox="0 0 100 64" aria-hidden="true">' + r + '</svg></div>' +
-      '<nav class="lk-filter er-nav" aria-label="Räume">' + knoepfe + '</nav>' +
-      '<p class="er-stand">' + anzahlGeloest() + ' von ' + welt.schloesser.length + ' Schlössern offen</p>';
-  }
-  function mappe() {
-    var docs = welt.dokumente.filter(function (d) { return st.gelesen[d.id]; });
-    var prot = st.log.map(function (l) { return '<li>' + l.notiz + (l.art === 'loesung' ? ' <em>(Lösung angezeigt)</em>' : l.h ? ' <em>(mit Hinweis)</em>' : '') + '</li>'; }).join('');
-    return '<details class="er-protokoll" id="erMappe"><summary>Mappe: ' + docs.length + ' Dokumente, ' + st.log.length + ' Einträge im Freigabeprotokoll</summary><div class="er-mappe">' +
-      '<h3>Freigabeprotokoll</h3>' + (prot ? '<ol>' + prot + '</ol>' : '<p>Noch leer. Jedes offene Schloss trägt hier seinen Fachwert ein.</p>') +
-      '<h3>Dokumente</h3>' + (docs.length ? docs.map(function (d) { return '<details class="er-dok"><summary>' + d.titel + ' <span>(' + ort(d.ort).name + ')</span></summary><div>' + d.html + '</div></details>'; }).join('')
-        : '<p>Noch keine. Öffnen Sie Dokumente in den Räumen, dann liegen sie hier.</p>') + '</div></details>';
+      '<p class="er-stand">' + (ort(aktOrt).uhr ? ort(aktOrt).uhr + ' Uhr · ' : '') + anzahlGeloest() + ' von ' + welt.schloesser.length + ' Schlössern offen</p>';
   }
   function kopfNeu() {
-    var offenMappe = el('erMappe') && el('erMappe').open;
-    el('erKopf').innerHTML = plan() + mappe();
-    if (offenMappe) el('erMappe').open = true;
+    el('erKopf').innerHTML = plan();
     [].forEach.call(el('erKopf').querySelectorAll('[data-ort]'), function (x) {
       x.addEventListener('click', function () { var o = ort(x.dataset.ort); if (istOffen(o)) gehe(o.id); });
     });
@@ -167,7 +151,7 @@ var EscapeRoom = (function () {
     if (alt && alt.v !== 2) alt = null;  // Stand aus Version 1 passt nicht mehr
     el('escape').innerHTML = '<section class="er-szene"><p class="er-ort">' + cfg.titel + '</p>' + cfg.intro + '</section>' +
       '<section class="q-card er-regeln"><h2>So funktioniert es</h2><ul>' +
-      '<li>Die Molkerei hat mehrere Räume. Schauen Sie sich in jedem Raum die Dokumente an: Protokolle, Listen, Schemas. Geöffnete Dokumente liegen danach in Ihrer Mappe.</li>' +
+      '<li>Die Molkerei hat mehrere Räume. Schauen Sie sich in jedem Raum die Dokumente an: Protokolle, Listen, Schemas.</li>' +
       '<li>Jedes Schloss verlangt einen Code: eine Zahl, eine Uhrzeit, Ziffern in der richtigen Reihenfolge oder einen Code aus mehreren Teilen. Oft brauchen Sie dafür Dokumente aus anderen Räumen.</li>' +
       '<li>Nicht jedes Dokument hilft. Prüfen Sie jede Angabe mit Ihrem Fachwissen.</li>' +
       '<li>Ihre Zahlen sind zufällig, die Nachbargruppe hat andere Codes. Hinweise kosten Wartezeit, keine Punkte. Nach ' + (cfg.fehlerBisSperre || 3) + ' Fehlversuchen ist ein Schloss ' + (cfg.sperre || 30) + ' s gesperrt.</li>' +
@@ -196,25 +180,26 @@ var EscapeRoom = (function () {
     clearInterval(uhrTimer); uhrTimer = null;  // laufende Wartezeit läuft in st.tippBis weiter und wird beim Zurückkommen fortgesetzt
     sperrTimer.forEach(clearInterval); sperrTimer = [];
     aktOrt = id; st.ort = id; speichern();
+    el('escape').insertBefore(el('erKopf'), el('erOrt'));  // Plan zurück nach oben, bevor erOrt neu geschrieben wird
     var o = ort(id), docs = welt.dokumente.filter(function (d) { return d.ort === id; });
     kopfNeu();
     el('erOrt').innerHTML = '<div class="er-station">' +
-      '<section class="er-szene"><p class="er-ort">' + (o.uhr ? o.uhr + ' Uhr · ' : '') + o.name + '</p>' + o.szene + '</section>' +
+      (o.ansicht ? '' : '<section class="er-szene"><p class="er-ort">' + (o.uhr ? o.uhr + ' Uhr · ' : '') + o.name + '</p>' + o.szene + '</section>') +  // mit Ansicht nur das Bild: Schloss und Szenentext erst nach dem Klick
       '<h2 class="er-sr" id="erTitel" tabindex="-1">' + o.name + '</h2>' +
       (o.ansicht ? ansicht(o.ansicht) : (o.bild ? '<figure class="er-bild"><img src="' + o.bild.src + '" alt="' + o.bild.alt + '" loading="lazy">' + (o.bild.quelle ? '<figcaption>' + o.bild.quelle + '</figcaption>' : '') + '</figure>' : '') +
       (docs.length ? '<section class="er-doks"><h3>Im Raum</h3>' + docs.map(function (d) {
-        return '<details class="er-dok" data-dok="' + d.id + '"><summary>' + d.titel + (st.gelesen[d.id] ? ' <span>(in der Mappe)</span>' : '') + '</summary><div>' + d.html + '</div></details>';
+        return '<details class="er-dok" data-dok="' + d.id + '"><summary>' + d.titel + (st.gelesen[d.id] ? ' <span>(gelesen)</span>' : '') + '</summary><div>' + d.html + '</div></details>';
       }).join('') + '</section>' : '')) +
-      schloesserIn(o).map(function (s) { return '<section class="q-card er-karte" id="erS-' + s.id + '"></section>'; }).join('') +
-      '<div class="er-knoepfe"><button type="button" class="q-btn ghost" id="erPlan">Zum Raumplan</button></div></div>';
+      (o.ansicht ? '' : schloesserIn(o).map(function (s) { return '<section class="q-card er-karte" id="erS-' + s.id + '"></section>'; }).join('')) +
+      '</div>';
     [].forEach.call(el('erOrt').querySelectorAll('.er-dok'), function (d) {
       d.addEventListener('toggle', function () {
         if (d.open && !st.gelesen[d.dataset.dok]) { st.gelesen[d.dataset.dok] = 1; speichern(); kopfNeu(); }
       });
     });
     ansichtBinden();
-    schloesserIn(o).forEach(schloss);
-    el('erPlan').onclick = function () { window.scrollTo(0, 0); el('erKopf').querySelector('.er-nav button:not([disabled])').focus(); };
+    if (!o.ansicht) schloesserIn(o).forEach(schloss);
+    if (o.ansicht) el('erOrt').querySelector('.er-ansicht').appendChild(el('erKopf'));  // Plan schwebt über dem Bild
     if (!ohneFokus) el('erTitel').focus();
   }
 
@@ -224,7 +209,7 @@ var EscapeRoom = (function () {
     return '<div class="er-ansicht"><img src="' + a.src + '" alt="' + a.alt + '">' + a.hotspots.filter(function (h) {
       return !h.schloss || welt.schloesser.some(function (s) { return s.id === h.schloss; });  // Schloss fehlt in der Kurzfassung: kein toter Hotspot
     }).map(function (h) {
-      var gelesen = h.dok && st.gelesen[h.dok];
+      var gelesen = h.dok ? st.gelesen[h.dok] : st.geloest[h.schloss];
       return '<button type="button" class="er-hot' + (gelesen ? ' er-gelesen' : '') + '" style="left:' + h.x + '%;top:' + h.y + '%;width:' + h.b + '%;height:' + h.h + '%" aria-label="' +
         h.titel + (gelesen ? ' (gelesen)' : '') + '"' + (h.dok ? ' data-dok="' + h.dok + '"' : ' data-schloss="' + h.schloss + '"') + '></button>';
     }).join('') + '</div><dialog class="er-dlg" id="erDlg"><div id="erDlgInhalt"></div><div class="er-knoepfe"><button type="button" class="q-btn" id="erDlgZu">Schliessen</button></div></dialog>';
@@ -234,9 +219,16 @@ var EscapeRoom = (function () {
     if (!dlg) return;
     el('erDlgZu').onclick = function () { dlg.close(); };
     dlg.onclick = function (e) { if (e.target === dlg) dlg.close(); };
+    dlg.onclose = function () {
+      [].forEach.call(el('erOrt').querySelectorAll('.er-hot[data-schloss]'), function (b) { b.classList.toggle('er-gelesen', !!st.geloest[b.dataset.schloss]); });
+    };
     [].forEach.call(el('erOrt').querySelectorAll('.er-hot'), function (b) {
       b.onclick = function () {
-        if (b.dataset.schloss) { var k = el('erS-' + b.dataset.schloss); if (k) k.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+        if (b.dataset.schloss) {
+          var sl = welt.schloesser.filter(function (x) { return x.id === b.dataset.schloss; })[0];
+          el('erDlgInhalt').innerHTML = '<section class="er-karte" id="erS-' + sl.id + '"></section>';
+          schloss(sl); dlg.showModal(); return;
+        }
         var d = welt.dokumente.filter(function (x) { return x.id === b.dataset.dok; })[0];
         el('erDlgInhalt').innerHTML = '<h3>' + d.titel + '</h3>' + d.html;
         if (!st.gelesen[d.id]) { st.gelesen[d.id] = 1; speichern(); b.classList.add('er-gelesen'); kopfNeu(); }
