@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="620" viewBox="0 0 1100 620" font-family="Aptos, Calibri, sans-serif">
+<defs>
+<marker id="g" markerWidth="10" markerHeight="10" refX="10" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#484846"/></marker>
+</defs>
+<rect x="0" y="0" width="1100" height="620" fill="#fff"/>
+<text x="10" y="40" font-size="26" fill="#484846">Erhitzungsnachweise</text>
+
+<!-- Enzym-Anzeige: hellblau gefüllt = noch da, gestrichelt weiss = weg -->
+<rect x="222" y="66" width="316" height="170" rx="20" fill="#fff" stroke="#134061" stroke-width="4" stroke-dasharray="14 10"/>
+<text x="380" y="106" font-size="34" font-weight="bold" fill="#134061" text-anchor="middle">Phosphatase</text>
+<text x="380" y="144" font-size="28" fill="#1a202c" text-anchor="middle">inaktiviert bei</text>
+<text x="380" y="180" font-size="28" fill="#1a202c" text-anchor="middle">72 °C, 15 s</text>
+<text x="380" y="220" font-size="28" font-weight="bold" fill="#484846" text-anchor="middle">weg</text>
+
+<rect class="weg" x="562" y="66" width="316" height="170" rx="20" fill="#fff" stroke="#134061" stroke-width="4" stroke-dasharray="14 10" opacity="0"/>
+<rect class="da" x="562" y="66" width="316" height="170" rx="20" fill="#69A9C9" fill-opacity="0.35" stroke="#134061" stroke-width="4"/>
+<text x="720" y="106" font-size="34" font-weight="bold" fill="#134061" text-anchor="middle">Peroxidase</text>
+<text x="720" y="144" font-size="28" fill="#1a202c" text-anchor="middle">inaktiviert bei</text>
+<text x="720" y="180" font-size="28" fill="#1a202c" text-anchor="middle">85 °C, 10 s</text>
+<!-- beide Zustände in einem text, damit nur einer gemessen wird -->
+<text y="220" font-size="28" font-weight="bold" text-anchor="middle"><tspan class="tda" x="720" fill="#134061">noch da</tspan><tspan class="tweg" x="720" fill="#484846" fill-opacity="0">weg</tspan></text>
+
+<!-- Marker: Erhitzung der Milch -->
+<g class="m">
+<text x="380" y="282" font-size="28" font-weight="bold" fill="#134061" text-anchor="middle">Milch</text>
+<path d="M358,298 L402,298 L380,342 z" fill="#134061"/>
+</g>
+
+<!-- Bereiche und Achse -->
+<line x1="40" y1="360" x2="380" y2="360" stroke="#CC3333" stroke-width="22" stroke-opacity="0.6"/>
+<line x1="380" y1="360" x2="720" y2="360" stroke="#69A9C9" stroke-width="22" stroke-opacity="0.6"/>
+<line x1="720" y1="360" x2="1040" y2="360" stroke="#134061" stroke-width="22" stroke-opacity="0.6"/>
+<line x1="40" y1="392" x2="1060" y2="392" stroke="#484846" stroke-width="4" marker-end="url(#g)"/>
+<line x1="380" y1="340" x2="380" y2="404" stroke="#484846" stroke-width="4"/>
+<line x1="720" y1="340" x2="720" y2="404" stroke="#484846" stroke-width="4"/>
+<text x="380" y="444" font-size="34" font-weight="bold" fill="#134061" text-anchor="middle">72 °C</text>
+<text x="720" y="444" font-size="34" font-weight="bold" fill="#134061" text-anchor="middle">85 °C</text>
+<text x="1060" y="444" font-size="28" fill="#484846" text-anchor="end">Temperatur in °C</text>
+
+<!-- Bedeutung pro Bereich -->
+<text x="210" y="498" font-size="34" font-weight="bold" fill="#CC3333" text-anchor="middle">zu wenig erhitzt</text>
+<text x="210" y="536" font-size="28" fill="#1a202c" text-anchor="middle">keine Pastmilch,</text>
+<text x="210" y="572" font-size="28" fill="#1a202c" text-anchor="middle">nicht in den Verkauf</text>
+<text x="210" y="608" font-size="28" fill="#484846" text-anchor="middle">Phosphatase positiv</text>
+
+<text x="550" y="498" font-size="34" font-weight="bold" fill="#134061" text-anchor="middle">korrekt erhitzt</text>
+<text x="550" y="536" font-size="28" fill="#1a202c" text-anchor="middle">Pastmilch</text>
+<text x="550" y="572" font-size="28" fill="#484846" text-anchor="middle">Phosphatase negativ</text>
+<text x="550" y="608" font-size="28" fill="#484846" text-anchor="middle">Peroxidase positiv</text>
+
+<text x="880" y="498" font-size="34" font-weight="bold" fill="#134061" text-anchor="middle">zu stark erhitzt</text>
+<text x="880" y="536" font-size="28" fill="#1a202c" text-anchor="middle">Hochpastmilch</text>
+<text x="880" y="572" font-size="28" fill="#484846" text-anchor="middle">Peroxidase negativ</text>
+</svg>

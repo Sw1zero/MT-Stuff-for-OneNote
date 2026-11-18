@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Escape Room – Pastmilch freigeben</title>
+  <link rel="stylesheet" href="../style.css?v=efeeec8d">
+</head>
+<body>
+<header class="bzwu-header">
+  <div class="header-text">
+  <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · b.6</span>
+  <h1>Escape Room: Frühtour 07:00</h1>
+  <p>Pastmilch freigeben, Raum für Raum</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+<main class="q-wrap er-wrap">
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+  <div id="escape"></div>
+</main>
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+<script src="../assets/escape-room.js?v=7e7b89b2"></script>
+<script>
+// Fachquelle aller Werte: lehrmittel/efz/b.6 - Konsummilch herstellen.md (Seiten = PDF-Seiten), Belege in material/efz/b.6/escape-room/QUELLEN_b6_escape-room.md
+var z2 = function (n) { return EscapeRoom.zahl(n); };
+var uhr = function (m) { return EscapeRoom.zeit(m); };
+
+function tabelle(kopf, zeilen) {
+  return '<div class="er-tabelle"><table class="r-tabelle"><thead><tr>' + kopf.map(function (k) { return '<th scope="col">' + k + '</th>'; }).join('') +
+    '</tr></thead><tbody>' + zeilen.map(function (r) { return '<tr>' + r.map(function (c) { return '<td>' + c + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table></div>';
+}
+function mailbox(von, uhr, html, audio) {
+  return dokument('Anrufbeantworter, ' + uhr + ' Uhr, ' + von, audio
+    ? '<audio controls preload="none" src="' + audio + '" style="width:100%"></audio><details><summary>Transkript</summary>' + html + '</details>' : html);
+}
+function dokument(kopf, inhalt) { return '<div class="er-papier"><p class="er-papier-kopf">' + kopf + '</p>' + inhalt + '</div>'; }
+
+// Tanklager als Bild: drei Tanks mit Füllstand und Anzeige
+function tanks(liste) {
+  return '<figure class="er-kurve"><svg viewBox="0 0 330 190" role="img" aria-label="' + liste.map(function (t) { return t.name + ', ' + t.inhalt + ', Fett ' + t.fett; }).join('; ') + '">' +
+    liste.map(function (t, i) {
+      var x = 20 + i * 105, h = 110, f = Math.round(h * t.stand);
+      return '<rect x="' + x + '" y="20" width="80" height="' + h + '" rx="10" class="er-tank"/>' +
+        '<rect x="' + (x + 4) + '" y="' + (24 + h - 8 - f) + '" width="72" height="' + f + '" rx="6" class="er-tank-milch"/>' +
+        '<text x="' + (x + 40) + '" y="14" text-anchor="middle" class="er-wert">' + t.name + '</text>' +
+        '<rect x="' + (x + 2) + '" y="140" width="76" height="40" rx="4" class="er-anzeige"/>' +
+        '<text x="' + (x + 40) + '" y="156" text-anchor="middle" class="er-anzeige-text">' + t.inhalt + '</text>' +
+        '<text x="' + (x + 40) + '" y="173" text-anchor="middle" class="er-anzeige-text">Fett ' + t.fett + '</text>';
+    }).join('') + '</svg><figcaption>Tankanzeigen im Tanklager</figcaption></figure>';
+}
+
+var LEGENDE = ['Vorlaufgefäss Milch', 'Milchpumpe', 'Durchflussregler', 'Plattenwärmetauscher', 'Separator', 'Konstantdruckventil', 'Durchflussmessgerät', 'Dichtemessgerät',
+  'Regelventil', 'Absperrventil', 'Rückschlagventil', 'Homogenisator', 'Druckerhöhungspumpe', 'Heisshalter', 'Umschaltventil', 'Anlagensteuerung'];
+
+var MAENGEL = [
+  { name: 'talgig', klage: '«Die Milch schmeckt talgig.»', ursachen: ['Ungenügender Lichtschutz der Milchverpackung'],
+    tipp: 'Talgigkeit hängt mit der Verpackung zusammen: Was schützt die Milch im Regal?' },
+  { name: 'ranzig', klage: '«Die Milch schmeckt ranzig.»', ursachen: ['Bei weniger als 60 °C homogenisiert', 'Homogenisierte Pastmilch mit Rohmilch vermischt'],
+    tipp: 'Denken Sie an die Lipase: Bei welcher Temperatur ist sie inaktiviert, und wo kommt noch aktive Lipase vor?' },
+  { name: 'Kochgeschmack', klage: '«Die Milch hat einen Kochgeschmack.»', ursachen: ['Zu hohe Hitzebelastung während der Pasteurisation'],  // «Schlechte Rührwirkung im Chargenpasteur» weggelassen: kein Chargenpasteur in diesem Raum
+    tipp: 'Kochgeschmack entsteht durch Hitze.' },
+  { name: 'Gehaltsabweichungen', klage: '«Der Fettgehalt weicht von der Angabe auf der Packung ab.»', ursachen: ['Vermischung mit Spülwasser', 'Fehlerhafte Fettgehaltstandardisation'],
+    tipp: 'Was verändert die Zusammensetzung der Milch, nachdem sie eingestellt wurde, oder schon beim Einstellen?' },
+  { name: 'ungenügende Haltbarkeit', klage: '«Die Milch ist vor dem Verbrauchsdatum verdorben.»', ursachen: ['Keimreiche Rohmilch', 'Nachinfektion beim Kühlen oder Abfüllen', 'Infektion durch Verpackungsmaterial', 'Ungenügendes Kühlen', 'Unterbrochene Kühlkette'],
+    nichtBei: ['Zu hohe Hitzebelastung während der Pasteurisation', 'Homogenisierte Pastmilch mit Rohmilch vermischt', 'Vermischung mit Spülwasser'],  // als Ursache für Verderb vertretbar
+    tipp: 'Das ist mikrobiologischer Verderb: Woher kommen Keime, oder warum vermehren sie sich?' }
+];
+
+function raum(z) {
+  /* ---- Welt: alle Zahlen eines Durchlaufs, damit die Dokumente zusammenpassen ---- */
+  // Tanklager, Mischungskreuz
+  var ziel = z.pick([
+    { name: 'halbentrahmte Milch', grenze: 'tiefsten', g: 15, andere: 18 },
+    { name: 'halbentrahmte Milch', grenze: 'höchsten', g: 18, andere: 15 },
+    { name: 'standardisierte Vollmilch', grenze: 'tiefsten', g: 35 }
+  ]);
+  var V = z.int(38, 44) / 10, m = 0.05, M = z.int(4, 16) * 50, Z = ziel.g / 10, R = z.int(35, 40), rahmKg = z.int(6, 18) * 10;
+  var kgV = M * (Z - m) / (V - m), kgM = M - kgV;
+  var irrS2 = [{ wert: kgM, tol: 0.5, text: 'Das ist die Menge Magermilch. Gefragt ist die Vollmilch.' },
+    { wert: M * (Z - m) / (R - m), tol: 0.5, text: 'Sie haben mit dem Rahm gerechnet. Der Tagesauftrag verlangt Vollmilch und Magermilch.' }];
+  if (ziel.andere) irrS2.push({ wert: M * (ziel.andere / 10 - m) / (V - m), tol: 0.5, text: 'Sie haben mit ' + ziel.andere + ' g/kg gerechnet. Der Tagesauftrag verlangt den ' + ziel.grenze + ' erlaubten Fettgehalt.' });
+
+  // Pastanlage: Spülung (Wasser am Ende des Kühlers)
+  var start = 5 * 60 + z.int(0, 6), k = z.pick([2, 3, 4, 6]), spuel = [], t = z.int(600, 640) / 10, i;
+  for (i = 0; i < 8; i++) {
+    if (i < k - 1) t = Math.min(t + z.int(15, 40) / 10, 73.8);
+    else if (i === k - 1) t = z.int(740, 748) / 10;
+    else if (i === k) t = z.int(750, 756) / 10;
+    else t = t + z.int(0, 4) / 10;
+    spuel.push(Math.round(t * 10) / 10);
+  }
+  var erreicht = start + 2 * k, prod = erreicht + 10;
+
+  // Pastanlage: Schreiberstreifen Heisshalter
+  var nUnter = z.int(1, 4), nGrenz = z.int(1, 2), schreib = [];
+  for (i = 0; i < nUnter; i++) schreib.push(z.int(700, 718) / 10);
+  for (i = 0; i < nGrenz; i++) schreib.push(z.int(721, 729) / 10);
+  while (schreib.length < 8) schreib.push(z.int(730, 750) / 10);
+  schreib = z.mische(schreib);
+  var punkte = schreib.map(function (w, j) { return { zeit: uhr(6 * 60 + 2 * j), wert: w }; });
+  var unter = punkte.filter(function (p) { return p.wert < 72; }), gut = punkte.filter(function (p) { return p.wert >= 73; });
+  var nenn = z.pick([3000, 4500, 6000]), litSperr = nUnter * 2 * nenn / 60;  // Nennleistung l/h, Messabstand 2 min: gesperrte Menge in Litern
+  var nennText = String(nenn).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+
+  // Labor: Probennummern, Probenahme passt zum Schreiberstreifen
+  var nr = z.ziffern(3), pK = nr[0], pW = nr[1], pS = nr[2];
+  var zeitK = z.pick(gut).zeit, zeitW = z.pick(unter).zeit;
+  var minuten = function (hhmm) { return +hhmm.slice(0, 2) * 60 + +hhmm.slice(3); };
+  var proben = z.mische([
+    [pK, zeitK + ' Uhr, Pastanlage', 'negativ', 'positiv'],
+    [pW, zeitW + ' Uhr, Pastanlage', 'positiv', 'positiv'],
+    [pS, 'Rückstellmuster von gestern, Linie 2', 'negativ', 'negativ']]);
+
+  // Kühlraum: Reklamation
+  var mg = z.pick(MAENGEL), ursache = z.pick(mg.ursachen);
+  var falschU = z.mische(MAENGEL.filter(function (x) { return x !== mg; })).slice(0, 3).map(function (x) {
+    return { text: z.pick(x.ursachen.filter(function (u) { return (mg.nichtBei || []).indexOf(u) < 0; })), warum: 'Diese Ursache steht in der Tabelle beim Mangel «' + x.name + '».' };
+  });
+
+  /* ---- Räume ---- */
+  var orte = [
+    { id: 'leitstand', name: 'Leitstand', uhr: '05:30', plan: { x: 35, y: 2, b: 30, h: 16 },
+      szene: '<p>Der Bildschirm im Leitstand zeigt «Ablauf unvollständig. Anlage gesperrt.» Auf dem Pult liegen der Tagesauftrag und ein Zettel der Nachtschicht. Am Telefon blinkt der Anrufbeantworter.</p>' },
+    { id: 'tank', name: 'Tanklager', uhr: '05:40', plan: { x: 2, y: 22, b: 31, h: 18 }, oeffnetMit: ['s1'],
+      szene: '<p>Drei Tanks, drei Anzeigen. Das Mischventil zur Pastanlage öffnet erst, wenn die Menge Vollmilch eingegeben ist. An der Wand hängt ein Aushang. Am Wandtelefon blinkt der Anrufbeantworter.</p>' },
+    { id: 'past', name: 'Pastanlage', uhr: '05:50', plan: { x: 67, y: 22, b: 31, h: 18 }, oeffnetMit: ['s1'],
+      ansicht: {"src": "images/pastanlage_a.webp", "alt": "Pastanlage: Plattenwärmetauscher, Heisshalter, Homogenisator und Schaltschrank mit Schreiber", "hotspots": [{"titel": "Heisshalter, Typenschild", "x": 15.8, "y": 36.3, "b": 27.5, "h": 38.6, "dok": "typenschild"}, {"titel": "Homogenisator (S3)", "x": 51.4, "y": 35.0, "b": 22.7, "h": 40.7, "schloss": "s3"}, {"titel": "Wärmetauscher, Temperaturanzeige", "x": 0, "y": 41.2, "b": 14.3, "h": 36.9, "dok": "temperatur"}, {"titel": "Steuerpult (S4)", "x": 81.1, "y": 34.2, "b": 10.4, "h": 33.7, "schloss": "s4"}, {"titel": "Schreiberstreifen", "x": 84.5, "y": 51.7, "b": 6.0, "h": 6.1, "dok": "schreiber"}, {"titel": "Anlagenschema", "x": 54.2, "y": 24.9, "b": 7.9, "h": 11.2, "dok": "legende"}, {"titel": "Warnschild", "x": 23.3, "y": 29.0, "b": 4.6, "h": 5.7, "dok": "warnschild"}, {"titel": "Spülprotokoll", "x": 68.5, "y": 62.6, "b": 5.4, "h": 13.3, "dok": "spuel"}]},
+      szene: '<p>Die Anlage ist mit Wasser gefüllt und keimarm gemacht. Hier hat die Qualitätssicherung in der Nacht gesperrt. An der Wand hängt das Anlagenschema.</p>' },
+    { id: 'labor', name: 'Labor', uhr: '06:20', plan: { x: 35, y: 22, b: 30, h: 18 }, oeffnetMit: ['s2', 's3', 's4'],
+      szene: '<p>Im Labor stehen drei Proben im Kühlschrank. Der Probenschrank öffnet nur, wenn die Proben richtig geordnet sind. Am Telefon blinkt der Anrufbeantworter.</p>' },
+    { id: 'kuehl', name: 'Kühlraum', uhr: '06:45', plan: { x: 35, y: 44, b: 30, h: 18 }, oeffnetMit: ['s5'],
+      szene: '<p>Letzte Tür vor der Laderampe. Am Freigabe-Terminal hängt eine offene Reklamation vom Vortag. Der Lastwagen wartet.</p>' }
+  ];
+
+  var dokumente = [
+    { id: 'mb1', ort: 'leitstand', titel: 'Anrufbeantworter: Nachricht von Frau Keller', html: mailbox('Frau Keller, Betriebsleitung', '05:31', '<p>Guten Morgen, hier spricht Frau Keller aus der Betriebsleitung. Es ist halb sechs, und ich stehe im Stau hinter einem Güllewagen, falls Sie sich fragen, warum es so rauscht.</p><p>Die Kaffeemaschine im Aufenthaltsraum ist übrigens schon wieder kaputt. Bitte nicht daran herumschrauben, der Hauswart kommt am Donnerstag.</p><p>Nun zur Sache. Die Qualitätssicherung hat die Pastanlage heute Nacht gesperrt, ein Messwert war auffällig. Die Frühtour muss um sieben Uhr los, und der Fahrer ruft sowieso alle zehn Minuten an. Sie geben frei, nicht ich.</p><p>Damit Sie wissen, worum es geht: Beim Pasteurisieren töten wir alle krankmachenden Keime ab und die meisten übrigen auch. Das gibt dem Konsumenten Sicherheit und der Milch eine längere Haltbarkeit. Darum müssen wir jederzeit nachweisen können, dass die Milch heiss genug war.</p><p>Fangen Sie im Leitstand an. Dort liegt der Tagesauftrag, und der Bildschirm zeigt, was an der Anlage noch fehlt. Dann sehen Sie weiter.</p><p>Ach ja, am Samstag ist Betriebsfest. Sie sind eingeladen, es gibt Raclette. Danke, tschüss.</p>', 'audio/mailbox_1.mp3') },
+    { id: 'mb2', ort: 'tank', titel: 'Anrufbeantworter: Nachricht von Herrn Brunner', html: mailbox('Herr Brunner, Nachtschicht', '05:48', '<p>Hallo, hier ist Brunner von der Nachtschicht. Ich hoffe, ich erwische die Mailbox richtig. Mein Handy hat nur noch zehn Prozent, und meine Tochter hat gestern die Hälfte meiner Kontakte gelöscht.</p><p>Ich bin um sechs raus und sage lieber, was gestern Nacht los war. Der Schreiber am Heisshalter hat zwischendurch gepiept. Ich habe ihn nicht weiter beachtet, es lief ja alles.</p><p>Vor der Produktion haben wir die Anlage wie immer keimarm gemacht: Wasser durch, heiss, und am Ende vom Kühler gemessen. Ich glaube, es waren so um die fünfundsiebzig Grad. Dann haben wir noch eine Weile laufen lassen. Wie lange genau, weiss ich nicht mehr, das steht im Spülprotokoll.</p><p>Den Homogenisator habe ich nach Gefühl eingestellt. Auf dem Zettel steht, was ich genommen habe. Mein Kollege sagt immer, mehr Druck sei besser. Ich bin da nicht so sicher.</p><p>Und bitte, die Fische im Aquarium im Pausenraum nicht füttern, die sind auf Diät. Gute Schicht noch.</p>', 'audio/mailbox_2.mp3') },
+    { id: 'mb3', ort: 'labor', titel: 'Anrufbeantworter: Nachricht von Frau Dr. Studer', html: mailbox('Frau Dr. Studer, Labor', '06:22', '<p>Guten Tag, hier ist Studer vom Labor. Ich habe heute Nacht drei Proben gezogen und in den Probenschrank gelegt. Er geht nur auf, wenn man weiss, welche Probe wie stark erhitzt wurde.</p><p>Zur Erinnerung: Die Phosphatase wird bei 72 Grad in 15 Sekunden inaktiviert, die Peroxidase erst bei 85 Grad in 10 Sekunden. Ist die Phosphatase nicht mehr nachweisbar, wurde genug erhitzt. Ist auch die Peroxidase weg, wurde zu stark erhitzt. Dann ist es keine Pastmilch mehr, sondern Hochpastmilch.</p><p>Den Laborbericht habe ich auf den Tisch gelegt. Vergleichen Sie die Probenahmezeiten mit dem Schreiberstreifen von der Pastanlage.</p><p>Und wenn Sie wissen wollen, wie viel Milch betroffen ist: Die Anlage lief die ganze Zeit mit Nennleistung. Die steht auf dem Typenschild vom Heisshalter. Rechnen Sie bitte selbst, ich habe meinen Taschenrechner heute nicht gefunden.</p><p>Der Lastwagenfahrer hat mich übrigens schon dreimal gefragt, ob er einen Kaffee bekommt. Er bekommt keinen, die Maschine ist kaputt. Danke.</p>', 'audio/mailbox_3.mp3') },
+    { id: 'typenschild', ort: 'past', titel: 'Typenschild Heisshalter', html: dokument('Typenschild Heisshalter', tabelle(['Angabe', 'Wert'], [['Typ', 'HH-2'], ['Nennleistung', nennText + ' l/h'], ['Heisshaltezeit bei Nennleistung', '18 s']])) },
+    { id: 'temperatur', ort: 'past', titel: 'Temperaturanzeige Wärmetauscher', html: dokument('Anzeige am Plattenwärmetauscher', tabelle(['Messstelle', 'Anzeige'], [['Milch Austritt Kühlabteilung', '4.5 °C']])) },
+    { id: 'warnschild', ort: 'past', titel: 'Warnschild', html: dokument('Warnschild', '<p><strong>Achtung heiss.</strong> Heisse Oberflächen und Dampf. Nicht berühren.</p>') },
+    { id: 'auftrag', ort: 'leitstand', titel: 'Tagesauftrag', html: dokument('Tagesauftrag Frühschicht',
+      tabelle(['Linie', 'Auftrag'], [
+        ['Pastmilch (kontinuierlich)', z2(M) + ' kg ' + ziel.name + ' mit dem ' + ziel.grenze + ' Fettgehalt, den Art. 33 VLtH erlaubt. Mischen aus Vollmilch und Magermilch.'],
+        ['ESL-Linie', 'Revision, keine Produktion.'],
+        ['Spätschicht', z2(rahmKg) + ' kg Rahm abfüllen.']])) },
+    { id: 'nacht', ort: 'leitstand', titel: 'Zettel der Nachtschicht', html: dokument('Notiz Nachtschicht',
+      '<p class="er-hand">Homogenisator: Habe das Programm mit 55 °C und 120 bar genommen, dann geht das Vorwärmen schneller. Lief ohne Störung.</p>') },
+    { id: 'tanks', ort: 'tank', titel: 'Tankanzeigen', html: tanks([
+      { name: 'Tank 1', inhalt: 'Vollmilch', fett: z2(V) + ' %', stand: 0.7 },
+      { name: 'Tank 2', inhalt: 'Magermilch', fett: '0.05 %', stand: 0.55 },
+      { name: 'Tank 3', inhalt: 'Rahm', fett: R + ' %', stand: 0.3 }]) },
+    { id: 'vlth', ort: 'tank', titel: 'Aushang Art. 33 VLtH', html: dokument('Art. 33 VLtH, Fettgehaltsstufen genussfertiger Milch',
+      '<ul><li>Vollmilch: mindestens 35 g/kg, Fettgehalt nicht verändert</li><li>Standardisierte Vollmilch: mindestens 35 g und weniger als 50 g/kg</li>' +
+      '<li>Teilentrahmte Milch: mehr als 5 g und weniger als 35 g/kg</li><li>Halbentrahmte Milch: mindestens 15 g und höchstens 18 g/kg</li>' +
+      '<li>Entrahmte Milch oder Magermilch: höchstens 5 g/kg</li><li>Rahmangereicherte Milch: mindestens 50 g und weniger als 150 g/kg</li></ul>') },
+    { id: 'legende', ort: 'past', titel: 'Anlagenschema mit Legende', html: dokument('Anlagenschema und Legende', '<img src="images/b.6_kontinuierliche_Pasteurisation_nummeriert.png" alt="Schema einer kontinuierlichen Pastmilchanlage mit nummerierten Bauteilen 1 bis 16" style="max-width:100%;height:auto"><ol class="er-legende">' + LEGENDE.map(function (l) { return '<li>' + l + '</li>'; }).join('') + '</ol>') },
+    { id: 'spuel', ort: 'past', titel: 'Spülprotokoll von heute Morgen', html: dokument('Anlage keimarm machen: Wasser am Ende des Kühlers',
+      tabelle(['Uhrzeit', 'Temperatur'], spuel.map(function (w, j) { return [uhr(start + 2 * j) + ' Uhr', z2(w) + ' °C']; }))) },
+    { id: 'schreiber', ort: 'past', titel: 'Schreiberstreifen Heisshalter', html: EscapeRoom.kurve(punkte, { min: 69, max: 76.5, linien: [70, 73, 76], einheit: '°C', label: 'Temperatur am Ende des Heisshalters, Sollwert 74 °C' }) },
+    { id: 'labor', ort: 'labor', titel: 'Laborbericht Erhitzungsnachweis', html: dokument('Laborbericht',
+      tabelle(['Probe', 'Probenahme', 'Phosphatase', 'Peroxidase'], proben.map(function (p) { return ['Nr. ' + p[0], p[1], p[2], p[3]]; }))) },
+    { id: 'klage', ort: 'kuehl', titel: 'Reklamation', html: dokument('Reklamation eines Ladens', '<p>' + mg.klage + '</p><p>Bitte Ursache melden.</p>') }
+  ];
+
+  var schloesser = [
+    // S1 Leitstand: Reihenfolge-Code (b.6.1.1)
+    { id: 's1', ort: 'leitstand', titel: 'Bildschirm: Ablauf ergänzen', ziel: 'b.6.1.1', kurz: false,
+      aufgabe: '<p>Der Bildschirm zeigt acht Schritte, jeder mit einer Ziffer. Tippen Sie die Schritte der kontinuierlichen Pastmilchherstellung in der richtigen Reihenfolge an, ab dem Vorwärmen. Schritte anderer Produkte lassen Sie weg.</p>',
+      reihe: { label: 'Code (Ziffern in Reihenfolge)', folge: ['Vorwärmen', 'Homogenisieren', 'Erhitzen', 'Heisshalten', 'Kühlen', 'Abfüllen'],
+        falsch: [{ text: 'Mikrofiltration', warum: 'Eine Ziffer gehört zur Mikrofiltration: Sie gehört zur ESL-Milch, nicht zur Pastmilch.' },
+          { text: 'Rahm kristallisieren lassen', warum: 'Eine Ziffer gehört zum Kristallisieren: Das gehört zum Schlagrahm.' }],
+        irrtum: [
+          { folge: ['Vorwärmen', 'Erhitzen', 'Heisshalten', 'Homogenisieren', 'Kühlen', 'Abfüllen'], text: 'Homogenisiert wird vor dem Erhitzen: Die Milch wird auf 65 °C vorgewärmt und dann homogenisiert.' },
+          { folge: ['Homogenisieren', 'Vorwärmen', 'Erhitzen', 'Heisshalten', 'Kühlen', 'Abfüllen'], text: 'Vor dem Homogenisieren wird vorgewärmt: Das Fett muss flüssig sein.' },
+          { folge: ['Vorwärmen', 'Homogenisieren', 'Heisshalten', 'Erhitzen', 'Kühlen', 'Abfüllen'], text: 'Zuerst wird erhitzt, dann heissgehalten.' },
+          { folge: ['Vorwärmen', 'Homogenisieren', 'Erhitzen', 'Heisshalten', 'Abfüllen', 'Kühlen'], text: 'Gekühlt wird vor dem Abfüllen.' }] },
+      hinweise: ['Überlegen Sie: Wann muss das Fett flüssig sein, wann werden die Keime abgetötet, und wann wird die Milch für die Lagerung vorbereitet?',
+        'Reihenfolge: Vorwärmen, Homogenisieren, Erhitzen, Heisshalten, Kühlen, Abfüllen.'],
+      loesung: '<p>Kontinuierliche Pastmilch: Vorwärmen, Homogenisieren bei 65 °C und 120 bar, Erhitzen auf 74 °C, Heisshalten 15 s, Kühlen auf 5 °C, Abfüllen.</p>',
+      quelle: 'Lehrmittel b.6, S. 9, Herstellungsschema kontinuierliche Pastmilchherstellung',
+      notiz: 'Ablauf: Vorwärmen, Homogenisieren, Erhitzen, Heisshalten, Kühlen, Abfüllen' },
+
+    // S2 Tanklager: Mischungskreuz mit Tagesauftrag aus dem Leitstand (b.6.1.2, b.6.2.1)
+    { id: 's2', ort: 'tank', titel: 'Mischventil: Menge Vollmilch', ziel: 'b.6.1.2, b.6.2.1',
+      aufgabe: '<p>Wie viele kg Vollmilch braucht der heutige Auftrag für die Pastmilchlinie? Runden Sie auf 1 kg.</p>',
+      felder: [{ label: 'Vollmilch', einheit: 'kg', wert: kgV, tol: 0.5, irrtum: irrS2 }],
+      hinweise: ['Die Angaben stehen im Tagesauftrag (Leitstand), an den Tankanzeigen und am Aushang. Der Tagesauftrag nennt die Sachbezeichnung und die Grenze. Suchen Sie den Grenzwert am Aushang und rechnen Sie ihn in % um: 10 g/kg = 1 %.',
+        'Ziel: ' + z2(Z) + ' %. Mischungskreuz: Teile Vollmilch = ' + z2(Z) + ' − 0.05, Teile Magermilch = ' + z2(V) + ' − ' + z2(Z) + '.'],
+      loesung: '<ol><li>' + ziel.name + ', ' + ziel.grenze + ' erlaubter Fettgehalt: ' + ziel.g + ' g/kg = ' + z2(Z) + ' %</li>' +
+        '<li>Teile Vollmilch: ' + z2(Z) + ' − 0.05 = ' + z2(Z - m) + ', Teile Magermilch: ' + z2(V) + ' − ' + z2(Z) + ' = ' + z2(V - Z) + ', Gesamtteile ' + z2(V - m) + '</li>' +
+        '<li>Vollmilch: ' + z2(M) + ' kg × ' + z2(Z - m) + ' : ' + z2(V - m) + ' = <strong>' + z2(kgV) + ' kg</strong>, Magermilch ' + z2(kgM) + ' kg</li></ol>',
+      quelle: 'Lehrmittel b.6, S. 7, Art. 33 VLtH Fettgehaltsstufen, Mischungskreuz',
+      notiz: 'Standardisieren: ' + ziel.name + ' ' + ziel.g + ' g/kg (' + z2(Z) + ' %) aus ' + Math.round(kgV) + ' kg Vollmilch und ' + Math.round(kgM) + ' kg Magermilch' },
+
+    // S3 Pastanlage: Homogenisator, Ablenkung durch die Notiz der Nachtschicht (b.6.3.2)
+    { id: 's3', ort: 'past', titel: 'Homogenisator: Programm wählen', ziel: 'b.6.3.2', kurz: false,
+      aufgabe: '<p>Am Homogenisator sind vier Programme gespeichert. Welches ist für Pastmilch richtig? Tippen Sie das Programm an, die Programmnummer ist der Code.</p>',
+      wahl: { label: 'Programmnummer', richtig: 'Milch 65 °C, Druck 120 bar', falsch: [
+        { text: 'Milch 55 °C, Druck 120 bar', warum: 'Das ist das Programm der Nachtschicht. Unter 60 °C homogenisierte Pastmilch wird ranzig. Bei 65 °C ist die Lipase inaktiviert.' },
+        { text: 'Milch 65 °C, Druck 200 bar', warum: 'Mehr Druck macht die Fettkügelchen kleiner und ihre Oberfläche grösser: Die Milch neigt zu Talgigkeit, und die Energiekosten steigen. 120 bar reichen aus.' },
+        { text: 'Milch 5 °C, Druck 120 bar', warum: 'Die Milch wird vor dem Homogenisieren auf 65 °C vorgewärmt: Dann ist das Fett flüssig, und das ist eine Voraussetzung für die Homogenisation.' }] },
+      hinweise: ['Trauen Sie dem Zettel der Nachtschicht nicht ungeprüft. Welche Temperatur hat die Milch nach dem Vorwärmen, und was ist die Richtgrösse für den Druck?',
+        'Unter 60 °C wird Pastmilch ranzig. Mehr Druck als die Richtgrösse fördert Talgigkeit. Für die Homogenisation muss das Fett flüssig sein.'],
+      loesung: '<p>Bei 65 °C ist die Lipase inaktiviert und das Fett flüssig. 120 bar reichen, damit die Pastmilch bis zum Ende der Haltbarkeit nicht aufrahmt. Der Zettel der Nachtschicht war falsch: Bei 55 °C wird die Milch ranzig.</p>',
+      quelle: 'Lehrmittel b.6, S. 7 (Vorwärmen 65 °C), S. 8 (Homogenisieren 120 bar), S. 12 (ranzig unter 60 °C)',
+      notiz: 'Homogenisieren: 65 °C (Lipase inaktiviert, Fett flüssig), 120 bar' },
+
+    // S4 Pastanlage: zusammengesetzter Code aus Spülprotokoll und Schreiberstreifen (b.6.3.1, b.6.3.3, b.6.1.2)
+    { id: 's4', ort: 'past', titel: 'Steuerpult: Freigabe der Anlage', ziel: 'b.6.3.1, b.6.3.3, b.6.1.2',
+      aufgabe: '<p>Das Steuerpult verlangt einen Code aus zwei Teilen:</p><ol><li>die Uhrzeit, ab der die Anlage heute frühestens auf Produktion umstellen durfte,</li>' +
+        '<li>die Anzahl Messpunkte, bei denen die Milch nicht korrekt pasteurisiert wurde.</li></ol>',
+      felder: [
+        { label: 'Teil 1: frühester Produktionsstart', art: 'zeit', wert: prod, irrtum: [
+          { wert: start + 10, text: 'Teil 1: Die 10 Minuten zählen erst ab dem Moment, in dem das Wasser am Ende des Kühlers 75 °C erreicht.' },
+          { wert: erreicht, text: 'Teil 1: Um ' + uhr(erreicht) + ' Uhr sind 75 °C erreicht. Danach muss das Wasser noch mindestens 10 Minuten im Kreislauf bleiben.' },
+          { wert: erreicht + 8, text: 'Teil 1: Um ' + uhr(erreicht - 2) + ' Uhr zeigt das Protokoll ' + z2(spuel[k - 1]) + ' °C. Die 75 °C sind da noch nicht erreicht.' }] },
+        { label: 'Teil 2: Messpunkte nicht korrekt pasteurisiert', wert: nUnter, irrtum: [
+          { wert: nUnter + nGrenz, text: 'Teil 2: Sie haben auch Werte zwischen 72 und 73 °C gezählt. Der Istwert darf 1 °C vom Sollwert 74 °C abweichen, die Grenze ist aber die minimale Pasteurisationstemperatur von 72 °C.' },
+          { wert: 0, text: 'Teil 2: Vergleichen Sie jeden Wert mit der minimalen Pasteurisationstemperatur, nicht mit dem Sollwert.' }] }],
+      hinweise: ['Teil 1 steht im Spülprotokoll, Teil 2 auf dem Schreiberstreifen. Teil 1: Welche Temperatur muss das Wasser am Ende des Kühlers erreichen, und wie lange bleibt es danach im Kreislauf? Teil 2: Welche Mindesttemperatur müssen die Nachweisdokumente belegen?',
+        'Teil 1: ab dem ersten Wert von mindestens 75 °C noch 10 Minuten. Teil 2: Zählen Sie nur Werte unter 72 °C, der Sollwert 74 °C lässt 1 °C Spielraum.'],
+      loesung: '<p>Teil 1: Um ' + uhr(erreicht) + ' Uhr erreicht das Wasser ' + z2(spuel[k]) + ' °C, danach mindestens 10 Minuten im Kreislauf: Start frühestens um <strong>' + uhr(prod) + ' Uhr</strong>.</p>' +
+        '<p>Teil 2: <strong>' + nUnter + ' Messpunkte</strong> liegen unter 72 °C (' + unter.map(function (p) { return p.zeit + ' Uhr: ' + z2(p.wert) + ' °C'; }).join(', ') + '). ' +
+        'Für Milch aus diesen Zeitpunkten fehlt der Nachweis von mindestens 72 °C: Sie wird nicht als Pastmilch freigegeben. Aufgezeichnet werden die Temperatur am Ende des Heisshalters (14), die Stellung des Umschaltventils (15) und die Kühltemperatur nach der Kühlabteilung.</p>',
+      quelle: 'Lehrmittel b.6, S. 9 (Spülen 75 °C / 10 min, Sollwert 74 °C, Minimum 72 °C), S. 10 (Nachweisdokumente, Legende)',
+      notiz: 'Anlage: Spülwasser mindestens 75 °C, dann 10 min; Nachweis mindestens 72 °C am Ende des Heisshalters, Milch darunter nicht freigeben' },
+
+    // S5 Labor: Reihenfolge-Code, Probennummern aus dem Laborbericht (b.6.6)
+    { id: 's5', ort: 'labor', titel: 'Probenschrank: Proben ordnen', ziel: 'b.6.6, b.6.1.2',
+      aufgabe: '<p>Ordnen Sie die drei Proben nach der Stärke der Erhitzung: zuerst die am schwächsten erhitzte, zuletzt die am stärksten erhitzte.</p>',
+      reihe: { label: 'Probennummern in Reihenfolge', folge: [{ text: 'Probe ' + pW, code: pW }, { text: 'Probe ' + pK, code: pK }, { text: 'Probe ' + pS, code: pS }],
+        irrtum: [
+          { folge: ['Probe ' + pS, 'Probe ' + pK, 'Probe ' + pW], text: 'Das ist die Reihenfolge von stark nach schwach. Gefragt ist von schwach nach stark.' },
+          { folge: ['Probe ' + pK, 'Probe ' + pW, 'Probe ' + pS], text: 'Phosphatase positiv heisst: zu wenig erhitzt. Diese Probe ist am schwächsten erhitzt.' },
+          { folge: ['Probe ' + pK, 'Probe ' + pS, 'Probe ' + pW], text: 'Phosphatase positiv heisst: zu wenig erhitzt. Diese Probe ist am schwächsten erhitzt.' },
+          { folge: ['Probe ' + pW, 'Probe ' + pS, 'Probe ' + pK], text: 'Peroxidase negativ heisst: zu stark erhitzt. Diese Probe ist am stärksten erhitzt.' },
+          { folge: ['Probe ' + pS, 'Probe ' + pW, 'Probe ' + pK], text: 'Peroxidase negativ heisst: zu stark erhitzt. Diese Probe ist am stärksten erhitzt.' }] },
+      hinweise: ['Die Ergebnisse stehen im Laborbericht. Phosphatase wird bei 72 °C während 15 s inaktiviert, Peroxidase bei 85 °C während 10 s. Negativ heisst: Das Enzym ist nicht mehr nachweisbar. Vergleichen Sie die Probenahmezeit auch mit dem Schreiberstreifen.',
+        'Am schwächsten: Phosphatase positiv. In der Mitte: Phosphatase negativ, Peroxidase positiv. Am stärksten: beide negativ.'],
+      loesung: '<p>Am schwächsten erhitzt ist die Probe mit Phosphatase positiv: zu wenig erhitzt, keine Pastmilch. Sie stammt aus einem Zeitpunkt, an dem der Schreiberstreifen unter 72 °C zeigt. ' +
+        'In der Mitte liegt die Probe mit Phosphatase negativ und Peroxidase positiv. Am stärksten erhitzt ist die Probe mit beiden Enzymen negativ: Hochpastmilch.</p>',
+      quelle: 'Lehrmittel b.6, S. 11, Enzymatische Erhitzungsnachweise',
+      notiz: 'Labor: Phosphatase negativ (72 °C / 15 s) und Peroxidase positiv (85 °C / 10 s) = korrekt pasteurisiert' },
+
+    // S6 Kühlraum: Code aus Labor und Reklamation (b.6.6, b.6.7)
+    { id: 's6', ort: 'kuehl', titel: 'Freigabe-Terminal', ziel: 'b.6.6, b.6.7', ausgang: true,
+      aufgabe: '<p>Das Terminal gibt die Charge erst frei, wenn drei Dinge eingetragen sind:</p><ol><li>der Code der Ursache für die offene Reklamation,</li>' +
+        '<li>die Uhrzeit, zu der die Probe genommen wurde, deren Milch als Pastmilch in den Verkauf darf,</li>' +
+        '<li>die Menge Milch in Litern, die gesperrt bleibt, weil die Temperatur unter 72 °C lag. Jeder Messpunkt gilt bis zum nächsten Messpunkt, die Anlage lief mit Nennleistung.</li></ol>',
+      wahl: { label: 'Teil 1: Code der Ursache', richtig: ursache, falsch: falschU },
+      felder: [{ label: 'Teil 2: Probenahme der verkaufsfähigen Probe', art: 'zeit', wert: minuten(zeitK), irrtum: [
+        { wert: minuten(zeitW), text: 'Teil 2: Die Probe von ' + zeitW + ' Uhr ist Phosphatase positiv, also zu wenig erhitzt. Sie darf nicht in den Verkauf.' }] },
+        { label: 'Teil 3: gesperrte Milch', einheit: 'l', wert: litSperr, tol: 0.5, irrtum: [
+          { wert: (nUnter + nGrenz) * 2 * nenn / 60, text: 'Teil 3: Sie haben auch Messpunkte zwischen 72 und 73 °C gezählt. Gesperrt ist nur, was unter 72 °C lag.' },
+          { wert: nUnter * nenn / 60, text: 'Teil 3: Ein Messpunkt gilt bis zum nächsten Messpunkt, das sind 2 Minuten, nicht 1 Minute.' },
+          { wert: nUnter * nenn, text: 'Teil 3: Die Nennleistung gilt pro Stunde. Ein Messpunkt steht für 2 Minuten.' }] }],
+      hinweise: [mg.tipp + ' Für Teil 2 brauchen Sie den Laborbericht aus dem Labor. Für Teil 3 den Schreiberstreifen (Abstand der Messpunkte) und das Typenschild des Heisshalters (Nennleistung).',
+        'Zum Mangel «' + mg.name + '» nennt das Lehrmittel: ' + mg.ursachen.join(', ') + '. Verkaufen darf man nur Phosphatase negativ und Peroxidase positiv. Teil 3: Anzahl Messpunkte unter 72 °C × Abstand in Minuten × Nennleistung : 60.'],
+      loesung: '<p>Mangel «' + mg.name + '»: mögliche Ursachen sind ' + mg.ursachen.join(', ') + '. Die richtige Karte war: <strong>' + ursache + '</strong>. In den Verkauf darf die Probe von <strong>' + zeitK + ' Uhr</strong> (Phosphatase negativ, Peroxidase positiv).</p>' +
+        '<p>Gesperrt bleiben ' + nUnter + ' Messpunkte × 2 Minuten × ' + nennText + ' l/h : 60 = <strong>' + z2(litSperr) + ' l</strong>.</p>',
+      quelle: 'Lehrmittel b.6, S. 11 (Erhitzungsnachweise), S. 12 (Qualitätsmängel bei Pastmilch)',
+      notiz: 'Reklamation ' + mg.name + ': ' + ursache + '; freigegeben nur Milch mit Phosphatase negativ und Peroxidase positiv; gesperrt ' + z2(litSperr) + ' l (' + nUnter + ' Messpunkte unter 72 °C)' }
+  ];
+  return { orte: orte, dokumente: dokumente, schloesser: schloesser };
+}
+
+EscapeRoom.init({
+  id: 'b6-pastmilch',
+  titel: '05:30 Uhr · Molkerei',
+  intro: '<p>Die Pastmilch für die Frühtour muss um 07:00 Uhr auf den Lastwagen. In der Nacht hat die Qualitätssicherung die Anlage gesperrt, weil ein Messwert auffällig war.</p>' +
+    '<p>Sie sind heute für die Freigabe zuständig. Leitstand, Tanklager, Pastanlage, Labor und Kühlraum öffnen sich nur mit Codes. Die Dokumente liegen in den Räumen verteilt, das Fachwissen haben Sie.</p>',
+  warten: [20, 60, 180], sperre: 30, fehlerBisSperre: 3,  // Tipp 1, Tipp 2, Lösung (s); Philipp 18.11.: Lösung nicht nach 90 s abrufbar
+  raum: raum,
+  schluss: {
+    uhr: '07:00',
+    szene: '<p>Alle Schlösser sind offen. Sie unterschreiben das Freigabeprotokoll. Die korrekt pasteurisierte Milch geht mit der Frühtour raus, die Milch unter 72 °C bleibt gesperrt.</p>',
+    ziele: [
+      '<b>b.6.1.1</b> Ablauf der kontinuierlichen Pastmilchherstellung (Leitstand)',
+      '<b>b.6.1.2</b> Gesetzliche Anforderungen: Fettgehaltsstufen nach Art. 33 VLtH, Nachweis der Pasteurisation (Tanklager, Pastanlage, Labor)',
+      '<b>b.6.2.1</b> Fettgehalt mit dem Mischungskreuz berechnen (Tanklager)',
+      '<b>b.6.3.1</b> Kontinuierliche Anlage mit Heisshalter und Aufzeichnung (Pastanlage)',
+      '<b>b.6.3.2</b> Einfluss von Temperatur und Druck beim Homogenisieren (Pastanlage)',
+      '<b>b.6.3.3</b> Hygiene: Anlage vor der Produktion keimarm machen (Pastanlage)',
+      '<b>b.6.6, b.6.7</b> Qualität mit Erhitzungsnachweisen beurteilen, Ursachen von Qualitätsmängeln (Labor, Kühlraum)'
+    ],
+    html: '<h2>Zum Mitnehmen</h2><figure class="er-bild"><img src="images/b.6_schema_past_kontinuierlich.svg" alt="Schema: Pastmilch kontinuierlich herstellen, mit Temperaturen und Zeiten"></figure>' +
+      '<figure class="er-bild"><img src="images/b.6_schema_enzym_skala.svg" alt="Skala der Erhitzungsnachweise: Phosphatase 72 °C, Peroxidase 85 °C"></figure>'
+  }
+});
+</script>
+</body>
+</html>
