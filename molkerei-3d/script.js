@@ -41,6 +41,22 @@ AFRAME.registerComponent('beschriftung', {
   }
 });
 
+// Namensschild auf der Vorderseite jeder gebauten Anlage (anlagen.js: schild: false aus, { seite: '-z', x, y } verschiebt).
+// Lage aus der Bounding-Box nach dem Laden des Modells, damit Kopien und gedrehte Anlagen es ohne eigene Masse tragen.
+function namensschild(an, g) {
+  const s = an.schild || {}, vorn = s.seite === '-z' ? -1 : 1;
+  const setze = () => {
+    const b = new THREE.Box3().setFromObject(g.object3D);
+    const lo = g.object3D.worldToLocal(b.min.clone()), hi = g.object3D.worldToLocal(b.max.clone());
+    const leer = b.isEmpty(), hoehe = leer ? an.h || 1 : b.max.y - b.min.y;
+    const z = leer ? vorn * an.t / 2 : vorn > 0 ? Math.max(lo.z, hi.z) : Math.min(lo.z, hi.z);
+    el('a-entity', { beschriftung: `text: ${an.name}; hoehe: 0.09; grund: #ffffff`, rotation: `0 ${vorn > 0 ? 0 : 180} 0`,
+      position: `${s.x ?? (leer ? 0 : (lo.x + hi.x) / 2)} ${s.y ?? Math.min(1.2, 0.55 * hoehe)} ${z + vorn * 0.01}` }, g);
+  };
+  if (g.querySelector('[gltf-model]')) g.addEventListener('model-loaded', setze, { once: true });
+  else setze();
+}
+
 // Oberflächen als Canvas-Texturen (keine Bilddateien). groesse = Meter, die eine Textur abdeckt.
 function textur(groesse, zeichne) {
   const c = document.createElement('canvas');
@@ -286,6 +302,7 @@ function baueSzene(szene) {
     }
     // Raycaster trifft nur Entities mit eigenem Mesh, darum die Bauteile markieren, nicht die Gruppe.
     for (const t of g.querySelectorAll('*')) t.classList.add('klickbar');
+    if (an.bau && an.schild !== false) namensschild(an, g);
   }
 }
 

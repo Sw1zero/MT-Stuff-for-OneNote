@@ -535,7 +535,7 @@ async (page) => {
   await page.mouse.move(box.x + mr[0] * box.width, box.y + mr[1] * box.height);
   await page.waitForTimeout(200);
   await page.mouse.down(); await page.mouse.up();
-  ok((await t('overlay-titel').textContent()) === 'Röhrenwärmetauscher 3b: Erhitzer' && (await t('overlay-teil').textContent()) === 'Mantelrohr', `Klick auf das Mantelrohr zeigt: ${await t('overlay-titel').textContent()} / ${await t('overlay-teil').textContent()}`);
+  ok((await t('overlay-titel').textContent()) === 'Röhrenwärmetauscher, Erhitzer' && (await t('overlay-teil').textContent()) === 'Mantelrohr', `Klick auf das Mantelrohr zeigt: ${await t('overlay-titel').textContent()} / ${await t('overlay-teil').textContent()}`);
   await page.evaluate(() => window.kaeserei.schliessen());
 
   // Durch den Durchgang Milchbehandlung -> Käserei (Tür bei x=30, z=20)

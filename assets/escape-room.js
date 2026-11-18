@@ -216,7 +216,8 @@ var EscapeRoom = (function () {
       return !h.schloss || welt.schloesser.some(function (s) { return s.id === h.schloss; });  // Schloss fehlt in der Kurzfassung: kein toter Hotspot
     }).map(function (h) {
       var gelesen = h.dok ? st.gelesen[h.dok] : st.geloest[h.schloss];
-      return '<button type="button" class="er-hot' + (gelesen ? ' er-gelesen' : '') + '" style="left:' + h.x + '%;top:' + h.y + '%;width:' + h.b + '%;height:' + h.h + '%" data-titel="' + h.titel + '" aria-label="' +
+      var dk = h.dok && welt.dokumente.filter(function (x) { return x.id === h.dok; })[0];
+      return '<button type="button" class="er-hot' + (dk && dk.blinkt ? ' er-blink' : '') + (gelesen ? ' er-gelesen' : '') + '" style="left:' + h.x + '%;top:' + h.y + '%;width:' + h.b + '%;height:' + h.h + '%" data-titel="' + h.titel + '" aria-label="' +
         hotText(h.titel, h.dok, gelesen) + '"' + (h.dok ? ' data-dok="' + h.dok + '"' : ' data-schloss="' + h.schloss + '"') + '></button>';
     }).join('') + '</div><dialog class="er-dlg" id="erDlg"><div id="erDlgInhalt"></div><div class="er-knoepfe"><button type="button" class="q-btn" id="erDlgZu">Schliessen</button></div></dialog>';
   }
