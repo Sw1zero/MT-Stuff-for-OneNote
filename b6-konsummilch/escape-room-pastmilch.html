@@ -25,7 +25,7 @@
 <footer class="bzwu-footer">
   BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
 </footer>
-<script src="../assets/escape-room.js?v=443ce4f6"></script>
+<script src="../assets/escape-room.js?v=6badb724"></script>
 <script>
 // Fachquelle aller Werte: lehrmittel/efz/b.6 - Konsummilch herstellen.md (Seiten = PDF-Seiten), Belege in material/efz/b.6/escape-room/QUELLEN_b6_escape-room.md
 var z2 = function (n) { return EscapeRoom.zahl(n); };
@@ -103,6 +103,8 @@ function raum(z) {
   for (i = 0; i < nGrenz; i++) schreib.push(z.int(721, 729) / 10);
   while (schreib.length < 8) schreib.push(z.int(730, 750) / 10);
   schreib = z.mische(schreib);
+  // Der letzte Messpunkt hat keinen «nächsten»: er liegt nie unter 72 °C, sonst wäre die Regel für ihn unklar
+  if (schreib[7] < 72) { var tj = schreib.findIndex(function (w) { return w >= 73; }); var tw = schreib[7]; schreib[7] = schreib[tj]; schreib[tj] = tw; }
   var punkte = schreib.map(function (w, j) { return { zeit: uhr(6 * 60 + 2 * j), wert: w }; });
   var unter = punkte.filter(function (p) { return p.wert < 72; }), gut = punkte.filter(function (p) { return p.wert >= 73; });
   var nenn = z.pick([3000, 4500, 6000]), litSperr = nUnter * 2 * nenn / 60;  // Nennleistung l/h, Messabstand 2 min: gesperrte Menge in Litern
@@ -130,10 +132,10 @@ function raum(z) {
       ansicht: {"src": "images/leitstand_a.webp", "alt": "Leitstand: Pult mit Bildschirm und Telefon, Pinnwand mit Tagesauftrag und Zettel, Regal, Wanduhr", "hotspots": [{"titel": "Bildschirm", "x": 32.9, "y": 44.7, "b": 19.6, "h": 26.3, "schloss": "s1"}, {"titel": "Tagesauftrag", "x": 11.1, "y": 34.6, "b": 6.1, "h": 14.5, "dok": "auftrag"}, {"titel": "Zettel der Nachtschicht", "x": 22.2, "y": 40.6, "b": 3.2, "h": 5.7, "dok": "nacht"}, {"titel": "Telefon, Anrufbeantworter", "x": 61.5, "y": 67.9, "b": 6.3, "h": 5.8, "dok": "mb1"}]},
       szene: '<p>Der Bildschirm im Leitstand zeigt «Ablauf unvollständig. Anlage gesperrt.» Auf dem Pult liegen der Tagesauftrag und ein Zettel der Nachtschicht. Am Telefon blinkt der Anrufbeantworter.</p>' },
     { id: 'tank', name: 'Tanklager', uhr: '05:40', plan: { x: 2, y: 22, b: 31, h: 18 }, oeffnetMit: ['s1'],
-      ansicht: {"src": "images/tanklager_a.webp", "alt": "Tanklager: drei liegende Tanks mit Anzeigen, Mischventil am Rohr, Aushang und Wandtelefon", "hotspots": [{"titel": "Tank 1", "x": 5.2, "y": 52.1, "b": 28.0, "h": 27.4, "dok": "tanks"}, {"titel": "Tank 2", "x": 37.5, "y": 52.1, "b": 25.7, "h": 27.4, "dok": "tanks"}, {"titel": "Tank 3", "x": 67.4, "y": 52.1, "b": 27.4, "h": 27.4, "dok": "tanks"}, {"titel": "Mischventil", "x": 78.3, "y": 69.8, "b": 4.0, "h": 9.9, "schloss": "s2"}, {"titel": "Aushang", "x": 32.9, "y": 36.2, "b": 5.3, "h": 12.4, "dok": "vlth"}, {"titel": "Wandtelefon, Anrufbeantworter", "x": 63.2, "y": 34.0, "b": 2.5, "h": 7.5, "dok": "mb2"}]},
+      ansicht: {"src": "images/tanklager_a.webp", "alt": "Tanklager: drei liegende Tanks mit Anzeigen, Mischventil am Rohr, Aushang und Wandtelefon", "hotspots": [{"titel": "Tank 1", "x": 5.2, "y": 52.1, "b": 28.0, "h": 19.9, "dok": "tanks"}, {"titel": "Tank 2", "x": 37.5, "y": 52.1, "b": 25.7, "h": 27.4, "dok": "tanks"}, {"titel": "Tank 3", "x": 67.4, "y": 52.1, "b": 27.4, "h": 27.4, "dok": "tanks"}, {"titel": "Mischventil", "x": 78.3, "y": 69.8, "b": 4.0, "h": 9.9, "schloss": "s2"}, {"titel": "Aushang", "x": 32.9, "y": 36.2, "b": 5.3, "h": 12.4, "dok": "vlth"}, {"titel": "Wandtelefon, Anrufbeantworter", "x": 63.2, "y": 34.0, "b": 2.5, "h": 7.5, "dok": "mb2"}]},
       szene: '<p>Drei Tanks, drei Anzeigen. Das Mischventil zur Pastanlage öffnet erst, wenn die Menge Vollmilch eingegeben ist. An der Wand hängt ein Aushang. Am Wandtelefon blinkt der Anrufbeantworter.</p>' },
     { id: 'past', name: 'Pastanlage', uhr: '05:50', plan: { x: 67, y: 22, b: 31, h: 18 }, oeffnetMit: ['s1'],
-      ansicht: {"src": "images/pastanlage_a.webp", "alt": "Pastanlage: Plattenwärmetauscher, Heisshalter, Homogenisator und Schaltschrank mit Schreiber", "hotspots": [{"titel": "Heisshalter, Typenschild", "x": 15.8, "y": 36.3, "b": 27.5, "h": 38.6, "dok": "typenschild"}, {"titel": "Homogenisator", "x": 51.4, "y": 35.0, "b": 22.7, "h": 40.7, "schloss": "s3"}, {"titel": "Wärmetauscher, Temperaturanzeige", "x": 0, "y": 41.2, "b": 14.3, "h": 36.9, "dok": "temperatur"}, {"titel": "Steuerpult", "x": 81.1, "y": 34.2, "b": 10.4, "h": 33.7, "schloss": "s4"}, {"titel": "Schreiberstreifen", "x": 84.5, "y": 51.7, "b": 6.0, "h": 6.1, "dok": "schreiber"}, {"titel": "Anlagenschema", "x": 54.2, "y": 24.9, "b": 7.9, "h": 11.2, "dok": "legende"}, {"titel": "Warnschild", "x": 23.3, "y": 29.0, "b": 4.6, "h": 5.7, "dok": "warnschild"}, {"titel": "Spülprotokoll", "x": 68.5, "y": 62.6, "b": 5.4, "h": 13.3, "dok": "spuel"}]},
+      ansicht: {"src": "images/pastanlage_a.webp", "alt": "Pastanlage: Plattenwärmetauscher, Heisshalter, Homogenisator und Schaltschrank mit Schreiber", "hotspots": [{"titel": "Heisshalter, Typenschild", "x": 15.8, "y": 36.3, "b": 27.5, "h": 35.7, "dok": "typenschild"}, {"titel": "Homogenisator", "x": 51.4, "y": 35.0, "b": 22.7, "h": 40.7, "schloss": "s3"}, {"titel": "Wärmetauscher, Temperaturanzeige", "x": 0, "y": 41.2, "b": 14.3, "h": 30.8, "dok": "temperatur"}, {"titel": "Steuerpult", "x": 81.1, "y": 34.2, "b": 10.4, "h": 33.7, "schloss": "s4"}, {"titel": "Schreiberstreifen", "x": 84.5, "y": 51.7, "b": 6.0, "h": 6.1, "dok": "schreiber"}, {"titel": "Anlagenschema", "x": 54.2, "y": 24.9, "b": 7.9, "h": 11.2, "dok": "legende"}, {"titel": "Warnschild", "x": 23.3, "y": 29.0, "b": 4.6, "h": 5.7, "dok": "warnschild"}, {"titel": "Spülprotokoll", "x": 68.5, "y": 62.6, "b": 5.4, "h": 13.3, "dok": "spuel"}]},
       szene: '<p>Die Anlage ist mit Wasser gefüllt und keimarm gemacht. Hier hat die Qualitätssicherung in der Nacht gesperrt. An der Wand hängt das Anlagenschema.</p>' },
     { id: 'labor', name: 'Labor', uhr: '06:20', plan: { x: 35, y: 22, b: 30, h: 18 }, oeffnetMit: ['s2', 's4'],
       ansicht: {"src": "images/labor_a.webp", "alt": "Labor: Probenschrank mit Proben, Laborbericht an der Wand, Laborbank mit Waage, Reagenzglasgestell und Telefon", "hotspots": [{"titel": "Probenschrank", "x": 72.2, "y": 25.7, "b": 22.3, "h": 72.5, "schloss": "s5"}, {"titel": "Laborbericht", "x": 38.9, "y": 30.5, "b": 8.1, "h": 19.4, "dok": "labor"}, {"titel": "Waage", "x": 3.4, "y": 57.5, "b": 14.5, "h": 6.1, "dok": "fett"}, {"titel": "Reagenzglasgestell", "x": 22.8, "y": 56.4, "b": 8.3, "h": 6.4, "dok": "hemm"}, {"titel": "Telefon, Anrufbeantworter", "x": 54.3, "y": 58.4, "b": 5.0, "h": 4.5, "dok": "mb3"}]},
@@ -171,7 +173,7 @@ function raum(z) {
     { id: 'schreiber', ort: 'past', titel: 'Schreiberstreifen Heisshalter', html: EscapeRoom.kurve(punkte, { min: 69, max: 76.5, linien: [70, 73, 76], einheit: '°C', label: 'Temperatur am Ende des Heisshalters, Sollwert 74 °C' }) },
     { id: 'labor', ort: 'labor', titel: 'Laborbericht Erhitzungsnachweis', html: dokument('Laborbericht',
       tabelle(['Probe', 'Probenahme', 'Phosphatase', 'Peroxidase'], proben.map(function (p) { return ['Nr. ' + p[0], p[1], p[2], p[3]]; }))) },
-    { id: 'fett', ort: 'labor', titel: 'Wägeprotokoll Fettbestimmung von gestern', html: dokument('Fettbestimmung von gestern', tabelle(['Probe', 'Fettgehalt'], [['Vollmilch Tank 1', '4.1 %'], ['Magermilch Tank 2', '0.05 %'], ['Rahm Tank 3', '35.2 %']])) },
+    { id: 'fett', ort: 'labor', titel: 'Wägeprotokoll Trockenmasse von gestern', html: dokument('Trockenmasse von gestern', tabelle(['Probe', 'Trockenmasse'], [['Vollmilch Tank 1', '12.7 %'], ['Magermilch Tank 2', '9.1 %']])) },
     { id: 'hemm', ort: 'labor', titel: 'Hemmstofftest Rohmilch', html: dokument('Hemmstofftest Rohmilch von heute früh', tabelle(['Tour', 'Ergebnis'], [['Tour 1', 'negativ'], ['Tour 2', 'negativ'], ['Tour 3', 'negativ']])) },
     { id: 'klage', ort: 'kuehl', titel: 'Reklamation', html: dokument('Reklamation eines Ladens', '<p>' + mg.klage + '</p><p>Bitte Ursache melden.</p>') }
   ];
@@ -260,13 +262,13 @@ function raum(z) {
     { id: 's6', ort: 'kuehl', titel: 'Freigabe-Terminal', ziel: 'b.6.6, b.6.7', ausgang: true,
       aufgabe: '<p>Das Terminal gibt die Charge erst frei, wenn drei Dinge eingetragen sind:</p><ol><li>der Code der Ursache für die offene Reklamation,</li>' +
         '<li>die Uhrzeit, zu der die Probe genommen wurde, deren Milch als Pastmilch in den Verkauf darf,</li>' +
-        '<li>die Menge Milch in Litern, die gesperrt bleibt, weil die Temperatur unter 72 °C lag. Jeder Messpunkt steht für 2 Minuten, die Anlage lief mit Nennleistung.</li></ol>',
+        '<li>die Menge Milch in Litern, die gesperrt bleibt, weil die Temperatur unter 72 °C lag. Jeder Messpunkt gilt bis zum nächsten Messpunkt, die Anlage lief mit Nennleistung.</li></ol>',
       wahl: { label: 'Teil 1: Code der Ursache', richtig: ursache, falsch: falschU },
       felder: [{ label: 'Teil 2: Probenahme der verkaufsfähigen Probe', art: 'zeit', wert: minuten(zeitK), irrtum: [
         { wert: minuten(zeitW), text: 'Teil 2: Die Probe von ' + zeitW + ' Uhr ist Phosphatase positiv, also zu wenig erhitzt. Sie darf nicht in den Verkauf.' }] },
         { label: 'Teil 3: gesperrte Milch', einheit: 'l', wert: litSperr, tol: 0.5, irrtum: [
           { wert: (nUnter + nGrenz) * 2 * nenn / 60, text: 'Teil 3: Sie haben auch Messpunkte zwischen 72 und 73 °C gezählt. Gesperrt ist nur, was unter 72 °C lag.' },
-          { wert: nUnter * nenn / 60, text: 'Teil 3: Ein Messpunkt steht für 2 Minuten, nicht für 1 Minute.' },
+          { wert: nUnter * nenn / 60, text: 'Teil 3: Ein Messpunkt gilt bis zum nächsten Messpunkt, das sind 2 Minuten, nicht 1 Minute.' },
           { wert: nUnter * nenn, text: 'Teil 3: Die Nennleistung gilt pro Stunde. Ein Messpunkt steht für 2 Minuten.' }] }],
       hinweise: [mg.tipp + ' Für Teil 2 brauchen Sie den Laborbericht aus dem Labor. Für Teil 3 den Schreiberstreifen (Abstand der Messpunkte) und das Typenschild des Heisshalters (Nennleistung).',
         'Zum Mangel «' + mg.name + '» nennt das Lehrmittel: ' + mg.ursachen.join(', ') + '. Verkaufen darf man nur Phosphatase negativ und Peroxidase positiv. Teil 3: Anzahl Messpunkte unter 72 °C × Abstand in Minuten × Nennleistung : 60.'],
@@ -287,7 +289,7 @@ EscapeRoom.init({
   raum: raum,
   schluss: {
     uhr: '07:00',
-    szene: '<p>Alle Schlösser sind offen. Sie unterschreiben das Freigabeprotokoll. Die korrekt pasteurisierte Milch geht mit der Frühtour raus, die Milch unter 72 °C bleibt gesperrt.</p>',
+    szene: '<p>Sie unterschreiben das Freigabeprotokoll. Die korrekt pasteurisierte Milch geht mit der Frühtour raus, die Milch unter 72 °C bleibt gesperrt.</p>',
     ziele: [
       '<b>b.6.1.1</b> Ablauf der kontinuierlichen Pastmilchherstellung (Leitstand)',
       '<b>b.6.1.2</b> Gesetzliche Anforderungen: Fettgehaltsstufen nach Art. 33 VLtH, Nachweis der Pasteurisation (Tanklager, Pastanlage, Labor)',

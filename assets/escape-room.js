@@ -163,7 +163,10 @@ var EscapeRoom = (function () {
     if (el('erWeiter')) el('erWeiter').onclick = function () {
       st = alt;
       var pause = Date.now() - (st.zuletzt || Date.now());
-      if (pause > 10 * 60000) st.start += pause;  // lange Pause (z. B. nächster Tag) zählt nicht zur Zeit
+      if (pause > 10 * 60000) {  // lange Pause (z. B. nächster Tag) zählt nicht zur Zeit, auch nicht pro Schloss
+        st.start += pause;
+        Object.keys(st.stat || {}).forEach(function (id) { if (!st.stat[id].t1) st.stat[id].t0 += pause; });
+      }
       spiel();
     };
   }
@@ -205,13 +208,16 @@ var EscapeRoom = (function () {
 
   /* ---------- Szene mit Hotspots (Blender-Render) ---------- */
   // Hotspots in Prozent des Bildes. Kleine zuletzt nennen, sie liegen dann oben. Kein Etikett im Bild, nur Rahmen bei Hover und Häkchen nach dem Lesen.
+  function hotText(titel, dok, fertig) { return titel + (fertig ? (dok ? ' (gelesen)' : ' (offen)') : ''); }
+  function hotMark(b, fertig) { b.classList.toggle('er-gelesen', !!fertig); b.setAttribute('aria-label', hotText(b.dataset.titel, b.dataset.dok, fertig)); }
+  function hotAlle() { [].forEach.call(el('erOrt').querySelectorAll('.er-hot[data-schloss]'), function (b) { hotMark(b, st.geloest[b.dataset.schloss]); }); }
   function ansicht(a) {
     return '<div class="er-ansicht"><img src="' + a.src + '" alt="' + a.alt + '">' + a.hotspots.filter(function (h) {
       return !h.schloss || welt.schloesser.some(function (s) { return s.id === h.schloss; });  // Schloss fehlt in der Kurzfassung: kein toter Hotspot
     }).map(function (h) {
       var gelesen = h.dok ? st.gelesen[h.dok] : st.geloest[h.schloss];
-      return '<button type="button" class="er-hot' + (gelesen ? ' er-gelesen' : '') + '" style="left:' + h.x + '%;top:' + h.y + '%;width:' + h.b + '%;height:' + h.h + '%" aria-label="' +
-        h.titel + (gelesen ? ' (gelesen)' : '') + '"' + (h.dok ? ' data-dok="' + h.dok + '"' : ' data-schloss="' + h.schloss + '"') + '></button>';
+      return '<button type="button" class="er-hot' + (gelesen ? ' er-gelesen' : '') + '" style="left:' + h.x + '%;top:' + h.y + '%;width:' + h.b + '%;height:' + h.h + '%" data-titel="' + h.titel + '" aria-label="' +
+        hotText(h.titel, h.dok, gelesen) + '"' + (h.dok ? ' data-dok="' + h.dok + '"' : ' data-schloss="' + h.schloss + '"') + '></button>';
     }).join('') + '</div><dialog class="er-dlg" id="erDlg"><div id="erDlgInhalt"></div><div class="er-knoepfe"><button type="button" class="q-btn" id="erDlgZu">Schliessen</button></div></dialog>';
   }
   function ansichtBinden() {
@@ -220,19 +226,19 @@ var EscapeRoom = (function () {
     el('erDlgZu').onclick = function () { dlg.close(); };
     dlg.onclick = function (e) { if (e.target === dlg) dlg.close(); };
     dlg.onclose = function () {
-      [].forEach.call(el('erOrt').querySelectorAll('.er-hot[data-schloss]'), function (b) { b.classList.toggle('er-gelesen', !!st.geloest[b.dataset.schloss]); });
+      hotAlle();
     };
     [].forEach.call(el('erOrt').querySelectorAll('.er-hot'), function (b) {
       b.onclick = function () {
         if (b.dataset.schloss) {
           var sl = welt.schloesser.filter(function (x) { return x.id === b.dataset.schloss; })[0];
           el('erDlgInhalt').innerHTML = '<section class="er-karte" id="erS-' + sl.id + '"></section>';
-          schloss(sl); dlg.showModal(); return;
+          schloss(sl); dlg.setAttribute('aria-label', sl.titel); dlg.showModal(); return;
         }
         var d = welt.dokumente.filter(function (x) { return x.id === b.dataset.dok; })[0];
         el('erDlgInhalt').innerHTML = '<h3>' + d.titel + '</h3>' + d.html;
-        if (!st.gelesen[d.id]) { st.gelesen[d.id] = 1; speichern(); b.classList.add('er-gelesen'); kopfNeu(); }
-        dlg.showModal();
+        if (!st.gelesen[d.id]) { st.gelesen[d.id] = 1; speichern(); hotMark(b, 1); kopfNeu(); }
+        dlg.setAttribute('aria-label', d.titel); dlg.showModal();
       };
     });
   }
@@ -303,19 +309,19 @@ var EscapeRoom = (function () {
     var p = 'er' + s.id, h = st.offen[s.id] || 0;
     var text = h < 2 ? 'Hinweis ' + (h + 1) : 'Die Lösung erscheint';
     function rest() { return Math.ceil((st.tippBis[s.id] - Date.now()) / 1000); }
+    function sag(id, t) { if (el(p + id)) el(p + id).textContent = t; }  // die Karte kann inzwischen durch ein anderes Dokument im Dialog ersetzt sein
     function tick() {
-      if (rest() > 0) { el(p + 'Uhr').textContent = 'Noch ' + rest() + ' s.'; return; }
+      if (rest() > 0) { sag('Uhr', 'Noch ' + rest() + ' s.'); return; }
       clearInterval(uhrTimer); uhrTimer = null; delete st.tippBis[s.id];
-      el(p + 'Warte').textContent = ''; el(p + 'Uhr').textContent = '';
+      sag('Warte', ''); sag('Uhr', '');
       if (h < 2) {
-        var li = document.createElement('li'); li.innerHTML = s.hinweise[h];
-        el(p + 'Tipps').appendChild(li);
-        st.offen[s.id] = h + 1; st.hinweise++; speichern();
+        st.offen[s.id] = h + 1; st.hinweise++; speichern();  // zuerst buchen, dann anzeigen
+        if (el(p + 'Tipps')) { var li = document.createElement('li'); li.innerHTML = s.hinweise[h]; el(p + 'Tipps').appendChild(li); }
       } else geloest(s, 'loesung');
       [].forEach.call(document.querySelectorAll('.er-tipp'), function (b) { b.disabled = false; });
       if (el(p + 'Tipp')) tippKnopf(s);
     }
-    el(p + 'Warte').textContent = text + ' in ' + Math.max(rest(), 0) + ' s.';  // nur einmal ansagen, die Sekunden laufen ohne aria-live
+    sag('Warte', text + ' in ' + Math.max(rest(), 0) + ' s.');  // nur einmal ansagen, die Sekunden laufen ohne aria-live
     [].forEach.call(document.querySelectorAll('.er-tipp'), function (b) { b.disabled = true; });
     uhrTimer = setInterval(tick, 1000);
     tick();
@@ -373,7 +379,11 @@ var EscapeRoom = (function () {
   function weiterBinden(s) {
     var box = el('erS-' + s.id);
     [].forEach.call(box.querySelectorAll('[data-gehe]'), function (b) { b.onclick = function () { gehe(b.dataset.gehe); window.scrollTo(0, 0); }; });
-    if (el('erAus')) el('erAus').onclick = schlussbild;
+    if (el('erAus')) el('erAus').onclick = function () {
+      var zu = welt.schloesser.filter(function (x) { return !st.geloest[x.id]; });
+      if (zu.length && !confirm('Noch nicht geöffnet: ' + zu.map(function (x) { return x.titel; }).join(', ') + '.\nTrotzdem freigeben?')) return;
+      schlussbild();
+    };
   }
 
   function geloest(s, art) {
@@ -382,6 +392,7 @@ var EscapeRoom = (function () {
     st.log.push({ notiz: s.notiz, art: art, h: st.offen[s.id] || 0, ziel: s.ziel });
     speichern();
     var box = el('erS-' + s.id), p = 'er' + s.id;
+    if (!box) { kopfNeu(); hotAlle(); return; }  // Karte nicht mehr im Dialog: gebucht, beim nächsten Öffnen erscheint sie als gelöst
     s.felder.forEach(function (f, i) {
       var inp = el(p + 'In' + i); inp.value = anzeige(f); inp.readOnly = true; inp.disabled = false;
       inp.closest('.r-feld').className = 'r-feld ok';
@@ -404,12 +415,14 @@ var EscapeRoom = (function () {
   }
 
   function messtabelle() {
-    var z = welt.schloesser.filter(function (x) { return st.geloest[x.id] && messung(x.id).t1; }).sort(function (a, b) { return st.stat[a.id].t1 - st.stat[b.id].t1; });
-    if (!z.length) return '';
+    var m = function (x) { return (st.stat || {})[x.id]; };
+    var fertig = function (x) { return st.geloest[x.id] && m(x) && m(x).t1; };
+    var z = welt.schloesser.filter(fertig).sort(function (a, b) { return m(a).t1 - m(b).t1; }).concat(welt.schloesser.filter(function (x) { return !fertig(x); }));
     return '<h3 class="er-mess-titel">Pro Schloss</h3><div class="er-mess"><table><thead><tr><th>Schloss</th><th>Ziel</th><th>Zeit</th><th>Fehlversuche</th><th>Hinweise</th></tr></thead><tbody>' +
       z.map(function (x) {
-        var m = st.stat[x.id], sek = Math.max(1, Math.round((m.t1 - m.t0) / 1000)), l = st.geloest[x.id].art === 'loesung';
-        return '<tr><td>' + x.titel + (l ? ' <em>(Lösung angezeigt)</em>' : '') + '</td><td>' + x.ziel + '</td><td>' + Math.floor(sek / 60) + ' min ' + (sek % 60) + ' s</td><td>' + m.fehl + '</td><td>' + (st.offen[x.id] || 0) + '</td></tr>';
+        if (!fertig(x)) return '<tr><td>' + x.titel + '</td><td>' + x.ziel + '</td><td colspan="3"><em>' + (st.geloest[x.id] ? 'keine Messung' : 'nicht geöffnet') + '</em></td></tr>';
+        var sek = Math.max(1, Math.round((m(x).t1 - m(x).t0) / 1000)), l = st.geloest[x.id].art === 'loesung';
+        return '<tr><td>' + x.titel + (l ? ' <em>(Lösung angezeigt)</em>' : '') + '</td><td>' + x.ziel + '</td><td>' + Math.floor(sek / 60) + ' min ' + (sek % 60) + ' s</td><td>' + m(x).fehl + '</td><td>' + (st.offen[x.id] || 0) + '</td></tr>';
       }).join('') + '</tbody></table></div>';
   }
 
