@@ -173,7 +173,7 @@ var EscapeRoom = (function () {
       '<li>Ihre Zahlen sind zufällig, die Nachbargruppe hat andere Codes. Hinweise kosten Wartezeit, keine Punkte. Nach ' + (cfg.fehlerBisSperre || 3) + ' Fehlversuchen ist ein Schloss ' + (cfg.sperre || 30) + ' s gesperrt.</li>' +
       '<li>Ihr Stand bleibt in diesem Browser gespeichert.</li></ul></section>' +
       '<div class="er-knoepfe">' +
-      (alt && !alt.ende && alt.log.length ? '<button type="button" class="q-btn" id="erWeiter">Weiterspielen (' + alt.log.length + ' Schlösser offen)</button><button type="button" class="q-btn ghost" id="erNeu">Neu beginnen (neue Zahlen)</button>'
+      (alt && !alt.ende && (alt.log.length || Object.keys(alt.gelesen || {}).length) ? '<button type="button" class="q-btn" id="erWeiter">Weiterspielen (' + alt.log.length + ' Schlösser offen)</button><button type="button" class="q-btn ghost" id="erNeu">Neu beginnen (neue Zahlen)</button>'
         : '<button type="button" class="q-btn" id="erNeu">Starten</button>') + '</div>';
     el('erNeu').onclick = function () { st = neuerStand(kurz); speichern(); spiel(); };
     if (el('erWeiter')) el('erWeiter').onclick = function () {
@@ -226,7 +226,7 @@ var EscapeRoom = (function () {
     }).map(function (h) {
       var gelesen = h.dok && st.gelesen[h.dok];
       return '<button type="button" class="er-hot' + (gelesen ? ' er-gelesen' : '') + '" style="left:' + h.x + '%;top:' + h.y + '%;width:' + h.b + '%;height:' + h.h + '%" aria-label="' +
-        h.titel + (gelesen ? ' (gelesen)' : '') + '" title="' + h.titel + '"' + (h.dok ? ' data-dok="' + h.dok + '"' : ' data-schloss="' + h.schloss + '"') + '></button>';
+        h.titel + (gelesen ? ' (gelesen)' : '') + '"' + (h.dok ? ' data-dok="' + h.dok + '"' : ' data-schloss="' + h.schloss + '"') + '></button>';
     }).join('') + '</div><dialog class="er-dlg" id="erDlg"><div id="erDlgInhalt"></div><div class="er-knoepfe"><button type="button" class="q-btn" id="erDlgZu">Schliessen</button></div></dialog>';
   }
   function ansichtBinden() {

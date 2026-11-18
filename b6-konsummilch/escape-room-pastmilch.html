@@ -25,7 +25,7 @@
 <footer class="bzwu-footer">
   BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
 </footer>
-<script src="../assets/escape-room.js?v=7e7b89b2"></script>
+<script src="../assets/escape-room.js?v=5ba2041f"></script>
 <script>
 // Fachquelle aller Werte: lehrmittel/efz/b.6 - Konsummilch herstellen.md (Seiten = PDF-Seiten), Belege in material/efz/b.6/escape-room/QUELLEN_b6_escape-room.md
 var z2 = function (n) { return EscapeRoom.zahl(n); };
@@ -67,7 +67,7 @@ var MAENGEL = [
     tipp: 'Kochgeschmack entsteht durch Hitze.' },
   { name: 'Gehaltsabweichungen', klage: '«Der Fettgehalt weicht von der Angabe auf der Packung ab.»', ursachen: ['Vermischung mit Spülwasser', 'Fehlerhafte Fettgehaltstandardisation'],
     tipp: 'Was verändert die Zusammensetzung der Milch, nachdem sie eingestellt wurde, oder schon beim Einstellen?' },
-  { name: 'ungenügende Haltbarkeit', klage: '«Die Milch ist vor dem Verbrauchsdatum verdorben.»', ursachen: ['Keimreiche Rohmilch', 'Nachinfektion beim Kühlen oder Abfüllen', 'Infektion durch Verpackungsmaterial', 'Ungenügendes Kühlen', 'Unterbrochene Kühlkette'],
+  { name: 'ungenügende Haltbarkeit', klage: '«Die Milch ist vor dem Verbrauchsdatum verdorben.»', ursachen: ['Keimreiche Rohmilch', 'Nachinfektion beim Kühlen oder Abfüllen', 'Infektion durch Verpackungsmaterial', 'Ungenügendes Kühlen', 'Unterbrochene Kühlkette', 'Ungenügende Pasteurisation'],
     nichtBei: ['Zu hohe Hitzebelastung während der Pasteurisation', 'Homogenisierte Pastmilch mit Rohmilch vermischt', 'Vermischung mit Spülwasser'],  // als Ursache für Verderb vertretbar
     tipp: 'Das ist mikrobiologischer Verderb: Woher kommen Keime, oder warum vermehren sie sich?' }
 ];
@@ -119,18 +119,20 @@ function raum(z) {
 
   // Kühlraum: Reklamation
   var mg = z.pick(MAENGEL), ursache = z.pick(mg.ursachen);
-  var falschU = z.mische(MAENGEL.filter(function (x) { return x !== mg; })).slice(0, 3).map(function (x) {
-    return { text: z.pick(x.ursachen.filter(function (u) { return (mg.nichtBei || []).indexOf(u) < 0; })), warum: 'Diese Ursache steht in der Tabelle beim Mangel «' + x.name + '».' };
+  var frei = function (x) { return x.ursachen.filter(function (u) { return (mg.nichtBei || []).indexOf(u) < 0; }); };
+  var falschU = z.mische(MAENGEL.filter(function (x) { return x !== mg && frei(x).length; })).slice(0, 3).map(function (x) {
+    return { text: z.pick(frei(x)), warum: 'Diese Ursache steht in der Tabelle beim Mangel «' + x.name + '».' };
   });
 
   /* ---- Räume ---- */
   var orte = [
     { id: 'leitstand', name: 'Leitstand', uhr: '05:30', plan: { x: 35, y: 2, b: 30, h: 16 },
+      ansicht: {"src": "images/leitstand_a.webp", "alt": "Leitstand: Pult mit Bildschirm und Telefon, Pinnwand mit Tagesauftrag und Zettel, Regal, Wanduhr", "hotspots": [{"titel": "Bildschirm", "x": 32.9, "y": 44.7, "b": 19.6, "h": 26.3, "schloss": "s1"}, {"titel": "Tagesauftrag", "x": 11.1, "y": 34.6, "b": 6.1, "h": 14.5, "dok": "auftrag"}, {"titel": "Zettel der Nachtschicht", "x": 22.2, "y": 40.6, "b": 3.2, "h": 5.7, "dok": "nacht"}, {"titel": "Telefon, Anrufbeantworter", "x": 61.5, "y": 67.9, "b": 6.3, "h": 5.8, "dok": "mb1"}]},
       szene: '<p>Der Bildschirm im Leitstand zeigt «Ablauf unvollständig. Anlage gesperrt.» Auf dem Pult liegen der Tagesauftrag und ein Zettel der Nachtschicht. Am Telefon blinkt der Anrufbeantworter.</p>' },
     { id: 'tank', name: 'Tanklager', uhr: '05:40', plan: { x: 2, y: 22, b: 31, h: 18 }, oeffnetMit: ['s1'],
       szene: '<p>Drei Tanks, drei Anzeigen. Das Mischventil zur Pastanlage öffnet erst, wenn die Menge Vollmilch eingegeben ist. An der Wand hängt ein Aushang. Am Wandtelefon blinkt der Anrufbeantworter.</p>' },
     { id: 'past', name: 'Pastanlage', uhr: '05:50', plan: { x: 67, y: 22, b: 31, h: 18 }, oeffnetMit: ['s1'],
-      ansicht: {"src": "images/pastanlage_a.webp", "alt": "Pastanlage: Plattenwärmetauscher, Heisshalter, Homogenisator und Schaltschrank mit Schreiber", "hotspots": [{"titel": "Heisshalter, Typenschild", "x": 15.8, "y": 36.3, "b": 27.5, "h": 38.6, "dok": "typenschild"}, {"titel": "Homogenisator (S3)", "x": 51.4, "y": 35.0, "b": 22.7, "h": 40.7, "schloss": "s3"}, {"titel": "Wärmetauscher, Temperaturanzeige", "x": 0, "y": 41.2, "b": 14.3, "h": 36.9, "dok": "temperatur"}, {"titel": "Steuerpult (S4)", "x": 81.1, "y": 34.2, "b": 10.4, "h": 33.7, "schloss": "s4"}, {"titel": "Schreiberstreifen", "x": 84.5, "y": 51.7, "b": 6.0, "h": 6.1, "dok": "schreiber"}, {"titel": "Anlagenschema", "x": 54.2, "y": 24.9, "b": 7.9, "h": 11.2, "dok": "legende"}, {"titel": "Warnschild", "x": 23.3, "y": 29.0, "b": 4.6, "h": 5.7, "dok": "warnschild"}, {"titel": "Spülprotokoll", "x": 68.5, "y": 62.6, "b": 5.4, "h": 13.3, "dok": "spuel"}]},
+      ansicht: {"src": "images/pastanlage_a.webp", "alt": "Pastanlage: Plattenwärmetauscher, Heisshalter, Homogenisator und Schaltschrank mit Schreiber", "hotspots": [{"titel": "Heisshalter, Typenschild", "x": 15.8, "y": 36.3, "b": 27.5, "h": 38.6, "dok": "typenschild"}, {"titel": "Homogenisator", "x": 51.4, "y": 35.0, "b": 22.7, "h": 40.7, "schloss": "s3"}, {"titel": "Wärmetauscher, Temperaturanzeige", "x": 0, "y": 41.2, "b": 14.3, "h": 36.9, "dok": "temperatur"}, {"titel": "Steuerpult", "x": 81.1, "y": 34.2, "b": 10.4, "h": 33.7, "schloss": "s4"}, {"titel": "Schreiberstreifen", "x": 84.5, "y": 51.7, "b": 6.0, "h": 6.1, "dok": "schreiber"}, {"titel": "Anlagenschema", "x": 54.2, "y": 24.9, "b": 7.9, "h": 11.2, "dok": "legende"}, {"titel": "Warnschild", "x": 23.3, "y": 29.0, "b": 4.6, "h": 5.7, "dok": "warnschild"}, {"titel": "Spülprotokoll", "x": 68.5, "y": 62.6, "b": 5.4, "h": 13.3, "dok": "spuel"}]},
       szene: '<p>Die Anlage ist mit Wasser gefüllt und keimarm gemacht. Hier hat die Qualitätssicherung in der Nacht gesperrt. An der Wand hängt das Anlagenschema.</p>' },
     { id: 'labor', name: 'Labor', uhr: '06:20', plan: { x: 35, y: 22, b: 30, h: 18 }, oeffnetMit: ['s2', 's3', 's4'],
       szene: '<p>Im Labor stehen drei Proben im Kühlschrank. Der Probenschrank öffnet nur, wenn die Proben richtig geordnet sind. Am Telefon blinkt der Anrufbeantworter.</p>' },
@@ -253,13 +255,13 @@ function raum(z) {
     { id: 's6', ort: 'kuehl', titel: 'Freigabe-Terminal', ziel: 'b.6.6, b.6.7', ausgang: true,
       aufgabe: '<p>Das Terminal gibt die Charge erst frei, wenn drei Dinge eingetragen sind:</p><ol><li>der Code der Ursache für die offene Reklamation,</li>' +
         '<li>die Uhrzeit, zu der die Probe genommen wurde, deren Milch als Pastmilch in den Verkauf darf,</li>' +
-        '<li>die Menge Milch in Litern, die gesperrt bleibt, weil die Temperatur unter 72 °C lag. Jeder Messpunkt gilt bis zum nächsten Messpunkt, die Anlage lief mit Nennleistung.</li></ol>',
+        '<li>die Menge Milch in Litern, die gesperrt bleibt, weil die Temperatur unter 72 °C lag. Jeder Messpunkt steht für 2 Minuten, die Anlage lief mit Nennleistung.</li></ol>',
       wahl: { label: 'Teil 1: Code der Ursache', richtig: ursache, falsch: falschU },
       felder: [{ label: 'Teil 2: Probenahme der verkaufsfähigen Probe', art: 'zeit', wert: minuten(zeitK), irrtum: [
         { wert: minuten(zeitW), text: 'Teil 2: Die Probe von ' + zeitW + ' Uhr ist Phosphatase positiv, also zu wenig erhitzt. Sie darf nicht in den Verkauf.' }] },
         { label: 'Teil 3: gesperrte Milch', einheit: 'l', wert: litSperr, tol: 0.5, irrtum: [
           { wert: (nUnter + nGrenz) * 2 * nenn / 60, text: 'Teil 3: Sie haben auch Messpunkte zwischen 72 und 73 °C gezählt. Gesperrt ist nur, was unter 72 °C lag.' },
-          { wert: nUnter * nenn / 60, text: 'Teil 3: Ein Messpunkt gilt bis zum nächsten Messpunkt, das sind 2 Minuten, nicht 1 Minute.' },
+          { wert: nUnter * nenn / 60, text: 'Teil 3: Ein Messpunkt steht für 2 Minuten, nicht für 1 Minute.' },
           { wert: nUnter * nenn, text: 'Teil 3: Die Nennleistung gilt pro Stunde. Ein Messpunkt steht für 2 Minuten.' }] }],
       hinweise: [mg.tipp + ' Für Teil 2 brauchen Sie den Laborbericht aus dem Labor. Für Teil 3 den Schreiberstreifen (Abstand der Messpunkte) und das Typenschild des Heisshalters (Nennleistung).',
         'Zum Mangel «' + mg.name + '» nennt das Lehrmittel: ' + mg.ursachen.join(', ') + '. Verkaufen darf man nur Phosphatase negativ und Peroxidase positiv. Teil 3: Anzahl Messpunkte unter 72 °C × Abstand in Minuten × Nennleistung : 60.'],
