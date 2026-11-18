@@ -238,7 +238,11 @@ var EscapeRoom = (function () {
   }
 
   /* ---------- Schloss ---------- */
+  // Messung pro Schloss: erster Blick, Fehlversuche, Zeit bis offen (Hinweise stehen in st.offen)
+  function messung(id) { st.stat = st.stat || {}; return st.stat[id] || (st.stat[id] = { t0: Date.now(), fehl: 0 }); }
+
   function schloss(s) {
+    messung(s.id);
     var box = el('erS-' + s.id), p = 'er' + s.id;
     var titel = '<span class="q-badge">Schloss</span><h3 class="er-titel">' + s.titel + '</h3>';
     if (st.geloest[s.id]) {
@@ -347,7 +351,7 @@ var EscapeRoom = (function () {
     if (leer) return;
     var richtig = erg.filter(function (r) { return r.ok; }).length;
     if (richtig === s.felder.length) return geloest(s, st.offen[s.id] ? 'hinweis' : 'ok');
-    st.fehl[s.id] = (st.fehl[s.id] || 0) + 1;
+    st.fehl[s.id] = (st.fehl[s.id] || 0) + 1; messung(s.id).fehl++;
     var texte = erg.filter(function (r) { return !r.ok && r.irrtum; }).map(function (r) { return r.irrtum; });
     var fb = el(p + 'Fb');
     fb.className = 'q-feedback show nok';
@@ -374,7 +378,7 @@ var EscapeRoom = (function () {
 
   function geloest(s, art) {
     st.geloest[s.id] = { art: art, h: st.offen[s.id] || 0 };
-    st.fehl[s.id] = 0; delete st.sperreBis[s.id];
+    st.fehl[s.id] = 0; delete st.sperreBis[s.id]; messung(s.id).t1 = Date.now();
     st.log.push({ notiz: s.notiz, art: art, h: st.offen[s.id] || 0, ziel: s.ziel });
     speichern();
     var box = el('erS-' + s.id), p = 'er' + s.id;
@@ -399,6 +403,16 @@ var EscapeRoom = (function () {
     kopfNeu();
   }
 
+  function messtabelle() {
+    var z = welt.schloesser.filter(function (x) { return st.geloest[x.id] && messung(x.id).t1; }).sort(function (a, b) { return st.stat[a.id].t1 - st.stat[b.id].t1; });
+    if (!z.length) return '';
+    return '<h3 class="er-mess-titel">Pro Schloss</h3><div class="er-mess"><table><thead><tr><th>Schloss</th><th>Ziel</th><th>Zeit</th><th>Fehlversuche</th><th>Hinweise</th></tr></thead><tbody>' +
+      z.map(function (x) {
+        var m = st.stat[x.id], sek = Math.max(1, Math.round((m.t1 - m.t0) / 1000)), l = st.geloest[x.id].art === 'loesung';
+        return '<tr><td>' + x.titel + (l ? ' <em>(Lösung angezeigt)</em>' : '') + '</td><td>' + x.ziel + '</td><td>' + Math.floor(sek / 60) + ' min ' + (sek % 60) + ' s</td><td>' + m.fehl + '</td><td>' + (st.offen[x.id] || 0) + '</td></tr>';
+      }).join('') + '</tbody></table></div>';
+  }
+
   function schlussbild() {
     clearInterval(uhrTimer); uhrTimer = null;
     if (!st.ende) { st.ende = Date.now(); speichern(); }
@@ -407,6 +421,7 @@ var EscapeRoom = (function () {
     el('escape').innerHTML = '<section class="er-szene er-ende"><p class="er-ort">' + cfg.schluss.uhr + ' Uhr · Freigabe</p>' + cfg.schluss.szene + '</section>' +
       '<section class="q-card"><h2 class="er-titel" id="erTitel" tabindex="-1">Ihr Freigabeprotokoll</h2><ol class="er-liste">' +
       st.log.map(function (l) { return '<li>' + l.notiz + (l.art === 'loesung' ? ' <em>(Lösung angezeigt)</em>' : '') + '</li>'; }).join('') + '</ol>' +
+      messtabelle() +
       '<p class="er-bilanz">Zeit: etwa ' + min + ' min, davon ' + warteMin + ' min Wartezeit. Hinweise: ' + st.hinweise + '. Lösungen angezeigt: ' + loesungen + '.' +
       (loesungen ? ' Spielen Sie den Raum nochmals mit neuen Zahlen, um die Schlösser mit angezeigter Lösung selbst zu öffnen.' : '') + '</p></section>' +
       '<section class="q-card er-ziele"><h2>Was Sie gerade repetiert haben</h2><ul>' + cfg.schluss.ziele.map(function (z) { return '<li>' + z + '</li>'; }).join('') + '</ul></section>' +
