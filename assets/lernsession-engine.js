@@ -47,7 +47,10 @@
   function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;} return a; }
   function shuffleIdx(n){ var a=[]; for(var i=0;i<n;i++) a.push(i); return shuffle(a); }
   function fold(s){ return String(s).toLowerCase().replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss').replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim(); }
-  function matchKeys(input, it){ var f=fold(input); if(!f) return false; if(f===fold(it.name)) return true; for(var i=0;i<it.keys.length;i++){ if(f.indexOf(fold(it.keys[i]))!==-1) return true; } return false; }
+  // Länge des längsten passenden Stichworts, voller Name zählt am meisten, 0 = passt nicht. Ohne Leerzeichen: «Hochdruck Pressostat» = «Hochdruckpressostat»
+  function treffer(f, it){ var o=function(s){ return fold(s).replace(/ /g,''); }; f=f.replace(/ /g,''); var best=f===o(it.name)?1e9:0; (it.keys||[]).forEach(function(k){ var fk=o(k); if(fk && f.indexOf(fk)!==-1 && fk.length>best) best=fk.length; }); return best; }
+  // Richtig nur, wenn kein anderes Teil besser passt («Hochdruckpressostat» zählt nicht beim Niederdruckpressostat)
+  function matchKeys(input, it, alle){ var f=fold(input); if(!f) return false; var t=treffer(f, it); return t>0 && !(alle||[]).some(function(o){ return o!==it && treffer(f, o)>t; }); }
 
   /* ---------- Rückmeldung: nie nur Farbe, immer Symbol und Wort (wie basis/quiz.js) ---------- */
   function feedback(el, ok, titel, text){
@@ -321,7 +324,7 @@
       st.items.forEach(function(it){
         var inp=document.getElementById('lb-'+idx+'-'+it.n); var sol=document.getElementById('lbsol-'+idx+'-'+it.n);
         inp.classList.remove('correct','wrong');
-        var ok=matchKeys(inp.value, it);
+        var ok=matchKeys(inp.value, it, st.items);
         if(ok){ inp.classList.add('correct'); sol.style.display='none'; correct++; } else { inp.classList.add('wrong'); sol.textContent='→ '+it.name; sol.style.display='block'; }
       });
       bilanz(this.parentNode, correct, st.items.length, 'Bezeichnungen', 'Die richtige Bezeichnung steht jeweils unter dem falschen Feld.');
