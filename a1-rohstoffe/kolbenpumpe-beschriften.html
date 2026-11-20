@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kolbenpumpe beschriften</title>
+  <link rel="stylesheet" href="../style.css?v=3d62503e">
+</head>
+<body>
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · a.1</span>
+    <h1>Kolbenpumpe beschriften</h1>
+    <p>Benennen Sie die Bauteile einer Kolbenpumpe: zuordnen, im Bild zeigen und eintippen.</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+<main class="z-wrap">
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+  <div id="zuordnung"></div>
+</main>
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+<script src="../assets/zuordnung.js?v=82b06139"></script>
+<script>
+Zuordnung.init({
+  stufen: ['zuordnen', 'zeigen', 'eintippen'],
+  beschriften: {
+    bild: "images/pumpen/a.1_schema_kolbenpumpe_nummern.svg",
+    bildLeer: "images/pumpen/a.1_schema_kolbenpumpe_leer.svg",
+    quelle: "Eigenes Schema, Inhalt nach dem Lehrmittel a.1, Rohstoffe annehmen (Kolbenpumpe)",
+    treffer: 0.12,
+    teile: [
+      {n: 1, name: "Zylinder", keys: ["zylinder"], zonen: [{cx: 30.5, cy: 49.7}, {cx: 30.5, cy: 67.7}, {cx: 77.3, cy: 49.7}, {cx: 77.3, cy: 67.7}]},
+      {n: 2, name: "Kolben", keys: ["kolben"], zonen: [{cx: 32.3, cy: 58.9}, {cx: 73.1, cy: 63.5}, {cx: 73.8, cy: 56.5}]},
+      {n: 3, name: "Saugventil", keys: ["saugventil"], zonen: [{cx: 19.3, cy: 73.2}, {cx: 63.0, cy: 76.1}]},
+      {n: 4, name: "Druckventil", keys: ["druckventil"], zonen: [{cx: 64.7, cy: 43.2}, {cx: 17.8, cy: 46.0}]},
+      {n: 5, name: "Saugleitung", keys: ["saugleitung"], zonen: [{cx: 20.9, cy: 84.5}, {cx: 15.9, cy: 87.9}, {cx: 62.7, cy: 87.1}]},
+      {n: 6, name: "Druckleitung", keys: ["druckleitung"], zonen: [{cx: 66.4, cy: 32.3}, {cx: 18.2, cy: 32.3}]}
+    ]
+  }
+});
+</script>
+</body>
+</html>

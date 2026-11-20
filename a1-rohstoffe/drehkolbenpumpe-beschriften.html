@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dreh- oder Kreiskolbenpumpe beschriften</title>
+  <link rel="stylesheet" href="../style.css?v=3d62503e">
+</head>
+<body>
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · a.1</span>
+    <h1>Dreh- oder Kreiskolbenpumpe beschriften</h1>
+    <p>Benennen Sie die Bauteile einer Dreh- oder Kreiskolbenpumpe: zuordnen, im Bild zeigen und eintippen.</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+<main class="z-wrap">
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+  <div id="zuordnung"></div>
+</main>
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+<script src="../assets/zuordnung.js?v=82b06139"></script>
+<script>
+Zuordnung.init({
+  stufen: ['zuordnen', 'zeigen', 'eintippen'],
+  beschriften: {
+    bild: "images/pumpen/a.1_schema_drehkolbenpumpe_nummern.svg",
+    bildLeer: "images/pumpen/a.1_schema_drehkolbenpumpe_leer.svg",
+    quelle: "Eigenes Schema, Inhalt nach dem Lehrmittel a.1, Rohstoffe annehmen (Dreh- oder Kreiskolbenpumpe)",
+    treffer: 0.12,
+    teile: [
+      {n: 1, name: "Gehäuse", keys: ["gehaeuse", "gehäuse"], zonen: [{cx: 35.1, cy: 76.8}, {cx: 40.9, cy: 20.6}, {cx: 30.5, cy: 35.5}, {cx: 51.4, cy: 35.5}, {cx: 50.9, cy: 72.6}, {cx: 84.7, cy: 58.1}]},
+      {n: 2, name: "Drehkolben", keys: ["drehkolben", "kreiskolben", "kolben"], zonen: [{cx: 43.1, cy: 71.0}, {cx: 40.9, cy: 38.7}, {cx: 40.0, cy: 62.1}, {cx: 34.5, cy: 39.0}, {cx: 47.3, cy: 39.0}, {cx: 34.5, cy: 61.0}, {cx: 47.3, cy: 61.0}, {cx: 88.0, cy: 38.7}, {cx: 88.0, cy: 62.9}]},
+      {n: 3, name: "Saugstutzen", keys: ["saugstutzen"], zonen: [{cx: 26.9, cy: 58.4}, {cx: 27.3, cy: 50.0}]},
+      {n: 4, name: "Druckstutzen", keys: ["druckstutzen"], zonen: [{cx: 54.9, cy: 58.4}, {cx: 54.5, cy: 50.0}]}
+    ]
+  }
+});
+</script>
+</body>
+</html>

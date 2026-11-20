@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Impellerpumpe beschriften</title>
+  <link rel="stylesheet" href="../style.css?v=3d62503e">
+</head>
+<body>
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · a.1</span>
+    <h1>Impellerpumpe beschriften</h1>
+    <p>Benennen Sie die Bauteile einer Impellerpumpe: zuordnen, im Bild zeigen und eintippen.</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+<main class="z-wrap">
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+  <div id="zuordnung"></div>
+</main>
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+<script src="../assets/zuordnung.js?v=82b06139"></script>
+<script>
+Zuordnung.init({
+  stufen: ['zuordnen', 'zeigen', 'eintippen'],
+  beschriften: {
+    bild: "images/pumpen/a.1_schema_impellerpumpe_nummern.svg",
+    bildLeer: "images/pumpen/a.1_schema_impellerpumpe_leer.svg",
+    quelle: "Eigenes Schema, Inhalt nach dem Lehrmittel a.1, Rohstoffe annehmen (Impellerpumpe)",
+    treffer: 0.12,
+    teile: [
+      {n: 1, name: "Saugstutzen", keys: ["saugstutzen"], zonen: [{cx: 27.1, cy: 32.3}, {cx: 23.5, cy: 33.5}]},
+      {n: 2, name: "Druckstutzen", keys: ["druckstutzen"], zonen: [{cx: 49.3, cy: 32.3}, {cx: 52.9, cy: 33.5}]},
+      {n: 3, name: "Pumpengehäuse", keys: ["pumpengehaeuse", "pumpengehäuse", "gehaeuse", "gehäuse"], zonen: [{cx: 27.8, cy: 73.5}, {cx: 24.0, cy: 55.6}, {cx: 52.4, cy: 55.6}, {cx: 38.2, cy: 80.8}]},
+      {n: 4, name: "Impeller mit elastischen Lamellen", keys: ["impeller mit elastischen lamellen", "impeller", "lamelle", "elastische lamelle"], zonen: [{cx: 44.9, cy: 65.0}, {cx: 38.2, cy: 55.6}, {cx: 49.5, cy: 53.5}, {cx: 30.0, cy: 48.4}, {cx: 30.0, cy: 64.5}, {cx: 38.2, cy: 71.0}, {cx: 88.7, cy: 61.9}]},
+      {n: 5, name: "Exzenterplatte", keys: ["exzenterplatte", "exzenter"], zonen: [{cx: 38.2, cy: 35.6}, {cx: 88.7, cy: 35.6}]}
+    ]
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,390 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="620" viewBox="0 0 1100 620" font-family="Aptos, Calibri, sans-serif">
+<defs>
+  <!-- Pfeilspitzen -->
+  <marker id="pfeil-fluss" markerWidth="14" markerHeight="12" refX="9.5" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L14,6 L0,12 z" fill="#134061"/>
+  </marker>
+  <marker id="pfeil-kammer" markerWidth="10" markerHeight="9" refX="7" refY="4.5" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L10,4.5 L0,9 z" fill="#134061"/>
+  </marker>
+  <marker id="pfeil-dreh" markerWidth="11" markerHeight="9" refX="7" refY="4.5" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L11,4.5 L0,9 z" fill="#134061"/>
+  </marker>
+
+  <!-- Schraffur Metall (45 Grad, wie Teilschnitt Seitenkanalpumpe) -->
+  <pattern id="metall-schraffur" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+    <line x1="0" y1="0" x2="0" y2="12" stroke="#4a545c" stroke-width="1.5" stroke-opacity="0.38"/>
+  </pattern>
+
+  <!-- Kreuzschraffur Kunststoff (Stator, deutlich von Metall unterschieden) -->
+  <pattern id="kunststoff-schraffur" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+    <line x1="0" y1="0" x2="0" y2="10" stroke="#7a5a3a" stroke-width="1.4" stroke-opacity="0.42"/>
+    <line x1="0" y1="0" x2="10" y2="0" stroke="#7a5a3a" stroke-width="1.4" stroke-opacity="0.42"/>
+  </pattern>
+
+  <!-- Produktverlauf von Saugseite (hell, Vakuum) zur Druckseite (verdichtet, Ueberdruck) -->
+  <linearGradient id="produkt-verlauf" x1="396" y1="0" x2="804" y2="0" gradientUnits="userSpaceOnUse">
+    <stop offset="0%" stop-color="#c9dce6"/>
+    <stop offset="30%" stop-color="#c9dce6"/>
+    <stop offset="72%" stop-color="#69A9C9" stop-opacity="0.65"/>
+    <stop offset="100%" stop-color="#69A9C9" stop-opacity="0.82"/>
+  </linearGradient>
+
+  <!-- Druckstutzen-Fuellung -->
+  <linearGradient id="druck-verlauf" x1="804" y1="0" x2="968" y2="0" gradientUnits="userSpaceOnUse">
+    <stop offset="0%" stop-color="#69A9C9" stop-opacity="0.82"/>
+    <stop offset="100%" stop-color="#69A9C9" stop-opacity="0.72"/>
+  </linearGradient>
+
+  <!-- Metallischer Verlauf fuer Rotor-Kappen (Chromnickelstahl) -->
+  <linearGradient id="metall-rund" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" stop-color="#eef1f3"/>
+    <stop offset="28%" stop-color="#b9c0c6"/>
+    <stop offset="76%" stop-color="#8a96a0"/>
+    <stop offset="100%" stop-color="#4a545c"/>
+  </linearGradient>
+
+  <!-- Clip fuer den Stator-Innenraum (Produkt und Kammern) -->
+  <clipPath id="clip-stator-innen">
+    <path d="M 396.0,287.7 L 400.2,287.9 L 404.5,288.3 L 408.8,288.9 L 413.0,289.8 L 417.2,291.0 L 421.5,292.4 L 425.8,294.0 L 430.0,295.8 L 434.2,297.8 L 438.5,299.9 L 442.8,302.2 L 447.0,304.6 L 451.2,307.0 L 455.5,309.3 L 459.8,311.2 L 464.0,312.0 L 468.2,311.2 L 472.5,309.3 L 476.8,307.0 L 481.0,304.6 L 485.2,302.2 L 489.5,299.9 L 493.8,297.8 L 498.0,295.8 L 502.2,294.0 L 506.5,292.4 L 510.8,291.0 L 515.0,289.8 L 519.2,288.9 L 523.5,288.3 L 527.8,287.9 L 532.0,287.7 L 536.2,287.9 L 540.5,288.3 L 544.8,288.9 L 549.0,289.8 L 553.2,291.0 L 557.5,292.4 L 561.8,294.0 L 566.0,295.8 L 570.2,297.8 L 574.5,299.9 L 578.8,302.2 L 583.0,304.6 L 587.2,307.0 L 591.5,309.3 L 595.8,311.2 L 600.0,312.0 L 604.2,311.2 L 608.5,309.3 L 612.8,307.0 L 617.0,304.6 L 621.2,302.2 L 625.5,299.9 L 629.8,297.8 L 634.0,295.8 L 638.2,294.0 L 642.5,292.4 L 646.8,291.0 L 651.0,289.8 L 655.2,288.9 L 659.5,288.3 L 663.8,287.9 L 668.0,287.7 L 672.2,287.9 L 676.5,288.3 L 680.8,288.9 L 685.0,289.8 L 689.2,291.0 L 693.5,292.4 L 697.8,294.0 L 702.0,295.8 L 706.2,297.8 L 710.5,299.9 L 714.8,302.2 L 719.0,304.6 L 723.2,307.0 L 727.5,309.3 L 731.8,311.2 L 736.0,312.0 L 740.2,311.2 L 744.5,309.3 L 748.8,307.0 L 753.0,304.6 L 757.2,302.2 L 761.5,299.9 L 765.8,297.8 L 770.0,295.8 L 774.2,294.0 L 778.5,292.4 L 782.8,291.0 L 787.0,289.8 L 791.2,288.9 L 795.5,288.3 L 799.8,287.9 L 804.0,287.7 L 804.0,382.3 L 799.8,382.1 L 795.5,381.7 L 791.2,381.1 L 787.0,380.2 L 782.8,379.0 L 778.5,377.6 L 774.2,376.0 L 770.0,374.2 L 765.8,372.2 L 761.5,370.1 L 757.2,367.8 L 753.0,365.4 L 748.8,363.0 L 744.5,360.7 L 740.2,358.8 L 736.0,358.0 L 731.8,358.8 L 727.5,360.7 L 723.2,363.0 L 719.0,365.4 L 714.8,367.8 L 710.5,370.1 L 706.2,372.2 L 702.0,374.2 L 697.8,376.0 L 693.5,377.6 L 689.2,379.0 L 685.0,380.2 L 680.8,381.1 L 676.5,381.7 L 672.2,382.1 L 668.0,382.3 L 663.8,382.1 L 659.5,381.7 L 655.2,381.1 L 651.0,380.2 L 646.8,379.0 L 642.5,377.6 L 638.2,376.0 L 634.0,374.2 L 629.8,372.2 L 625.5,370.1 L 621.2,367.8 L 617.0,365.4 L 612.8,363.0 L 608.5,360.7 L 604.2,358.8 L 600.0,358.0 L 595.8,358.8 L 591.5,360.7 L 587.2,363.0 L 583.0,365.4 L 578.8,367.8 L 574.5,370.1 L 570.2,372.2 L 566.0,374.2 L 561.8,376.0 L 557.5,377.6 L 553.2,379.0 L 549.0,380.2 L 544.8,381.1 L 540.5,381.7 L 536.2,382.1 L 532.0,382.3 L 527.8,382.1 L 523.5,381.7 L 519.2,381.1 L 515.0,380.2 L 510.8,379.0 L 506.5,377.6 L 502.2,376.0 L 498.0,374.2 L 493.8,372.2 L 489.5,370.1 L 485.2,367.8 L 481.0,365.4 L 476.8,363.0 L 472.5,360.7 L 468.2,358.8 L 464.0,358.0 L 459.8,358.8 L 455.5,360.7 L 451.2,363.0 L 447.0,365.4 L 442.8,367.8 L 438.5,370.1 L 434.2,372.2 L 430.0,374.2 L 425.8,376.0 L 421.5,377.6 L 417.2,379.0 L 413.0,380.2 L 408.8,381.1 L 404.5,381.7 L 400.2,382.1 L 396.0,382.3 Z"/>
+  </clipPath>
+
+  <!-- Clip fuer den gewellten Rotor zwischen Stator-Eintritt und -Austritt -->
+  <clipPath id="clip-rotor-laenge">
+    <rect x="396" y="264" width="408" height="142"/>
+  </clipPath>
+</defs>
+
+<style>
+  /* Zyklus: 4 s pro Umdrehung.
+     Ausgangszustand (PDF und prefers-reduced-motion: reduce): symmetrische Kammern oben und unten, klar verstaendlich. */
+  .rotor-welle {
+    animation: rotor-lauf 4s linear infinite;
+  }
+  .rotor-kappe {
+    animation: kappe-lauf 4s linear infinite;
+  }
+  .gelenk-stange {
+    transform-origin: 268px 335px;
+    animation: gelenk-schwingen 4s linear infinite;
+  }
+  .kammer-inhalt {
+    animation: kammer-lauf 4s linear infinite;
+  }
+  .fluss-strich {
+    animation: fluss-lauf 2s linear infinite;
+  }
+
+  @keyframes rotor-lauf {
+    0%      { transform: translate(0.00px, -0.00px); }
+    6.25%   { transform: translate(8.50px, 5.36px); }
+    12.5%   { transform: translate(17.00px, 9.90px); }
+    18.75%  { transform: translate(25.50px, 12.93px); }
+    25%     { transform: translate(34.00px, 14.00px); }
+    31.25%  { transform: translate(42.50px, 12.93px); }
+    37.5%   { transform: translate(51.00px, 9.90px); }
+    43.75%  { transform: translate(59.50px, 5.36px); }
+    50%     { transform: translate(68.00px, 0.00px); }
+    56.25%  { transform: translate(76.50px, -5.36px); }
+    62.5%   { transform: translate(85.00px, -9.90px); }
+    68.75%  { transform: translate(93.50px, -12.93px); }
+    75%     { transform: translate(102.00px, -14.00px); }
+    81.25%  { transform: translate(110.50px, -12.93px); }
+    87.5%   { transform: translate(119.00px, -9.90px); }
+    93.75%  { transform: translate(127.50px, -5.36px); }
+    100%    { transform: translate(136.00px, -0.00px); }
+  }
+
+  @keyframes kappe-lauf {
+    0%      { transform: translateY(-0.00px); }
+    6.25%   { transform: translateY(10.72px); }
+    12.5%   { transform: translateY(19.80px); }
+    18.75%  { transform: translateY(25.87px); }
+    25%     { transform: translateY(28.00px); }
+    31.25%  { transform: translateY(25.87px); }
+    37.5%   { transform: translateY(19.80px); }
+    43.75%  { transform: translateY(10.72px); }
+    50%     { transform: translateY(0.00px); }
+    56.25%  { transform: translateY(-10.72px); }
+    62.5%   { transform: translateY(-19.80px); }
+    68.75%  { transform: translateY(-25.87px); }
+    75%     { transform: translateY(-28.00px); }
+    81.25%  { transform: translateY(-25.87px); }
+    87.5%   { transform: translateY(-19.80px); }
+    93.75%  { transform: translateY(-10.72px); }
+    100%    { transform: translateY(-0.00px); }
+  }
+
+  @keyframes gelenk-schwingen {
+    0%      { transform: rotate(-0.00deg); }
+    6.25%   { transform: rotate(5.59deg); }
+    12.5%   { transform: rotate(10.37deg); }
+    18.75%  { transform: rotate(13.60deg); }
+    25%     { transform: rotate(14.75deg); }
+    31.25%  { transform: rotate(13.60deg); }
+    37.5%   { transform: rotate(10.37deg); }
+    43.75%  { transform: rotate(5.59deg); }
+    50%     { transform: rotate(0.00deg); }
+    56.25%  { transform: rotate(-5.59deg); }
+    62.5%   { transform: rotate(-10.37deg); }
+    68.75%  { transform: rotate(-13.60deg); }
+    75%     { transform: rotate(-14.75deg); }
+    81.25%  { transform: rotate(-13.60deg); }
+    87.5%   { transform: rotate(-10.37deg); }
+    93.75%  { transform: rotate(-5.59deg); }
+    100%    { transform: rotate(-0.00deg); }
+  }
+
+  @keyframes kammer-lauf {
+    from { transform: translateX(0px); }
+    to   { transform: translateX(136px); }
+  }
+
+  @keyframes fluss-lauf {
+    from { stroke-dashoffset: 68; }
+    to   { stroke-dashoffset: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rotor-welle, .rotor-kappe, .gelenk-stange, .kammer-inhalt, .fluss-strich {
+      animation: none !important;
+    }
+  }
+</style>
+
+<!-- Hintergrund -->
+<rect x="0" y="0" width="1100" height="620" fill="#ffffff"/>
+
+<!-- Bildbezeichnung -->
+<text x="36" y="40" font-size="26" fill="#484846">Exzenterschneckenpumpe (Längsschnitt)</text>
+
+<!-- ===================================================================== -->
+<!-- ANTRIEB (LINKS, STIL WIE ZENTRIFUGALPUMPE)                            -->
+<!-- ===================================================================== -->
+<g>
+  <!-- Verbindungslaterne zwischen Antrieb und Sauggehaeuse -->
+  <rect x="176" y="269" width="66" height="16" fill="#b9c0c6" stroke="#4a545c" stroke-width="4"/>
+  <rect x="176" y="385" width="66" height="16" fill="#b9c0c6" stroke="#4a545c" stroke-width="4"/>
+
+  <!-- Antriebsgehaeuse aussen -->
+  <rect x="36" y="255" width="146" height="160" rx="10" fill="#b9c0c6" stroke="#4a545c" stroke-width="4"/>
+  <!-- Antriebsgehaeuse innen -->
+  <rect x="50" y="269" width="118" height="132" rx="3" fill="#eef1f3" stroke="#4a545c" stroke-width="3"/>
+  <!-- Statorpakete oben und unten im Motor -->
+  <rect x="70" y="273" width="74" height="20" rx="2" fill="#b9c0c6" stroke="#4a545c" stroke-width="3"/>
+  <rect x="70" y="377" width="74" height="20" rx="2" fill="#b9c0c6" stroke="#4a545c" stroke-width="3"/>
+
+  <!-- Antriebswelle (konzentrisch auf y = 335) -->
+  <rect x="58" y="324" width="210" height="22" fill="#8a96a0" stroke="#4a545c" stroke-width="4"/>
+  <!-- Rotorblock im Antrieb -->
+  <rect x="70" y="299" width="74" height="72" rx="4" fill="#8a96a0" stroke="#4a545c" stroke-width="4"/>
+  <!-- Wellenlager am Antriebsgehaeuse -->
+  <rect x="168" y="317" width="8" height="9" rx="1" fill="#22262a"/>
+  <rect x="168" y="344" width="8" height="9" rx="1" fill="#22262a"/>
+
+  <!-- Drehpfeil an der Antriebswelle (in der offenen Laterne) -->
+  <path d="M 204,322 C 206,302 220,300 223,320" fill="none" stroke="#134061" stroke-width="3" stroke-linecap="round" stroke-dasharray="4 4"/>
+  <path d="M 223,320 C 226,342 219,366 208,366 C 201,366 198,358 200,350" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round"/>
+  <path d="M 223,320 C 226,342 219,366 208,366 C 201,366 198,358 200,350" fill="none" stroke="#134061" stroke-width="3.5" stroke-linecap="round" marker-end="url(#pfeil-dreh)"/>
+</g>
+
+<!-- ===================================================================== -->
+<!-- SAUGGEHAEUSE UND SAUGSTUTZEN (TEILSCHNITT)                            -->
+<!-- ===================================================================== -->
+<g>
+  <!-- Produktfuellung im Saugstutzen und Sauggehaeuse (Saugseite, Vakuum) -->
+  <rect x="290" y="140" width="40" height="150" fill="#c9dce6"/>
+  <rect x="252" y="281" width="146" height="108" fill="#c9dce6"/>
+
+  <!-- Geschnittene Metallwaende Sauggehaeuse + Saugstutzen (links, oben, unten) -->
+  <!-- Linke Wand oben + Saugstutzen links -->
+  <path d="M 236,269 L 278,269 L 278,154 L 290,154 L 290,281 L 252,281 L 252,320 L 236,320 Z"
+        fill="#b9c0c6"/>
+  <path d="M 236,269 L 278,269 L 278,154 L 290,154 L 290,281 L 252,281 L 252,320 L 236,320 Z"
+        fill="url(#metall-schraffur)" stroke="#4a545c" stroke-width="4" stroke-linejoin="round"/>
+
+  <!-- Rechte Wand Saugstutzen + Sauggehaeuse oben bis Flansch -->
+  <path d="M 330,154 L 342,154 L 342,269 L 384,269 L 384,243 L 396,243 L 396,287 L 384,287 L 384,281 L 330,281 Z"
+        fill="#b9c0c6"/>
+  <path d="M 330,154 L 342,154 L 342,269 L 384,269 L 384,243 L 396,243 L 396,287 L 384,287 L 384,281 L 330,281 Z"
+        fill="url(#metall-schraffur)" stroke="#4a545c" stroke-width="4" stroke-linejoin="round"/>
+
+  <!-- Untere Wand Sauggehaeuse + Flansch unten -->
+  <path d="M 236,350 L 252,350 L 252,389 L 384,389 L 384,383 L 396,383 L 396,427 L 384,427 L 384,401 L 236,401 Z"
+        fill="#b9c0c6"/>
+  <path d="M 236,350 L 252,350 L 252,389 L 384,389 L 384,383 L 396,383 L 396,427 L 384,427 L 384,401 L 236,401 Z"
+        fill="url(#metall-schraffur)" stroke="#4a545c" stroke-width="4" stroke-linejoin="round"/>
+
+  <!-- Flansch oben am Saugstutzen -->
+  <rect x="266" y="142" width="88" height="12" rx="3" fill="#b9c0c6" stroke="#4a545c" stroke-width="4"/>
+
+  <!-- Wellendichtung (Saugseite, Niederdruck) -->
+  <rect x="238" y="317" width="12" height="10" rx="1" fill="#22262a"/>
+  <rect x="238" y="343" width="12" height="10" rx="1" fill="#22262a"/>
+</g>
+
+<!-- ===================================================================== -->
+<!-- DRUCKSTUTZEN (RECHTS, TEILSCHNITT)                                    -->
+<!-- ===================================================================== -->
+<g>
+  <!-- Produktfuellung im Druckstutzen (Druckseite, Ueberdruck) -->
+  <path d="M 802,287 L 816,287 L 894,309 L 970,309 L 970,361 L 894,361 L 816,383 L 802,383 Z"
+        fill="#ffffff"/>
+  <path d="M 802,287 L 816,287 L 894,309 L 970,309 L 970,361 L 894,361 L 816,383 L 802,383 Z"
+        fill="url(#druck-verlauf)"/>
+
+  <!-- Geschnittene Metallwand Druckstutzen oben -->
+  <path d="M 804,243 L 816,243 L 816,267 L 898,297 L 956,297 L 956,309 L 894,309 L 816,287 L 804,287 Z"
+        fill="#b9c0c6"/>
+  <path d="M 804,243 L 816,243 L 816,267 L 898,297 L 956,297 L 956,309 L 894,309 L 816,287 L 804,287 Z"
+        fill="url(#metall-schraffur)" stroke="#4a545c" stroke-width="4" stroke-linejoin="round"/>
+
+  <!-- Geschnittene Metallwand Druckstutzen unten -->
+  <path d="M 804,383 L 816,383 L 894,361 L 956,361 L 956,373 L 898,373 L 816,403 L 816,427 L 804,427 Z"
+        fill="#b9c0c6"/>
+  <path d="M 804,383 L 816,383 L 894,361 L 956,361 L 956,373 L 898,373 L 816,403 L 816,427 L 804,427 Z"
+        fill="url(#metall-schraffur)" stroke="#4a545c" stroke-width="4" stroke-linejoin="round"/>
+
+  <!-- Endflansch am Druckstutzen -->
+  <rect x="956" y="285" width="12" height="100" rx="3" fill="#b9c0c6" stroke="#4a545c" stroke-width="4"/>
+</g>
+
+<!-- ===================================================================== -->
+<!-- STATOR (KUNSTSTOFF IM METALLMANTEL) UND PRODUKTKAMMERN                -->
+<!-- ===================================================================== -->
+<g>
+  <!-- Produkt im Stator-Innenraum (Kammern zwischen Stator und Rotor) -->
+  <g clip-path="url(#clip-stator-innen)">
+    <rect x="394" y="276" width="412" height="118" fill="#ffffff"/>
+    <rect x="394" y="276" width="412" height="118" fill="url(#produkt-verlauf)"/>
+
+    <!-- Wandernde Kammer-Pfeile und Feststoffanteile (bewegen sich mit den Kammern nach rechts) -->
+    <g class="kammer-inhalt">
+      <line x1="278.0" y1="355.5" x2="309.0" y2="355.5" stroke="#134061" stroke-width="3.5" stroke-linecap="round" marker-end="url(#pfeil-kammer)"/>
+    <line x1="346.0" y1="314.5" x2="377.0" y2="314.5" stroke="#134061" stroke-width="3.5" stroke-linecap="round" marker-end="url(#pfeil-kammer)"/>
+    <rect x="263.2" y="355.0" width="7.5" height="5.0" rx="2" transform="rotate(-18 267.0 357.5)" fill="#ffffff" fill-opacity="0.76" stroke="#134061" stroke-width="1.4" stroke-opacity="0.45"/>
+    <rect x="316.8" y="357.2" width="6.5" height="4.5" rx="2" transform="rotate(22 320.0 359.5)" fill="#ffffff" fill-opacity="0.76" stroke="#134061" stroke-width="1.4" stroke-opacity="0.45"/>
+    <rect x="302.0" y="364.5" width="6.0" height="4.0" rx="2" transform="rotate(8 305.0 366.5)" fill="#ffffff" fill-opacity="0.76" stroke="#134061" stroke-width="1.4" stroke-opacity="0.45"/>
+    <rect x="331.2" y="310.0" width="7.5" height="5.0" rx="2" transform="rotate(16 335.0 312.5)" fill="#ffffff" fill-opacity="0.76" stroke="#134061" stroke-width="1.4" stroke-opacity="0.45"/>
+    <rect x="384.8" y="308.2" width="6.5" height="4.5" rx="2" transform="rotate(-20 388.0 310.5)" fill="#ffffff" fill-opacity="0.76" stroke="#134061" stroke-width="1.4" stroke-opacity="0.45"/>
+    <rect x="369.0" y="301.5" width="6.0" height="4.0" rx="2" transform="rotate(-10 372.0 303.5)" fill="#ffffff" fill-opacity="0.76" stroke="#134061" stroke-width="1.4" stroke-opacity="0.45"/>
+    <line x1="414.0" y1="355.5" x2="445.0" y2="355.5" stroke="#134061" stroke-width="3.5" stroke-linecap="round" marker-end="url(#pfeil-kammer)"/>
+    <line x1="482.0" y1="314.5" x2="513.0" y2="314.5" stroke="#134061" stroke-width="3.5" stroke-linecap="round" marker-end="url(#pfeil-kammer)"/>
+    <rect x="399.2" y="355.0" width="7.5" height="5.0" rx="2" transform="rotate(-18 403.0 357.5)" fill="#ffffff" fill-opacity="0.76" stroke="#134061" stroke-width="1.4" stroke-opacity="0.45"/>
+    <rect x="452.8" y="357.2" width="6.5" height="4.5" rx="2" transform="rotate(22 456.0 359.5)" fill="#ffffff" fill-opacity="0.76" stroke="#134061" stroke-width="1.4" stroke-opacity="0.45"/>
+    <rect x="438.0" y="364.5" width="6.0" height="4.0" rx="2" transform="rotate(8 441.0 366.5)" fill="#ffffff" fill-opacity="0.76" stroke="#134061" stroke-width="1.4" stroke-opacity="0.45"/>
+    <rect x="467.2" y="310.0" width="7.5" height="5.0" rx="2" transform="rotate(16 471.0 312.5)" fill="#ffffff" fill-opacity="0.76" stroke="#134061" stroke-width="1.4" stroke-opacity="0.45"/>
+    <rect x="520.8" y="308.2" width="6.5" height="4.5" rx="2" transform="rotate(-20 524.0 310.5)" fill="#ffffff" fill-opacity="0.76" stroke="#134061" stroke-width="1.4" stroke-opacity="0.45"/>
+    <rect x="505.0" y="301.5" width="6.0" height="4.0" rx="2" transform="rotate(-10 508.0 303.5)" fill="#ffffff" fill-opacity="0.76" stroke="#134061" stroke-width="1.4" stroke-opacity="0.45"/>
+    <line x1="550.0" y1="355.5" x2="581.0" y2="355.5" stroke="#134061" stroke-width="3.5" stroke-linecap="round" marker-end="url(#pfeil-kammer)"/>
+    <line x1="618.0" y1="314.5" x2="649.0" y2="314.5" stroke="#134061" stroke-width="3.5" stroke-linecap="round" marker-end="url(#pfeil-kammer)"/>
+    <rect x="535.2" y="355.0" width="7.5" height="5.0" rx="2" transform="rotate(-18 539.0 357.5)" fill="#ffffff" fill-opacity="0.76" stroke="#134061" stroke-width="1.4" stroke-opacity="0.45"/>
+    <rect x="588.8" y="357.2" width="6.5" height="4.5" rx="2" transform="rotate(22 592.0 359.5)" fill="#ffffff" fill-opacity="0.76" stroke="#134061" stroke-width="1.4" stroke-opacity="0.45"/>
+    <rect x="574.0" y="364.5" width="6.0" height="4.0" rx="2" transform="rotate(8 577.0 366.5)" fill="#ffffff" fill-opacity="0.76" stroke="#134061" stroke-width="1.4" stroke-opacity="0.45"/>
+    <rect x="603.2" y="310.0" width="7.5" height="5.0" rx="2" transform="rotate(16 607.0 312.5)" fill="#ffffff" fill-opacity="0.76" stroke="#134061" stroke-width="1.4" stroke-opacity="0.45"/>
+    <rect x="656.8" y="308.2" width="6.5" height="4.5" rx="2" transform="rotate(-20 660.0 310.5)" fill="#ffffff" fill-opacity="0.76" stroke="#134061" stroke-width="1.4" stroke-opacity="0.45"/>
+    <rect x="641.0" y="301.5" width="6.0" height="4.0" rx="2" transform="rotate(-10 644.0 303.5)" fill="#ffffff" fill-opacity="0.76" stroke="#134061" stroke-width="1.4" stroke-opacity="0.45"/>
+    <line x1="686.0" y1="355.5" x2="717.0" y2="355.5" stroke="#134061" stroke-width="3.5" stroke-linecap="round" marker-end="url(#pfeil-kammer)"/>
+    <line x1="754.0" y1="314.5" x2="785.0" y2="314.5" stroke="#134061" stroke-width="3.5" stroke-linecap="round" marker-end="url(#pfeil-kammer)"/>
+    <rect x="671.2" y="355.0" width="7.5" height="5.0" rx="2" transform="rotate(-18 675.0 357.5)" fill="#ffffff" fill-opacity="0.76" stroke="#134061" stroke-width="1.4" stroke-opacity="0.45"/>
+    <rect x="724.8" y="357.2" width="6.5" height="4.5" rx="2" transform="rotate(22 728.0 359.5)" fill="#ffffff" fill-opacity="0.76" stroke="#134061" stroke-width="1.4" stroke-opacity="0.45"/>
+    <rect x="710.0" y="364.5" width="6.0" height="4.0" rx="2" transform="rotate(8 713.0 366.5)" fill="#ffffff" fill-opacity="0.76" stroke="#134061" stroke-width="1.4" stroke-opacity="0.45"/>
+    <rect x="739.2" y="310.0" width="7.5" height="5.0" rx="2" transform="rotate(16 743.0 312.5)" fill="#ffffff" fill-opacity="0.76" stroke="#134061" stroke-width="1.4" stroke-opacity="0.45"/>
+    <rect x="792.8" y="308.2" width="6.5" height="4.5" rx="2" transform="rotate(-20 796.0 310.5)" fill="#ffffff" fill-opacity="0.76" stroke="#134061" stroke-width="1.4" stroke-opacity="0.45"/>
+    <rect x="777.0" y="301.5" width="6.0" height="4.0" rx="2" transform="rotate(-10 780.0 303.5)" fill="#ffffff" fill-opacity="0.76" stroke="#134061" stroke-width="1.4" stroke-opacity="0.45"/>
+    </g>
+  </g>
+
+  <!-- Metallmantel aussen um den Stator (oben und unten, geschnitten) -->
+  <rect x="396" y="253" width="408" height="14" fill="#b9c0c6"/>
+  <rect x="396" y="253" width="408" height="14" fill="url(#metall-schraffur)" stroke="#4a545c" stroke-width="4"/>
+  <rect x="396" y="403" width="408" height="14" fill="#b9c0c6"/>
+  <rect x="396" y="403" width="408" height="14" fill="url(#metall-schraffur)" stroke="#4a545c" stroke-width="4"/>
+
+  <!-- Stator (Kunststoff, warmes Elastomer mit Kreuzschraffur) -->
+  <path d="M 396.0,267.0 L 804.0,267.0 L 804.0,287.7 L 799.8,287.9 L 795.5,288.3 L 791.2,288.9 L 787.0,289.8 L 782.8,291.0 L 778.5,292.4 L 774.2,294.0 L 770.0,295.8 L 765.8,297.8 L 761.5,299.9 L 757.2,302.2 L 753.0,304.6 L 748.8,307.0 L 744.5,309.3 L 740.2,311.2 L 736.0,312.0 L 731.8,311.2 L 727.5,309.3 L 723.2,307.0 L 719.0,304.6 L 714.8,302.2 L 710.5,299.9 L 706.2,297.8 L 702.0,295.8 L 697.8,294.0 L 693.5,292.4 L 689.2,291.0 L 685.0,289.8 L 680.8,288.9 L 676.5,288.3 L 672.2,287.9 L 668.0,287.7 L 663.8,287.9 L 659.5,288.3 L 655.2,288.9 L 651.0,289.8 L 646.8,291.0 L 642.5,292.4 L 638.2,294.0 L 634.0,295.8 L 629.8,297.8 L 625.5,299.9 L 621.2,302.2 L 617.0,304.6 L 612.8,307.0 L 608.5,309.3 L 604.2,311.2 L 600.0,312.0 L 595.8,311.2 L 591.5,309.3 L 587.2,307.0 L 583.0,304.6 L 578.8,302.2 L 574.5,299.9 L 570.2,297.8 L 566.0,295.8 L 561.8,294.0 L 557.5,292.4 L 553.2,291.0 L 549.0,289.8 L 544.8,288.9 L 540.5,288.3 L 536.2,287.9 L 532.0,287.7 L 527.8,287.9 L 523.5,288.3 L 519.2,288.9 L 515.0,289.8 L 510.8,291.0 L 506.5,292.4 L 502.2,294.0 L 498.0,295.8 L 493.8,297.8 L 489.5,299.9 L 485.2,302.2 L 481.0,304.6 L 476.8,307.0 L 472.5,309.3 L 468.2,311.2 L 464.0,312.0 L 459.8,311.2 L 455.5,309.3 L 451.2,307.0 L 447.0,304.6 L 442.8,302.2 L 438.5,299.9 L 434.2,297.8 L 430.0,295.8 L 425.8,294.0 L 421.5,292.4 L 417.2,291.0 L 413.0,289.8 L 408.8,288.9 L 404.5,288.3 L 400.2,287.9 L 396.0,287.7 Z" fill="#8c7a6b"/>
+  <path d="M 396.0,267.0 L 804.0,267.0 L 804.0,287.7 L 799.8,287.9 L 795.5,288.3 L 791.2,288.9 L 787.0,289.8 L 782.8,291.0 L 778.5,292.4 L 774.2,294.0 L 770.0,295.8 L 765.8,297.8 L 761.5,299.9 L 757.2,302.2 L 753.0,304.6 L 748.8,307.0 L 744.5,309.3 L 740.2,311.2 L 736.0,312.0 L 731.8,311.2 L 727.5,309.3 L 723.2,307.0 L 719.0,304.6 L 714.8,302.2 L 710.5,299.9 L 706.2,297.8 L 702.0,295.8 L 697.8,294.0 L 693.5,292.4 L 689.2,291.0 L 685.0,289.8 L 680.8,288.9 L 676.5,288.3 L 672.2,287.9 L 668.0,287.7 L 663.8,287.9 L 659.5,288.3 L 655.2,288.9 L 651.0,289.8 L 646.8,291.0 L 642.5,292.4 L 638.2,294.0 L 634.0,295.8 L 629.8,297.8 L 625.5,299.9 L 621.2,302.2 L 617.0,304.6 L 612.8,307.0 L 608.5,309.3 L 604.2,311.2 L 600.0,312.0 L 595.8,311.2 L 591.5,309.3 L 587.2,307.0 L 583.0,304.6 L 578.8,302.2 L 574.5,299.9 L 570.2,297.8 L 566.0,295.8 L 561.8,294.0 L 557.5,292.4 L 553.2,291.0 L 549.0,289.8 L 544.8,288.9 L 540.5,288.3 L 536.2,287.9 L 532.0,287.7 L 527.8,287.9 L 523.5,288.3 L 519.2,288.9 L 515.0,289.8 L 510.8,291.0 L 506.5,292.4 L 502.2,294.0 L 498.0,295.8 L 493.8,297.8 L 489.5,299.9 L 485.2,302.2 L 481.0,304.6 L 476.8,307.0 L 472.5,309.3 L 468.2,311.2 L 464.0,312.0 L 459.8,311.2 L 455.5,309.3 L 451.2,307.0 L 447.0,304.6 L 442.8,302.2 L 438.5,299.9 L 434.2,297.8 L 430.0,295.8 L 425.8,294.0 L 421.5,292.4 L 417.2,291.0 L 413.0,289.8 L 408.8,288.9 L 404.5,288.3 L 400.2,287.9 L 396.0,287.7 Z" fill="url(#kunststoff-schraffur)" stroke="#4a545c" stroke-width="3.5" stroke-linejoin="round"/>
+
+  <path d="M 396.0,403.0 L 804.0,403.0 L 804.0,382.3 L 799.8,382.1 L 795.5,381.7 L 791.2,381.1 L 787.0,380.2 L 782.8,379.0 L 778.5,377.6 L 774.2,376.0 L 770.0,374.2 L 765.8,372.2 L 761.5,370.1 L 757.2,367.8 L 753.0,365.4 L 748.8,363.0 L 744.5,360.7 L 740.2,358.8 L 736.0,358.0 L 731.8,358.8 L 727.5,360.7 L 723.2,363.0 L 719.0,365.4 L 714.8,367.8 L 710.5,370.1 L 706.2,372.2 L 702.0,374.2 L 697.8,376.0 L 693.5,377.6 L 689.2,379.0 L 685.0,380.2 L 680.8,381.1 L 676.5,381.7 L 672.2,382.1 L 668.0,382.3 L 663.8,382.1 L 659.5,381.7 L 655.2,381.1 L 651.0,380.2 L 646.8,379.0 L 642.5,377.6 L 638.2,376.0 L 634.0,374.2 L 629.8,372.2 L 625.5,370.1 L 621.2,367.8 L 617.0,365.4 L 612.8,363.0 L 608.5,360.7 L 604.2,358.8 L 600.0,358.0 L 595.8,358.8 L 591.5,360.7 L 587.2,363.0 L 583.0,365.4 L 578.8,367.8 L 574.5,370.1 L 570.2,372.2 L 566.0,374.2 L 561.8,376.0 L 557.5,377.6 L 553.2,379.0 L 549.0,380.2 L 544.8,381.1 L 540.5,381.7 L 536.2,382.1 L 532.0,382.3 L 527.8,382.1 L 523.5,381.7 L 519.2,381.1 L 515.0,380.2 L 510.8,379.0 L 506.5,377.6 L 502.2,376.0 L 498.0,374.2 L 493.8,372.2 L 489.5,370.1 L 485.2,367.8 L 481.0,365.4 L 476.8,363.0 L 472.5,360.7 L 468.2,358.8 L 464.0,358.0 L 459.8,358.8 L 455.5,360.7 L 451.2,363.0 L 447.0,365.4 L 442.8,367.8 L 438.5,370.1 L 434.2,372.2 L 430.0,374.2 L 425.8,376.0 L 421.5,377.6 L 417.2,379.0 L 413.0,380.2 L 408.8,381.1 L 404.5,381.7 L 400.2,382.1 L 396.0,382.3 Z" fill="#8c7a6b"/>
+  <path d="M 396.0,403.0 L 804.0,403.0 L 804.0,382.3 L 799.8,382.1 L 795.5,381.7 L 791.2,381.1 L 787.0,380.2 L 782.8,379.0 L 778.5,377.6 L 774.2,376.0 L 770.0,374.2 L 765.8,372.2 L 761.5,370.1 L 757.2,367.8 L 753.0,365.4 L 748.8,363.0 L 744.5,360.7 L 740.2,358.8 L 736.0,358.0 L 731.8,358.8 L 727.5,360.7 L 723.2,363.0 L 719.0,365.4 L 714.8,367.8 L 710.5,370.1 L 706.2,372.2 L 702.0,374.2 L 697.8,376.0 L 693.5,377.6 L 689.2,379.0 L 685.0,380.2 L 680.8,381.1 L 676.5,381.7 L 672.2,382.1 L 668.0,382.3 L 663.8,382.1 L 659.5,381.7 L 655.2,381.1 L 651.0,380.2 L 646.8,379.0 L 642.5,377.6 L 638.2,376.0 L 634.0,374.2 L 629.8,372.2 L 625.5,370.1 L 621.2,367.8 L 617.0,365.4 L 612.8,363.0 L 608.5,360.7 L 604.2,358.8 L 600.0,358.0 L 595.8,358.8 L 591.5,360.7 L 587.2,363.0 L 583.0,365.4 L 578.8,367.8 L 574.5,370.1 L 570.2,372.2 L 566.0,374.2 L 561.8,376.0 L 557.5,377.6 L 553.2,379.0 L 549.0,380.2 L 544.8,381.1 L 540.5,381.7 L 536.2,382.1 L 532.0,382.3 L 527.8,382.1 L 523.5,381.7 L 519.2,381.1 L 515.0,380.2 L 510.8,379.0 L 506.5,377.6 L 502.2,376.0 L 498.0,374.2 L 493.8,372.2 L 489.5,370.1 L 485.2,367.8 L 481.0,365.4 L 476.8,363.0 L 472.5,360.7 L 468.2,358.8 L 464.0,358.0 L 459.8,358.8 L 455.5,360.7 L 451.2,363.0 L 447.0,365.4 L 442.8,367.8 L 438.5,370.1 L 434.2,372.2 L 430.0,374.2 L 425.8,376.0 L 421.5,377.6 L 417.2,379.0 L 413.0,380.2 L 408.8,381.1 L 404.5,381.7 L 400.2,382.1 L 396.0,382.3 Z" fill="url(#kunststoff-schraffur)" stroke="#4a545c" stroke-width="3.5" stroke-linejoin="round"/>
+</g>
+
+<!-- ===================================================================== -->
+<!-- ROTOR (CHROMNICKELSTAHL) UND GELENKWELLE                              -->
+<!-- ===================================================================== -->
+<!-- Rotor-Endkappen links und rechts (nahtlos ohne vertikale Trennlinie) -->
+<g class="rotor-kappe">
+  <!-- Linke Kappe (Uebergang zur Gelenkwelle) -->
+  <path d="M 398,316 A 19,19 0 0,0 398,354 L 402,354 L 402,316 Z" fill="url(#metall-rund)"/>
+  <path d="M 398,316 A 19,19 0 0,0 398,354" fill="none" stroke="#4a545c" stroke-width="4" stroke-linecap="round"/>
+  <!-- Rechte Kappe (freies Ende im Druckstutzen) -->
+  <path d="M 802,316 A 19,19 0 0,1 802,354 L 798,354 L 798,316 Z" fill="url(#metall-rund)"/>
+  <path d="M 802,316 A 19,19 0 0,1 802,354" fill="none" stroke="#4a545c" stroke-width="4" stroke-linecap="round"/>
+</g>
+
+<!-- Gewellter Rotor (Chromnickelstahl, Art Rundgewindeschraube, dreht exzentrisch) -->
+<g clip-path="url(#clip-rotor-laenge)">
+  <g class="rotor-welle">
+    <!-- Grundkoerper Chromnickelstahl -->
+    <path d="M 252.0,321.1 L 256.4,318.3 L 260.8,315.5 L 265.1,312.7 L 269.5,310.1 L 273.9,307.6 L 278.2,305.5 L 282.6,303.9 L 287.0,302.7 L 291.4,302.1 L 295.8,302.0 L 300.1,302.6 L 304.5,303.6 L 308.9,305.2 L 313.2,307.2 L 317.6,309.5 L 322.0,312.2 L 326.4,314.9 L 330.8,317.8 L 335.1,320.5 L 339.5,323.1 L 343.9,325.4 L 348.2,327.3 L 352.6,328.7 L 357.0,329.6 L 361.4,330.0 L 365.8,329.8 L 370.1,329.0 L 374.5,327.7 L 378.9,326.0 L 383.2,323.8 L 387.6,321.3 L 392.0,318.6 L 396.4,315.8 L 400.8,313.0 L 405.1,310.3 L 409.5,307.8 L 413.9,305.7 L 418.2,304.0 L 422.6,302.8 L 427.0,302.1 L 431.4,302.0 L 435.8,302.5 L 440.1,303.5 L 444.5,305.0 L 448.9,307.0 L 453.2,309.3 L 457.6,311.9 L 462.0,314.7 L 466.4,317.5 L 470.8,320.3 L 475.1,322.9 L 479.5,325.2 L 483.9,327.1 L 488.2,328.6 L 492.6,329.6 L 497.0,330.0 L 501.4,329.8 L 505.8,329.1 L 510.1,327.9 L 514.5,326.1 L 518.9,324.0 L 523.2,321.5 L 527.6,318.8 L 532.0,316.0 L 536.4,313.2 L 540.8,310.5 L 545.1,308.0 L 549.5,305.9 L 553.9,304.1 L 558.2,302.9 L 562.6,302.2 L 567.0,302.0 L 571.4,302.4 L 575.8,303.4 L 580.1,304.9 L 584.5,306.8 L 588.9,309.1 L 593.2,311.7 L 597.6,314.5 L 602.0,317.3 L 606.4,320.1 L 610.8,322.7 L 615.1,325.0 L 619.5,327.0 L 623.9,328.5 L 628.2,329.5 L 632.6,330.0 L 637.0,329.9 L 641.4,329.2 L 645.8,328.0 L 650.1,326.3 L 654.5,324.2 L 658.9,321.7 L 663.2,319.0 L 667.6,316.2 L 672.0,313.4 L 676.4,310.7 L 680.8,308.2 L 685.1,306.0 L 689.5,304.3 L 693.9,303.0 L 698.2,302.2 L 702.6,302.0 L 707.0,302.4 L 711.4,303.3 L 715.8,304.7 L 720.1,306.6 L 724.5,308.9 L 728.9,311.5 L 733.2,314.2 L 737.6,317.1 L 742.0,319.8 L 746.4,322.5 L 750.8,324.8 L 755.1,326.8 L 759.5,328.4 L 763.9,329.4 L 768.2,330.0 L 772.6,329.9 L 777.0,329.3 L 781.4,328.1 L 785.8,326.5 L 790.1,324.4 L 794.5,321.9 L 798.9,319.3 L 803.2,316.5 L 807.6,313.7 L 812.0,310.9 L 812.0,348.9 L 807.6,351.7 L 803.2,354.5 L 798.9,357.3 L 794.5,359.9 L 790.1,362.4 L 785.8,364.5 L 781.4,366.1 L 777.0,367.3 L 772.6,367.9 L 768.2,368.0 L 763.9,367.4 L 759.5,366.4 L 755.1,364.8 L 750.8,362.8 L 746.4,360.5 L 742.0,357.8 L 737.6,355.1 L 733.2,352.2 L 728.9,349.5 L 724.5,346.9 L 720.1,344.6 L 715.8,342.7 L 711.4,341.3 L 707.0,340.4 L 702.6,340.0 L 698.2,340.2 L 693.9,341.0 L 689.5,342.3 L 685.1,344.0 L 680.8,346.2 L 676.4,348.7 L 672.0,351.4 L 667.6,354.2 L 663.2,357.0 L 658.9,359.7 L 654.5,362.2 L 650.1,364.3 L 645.8,366.0 L 641.4,367.2 L 637.0,367.9 L 632.6,368.0 L 628.2,367.5 L 623.9,366.5 L 619.5,365.0 L 615.1,363.0 L 610.8,360.7 L 606.4,358.1 L 602.0,355.3 L 597.6,352.5 L 593.2,349.7 L 588.9,347.1 L 584.5,344.8 L 580.1,342.9 L 575.8,341.4 L 571.4,340.4 L 567.0,340.0 L 562.6,340.2 L 558.2,340.9 L 553.9,342.1 L 549.5,343.9 L 545.1,346.0 L 540.8,348.5 L 536.4,351.2 L 532.0,354.0 L 527.6,356.8 L 523.2,359.5 L 518.9,362.0 L 514.5,364.1 L 510.1,365.9 L 505.8,367.1 L 501.4,367.8 L 497.0,368.0 L 492.6,367.6 L 488.2,366.6 L 483.9,365.1 L 479.5,363.2 L 475.1,360.9 L 470.8,358.3 L 466.4,355.5 L 462.0,352.7 L 457.6,349.9 L 453.2,347.3 L 448.9,345.0 L 444.5,343.0 L 440.1,341.5 L 435.8,340.5 L 431.4,340.0 L 427.0,340.1 L 422.6,340.8 L 418.2,342.0 L 413.9,343.7 L 409.5,345.8 L 405.1,348.3 L 400.8,351.0 L 396.4,353.8 L 392.0,356.6 L 387.6,359.3 L 383.2,361.8 L 378.9,364.0 L 374.5,365.7 L 370.1,367.0 L 365.8,367.8 L 361.4,368.0 L 357.0,367.6 L 352.6,366.7 L 348.2,365.3 L 343.9,363.4 L 339.5,361.1 L 335.1,358.5 L 330.8,355.8 L 326.4,352.9 L 322.0,350.2 L 317.6,347.5 L 313.2,345.2 L 308.9,343.2 L 304.5,341.6 L 300.1,340.6 L 295.8,340.0 L 291.4,340.1 L 287.0,340.7 L 282.6,341.9 L 278.2,343.5 L 273.9,345.6 L 269.5,348.1 L 265.1,350.7 L 260.8,353.5 L 256.4,356.3 L 252.0,359.1 Z" fill="#b9c0c6"/>
+    <!-- Plastische Rundungs-Schattierung unten -->
+    <path d="M 252.0,343.6 L 256.4,340.8 L 260.8,338.0 L 265.1,335.2 L 269.5,332.6 L 273.9,330.1 L 278.2,328.0 L 282.6,326.4 L 287.0,325.2 L 291.4,324.6 L 295.8,324.5 L 300.1,325.1 L 304.5,326.1 L 308.9,327.7 L 313.2,329.7 L 317.6,332.0 L 322.0,334.7 L 326.4,337.4 L 330.8,340.3 L 335.1,343.0 L 339.5,345.6 L 343.9,347.9 L 348.2,349.8 L 352.6,351.2 L 357.0,352.1 L 361.4,352.5 L 365.8,352.3 L 370.1,351.5 L 374.5,350.2 L 378.9,348.5 L 383.2,346.3 L 387.6,343.8 L 392.0,341.1 L 396.4,338.3 L 400.8,335.5 L 405.1,332.8 L 409.5,330.3 L 413.9,328.2 L 418.2,326.5 L 422.6,325.3 L 427.0,324.6 L 431.4,324.5 L 435.8,325.0 L 440.1,326.0 L 444.5,327.5 L 448.9,329.5 L 453.2,331.8 L 457.6,334.4 L 462.0,337.2 L 466.4,340.0 L 470.8,342.8 L 475.1,345.4 L 479.5,347.7 L 483.9,349.6 L 488.2,351.1 L 492.6,352.1 L 497.0,352.5 L 501.4,352.3 L 505.8,351.6 L 510.1,350.4 L 514.5,348.6 L 518.9,346.5 L 523.2,344.0 L 527.6,341.3 L 532.0,338.5 L 536.4,335.7 L 540.8,333.0 L 545.1,330.5 L 549.5,328.4 L 553.9,326.6 L 558.2,325.4 L 562.6,324.7 L 567.0,324.5 L 571.4,324.9 L 575.8,325.9 L 580.1,327.4 L 584.5,329.3 L 588.9,331.6 L 593.2,334.2 L 597.6,337.0 L 602.0,339.8 L 606.4,342.6 L 610.8,345.2 L 615.1,347.5 L 619.5,349.5 L 623.9,351.0 L 628.2,352.0 L 632.6,352.5 L 637.0,352.4 L 641.4,351.7 L 645.8,350.5 L 650.1,348.8 L 654.5,346.7 L 658.9,344.2 L 663.2,341.5 L 667.6,338.7 L 672.0,335.9 L 676.4,333.2 L 680.8,330.7 L 685.1,328.5 L 689.5,326.8 L 693.9,325.5 L 698.2,324.7 L 702.6,324.5 L 707.0,324.9 L 711.4,325.8 L 715.8,327.2 L 720.1,329.1 L 724.5,331.4 L 728.9,334.0 L 733.2,336.7 L 737.6,339.6 L 742.0,342.3 L 746.4,345.0 L 750.8,347.3 L 755.1,349.3 L 759.5,350.9 L 763.9,351.9 L 768.2,352.5 L 772.6,352.4 L 777.0,351.8 L 781.4,350.6 L 785.8,349.0 L 790.1,346.9 L 794.5,344.4 L 798.9,341.8 L 803.2,339.0 L 807.6,336.2 L 812.0,333.4 L 812.0,348.9 L 807.6,351.7 L 803.2,354.5 L 798.9,357.3 L 794.5,359.9 L 790.1,362.4 L 785.8,364.5 L 781.4,366.1 L 777.0,367.3 L 772.6,367.9 L 768.2,368.0 L 763.9,367.4 L 759.5,366.4 L 755.1,364.8 L 750.8,362.8 L 746.4,360.5 L 742.0,357.8 L 737.6,355.1 L 733.2,352.2 L 728.9,349.5 L 724.5,346.9 L 720.1,344.6 L 715.8,342.7 L 711.4,341.3 L 707.0,340.4 L 702.6,340.0 L 698.2,340.2 L 693.9,341.0 L 689.5,342.3 L 685.1,344.0 L 680.8,346.2 L 676.4,348.7 L 672.0,351.4 L 667.6,354.2 L 663.2,357.0 L 658.9,359.7 L 654.5,362.2 L 650.1,364.3 L 645.8,366.0 L 641.4,367.2 L 637.0,367.9 L 632.6,368.0 L 628.2,367.5 L 623.9,366.5 L 619.5,365.0 L 615.1,363.0 L 610.8,360.7 L 606.4,358.1 L 602.0,355.3 L 597.6,352.5 L 593.2,349.7 L 588.9,347.1 L 584.5,344.8 L 580.1,342.9 L 575.8,341.4 L 571.4,340.4 L 567.0,340.0 L 562.6,340.2 L 558.2,340.9 L 553.9,342.1 L 549.5,343.9 L 545.1,346.0 L 540.8,348.5 L 536.4,351.2 L 532.0,354.0 L 527.6,356.8 L 523.2,359.5 L 518.9,362.0 L 514.5,364.1 L 510.1,365.9 L 505.8,367.1 L 501.4,367.8 L 497.0,368.0 L 492.6,367.6 L 488.2,366.6 L 483.9,365.1 L 479.5,363.2 L 475.1,360.9 L 470.8,358.3 L 466.4,355.5 L 462.0,352.7 L 457.6,349.9 L 453.2,347.3 L 448.9,345.0 L 444.5,343.0 L 440.1,341.5 L 435.8,340.5 L 431.4,340.0 L 427.0,340.1 L 422.6,340.8 L 418.2,342.0 L 413.9,343.7 L 409.5,345.8 L 405.1,348.3 L 400.8,351.0 L 396.4,353.8 L 392.0,356.6 L 387.6,359.3 L 383.2,361.8 L 378.9,364.0 L 374.5,365.7 L 370.1,367.0 L 365.8,367.8 L 361.4,368.0 L 357.0,367.6 L 352.6,366.7 L 348.2,365.3 L 343.9,363.4 L 339.5,361.1 L 335.1,358.5 L 330.8,355.8 L 326.4,352.9 L 322.0,350.2 L 317.6,347.5 L 313.2,345.2 L 308.9,343.2 L 304.5,341.6 L 300.1,340.6 L 295.8,340.0 L 291.4,340.1 L 287.0,340.7 L 282.6,341.9 L 278.2,343.5 L 273.9,345.6 L 269.5,348.1 L 265.1,350.7 L 260.8,353.5 L 256.4,356.3 L 252.0,359.1 Z" fill="#8a96a0"/>
+    <path d="M 252.0,351.6 L 256.4,348.8 L 260.8,346.0 L 265.1,343.2 L 269.5,340.6 L 273.9,338.1 L 278.2,336.0 L 282.6,334.4 L 287.0,333.2 L 291.4,332.6 L 295.8,332.5 L 300.1,333.1 L 304.5,334.1 L 308.9,335.7 L 313.2,337.7 L 317.6,340.0 L 322.0,342.7 L 326.4,345.4 L 330.8,348.3 L 335.1,351.0 L 339.5,353.6 L 343.9,355.9 L 348.2,357.8 L 352.6,359.2 L 357.0,360.1 L 361.4,360.5 L 365.8,360.3 L 370.1,359.5 L 374.5,358.2 L 378.9,356.5 L 383.2,354.3 L 387.6,351.8 L 392.0,349.1 L 396.4,346.3 L 400.8,343.5 L 405.1,340.8 L 409.5,338.3 L 413.9,336.2 L 418.2,334.5 L 422.6,333.3 L 427.0,332.6 L 431.4,332.5 L 435.8,333.0 L 440.1,334.0 L 444.5,335.5 L 448.9,337.5 L 453.2,339.8 L 457.6,342.4 L 462.0,345.2 L 466.4,348.0 L 470.8,350.8 L 475.1,353.4 L 479.5,355.7 L 483.9,357.6 L 488.2,359.1 L 492.6,360.1 L 497.0,360.5 L 501.4,360.3 L 505.8,359.6 L 510.1,358.4 L 514.5,356.6 L 518.9,354.5 L 523.2,352.0 L 527.6,349.3 L 532.0,346.5 L 536.4,343.7 L 540.8,341.0 L 545.1,338.5 L 549.5,336.4 L 553.9,334.6 L 558.2,333.4 L 562.6,332.7 L 567.0,332.5 L 571.4,332.9 L 575.8,333.9 L 580.1,335.4 L 584.5,337.3 L 588.9,339.6 L 593.2,342.2 L 597.6,345.0 L 602.0,347.8 L 606.4,350.6 L 610.8,353.2 L 615.1,355.5 L 619.5,357.5 L 623.9,359.0 L 628.2,360.0 L 632.6,360.5 L 637.0,360.4 L 641.4,359.7 L 645.8,358.5 L 650.1,356.8 L 654.5,354.7 L 658.9,352.2 L 663.2,349.5 L 667.6,346.7 L 672.0,343.9 L 676.4,341.2 L 680.8,338.7 L 685.1,336.5 L 689.5,334.8 L 693.9,333.5 L 698.2,332.7 L 702.6,332.5 L 707.0,332.9 L 711.4,333.8 L 715.8,335.2 L 720.1,337.1 L 724.5,339.4 L 728.9,342.0 L 733.2,344.7 L 737.6,347.6 L 742.0,350.3 L 746.4,353.0 L 750.8,355.3 L 755.1,357.3 L 759.5,358.9 L 763.9,359.9 L 768.2,360.5 L 772.6,360.4 L 777.0,359.8 L 781.4,358.6 L 785.8,357.0 L 790.1,354.9 L 794.5,352.4 L 798.9,349.8 L 803.2,347.0 L 807.6,344.2 L 812.0,341.4 L 812.0,348.9 L 807.6,351.7 L 803.2,354.5 L 798.9,357.3 L 794.5,359.9 L 790.1,362.4 L 785.8,364.5 L 781.4,366.1 L 777.0,367.3 L 772.6,367.9 L 768.2,368.0 L 763.9,367.4 L 759.5,366.4 L 755.1,364.8 L 750.8,362.8 L 746.4,360.5 L 742.0,357.8 L 737.6,355.1 L 733.2,352.2 L 728.9,349.5 L 724.5,346.9 L 720.1,344.6 L 715.8,342.7 L 711.4,341.3 L 707.0,340.4 L 702.6,340.0 L 698.2,340.2 L 693.9,341.0 L 689.5,342.3 L 685.1,344.0 L 680.8,346.2 L 676.4,348.7 L 672.0,351.4 L 667.6,354.2 L 663.2,357.0 L 658.9,359.7 L 654.5,362.2 L 650.1,364.3 L 645.8,366.0 L 641.4,367.2 L 637.0,367.9 L 632.6,368.0 L 628.2,367.5 L 623.9,366.5 L 619.5,365.0 L 615.1,363.0 L 610.8,360.7 L 606.4,358.1 L 602.0,355.3 L 597.6,352.5 L 593.2,349.7 L 588.9,347.1 L 584.5,344.8 L 580.1,342.9 L 575.8,341.4 L 571.4,340.4 L 567.0,340.0 L 562.6,340.2 L 558.2,340.9 L 553.9,342.1 L 549.5,343.9 L 545.1,346.0 L 540.8,348.5 L 536.4,351.2 L 532.0,354.0 L 527.6,356.8 L 523.2,359.5 L 518.9,362.0 L 514.5,364.1 L 510.1,365.9 L 505.8,367.1 L 501.4,367.8 L 497.0,368.0 L 492.6,367.6 L 488.2,366.6 L 483.9,365.1 L 479.5,363.2 L 475.1,360.9 L 470.8,358.3 L 466.4,355.5 L 462.0,352.7 L 457.6,349.9 L 453.2,347.3 L 448.9,345.0 L 444.5,343.0 L 440.1,341.5 L 435.8,340.5 L 431.4,340.0 L 427.0,340.1 L 422.6,340.8 L 418.2,342.0 L 413.9,343.7 L 409.5,345.8 L 405.1,348.3 L 400.8,351.0 L 396.4,353.8 L 392.0,356.6 L 387.6,359.3 L 383.2,361.8 L 378.9,364.0 L 374.5,365.7 L 370.1,367.0 L 365.8,367.8 L 361.4,368.0 L 357.0,367.6 L 352.6,366.7 L 348.2,365.3 L 343.9,363.4 L 339.5,361.1 L 335.1,358.5 L 330.8,355.8 L 326.4,352.9 L 322.0,350.2 L 317.6,347.5 L 313.2,345.2 L 308.9,343.2 L 304.5,341.6 L 300.1,340.6 L 295.8,340.0 L 291.4,340.1 L 287.0,340.7 L 282.6,341.9 L 278.2,343.5 L 273.9,345.6 L 269.5,348.1 L 265.1,350.7 L 260.8,353.5 L 256.4,356.3 L 252.0,359.1 Z" fill="#4a545c" fill-opacity="0.38"/>
+    <!-- Glanzlicht oben (polierter Chromnickelstahl) -->
+    <path d="M 252.0,326.6 L 256.4,323.8 L 260.8,321.0 L 265.1,318.2 L 269.5,315.6 L 273.9,313.1 L 278.2,311.0 L 282.6,309.4 L 287.0,308.2 L 291.4,307.6 L 295.8,307.5 L 300.1,308.1 L 304.5,309.1 L 308.9,310.7 L 313.2,312.7 L 317.6,315.0 L 322.0,317.7 L 326.4,320.4 L 330.8,323.3 L 335.1,326.0 L 339.5,328.6 L 343.9,330.9 L 348.2,332.8 L 352.6,334.2 L 357.0,335.1 L 361.4,335.5 L 365.8,335.3 L 370.1,334.5 L 374.5,333.2 L 378.9,331.5 L 383.2,329.3 L 387.6,326.8 L 392.0,324.1 L 396.4,321.3 L 400.8,318.5 L 405.1,315.8 L 409.5,313.3 L 413.9,311.2 L 418.2,309.5 L 422.6,308.3 L 427.0,307.6 L 431.4,307.5 L 435.8,308.0 L 440.1,309.0 L 444.5,310.5 L 448.9,312.5 L 453.2,314.8 L 457.6,317.4 L 462.0,320.2 L 466.4,323.0 L 470.8,325.8 L 475.1,328.4 L 479.5,330.7 L 483.9,332.6 L 488.2,334.1 L 492.6,335.1 L 497.0,335.5 L 501.4,335.3 L 505.8,334.6 L 510.1,333.4 L 514.5,331.6 L 518.9,329.5 L 523.2,327.0 L 527.6,324.3 L 532.0,321.5 L 536.4,318.7 L 540.8,316.0 L 545.1,313.5 L 549.5,311.4 L 553.9,309.6 L 558.2,308.4 L 562.6,307.7 L 567.0,307.5 L 571.4,307.9 L 575.8,308.9 L 580.1,310.4 L 584.5,312.3 L 588.9,314.6 L 593.2,317.2 L 597.6,320.0 L 602.0,322.8 L 606.4,325.6 L 610.8,328.2 L 615.1,330.5 L 619.5,332.5 L 623.9,334.0 L 628.2,335.0 L 632.6,335.5 L 637.0,335.4 L 641.4,334.7 L 645.8,333.5 L 650.1,331.8 L 654.5,329.7 L 658.9,327.2 L 663.2,324.5 L 667.6,321.7 L 672.0,318.9 L 676.4,316.2 L 680.8,313.7 L 685.1,311.5 L 689.5,309.8 L 693.9,308.5 L 698.2,307.7 L 702.6,307.5 L 707.0,307.9 L 711.4,308.8 L 715.8,310.2 L 720.1,312.1 L 724.5,314.4 L 728.9,317.0 L 733.2,319.7 L 737.6,322.6 L 742.0,325.3 L 746.4,328.0 L 750.8,330.3 L 755.1,332.3 L 759.5,333.9 L 763.9,334.9 L 768.2,335.5 L 772.6,335.4 L 777.0,334.8 L 781.4,333.6 L 785.8,332.0 L 790.1,329.9 L 794.5,327.4 L 798.9,324.8 L 803.2,322.0 L 807.6,319.2 L 812.0,316.4 L 812.0,325.4 L 807.6,328.2 L 803.2,331.0 L 798.9,333.8 L 794.5,336.4 L 790.1,338.9 L 785.8,341.0 L 781.4,342.6 L 777.0,343.8 L 772.6,344.4 L 768.2,344.5 L 763.9,343.9 L 759.5,342.9 L 755.1,341.3 L 750.8,339.3 L 746.4,337.0 L 742.0,334.3 L 737.6,331.6 L 733.2,328.7 L 728.9,326.0 L 724.5,323.4 L 720.1,321.1 L 715.8,319.2 L 711.4,317.8 L 707.0,316.9 L 702.6,316.5 L 698.2,316.7 L 693.9,317.5 L 689.5,318.8 L 685.1,320.5 L 680.8,322.7 L 676.4,325.2 L 672.0,327.9 L 667.6,330.7 L 663.2,333.5 L 658.9,336.2 L 654.5,338.7 L 650.1,340.8 L 645.8,342.5 L 641.4,343.7 L 637.0,344.4 L 632.6,344.5 L 628.2,344.0 L 623.9,343.0 L 619.5,341.5 L 615.1,339.5 L 610.8,337.2 L 606.4,334.6 L 602.0,331.8 L 597.6,329.0 L 593.2,326.2 L 588.9,323.6 L 584.5,321.3 L 580.1,319.4 L 575.8,317.9 L 571.4,316.9 L 567.0,316.5 L 562.6,316.7 L 558.2,317.4 L 553.9,318.6 L 549.5,320.4 L 545.1,322.5 L 540.8,325.0 L 536.4,327.7 L 532.0,330.5 L 527.6,333.3 L 523.2,336.0 L 518.9,338.5 L 514.5,340.6 L 510.1,342.4 L 505.8,343.6 L 501.4,344.3 L 497.0,344.5 L 492.6,344.1 L 488.2,343.1 L 483.9,341.6 L 479.5,339.7 L 475.1,337.4 L 470.8,334.8 L 466.4,332.0 L 462.0,329.2 L 457.6,326.4 L 453.2,323.8 L 448.9,321.5 L 444.5,319.5 L 440.1,318.0 L 435.8,317.0 L 431.4,316.5 L 427.0,316.6 L 422.6,317.3 L 418.2,318.5 L 413.9,320.2 L 409.5,322.3 L 405.1,324.8 L 400.8,327.5 L 396.4,330.3 L 392.0,333.1 L 387.6,335.8 L 383.2,338.3 L 378.9,340.5 L 374.5,342.2 L 370.1,343.5 L 365.8,344.3 L 361.4,344.5 L 357.0,344.1 L 352.6,343.2 L 348.2,341.8 L 343.9,339.9 L 339.5,337.6 L 335.1,335.0 L 330.8,332.3 L 326.4,329.4 L 322.0,326.7 L 317.6,324.0 L 313.2,321.7 L 308.9,319.7 L 304.5,318.1 L 300.1,317.1 L 295.8,316.5 L 291.4,316.6 L 287.0,317.2 L 282.6,318.4 L 278.2,320.0 L 273.9,322.1 L 269.5,324.6 L 265.1,327.2 L 260.8,330.0 L 256.4,332.8 L 252.0,335.6 Z" fill="#eef1f3" fill-opacity="0.90"/>
+    <path d="M 252.0,330.9 L 256.4,328.1 L 260.8,325.3 L 265.1,322.5 L 269.5,319.9 L 273.9,317.4 L 278.2,315.3 L 282.6,313.7 L 287.0,312.5 L 291.4,311.9 L 295.8,311.8 L 300.1,312.4 L 304.5,313.4 L 308.9,315.0 L 313.2,317.0 L 317.6,319.3 L 322.0,322.0 L 326.4,324.7 L 330.8,327.6 L 335.1,330.3 L 339.5,332.9 L 343.9,335.2 L 348.2,337.1 L 352.6,338.5 L 357.0,339.4 L 361.4,339.8 L 365.8,339.6 L 370.1,338.8 L 374.5,337.5 L 378.9,335.8 L 383.2,333.6 L 387.6,331.1 L 392.0,328.4 L 396.4,325.6 L 400.8,322.8 L 405.1,320.1 L 409.5,317.6 L 413.9,315.5 L 418.2,313.8 L 422.6,312.6 L 427.0,311.9 L 431.4,311.8 L 435.8,312.3 L 440.1,313.3 L 444.5,314.8 L 448.9,316.8 L 453.2,319.1 L 457.6,321.7 L 462.0,324.5 L 466.4,327.3 L 470.8,330.1 L 475.1,332.7 L 479.5,335.0 L 483.9,336.9 L 488.2,338.4 L 492.6,339.4 L 497.0,339.8 L 501.4,339.6 L 505.8,338.9 L 510.1,337.7 L 514.5,335.9 L 518.9,333.8 L 523.2,331.3 L 527.6,328.6 L 532.0,325.8 L 536.4,323.0 L 540.8,320.3 L 545.1,317.8 L 549.5,315.7 L 553.9,313.9 L 558.2,312.7 L 562.6,312.0 L 567.0,311.8 L 571.4,312.2 L 575.8,313.2 L 580.1,314.7 L 584.5,316.6 L 588.9,318.9 L 593.2,321.5 L 597.6,324.3 L 602.0,327.1 L 606.4,329.9 L 610.8,332.5 L 615.1,334.8 L 619.5,336.8 L 623.9,338.3 L 628.2,339.3 L 632.6,339.8 L 637.0,339.7 L 641.4,339.0 L 645.8,337.8 L 650.1,336.1 L 654.5,334.0 L 658.9,331.5 L 663.2,328.8 L 667.6,326.0 L 672.0,323.2 L 676.4,320.5 L 680.8,318.0 L 685.1,315.8 L 689.5,314.1 L 693.9,312.8 L 698.2,312.0 L 702.6,311.8 L 707.0,312.2 L 711.4,313.1 L 715.8,314.5 L 720.1,316.4 L 724.5,318.7 L 728.9,321.3 L 733.2,324.0 L 737.6,326.9 L 742.0,329.6 L 746.4,332.3 L 750.8,334.6 L 755.1,336.6 L 759.5,338.2 L 763.9,339.2 L 768.2,339.8 L 772.6,339.7 L 777.0,339.1 L 781.4,337.9 L 785.8,336.3 L 790.1,334.2 L 794.5,331.7 L 798.9,329.1 L 803.2,326.3 L 807.6,323.5 L 812.0,320.7" fill="none" stroke="#ffffff" stroke-width="3" stroke-opacity="0.84" stroke-linecap="round"/>
+    <!-- Dezente 3D-Windungslinien -->
+    <path d="M 320.0,318.5 Q 335.0,335.0 336.0,351.5" fill="none" stroke="#4a545c" stroke-width="2" stroke-opacity="0.28" stroke-linecap="round"/>
+    <path d="M 404.0,318.5 Q 389.0,335.0 388.0,351.5" fill="none" stroke="#4a545c" stroke-width="2" stroke-opacity="0.28" stroke-linecap="round"/>
+    <path d="M 456.0,318.5 Q 471.0,335.0 472.0,351.5" fill="none" stroke="#4a545c" stroke-width="2" stroke-opacity="0.28" stroke-linecap="round"/>
+    <path d="M 540.0,318.5 Q 525.0,335.0 524.0,351.5" fill="none" stroke="#4a545c" stroke-width="2" stroke-opacity="0.28" stroke-linecap="round"/>
+    <path d="M 592.0,318.5 Q 607.0,335.0 608.0,351.5" fill="none" stroke="#4a545c" stroke-width="2" stroke-opacity="0.28" stroke-linecap="round"/>
+    <path d="M 676.0,318.5 Q 661.0,335.0 660.0,351.5" fill="none" stroke="#4a545c" stroke-width="2" stroke-opacity="0.28" stroke-linecap="round"/>
+    <path d="M 728.0,318.5 Q 743.0,335.0 744.0,351.5" fill="none" stroke="#4a545c" stroke-width="2" stroke-opacity="0.28" stroke-linecap="round"/>
+    <!-- Kraeftige Aussenkontur oben und unten (ohne End-Abschlusslinien, damit Kappen nahtlos anschliessen) -->
+    <path d="M 252.0,321.1 L 256.4,318.3 L 260.8,315.5 L 265.1,312.7 L 269.5,310.1 L 273.9,307.6 L 278.2,305.5 L 282.6,303.9 L 287.0,302.7 L 291.4,302.1 L 295.8,302.0 L 300.1,302.6 L 304.5,303.6 L 308.9,305.2 L 313.2,307.2 L 317.6,309.5 L 322.0,312.2 L 326.4,314.9 L 330.8,317.8 L 335.1,320.5 L 339.5,323.1 L 343.9,325.4 L 348.2,327.3 L 352.6,328.7 L 357.0,329.6 L 361.4,330.0 L 365.8,329.8 L 370.1,329.0 L 374.5,327.7 L 378.9,326.0 L 383.2,323.8 L 387.6,321.3 L 392.0,318.6 L 396.4,315.8 L 400.8,313.0 L 405.1,310.3 L 409.5,307.8 L 413.9,305.7 L 418.2,304.0 L 422.6,302.8 L 427.0,302.1 L 431.4,302.0 L 435.8,302.5 L 440.1,303.5 L 444.5,305.0 L 448.9,307.0 L 453.2,309.3 L 457.6,311.9 L 462.0,314.7 L 466.4,317.5 L 470.8,320.3 L 475.1,322.9 L 479.5,325.2 L 483.9,327.1 L 488.2,328.6 L 492.6,329.6 L 497.0,330.0 L 501.4,329.8 L 505.8,329.1 L 510.1,327.9 L 514.5,326.1 L 518.9,324.0 L 523.2,321.5 L 527.6,318.8 L 532.0,316.0 L 536.4,313.2 L 540.8,310.5 L 545.1,308.0 L 549.5,305.9 L 553.9,304.1 L 558.2,302.9 L 562.6,302.2 L 567.0,302.0 L 571.4,302.4 L 575.8,303.4 L 580.1,304.9 L 584.5,306.8 L 588.9,309.1 L 593.2,311.7 L 597.6,314.5 L 602.0,317.3 L 606.4,320.1 L 610.8,322.7 L 615.1,325.0 L 619.5,327.0 L 623.9,328.5 L 628.2,329.5 L 632.6,330.0 L 637.0,329.9 L 641.4,329.2 L 645.8,328.0 L 650.1,326.3 L 654.5,324.2 L 658.9,321.7 L 663.2,319.0 L 667.6,316.2 L 672.0,313.4 L 676.4,310.7 L 680.8,308.2 L 685.1,306.0 L 689.5,304.3 L 693.9,303.0 L 698.2,302.2 L 702.6,302.0 L 707.0,302.4 L 711.4,303.3 L 715.8,304.7 L 720.1,306.6 L 724.5,308.9 L 728.9,311.5 L 733.2,314.2 L 737.6,317.1 L 742.0,319.8 L 746.4,322.5 L 750.8,324.8 L 755.1,326.8 L 759.5,328.4 L 763.9,329.4 L 768.2,330.0 L 772.6,329.9 L 777.0,329.3 L 781.4,328.1 L 785.8,326.5 L 790.1,324.4 L 794.5,321.9 L 798.9,319.3 L 803.2,316.5 L 807.6,313.7 L 812.0,310.9" fill="none" stroke="#4a545c" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M 252.0,359.1 L 256.4,356.3 L 260.8,353.5 L 265.1,350.7 L 269.5,348.1 L 273.9,345.6 L 278.2,343.5 L 282.6,341.9 L 287.0,340.7 L 291.4,340.1 L 295.8,340.0 L 300.1,340.6 L 304.5,341.6 L 308.9,343.2 L 313.2,345.2 L 317.6,347.5 L 322.0,350.2 L 326.4,352.9 L 330.8,355.8 L 335.1,358.5 L 339.5,361.1 L 343.9,363.4 L 348.2,365.3 L 352.6,366.7 L 357.0,367.6 L 361.4,368.0 L 365.8,367.8 L 370.1,367.0 L 374.5,365.7 L 378.9,364.0 L 383.2,361.8 L 387.6,359.3 L 392.0,356.6 L 396.4,353.8 L 400.8,351.0 L 405.1,348.3 L 409.5,345.8 L 413.9,343.7 L 418.2,342.0 L 422.6,340.8 L 427.0,340.1 L 431.4,340.0 L 435.8,340.5 L 440.1,341.5 L 444.5,343.0 L 448.9,345.0 L 453.2,347.3 L 457.6,349.9 L 462.0,352.7 L 466.4,355.5 L 470.8,358.3 L 475.1,360.9 L 479.5,363.2 L 483.9,365.1 L 488.2,366.6 L 492.6,367.6 L 497.0,368.0 L 501.4,367.8 L 505.8,367.1 L 510.1,365.9 L 514.5,364.1 L 518.9,362.0 L 523.2,359.5 L 527.6,356.8 L 532.0,354.0 L 536.4,351.2 L 540.8,348.5 L 545.1,346.0 L 549.5,343.9 L 553.9,342.1 L 558.2,340.9 L 562.6,340.2 L 567.0,340.0 L 571.4,340.4 L 575.8,341.4 L 580.1,342.9 L 584.5,344.8 L 588.9,347.1 L 593.2,349.7 L 597.6,352.5 L 602.0,355.3 L 606.4,358.1 L 610.8,360.7 L 615.1,363.0 L 619.5,365.0 L 623.9,366.5 L 628.2,367.5 L 632.6,368.0 L 637.0,367.9 L 641.4,367.2 L 645.8,366.0 L 650.1,364.3 L 654.5,362.2 L 658.9,359.7 L 663.2,357.0 L 667.6,354.2 L 672.0,351.4 L 676.4,348.7 L 680.8,346.2 L 685.1,344.0 L 689.5,342.3 L 693.9,341.0 L 698.2,340.2 L 702.6,340.0 L 707.0,340.4 L 711.4,341.3 L 715.8,342.7 L 720.1,344.6 L 724.5,346.9 L 728.9,349.5 L 733.2,352.2 L 737.6,355.1 L 742.0,357.8 L 746.4,360.5 L 750.8,362.8 L 755.1,364.8 L 759.5,366.4 L 763.9,367.4 L 768.2,368.0 L 772.6,367.9 L 777.0,367.3 L 781.4,366.1 L 785.8,364.5 L 790.1,362.4 L 794.5,359.9 L 798.9,357.3 L 803.2,354.5 L 807.6,351.7 L 812.0,348.9" fill="none" stroke="#4a545c" stroke-width="4" stroke-linejoin="round"/>
+  </g>
+</g>
+
+<!-- Gelenkwelle im Sauggehaeuse (beide Gelenke sichtbar, schwingt synchron zum exzentrischen Rotor) -->
+<g class="gelenk-stange">
+  <!-- Kuppelstange -->
+  <rect x="268" y="328" width="110" height="14" rx="4" fill="#8a96a0" stroke="#4a545c" stroke-width="3.5"/>
+  <!-- Linkes Gelenk (auf Antriebswelle bei x = 268, y = 335) -->
+  <circle cx="268" cy="335" r="10.5" fill="#b9c0c6" stroke="#4a545c" stroke-width="3.5"/>
+  <circle cx="268" cy="335" r="3.8" fill="#4a545c"/>
+  <!-- Rechtes Gelenk (am Rotor-Kopf bei x = 378, y = 335) -->
+  <circle cx="378" cy="335" r="10.5" fill="#b9c0c6" stroke="#4a545c" stroke-width="3.5"/>
+  <circle cx="378" cy="335" r="3.8" fill="#4a545c"/>
+</g>
+
+<!-- Stator-Innenkontur ueber Rotor-Clip sauber nachziehen -->
+<path d="M 396.0,287.7 L 400.2,287.9 L 404.5,288.3 L 408.8,288.9 L 413.0,289.8 L 417.2,291.0 L 421.5,292.4 L 425.8,294.0 L 430.0,295.8 L 434.2,297.8 L 438.5,299.9 L 442.8,302.2 L 447.0,304.6 L 451.2,307.0 L 455.5,309.3 L 459.8,311.2 L 464.0,312.0 L 468.2,311.2 L 472.5,309.3 L 476.8,307.0 L 481.0,304.6 L 485.2,302.2 L 489.5,299.9 L 493.8,297.8 L 498.0,295.8 L 502.2,294.0 L 506.5,292.4 L 510.8,291.0 L 515.0,289.8 L 519.2,288.9 L 523.5,288.3 L 527.8,287.9 L 532.0,287.7 L 536.2,287.9 L 540.5,288.3 L 544.8,288.9 L 549.0,289.8 L 553.2,291.0 L 557.5,292.4 L 561.8,294.0 L 566.0,295.8 L 570.2,297.8 L 574.5,299.9 L 578.8,302.2 L 583.0,304.6 L 587.2,307.0 L 591.5,309.3 L 595.8,311.2 L 600.0,312.0 L 604.2,311.2 L 608.5,309.3 L 612.8,307.0 L 617.0,304.6 L 621.2,302.2 L 625.5,299.9 L 629.8,297.8 L 634.0,295.8 L 638.2,294.0 L 642.5,292.4 L 646.8,291.0 L 651.0,289.8 L 655.2,288.9 L 659.5,288.3 L 663.8,287.9 L 668.0,287.7 L 672.2,287.9 L 676.5,288.3 L 680.8,288.9 L 685.0,289.8 L 689.2,291.0 L 693.5,292.4 L 697.8,294.0 L 702.0,295.8 L 706.2,297.8 L 710.5,299.9 L 714.8,302.2 L 719.0,304.6 L 723.2,307.0 L 727.5,309.3 L 731.8,311.2 L 736.0,312.0 L 740.2,311.2 L 744.5,309.3 L 748.8,307.0 L 753.0,304.6 L 757.2,302.2 L 761.5,299.9 L 765.8,297.8 L 770.0,295.8 L 774.2,294.0 L 778.5,292.4 L 782.8,291.0 L 787.0,289.8 L 791.2,288.9 L 795.5,288.3 L 799.8,287.9 L 804.0,287.7" fill="none" stroke="#4a545c" stroke-width="3.5" stroke-linejoin="round"/>
+<path d="M 396.0,382.3 L 400.2,382.1 L 404.5,381.7 L 408.8,381.1 L 413.0,380.2 L 417.2,379.0 L 421.5,377.6 L 425.8,376.0 L 430.0,374.2 L 434.2,372.2 L 438.5,370.1 L 442.8,367.8 L 447.0,365.4 L 451.2,363.0 L 455.5,360.7 L 459.8,358.8 L 464.0,358.0 L 468.2,358.8 L 472.5,360.7 L 476.8,363.0 L 481.0,365.4 L 485.2,367.8 L 489.5,370.1 L 493.8,372.2 L 498.0,374.2 L 502.2,376.0 L 506.5,377.6 L 510.8,379.0 L 515.0,380.2 L 519.2,381.1 L 523.5,381.7 L 527.8,382.1 L 532.0,382.3 L 536.2,382.1 L 540.5,381.7 L 544.8,381.1 L 549.0,380.2 L 553.2,379.0 L 557.5,377.6 L 561.8,376.0 L 566.0,374.2 L 570.2,372.2 L 574.5,370.1 L 578.8,367.8 L 583.0,365.4 L 587.2,363.0 L 591.5,360.7 L 595.8,358.8 L 600.0,358.0 L 604.2,358.8 L 608.5,360.7 L 612.8,363.0 L 617.0,365.4 L 621.2,367.8 L 625.5,370.1 L 629.8,372.2 L 634.0,374.2 L 638.2,376.0 L 642.5,377.6 L 646.8,379.0 L 651.0,380.2 L 655.2,381.1 L 659.5,381.7 L 663.8,382.1 L 668.0,382.3 L 672.2,382.1 L 676.5,381.7 L 680.8,381.1 L 685.0,380.2 L 689.2,379.0 L 693.5,377.6 L 697.8,376.0 L 702.0,374.2 L 706.2,372.2 L 710.5,370.1 L 714.8,367.8 L 719.0,365.4 L 723.2,363.0 L 727.5,360.7 L 731.8,358.8 L 736.0,358.0 L 740.2,358.8 L 744.5,360.7 L 748.8,363.0 L 753.0,365.4 L 757.2,367.8 L 761.5,370.1 L 765.8,372.2 L 770.0,374.2 L 774.2,376.0 L 778.5,377.6 L 782.8,379.0 L 787.0,380.2 L 791.2,381.1 L 795.5,381.7 L 799.8,382.1 L 804.0,382.3" fill="none" stroke="#4a545c" stroke-width="3.5" stroke-linejoin="round"/>
+
+<!-- Symmetrieachse (dezent, zeigt Exzentrizitaet des Rotors zur Pumpenachse) -->
+<line x1="24" y1="335" x2="994" y2="335" stroke="#484846" stroke-width="1.5" stroke-dasharray="14 5 3 5" stroke-opacity="0.45"/>
+
+<!-- ===================================================================== -->
+<!-- PRODUKTFLUSS-PFEILE (SAUGSTUTZEN EIN -> DRUCKSTUTZEN AUS)             -->
+<!-- ===================================================================== -->
+<!-- Eintritt in den Saugstutzen -->
+<path d="M 310,90 L 310,130"
+      fill="none" stroke="#134061" stroke-width="5" stroke-linecap="round" marker-end="url(#pfeil-fluss)"/>
+
+<!-- Durch den Saugstutzen ins Sauggehaeuse Richtung Stator -->
+<path class="fluss-strich" d="M 310,164 L 310,262 C 310,290 326,302 366,302"
+      fill="none" stroke="#134061" stroke-width="5" stroke-linecap="round" stroke-dasharray="16 18" marker-end="url(#pfeil-fluss)"/>
+
+<!-- Austritt aus dem Stator durch den Druckstutzen -->
+<path class="fluss-strich" d="M 838,323 L 948,323"
+      fill="none" stroke="#134061" stroke-width="5" stroke-linecap="round" stroke-dasharray="16 18" marker-end="url(#pfeil-fluss)"/>
+<path class="fluss-strich" d="M 838,347 L 948,347"
+      fill="none" stroke="#134061" stroke-width="5" stroke-linecap="round" stroke-dasharray="16 18" marker-end="url(#pfeil-fluss)"/>
+
+<!-- Haupt-Austrittspfeil rechts nach dem Druckstutzen -->
+<path d="M 984,335 L 1048,335"
+      fill="none" stroke="#134061" stroke-width="5" stroke-linecap="round" marker-end="url(#pfeil-fluss)"/>
+
+</svg>

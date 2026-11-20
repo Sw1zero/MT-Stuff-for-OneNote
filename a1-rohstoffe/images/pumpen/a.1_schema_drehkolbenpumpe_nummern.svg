@@ -1,0 +1,237 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="620" viewBox="0 0 1100 620" font-family="Aptos, Calibri, sans-serif">
+<defs>
+  <marker id="pfeil-fluss" markerWidth="14" markerHeight="12" refX="9.5" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L14,6 L0,12 z" fill="#134061"/>
+  </marker>
+  <marker id="pfeil-dreh" markerWidth="11" markerHeight="9" refX="7" refY="4.5" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L11,4.5 L0,9 z" fill="#134061"/>
+  </marker>
+
+  <!-- Druckverlauf im Gehäuse: links Saugseite (Unterdruck, hell), rechts Druckseite (Überdruck, kräftiger) -->
+  <linearGradient id="druck-verlauf" x1="252" y1="0" x2="648" y2="0" gradientUnits="userSpaceOnUse">
+    <stop offset="0%" stop-color="#eef1f3"/>
+    <stop offset="34%" stop-color="#c9dce6"/>
+    <stop offset="66%" stop-color="#69A9C9" stop-opacity="0.62"/>
+    <stop offset="100%" stop-color="#69A9C9" stop-opacity="0.88"/>
+  </linearGradient>
+
+  <!-- Schraffur für geschnittene Gehäusewand im Teilschnitt (Längsschnitt) -->
+  <pattern id="schnitt-schraffur" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+    <line x1="0" y1="0" x2="0" y2="12" stroke="#4a545c" stroke-width="1.5" stroke-opacity="0.38"/>
+  </pattern>
+
+  <!-- Exaktes konjugiertes Zweiflügel-Drehkolbenprofil (Zentrum 0,0; waagrechte Flügel, Spiel 2 px) -->
+  <path id="drehkolben-form"
+        d="M 100.0,0.0
+           C 100.0,22.0 85.2,40.7 71.3,46.4
+           C 62.1,50.2 52.0,49.2 49.5,46.7
+           C 43.5,40.7 25.0,32.0 0.0,32.0
+           C -25.0,32.0 -43.5,40.7 -49.5,46.7
+           C -52.0,49.2 -62.1,50.2 -71.3,46.4
+           C -85.2,40.7 -100.0,22.0 -100.0,0.0
+           C -100.0,-22.0 -85.2,-40.7 -71.3,-46.4
+           C -62.1,-50.2 -52.0,-49.2 -49.5,-46.7
+           C -43.5,-40.7 -25.0,-32.0 0.0,-32.0
+           C 25.0,-32.0 43.5,-40.7 49.5,-46.7
+           C 52.0,-49.2 62.1,-50.2 71.3,-46.4
+           C 85.2,-40.7 100.0,-22.0 100.0,0.0 Z"/>
+</defs>
+
+<style>
+  /* Gegenläufige Drehkolben (6 s pro Umdrehung) und Produktfluss entlang der Gehäusewand */
+  .kolben-oben {
+    transform-origin: 450px 242px;
+    animation: drehen-uhr 6s linear infinite;
+  }
+  .kolben-unten {
+    transform-origin: 450px 378px;
+    animation: drehen-gegen 6s linear infinite;
+  }
+  .fluss-strich {
+    animation: fluss-lauf 2.4s linear infinite;
+  }
+
+  @keyframes drehen-uhr {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+  @keyframes drehen-gegen {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(-360deg); }
+  }
+  @keyframes fluss-lauf {
+    from { stroke-dashoffset: 68; }
+    to   { stroke-dashoffset: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .kolben-oben, .kolben-unten, .fluss-strich {
+      animation: none !important;
+    }
+  }
+</style>
+
+<!-- Hintergrund -->
+<rect x="0" y="0" width="1100" height="620" fill="#ffffff"/>
+
+<!-- Bildbezeichnung -->
+<text x="36" y="42" font-size="26" fill="#484846">Dreh- oder Kreiskolbenpumpe (Querschnitt)</text>
+
+<!-- ===================================================================== -->
+<!-- QUERSCHNITT: GEHÄUSE, SAUGSTUTZEN (LINKS), DRUCKSTUTZEN (RECHTS)      -->
+<!-- ===================================================================== -->
+
+<!-- Äusseres Pumpengehäuse mit waagrechtem Saug- und Druckstutzen -->
+<path d="M 264,258 L 326,258
+         A 125,125 0 1,1 574,258
+         L 636,258 L 636,362 L 574,362
+         A 125,125 0 1,1 326,362
+         L 264,362 Z"
+      fill="#b9c0c6" stroke="#4a545c" stroke-width="4" stroke-linejoin="round"/>
+
+<!-- Flansche an Saugstutzen und Druckstutzen -->
+<rect x="252" y="246" width="12" height="128" rx="3" fill="#b9c0c6" stroke="#4a545c" stroke-width="4"/>
+<rect x="636" y="246" width="12" height="128" rx="3" fill="#b9c0c6" stroke="#4a545c" stroke-width="4"/>
+
+<!-- Innenraum mit Produktfüllung (Unterdruck links -> Überdruck rechts) -->
+<path d="M 250,274 L 350,274
+         A 105,105 0 1,1 550,274
+         L 650,274 L 650,346 L 550,346
+         A 105,105 0 1,1 350,346
+         L 250,346 Z"
+      fill="#ffffff"/>
+<path d="M 250,274 L 350,274
+         A 105,105 0 1,1 550,274
+         L 650,274 L 650,346 L 550,346
+         A 105,105 0 1,1 350,346
+         L 250,346 Z"
+      fill="url(#druck-verlauf)"/>
+
+<!-- Innenkontur des Pumpengehäuses und der Stutzenbohrungen -->
+<g fill="none" stroke="#4a545c" stroke-width="4" stroke-linejoin="round">
+  <path d="M 252,274 L 350,274 A 105,105 0 1,1 550,274 L 648,274"/>
+  <path d="M 648,346 L 550,346 A 105,105 0 1,1 350,346 L 252,346"/>
+</g>
+
+<!-- ===================================================================== -->
+<!-- ZWEI GEGENLÄUFIGE DREHKOLBEN                                          -->
+<!-- ===================================================================== -->
+
+<!-- Oberer Drehkolben (dreht im Uhrzeigersinn, Ausgangslage waagrecht) -->
+<g class="kolben-oben">
+  <g transform="translate(450, 242)">
+    <use href="#drehkolben-form" fill="#8a96a0" stroke="#4a545c" stroke-width="3.5" stroke-linejoin="round"/>
+    <!-- Welle mit Passfeder -->
+    <circle cx="0" cy="0" r="11" fill="#b9c0c6" stroke="#4a545c" stroke-width="3"/>
+    <rect x="-2.5" y="9" width="5" height="5" fill="#4a545c"/>
+  </g>
+</g>
+
+<!-- Unterer Drehkolben (dreht im Gegenuhrzeigersinn, Ausgangslage senkrecht) -->
+<g class="kolben-unten">
+  <g transform="translate(450, 378) rotate(90)">
+    <use href="#drehkolben-form" fill="#8a96a0" stroke="#4a545c" stroke-width="3.5" stroke-linejoin="round"/>
+    <!-- Welle mit Passfeder -->
+    <circle cx="0" cy="0" r="11" fill="#b9c0c6" stroke="#4a545c" stroke-width="3"/>
+    <rect x="-2.5" y="-14" width="5" height="5" fill="#4a545c"/>
+  </g>
+</g>
+
+<!-- Drehrichtungspfeile auf den Naben (oben im Uhrzeigersinn, unten im Gegenuhrzeigersinn) -->
+<g>
+  <!-- Oberer Drehkolben: Uhrzeigersinn (links -> rechts oben) -->
+  <path d="M 432,231 A 21,21 0 0,1 468,231"
+        fill="none" stroke="#ffffff" stroke-width="5.5" stroke-linecap="round"/>
+  <path d="M 432,231 A 21,21 0 0,1 468,231"
+        fill="none" stroke="#134061" stroke-width="3.5" stroke-linecap="round" marker-end="url(#pfeil-dreh)"/>
+
+  <!-- Unterer Drehkolben: Gegenuhrzeigersinn (links -> rechts unten) -->
+  <path d="M 432,389 A 21,21 0 0,0 468,389"
+        fill="none" stroke="#ffffff" stroke-width="5.5" stroke-linecap="round"/>
+  <path d="M 432,389 A 21,21 0 0,0 468,389"
+        fill="none" stroke="#134061" stroke-width="3.5" stroke-linecap="round" marker-end="url(#pfeil-dreh)"/>
+</g>
+
+<!-- ===================================================================== -->
+<!-- PRODUKTFLUSS (PFEILE ENTLANG DER GEHÄUSEWAND)                         -->
+<!-- ===================================================================== -->
+<g>
+  <!-- Eintritt in Saugstutzen -->
+  <path d="M 192,310 L 240,310"
+        fill="none" stroke="#134061" stroke-width="5" stroke-linecap="round" marker-end="url(#pfeil-fluss)"/>
+
+  <!-- Oberer Produktstrom: Saugstutzen -> obere Gehäusewand -> Druckstutzen -->
+  <path class="fluss-strich" d="M 268,298 L 368,298"
+        fill="none" stroke="#134061" stroke-width="5" stroke-linecap="round" stroke-dasharray="16 18" marker-end="url(#pfeil-fluss)"/>
+  <path class="fluss-strich" d="M 391.6,181.6 A 84,84 0 0,1 508.4,181.6"
+        fill="none" stroke="#134061" stroke-width="5" stroke-linecap="round" stroke-dasharray="16 18" marker-end="url(#pfeil-fluss)"/>
+  <path class="fluss-strich" d="M 532,298 L 626,298"
+        fill="none" stroke="#134061" stroke-width="5" stroke-linecap="round" stroke-dasharray="16 18" marker-end="url(#pfeil-fluss)"/>
+
+  <!-- Unterer Produktstrom: Saugstutzen -> untere Gehäusewand -> Druckstutzen -->
+  <path class="fluss-strich" d="M 268,324 L 332,324 C 354,324 364,348 366,382 C 368,408 376,428 390,444"
+        fill="none" stroke="#134061" stroke-width="5" stroke-linecap="round" stroke-dasharray="16 18" marker-end="url(#pfeil-fluss)"/>
+  <path class="fluss-strich" d="M 510,444 C 524,428 532,408 534,382 C 536,348 546,324 568,324 L 626,324"
+        fill="none" stroke="#134061" stroke-width="5" stroke-linecap="round" stroke-dasharray="16 18" marker-end="url(#pfeil-fluss)"/>
+
+  <!-- Austritt aus Druckstutzen -->
+  <path d="M 658,310 L 706,310"
+        fill="none" stroke="#134061" stroke-width="5" stroke-linecap="round" marker-end="url(#pfeil-fluss)"/>
+</g>
+
+<!-- ===================================================================== -->
+<!-- TEILSCHNITT (LÄNGSSCHNITT DURCH BEIDE WELLENACHSEN, OHNE NEUE TEXTE)  -->
+<!-- ===================================================================== -->
+<g>
+  <!-- Produktgefüllter Innenraum im Schnitt -->
+  <rect x="944" y="137" width="50" height="346" fill="#c9dce6"/>
+
+  <!-- Geschnittene Gehäusewand (Stirndeckel links, Mantel oben/unten, Rückwand rechts mit zwei Wellendurchführungen) -->
+  <path d="M 922,117 L 1016,117 L 1016,230 L 994,230 L 994,137 L 944,137 L 944,483
+           L 994,483 L 994,390 L 1016,390 L 1016,503 L 922,503 Z"
+        fill="#b9c0c6"/>
+  <path d="M 922,117 L 1016,117 L 1016,230 L 994,230 L 994,137 L 944,137 L 944,483
+           L 994,483 L 994,390 L 1016,390 L 1016,503 L 922,503 Z"
+        fill="url(#schnitt-schraffur)" stroke="#4a545c" stroke-width="4" stroke-linejoin="round"/>
+  <!-- Rückwand-Steg zwischen oberer und unterer Welle -->
+  <rect x="994" y="254" width="22" height="112" fill="#b9c0c6"/>
+  <rect x="994" y="254" width="22" height="112" fill="url(#schnitt-schraffur)" stroke="#4a545c" stroke-width="4" stroke-linejoin="round"/>
+
+  <!-- Zwei parallele Antriebswellen (y = 242 und y = 378) -->
+  <rect x="984" y="230" width="74" height="24" fill="#b9c0c6" stroke="#4a545c" stroke-width="3.5" stroke-linejoin="round"/>
+  <rect x="984" y="366" width="74" height="24" fill="#b9c0c6" stroke="#4a545c" stroke-width="3.5" stroke-linejoin="round"/>
+
+  <!-- Oberer Drehkolben im Schnitt (waagrecht, eng an Stirndeckel und Rückwand) -->
+  <rect x="949" y="210" width="40" height="64" rx="3" fill="#8a96a0" stroke="#4a545c" stroke-width="3.5" stroke-linejoin="round"/>
+
+  <!-- Unterer Drehkolben im Schnitt (senkrecht, greift bei y = 276 in oberen Kolben ein) -->
+  <rect x="949" y="278" width="40" height="200" rx="3" fill="#8a96a0" stroke="#4a545c" stroke-width="3.5" stroke-linejoin="round"/>
+
+  <!-- Symmetrieachsen beider Wellen -->
+  <line x1="908" y1="242" x2="1072" y2="242" stroke="#484846" stroke-width="1.5" stroke-dasharray="14 5 3 5"/>
+  <line x1="908" y1="378" x2="1072" y2="378" stroke="#484846" stroke-width="1.5" stroke-dasharray="14 5 3 5"/>
+</g>
+
+<path d="M 232,416 L 296,416 L 296,362" fill="none" stroke="#ffffff" stroke-width="6" stroke-linejoin="round"/>
+<path d="M 232,416 L 296,416 L 296,362" fill="none" stroke="#484846" stroke-width="2.5" stroke-linejoin="round"/>
+<circle cx="296" cy="362" r="4" fill="#484846"/>
+<circle cx="232" cy="416" r="18" fill="#134061"/>
+<text x="232" y="424" font-size="23" font-weight="bold" text-anchor="middle" fill="#ffffff">3</text>
+<line x1="232" y1="476" x2="386" y2="476" stroke="#ffffff" stroke-width="6"/>
+<line x1="232" y1="476" x2="386" y2="476" stroke="#484846" stroke-width="2.5"/>
+<circle cx="386" cy="476" r="4" fill="#484846"/>
+<!-- ===================================================================== -->
+<circle cx="232" cy="476" r="18" fill="#134061"/>
+<text x="232" y="484" font-size="23" font-weight="bold" text-anchor="middle" fill="#ffffff">1</text>
+<path d="M 668,416 L 604,416 L 604,362" fill="none" stroke="#ffffff" stroke-width="6" stroke-linejoin="round"/>
+<path d="M 668,416 L 604,416 L 604,362" fill="none" stroke="#484846" stroke-width="2.5" stroke-linejoin="round"/>
+<circle cx="604" cy="362" r="4" fill="#484846"/>
+<circle cx="668" cy="416" r="18" fill="#134061"/>
+<text x="668" y="424" font-size="23" font-weight="bold" text-anchor="middle" fill="#ffffff">4</text>
+<path d="M 668,476 L 560,476 L 474,440" fill="none" stroke="#ffffff" stroke-width="6" stroke-linejoin="round"/>
+<path d="M 668,476 L 560,476 L 474,440" fill="none" stroke="#484846" stroke-width="2.5" stroke-linejoin="round"/>
+<circle cx="474" cy="440" r="4" fill="#484846"/>
+<!-- ===================================================================== -->
+<circle cx="668" cy="476" r="18" fill="#134061"/>
+<text x="668" y="484" font-size="23" font-weight="bold" text-anchor="middle" fill="#ffffff">2</text>
+</svg>

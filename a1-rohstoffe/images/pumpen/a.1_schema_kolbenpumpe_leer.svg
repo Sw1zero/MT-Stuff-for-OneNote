@@ -1,0 +1,353 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="620" viewBox="0 0 1100 620" font-family="Aptos, Calibri, sans-serif">
+<defs>
+  <marker id="pfeil-fluss" markerWidth="14" markerHeight="12" refX="9.5" refY="6" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L14,6 L0,12 z" fill="#134061"/>
+  </marker>
+  <marker id="pfeil-klein" markerWidth="11" markerHeight="9" refX="7.5" refY="4.5" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L11,4.5 L0,9 z" fill="#134061"/>
+  </marker>
+
+  <!-- Schraffur für geschnittene Gehäuse- und Zylinderwände -->
+  <pattern id="schnitt-schraffur" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+    <line x1="0" y1="0" x2="0" y2="12" stroke="#4a545c" stroke-width="1.5" stroke-opacity="0.38"/>
+  </pattern>
+
+  <!-- Unterdruck-Verlauf im Saugtakt (links normal, zum zurückziehenden Kolben heller) -->
+  <linearGradient id="unterdruck-grad" x1="156" y1="365" x2="360" y2="365" gradientUnits="userSpaceOnUse">
+    <stop offset="0%" stop-color="#c9dce6"/>
+    <stop offset="55%" stop-color="#c9dce6" stop-opacity="0.72"/>
+    <stop offset="100%" stop-color="#eef1f3"/>
+  </linearGradient>
+
+  <!-- Überdruck-Verlauf im Drucktakt (kräftiges Blau vor dem drückenden Kolben) -->
+  <linearGradient id="ueberdruck-grad" x1="656" y1="365" x2="840" y2="365" gradientUnits="userSpaceOnUse">
+    <stop offset="0%" stop-color="#69A9C9" stop-opacity="0.62"/>
+    <stop offset="100%" stop-color="#69A9C9" stop-opacity="0.82"/>
+  </linearGradient>
+
+  <!-- Überdruck-Verlauf in der Druckleitung (rechts) -->
+  <linearGradient id="druckleitung-grad" x1="0" y1="166" x2="0" y2="310" gradientUnits="userSpaceOnUse">
+    <stop offset="0%" stop-color="#c9dce6"/>
+    <stop offset="55%" stop-color="#69A9C9" stop-opacity="0.58"/>
+    <stop offset="100%" stop-color="#69A9C9" stop-opacity="0.72"/>
+  </linearGradient>
+
+  <!-- Schnittmasken für bewegte Flüssigkeitsfüllung in beiden Zylindern -->
+  <clipPath id="clip-zylinder-links">
+    <rect x="234" y="315" width="168" height="100"/>
+  </clipPath>
+  <clipPath id="clip-zylinder-rechts">
+    <rect x="734" y="315" width="168" height="100"/>
+  </clipPath>
+</defs>
+
+<style>
+  /* Zyklus: 4.8 s. Beide Teilbilder zeigen ihren jeweiligen Takt parallel im direkten Vergleich.
+     Negativer Delay (-2.4 s) startet die Browser-Ansicht direkt im aktiven Arbeitshub.
+     Ausgangszustand ohne Animation (PDF und prefers-reduced-motion: reduce):
+     links grosses Volumen + Saugventil offen, rechts kleines Volumen + Druckventil offen. */
+
+  .kolben-links {
+    animation: kolben-saug 4.8s ease-in-out -2.4s infinite;
+  }
+  .saugventil-links {
+    animation: ventil-aktiv 4.8s ease-in-out -2.4s infinite;
+  }
+  .feder-saug-links {
+    transform-origin: 196px 426px;
+    animation: feder-aktiv 4.8s ease-in-out -2.4s infinite;
+  }
+  .fluss-links {
+    animation: fluss-aktiv 4.8s linear -2.4s infinite;
+  }
+
+  .kolben-rechts {
+    animation: kolben-druck 4.8s ease-in-out -2.4s infinite;
+  }
+  .druckventil-rechts {
+    animation: ventil-aktiv 4.8s ease-in-out -2.4s infinite;
+  }
+  .feder-druck-rechts {
+    transform-origin: 696px 240px;
+    animation: feder-aktiv 4.8s ease-in-out -2.4s infinite;
+  }
+  .fluss-rechts {
+    animation: fluss-aktiv 4.8s linear -2.4s infinite;
+  }
+
+  .fluss-strich {
+    animation: fluss-lauf 1.2s linear infinite;
+  }
+
+  @keyframes fluss-lauf {
+    from { stroke-dashoffset: 30; }
+    to   { stroke-dashoffset: 0; }
+  }
+
+  /* Links: Kolben zieht nach rechts (-54 px -> 0 px, Volumenvergrösserung) */
+  @keyframes kolben-saug {
+    0%        { transform: translateX(-54px); }
+    66%, 76%  { transform: translateX(0px); }
+    92%, 100% { transform: translateX(-54px); }
+  }
+
+  /* Rechts: Kolben drückt nach links (+54 px -> 0 px, Volumenverkleinerung) */
+  @keyframes kolben-druck {
+    0%        { transform: translateX(54px); }
+    66%, 76%  { transform: translateX(0px); }
+    92%, 100% { transform: translateX(54px); }
+  }
+
+  /* Aktives Ventil öffnet während des Arbeitshubs (-24 px) und schliesst am Hubende */
+  @keyframes ventil-aktiv {
+    0%, 66%   { transform: translateY(-24px); }
+    74%, 92%  { transform: translateY(0px); }
+    98%, 100% { transform: translateY(-24px); }
+  }
+
+  @keyframes feder-aktiv {
+    0%, 66%   { transform: scaleY(0.467); }
+    74%, 92%  { transform: scaleY(1); }
+    98%, 100% { transform: scaleY(0.467); }
+  }
+
+  @keyframes fluss-aktiv {
+    0%, 65%   { opacity: 1; }
+    73%, 92%  { opacity: 0.22; }
+    98%, 100% { opacity: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .kolben-links, .saugventil-links, .feder-saug-links, .fluss-links,
+    .kolben-rechts, .druckventil-rechts, .feder-druck-rechts, .fluss-rechts,
+    .fluss-strich {
+      animation: none !important;
+    }
+  }
+</style>
+
+<!-- Hintergrund -->
+<rect x="0" y="0" width="1100" height="620" fill="#ffffff"/>
+
+<!-- Bildbezeichnung -->
+<text x="36" y="36" font-size="26" fill="#484846">Kolbenpumpe</text>
+
+<!-- Dezente Trennlinie zwischen beiden Takten -->
+<line x1="550" y1="62" x2="550" y2="592" stroke="#b9c0c6" stroke-width="2" stroke-dasharray="8 8"/>
+
+<!-- ===================================================================== -->
+<!-- ÜBERSCHRIFTEN DER BEIDEN TEILBILDER                                   -->
+<!-- ===================================================================== -->
+<text x="292" y="84" font-size="34" font-weight="bold" text-anchor="middle" fill="#134061">Saugtakt</text>
+<text x="292" y="116" font-size="23" text-anchor="middle" fill="#134061">Volumenvergrösserung = Unterdruck</text>
+<rect x="172" y="126" width="240" height="4" rx="2" fill="#134061"/>
+
+<text x="808" y="84" font-size="34" font-weight="bold" text-anchor="middle" fill="#134061">Drucktakt</text>
+<text x="808" y="116" font-size="23" text-anchor="middle" fill="#134061">Volumenverkleinerung = Überdruck</text>
+<rect x="688" y="126" width="240" height="4" rx="2" fill="#134061"/>
+
+<!-- ===================================================================== -->
+<!-- LINKES TEILBILD: SAUGTAKT (cx = 196, cy = 365)                        -->
+<!-- Saugventil offen, Druckventil geschlossen, Kolben zieht nach rechts   -->
+<!-- ===================================================================== -->
+<g>
+  <!-- 1. Innenräume und Flüssigkeitsfüllung -->
+  <!-- Saugleitung (unten) -->
+  <rect x="176" y="486" width="40" height="78" fill="#c9dce6"/>
+  <!-- Saugventil-Kammer und zentrale Kammer -->
+  <rect x="156" y="310" width="80" height="176" fill="#eef1f3"/>
+  <rect x="156" y="310" width="80" height="176" fill="url(#unterdruck-grad)"/>
+  <!-- Druckventil-Kammer und Druckleitung (stehende Flüssigkeit über geschlossenem Druckventil) -->
+  <rect x="156" y="236" width="80" height="74" fill="#c9dce6"/>
+  <rect x="176" y="166" width="40" height="72" fill="#c9dce6"/>
+  <!-- Trockener Zylinderraum hinter dem Kolben -->
+  <rect x="234" y="315" width="168" height="100" fill="#eef1f3"/>
+  <!-- Flüssigkeitsraum im Zylinder (vergrössert sich synchron mit dem Kolben) -->
+  <g clip-path="url(#clip-zylinder-links)">
+    <rect class="kolben-links" x="138" y="315" width="200" height="100" fill="url(#unterdruck-grad)"/>
+  </g>
+
+  <!-- 2. Geschnittene Gehäuse- und Zylinderwände -->
+  <!-- Linke durchgehende Wand (Druckleitung, Druckventil, Saugventil, Saugleitung) -->
+  <path d="M 162,166 L 162,224 L 142,224 L 142,506 L 162,506 L 162,564
+           L 176,564 L 176,494 L 179,494 L 179,486 L 169,476 L 156,476
+           L 156,310 L 179,310 L 179,300 L 169,290 L 156,290
+           L 156,236 L 176,236 L 176,166 Z"
+        fill="#b9c0c6"/>
+  <path d="M 162,166 L 162,224 L 142,224 L 142,506 L 162,506 L 162,564
+           L 176,564 L 176,494 L 179,494 L 179,486 L 169,476 L 156,476
+           L 156,310 L 179,310 L 179,300 L 169,290 L 156,290
+           L 156,236 L 176,236 L 176,166 Z"
+        fill="url(#schnitt-schraffur)" stroke="#4a545c" stroke-width="4" stroke-linejoin="round"/>
+
+  <!-- Rechte obere Wand (Druckleitung, Druckventil-Sitz, Zylinderwand oben) -->
+  <path d="M 216,166 L 230,166 L 230,224 L 250,224 L 250,301 L 402,301
+           L 402,315 L 236,315 L 236,310 L 213,310 L 213,300 L 223,290
+           L 236,290 L 236,236 L 216,236 Z"
+        fill="#b9c0c6"/>
+  <path d="M 216,166 L 230,166 L 230,224 L 250,224 L 250,301 L 402,301
+           L 402,315 L 236,315 L 236,310 L 213,310 L 213,300 L 223,290
+           L 236,290 L 236,236 L 216,236 Z"
+        fill="url(#schnitt-schraffur)" stroke="#4a545c" stroke-width="4" stroke-linejoin="round"/>
+
+  <!-- Rechte untere Wand (Zylinderwand unten, Saugventil-Sitz, Saugleitung) -->
+  <path d="M 402,415 L 402,429 L 250,429 L 250,506 L 230,506 L 230,564
+           L 216,564 L 216,494 L 213,494 L 213,486 L 223,476 L 236,476
+           L 236,415 Z"
+        fill="#b9c0c6"/>
+  <path d="M 402,415 L 402,429 L 250,429 L 250,506 L 230,506 L 230,564
+           L 216,564 L 216,494 L 213,494 L 213,486 L 223,476 L 236,476
+           L 236,415 Z"
+        fill="url(#schnitt-schraffur)" stroke="#4a545c" stroke-width="4" stroke-linejoin="round"/>
+
+  <!-- Flansche oben und unten -->
+  <rect x="152" y="166" width="88" height="12" rx="3" fill="#b9c0c6" stroke="#4a545c" stroke-width="4"/>
+  <rect x="152" y="552" width="88" height="12" rx="3" fill="#b9c0c6" stroke="#4a545c" stroke-width="4"/>
+
+  <!-- 3. Druckventil links (GESCHLOSSEN) -->
+  <line x1="158" y1="240" x2="234" y2="240" stroke="#4a545c" stroke-width="3" stroke-dasharray="10 6"/>
+  <rect x="190" y="236" width="12" height="8" rx="2" fill="#4a545c"/>
+  <path d="M 196,242 L 188,248 L 204,255 L 188,262 L 204,269 L 188,276 L 196,282"
+        fill="none" stroke="#4a545c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 173,283 L 219,283 L 219,291 L 212,300 L 180,300 L 173,291 Z"
+        fill="#8a96a0" stroke="#4a545c" stroke-width="3.5" stroke-linejoin="round"/>
+  <line x1="173" y1="291" x2="180" y2="300" stroke="#22262a" stroke-width="3.5" stroke-linecap="round"/>
+  <line x1="219" y1="291" x2="212" y2="300" stroke="#22262a" stroke-width="3.5" stroke-linecap="round"/>
+
+  <!-- 4. Saugventil links (OFFEN im Ausgangszustand / Saugtakt) -->
+  <line x1="158" y1="426" x2="234" y2="426" stroke="#4a545c" stroke-width="3" stroke-dasharray="10 6"/>
+  <rect x="190" y="422" width="12" height="8" rx="2" fill="#4a545c"/>
+  <g class="feder-saug-links" transform="translate(0, 426) scale(1, 0.467) translate(0, -426)">
+    <path d="M 196,428 L 188,434 L 204,441 L 188,448 L 204,455 L 188,462 L 196,469"
+          fill="none" stroke="#4a545c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g class="saugventil-links" transform="translate(0, -24)">
+    <path d="M 173,469 L 219,469 L 219,477 L 212,486 L 180,486 L 173,477 Z"
+          fill="#8a96a0" stroke="#4a545c" stroke-width="3.5" stroke-linejoin="round"/>
+  </g>
+
+  <!-- 5. Kolben und Kolbenstange links (Ausgangszustand: weit rechts = grosses Volumen) -->
+  <g class="kolben-links">
+    <rect x="380" y="354" width="88" height="22" rx="2" fill="#8a96a0" stroke="#4a545c" stroke-width="3.5"/>
+    <rect x="338" y="317" width="44" height="96" rx="3" fill="#8a96a0" stroke="#4a545c" stroke-width="4"/>
+    <rect x="347" y="316" width="7" height="6" rx="1" fill="#22262a"/>
+    <rect x="366" y="316" width="7" height="6" rx="1" fill="#22262a"/>
+    <rect x="347" y="408" width="7" height="6" rx="1" fill="#22262a"/>
+    <rect x="366" y="408" width="7" height="6" rx="1" fill="#22262a"/>
+  </g>
+
+  <!-- 6. Produktfluss und Kolben-Bewegungsrichtung (Saugtakt) -->
+  <g class="fluss-links">
+    <path d="M 196,588 L 196,504"
+          fill="none" stroke="#134061" stroke-width="5" stroke-linecap="round" marker-end="url(#pfeil-fluss)"/>
+    <path class="fluss-strich" d="M 190,492 L 190,482 C 190,474 166,472 166,456 C 166,432 174,352 214,352 L 266,352"
+          fill="none" stroke="#134061" stroke-width="5" stroke-linecap="round" stroke-dasharray="16 14" marker-end="url(#pfeil-klein)"/>
+    <path class="fluss-strich" d="M 202,492 L 202,482 C 202,474 226,472 226,456 C 226,422 226,382 252,382 L 266,382"
+          fill="none" stroke="#134061" stroke-width="5" stroke-linecap="round" stroke-dasharray="16 14" marker-end="url(#pfeil-klein)"/>
+    <path d="M 416,336 L 464,336"
+          fill="none" stroke="#134061" stroke-width="5" stroke-linecap="round" marker-end="url(#pfeil-fluss)"/>
+  </g>
+</g>
+
+<!-- ===================================================================== -->
+<!-- RECHTES TEILBILD: DRUCKTAKT (cx = 696, cy = 365)                      -->
+<!-- Saugventil geschlossen, Druckventil offen, Kolben drückt nach links   -->
+<!-- ===================================================================== -->
+<g>
+  <!-- 1. Innenräume und Flüssigkeitsfüllung -->
+  <!-- Saugleitung (stehende Flüssigkeit unter geschlossenem Saugventil) -->
+  <rect x="676" y="486" width="40" height="78" fill="#c9dce6"/>
+  <!-- Druckventil-Kammer und Druckleitung (Überdruck, Produkt strömt aus) -->
+  <rect x="656" y="236" width="80" height="74" fill="url(#druckleitung-grad)"/>
+  <rect x="676" y="166" width="40" height="72" fill="url(#druckleitung-grad)"/>
+  <!-- Saugventil-Kammer und zentrale Kammer (Überdruck) -->
+  <rect x="656" y="310" width="80" height="176" fill="#ffffff"/>
+  <rect x="656" y="310" width="80" height="176" fill="url(#ueberdruck-grad)"/>
+  <!-- Trockener Zylinderraum hinter dem Kolben -->
+  <rect x="734" y="315" width="168" height="100" fill="#eef1f3"/>
+  <!-- Flüssigkeitsraum im Zylinder (verkleinert sich synchron mit dem Kolben) -->
+  <g clip-path="url(#clip-zylinder-rechts)">
+    <rect class="kolben-rechts" x="582" y="315" width="200" height="100" fill="#ffffff"/>
+    <rect class="kolben-rechts" x="582" y="315" width="200" height="100" fill="url(#ueberdruck-grad)"/>
+  </g>
+
+  <!-- 2. Geschnittene Gehäuse- und Zylinderwände -->
+  <path d="M 662,166 L 662,224 L 642,224 L 642,506 L 662,506 L 662,564
+           L 676,564 L 676,494 L 679,494 L 679,486 L 669,476 L 656,476
+           L 656,310 L 679,310 L 679,300 L 669,290 L 656,290
+           L 656,236 L 676,236 L 676,166 Z"
+        fill="#b9c0c6"/>
+  <path d="M 662,166 L 662,224 L 642,224 L 642,506 L 662,506 L 662,564
+           L 676,564 L 676,494 L 679,494 L 679,486 L 669,476 L 656,476
+           L 656,310 L 679,310 L 679,300 L 669,290 L 656,290
+           L 656,236 L 676,236 L 676,166 Z"
+        fill="url(#schnitt-schraffur)" stroke="#4a545c" stroke-width="4" stroke-linejoin="round"/>
+
+  <path d="M 716,166 L 730,166 L 730,224 L 750,224 L 750,301 L 902,301
+           L 902,315 L 736,315 L 736,310 L 713,310 L 713,300 L 723,290
+           L 736,290 L 736,236 L 716,236 Z"
+        fill="#b9c0c6"/>
+  <path d="M 716,166 L 730,166 L 730,224 L 750,224 L 750,301 L 902,301
+           L 902,315 L 736,315 L 736,310 L 713,310 L 713,300 L 723,290
+           L 736,290 L 736,236 L 716,236 Z"
+        fill="url(#schnitt-schraffur)" stroke="#4a545c" stroke-width="4" stroke-linejoin="round"/>
+
+  <path d="M 902,415 L 902,429 L 750,429 L 750,506 L 730,506 L 730,564
+           L 716,564 L 716,494 L 713,494 L 713,486 L 723,476 L 736,476
+           L 736,415 Z"
+        fill="#b9c0c6"/>
+  <path d="M 902,415 L 902,429 L 750,429 L 750,506 L 730,506 L 730,564
+           L 716,564 L 716,494 L 713,494 L 713,486 L 723,476 L 736,476
+           L 736,415 Z"
+        fill="url(#schnitt-schraffur)" stroke="#4a545c" stroke-width="4" stroke-linejoin="round"/>
+
+  <!-- Flansche oben und unten -->
+  <rect x="652" y="166" width="88" height="12" rx="3" fill="#b9c0c6" stroke="#4a545c" stroke-width="4"/>
+  <rect x="652" y="552" width="88" height="12" rx="3" fill="#b9c0c6" stroke="#4a545c" stroke-width="4"/>
+
+  <!-- 3. Druckventil rechts (OFFEN im Ausgangszustand / Drucktakt) -->
+  <line x1="658" y1="240" x2="734" y2="240" stroke="#4a545c" stroke-width="3" stroke-dasharray="10 6"/>
+  <rect x="690" y="236" width="12" height="8" rx="2" fill="#4a545c"/>
+  <g class="feder-druck-rechts" transform="translate(0, 240) scale(1, 0.467) translate(0, -240)">
+    <path d="M 696,242 L 688,248 L 704,255 L 688,262 L 704,269 L 688,276 L 696,282"
+          fill="none" stroke="#4a545c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g class="druckventil-rechts" transform="translate(0, -24)">
+    <path d="M 673,283 L 719,283 L 719,291 L 712,300 L 680,300 L 673,291 Z"
+          fill="#8a96a0" stroke="#4a545c" stroke-width="3.5" stroke-linejoin="round"/>
+  </g>
+
+  <!-- 4. Saugventil rechts (GESCHLOSSEN) -->
+  <line x1="658" y1="426" x2="734" y2="426" stroke="#4a545c" stroke-width="3" stroke-dasharray="10 6"/>
+  <rect x="690" y="422" width="12" height="8" rx="2" fill="#4a545c"/>
+  <path d="M 696,428 L 688,434 L 704,441 L 688,448 L 704,455 L 688,462 L 696,469"
+        fill="none" stroke="#4a545c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 673,469 L 719,469 L 719,477 L 712,486 L 680,486 L 673,477 Z"
+        fill="#8a96a0" stroke="#4a545c" stroke-width="3.5" stroke-linejoin="round"/>
+  <line x1="673" y1="477" x2="680" y2="486" stroke="#22262a" stroke-width="3.5" stroke-linecap="round"/>
+  <line x1="719" y1="477" x2="712" y2="486" stroke="#22262a" stroke-width="3.5" stroke-linecap="round"/>
+
+  <!-- 5. Kolben und Kolbenstange rechts (Ausgangszustand: weit links = kleines Volumen) -->
+  <g class="kolben-rechts">
+    <rect x="824" y="354" width="88" height="22" rx="2" fill="#8a96a0" stroke="#4a545c" stroke-width="3.5"/>
+    <rect x="782" y="317" width="44" height="96" rx="3" fill="#8a96a0" stroke="#4a545c" stroke-width="4"/>
+    <rect x="791" y="316" width="7" height="6" rx="1" fill="#22262a"/>
+    <rect x="810" y="316" width="7" height="6" rx="1" fill="#22262a"/>
+    <rect x="791" y="408" width="7" height="6" rx="1" fill="#22262a"/>
+    <rect x="810" y="408" width="7" height="6" rx="1" fill="#22262a"/>
+  </g>
+
+  <!-- 6. Produktfluss und Kolben-Bewegungsrichtung (Drucktakt) -->
+  <g class="fluss-rechts">
+    <path class="fluss-strich" d="M 766,352 L 714,352 C 696,352 690,342 690,322 L 690,298 C 690,288 666,286 666,268 C 666,254 683,252 683,238 L 683,222"
+          fill="none" stroke="#134061" stroke-width="5" stroke-linecap="round" stroke-dasharray="16 14" marker-end="url(#pfeil-klein)"/>
+    <path class="fluss-strich" d="M 766,382 L 722,382 C 708,382 702,366 702,336 L 702,298 C 702,288 726,286 726,268 C 726,254 709,252 709,238 L 709,222"
+          fill="none" stroke="#134061" stroke-width="5" stroke-linecap="round" stroke-dasharray="16 14" marker-end="url(#pfeil-klein)"/>
+    <path d="M 696,208 L 696,144"
+          fill="none" stroke="#134061" stroke-width="5" stroke-linecap="round" marker-end="url(#pfeil-fluss)"/>
+    <path d="M 964,336 L 916,336"
+          fill="none" stroke="#134061" stroke-width="5" stroke-linecap="round" marker-end="url(#pfeil-fluss)"/>
+  </g>
+</g>
+
+</svg>
