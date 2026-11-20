@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ventile am Bild erkennen</title>
+  <link rel="stylesheet" href="../style.css?v=3d62503e">
+  <style>
+    /* Geräteabbildungen brauchen mehr Platz als Piktogramme (Standard 96 px) */
+    .z-gross .z-current .z-img, .z-gross .z-row-card .z-img { max-height: 240px; }
+    .z-gross .z-card .z-img { max-height: 72px; max-width: 110px; }
+  </style>
+</head>
+<body>
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · a.1</span>
+    <h1>Ventile am Bild erkennen</h1>
+    <p>Ordnen Sie jede Abbildung dem richtigen Ventil zu.</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+<main class="z-wrap z-gross">
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+  <div id="zuordnung"></div>
+</main>
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+<script src="../assets/zuordnung.js?v=82b06139"></script>
+<script>
+Zuordnung.init({
+  stufen: ['zuordnen', 'anklicken', 'eintippen'],
+  gruppen: [
+    { key: 'hand', label: 'Klappenventil (von Hand)', keys: ['klappenventil', 'scheibenventil', 'handklappenventil', 'klappenventil von hand'] },
+    { key: 'umschalt', label: 'Zwei mit einer Stange gekoppelte Klappenventile (Umschaltkombination)', keys: ['umschaltkombination', 'zwei klappenventile', 'gekoppelte klappenventile', 'klappenventile als umschaltkombination', 'umschaltung', 'umschaltfunktion'] },
+    { key: 'pneuklappe', label: 'Pneumatisches Klappenventil', keys: ['pneumatisches klappenventil', 'pneumatischesklappenventil', 'pneumatische klappenventil', 'klappenventil pneumatisch'] },
+    { key: 'absperr', label: 'Pneumatisches Sitzventil als Absperrventil', keys: ['absperrventil', 'absperr', 'sitzventil als absperrventil'] },
+    { key: 'wechsel', label: 'Pneumatisches Sitzventil als Wechselventil', keys: ['wechselventil', 'wechsel', 'sitzventil als wechselventil'] }
+  ],
+  karten: [
+    { img: 'ventile/a.1_Klappenventil_einzeln.png', alt: 'Abbildung 1', gruppe: 'hand' },
+    { img: 'ventile/a.1_Klappenventil_Umschaltfunktion.png', alt: 'Abbildung 2', gruppe: 'umschalt' },
+    { img: 'ventile/a.1_pneumatisches_Klappenventil_unnummeriert.png', alt: 'Abbildung 3', gruppe: 'pneuklappe' },
+    { img: 'ventile/a.1_pneumatisches_Sitzventil_Absperrfunktion_nummeriert.png', alt: 'Abbildung 4', gruppe: 'absperr' },
+    { img: 'ventile/a.1_pneumatisches_Sitzventil_Umschaltfunktion_nummeriert.png', alt: 'Abbildung 5', gruppe: 'wechsel' }
+  ],
+  intro: {
+    zuordnen: 'Tippen Sie auf das Ventil, zu dem die Abbildung unten gehört, oder ziehen Sie die Abbildung dorthin.',
+    anklicken: 'Klicken Sie pro Abbildung das richtige Ventil an.',
+    eintippen: 'Schreiben Sie zu jeder Abbildung das Ventil auf, zum Beispiel «Pneumatisches Klappenventil».'
+  }
+});
+</script>
+</body>
+</html>

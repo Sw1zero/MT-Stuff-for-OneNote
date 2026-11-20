@@ -1,0 +1,232 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="620" height="620" viewBox="20 0 620 620" font-family="Aptos, Calibri, sans-serif"><style>*{animation:none !important}</style>
+<defs>
+  <marker id="pfeil-haupt" markerWidth="16" markerHeight="14" refX="11" refY="7" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L16,7 L0,14 z" fill="#134061"/>
+  </marker>
+  <marker id="pfeil-hilfe" markerWidth="16" markerHeight="14" refX="11" refY="7" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L16,7 L0,14 z" fill="#484846"/>
+  </marker>
+  <marker id="pfeil-fluss" markerWidth="15" markerHeight="13" refX="10" refY="6.5" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L15,6.5 L0,13 z" fill="#134061"/>
+  </marker>
+</defs>
+
+<style>
+  .bewegt {
+    animation: hub 8s ease-in-out infinite;
+  }
+  .feder {
+    transform-origin: 445px 92px;
+    animation: stauchen 8s ease-in-out infinite;
+  }
+  .luft-sicht {
+    animation: drucksicht 8s ease-in-out infinite;
+  }
+  .luft-kammer {
+    transform-origin: 445px 274px;
+    animation: druckkammer 8s ease-in-out infinite;
+  }
+  .p-druckluft {
+    animation: pfeil-ein 8s ease-in-out infinite;
+  }
+  .p-atmosphaere {
+    animation: pfeil-aus 8s ease-in-out infinite;
+  }
+  .luft-ein-fluss {
+    animation: luft-ein-sicht 8s ease-in-out infinite, luft-lauf 0.8s linear infinite;
+  }
+  .luft-aus-fluss {
+    animation: luft-aus-sicht 8s ease-in-out infinite, luft-lauf 0.8s linear infinite;
+  }
+  .produkt-auslass {
+    animation: produkt-auf 8s ease-in-out infinite;
+  }
+  .fluss-gruppe {
+    animation: fluss-sicht 8s ease-in-out infinite;
+  }
+  .fluss-strich {
+    animation: fluss-lauf 1s linear infinite;
+  }
+
+  @keyframes hub {
+    0%, 12%   { transform: translateY(0px); }
+    30%, 62%  { transform: translateY(-48px); }
+    80%, 100% { transform: translateY(0px); }
+  }
+  @keyframes stauchen {
+    0%, 12%   { transform: scaleY(1); }
+    30%, 62%  { transform: scaleY(0.6); }
+    80%, 100% { transform: scaleY(1); }
+  }
+  @keyframes drucksicht {
+    0%, 10%   { opacity: 0; }
+    16%, 62%  { opacity: 0.55; }
+    80%, 100% { opacity: 0; }
+  }
+  @keyframes druckkammer {
+    0%, 12%   { transform: scaleY(0.4286); }
+    30%, 62%  { transform: scaleY(1); }
+    80%, 100% { transform: scaleY(0.4286); }
+  }
+  @keyframes pfeil-ein {
+    0%, 10%   { opacity: 0.55; }
+    14%, 60%  { opacity: 1; }
+    66%, 100% { opacity: 0.55; }
+  }
+  @keyframes pfeil-aus {
+    0%, 60%   { opacity: 0.55; }
+    64%, 80%  { opacity: 1; }
+    86%, 100% { opacity: 0.55; }
+  }
+  @keyframes luft-ein-sicht {
+    0%, 11%   { opacity: 0; }
+    14%, 28%  { opacity: 1; }
+    32%, 100% { opacity: 0; }
+  }
+  @keyframes luft-aus-sicht {
+    0%, 61%   { opacity: 0; }
+    64%, 78%  { opacity: 1; }
+    82%, 100% { opacity: 0; }
+  }
+  @keyframes luft-lauf {
+    from { stroke-dashoffset: 36; }
+    to   { stroke-dashoffset: 0; }
+  }
+  @keyframes produkt-auf {
+    0%, 16%   { opacity: 0; }
+    28%, 64%  { opacity: 1; }
+    76%, 100% { opacity: 0; }
+  }
+  @keyframes fluss-sicht {
+    0%, 24%   { opacity: 0; }
+    30%, 62%  { opacity: 1; }
+    68%, 100% { opacity: 0; }
+  }
+  @keyframes fluss-lauf {
+    from { stroke-dashoffset: 68; }
+    to   { stroke-dashoffset: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bewegt, .feder, .luft-sicht, .luft-kammer,
+    .p-druckluft, .p-atmosphaere, .luft-ein-fluss, .luft-aus-fluss,
+    .produkt-auslass, .fluss-gruppe, .fluss-strich {
+      animation: none !important;
+    }
+  }
+</style>
+
+<!-- Hintergrund -->
+<rect x="0" y="0" width="1100" height="620" fill="#ffffff"/>
+
+<!-- Bildbezeichnung -->
+<text x="36" y="44" font-size="26" fill="#484846">Pneumatisches Sitzventil</text>
+
+<!-- ==================== ANTRIEBSEINHEIT (4) / PNEUMATIKZYLINDER (6) ==================== -->
+<!-- Luftanschluss-Stutzen links -->
+<rect x="324" y="244" width="38" height="24" fill="#b9c0c6" stroke="#4a545c" stroke-width="4"/>
+
+<!-- Zylindergehäuse aussen -->
+<rect x="357" y="78" width="176" height="210" rx="10" fill="#b9c0c6" stroke="#4a545c" stroke-width="4"/>
+
+<!-- Zylinder-Innenraum -->
+<rect x="371" y="92" width="148" height="182" rx="3" fill="#eef1f3" stroke="#4a545c" stroke-width="3"/>
+
+<!-- Bohrung durch Zylinderwand für Luftstutzen -->
+<rect x="322" y="250" width="54" height="12" fill="#eef1f3"/>
+<line x1="324" y1="250" x2="371" y2="250" stroke="#4a545c" stroke-width="3"/>
+<line x1="324" y1="262" x2="371" y2="262" stroke="#4a545c" stroke-width="3"/>
+
+<!-- Druckluft-Füllung (animiert) -->
+<g class="luft-sicht" opacity="0">
+  <rect x="324" y="251" width="50" height="10" fill="#69A9C9"/>
+  <rect class="luft-kammer" x="373" y="190" width="144" height="84" fill="#69A9C9"/>
+</g>
+
+<!-- Integrierte Feder -->
+<g class="feder">
+  <path d="M 405,94 L 485,94 L 400,104 L 490,114 L 400,124 L 490,134 L 400,144 L 490,154 L 400,164 L 490,174 L 400,184 L 490,194 L 400,204 L 485,210 L 405,210"
+        fill="none" stroke="#4a545c" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+</g>
+
+<!-- ==================== VERBINDUNGSLATERNE (offener Bereich) ==================== -->
+<rect x="374" y="288" width="18" height="74" fill="#b9c0c6" stroke="#4a545c" stroke-width="4"/>
+<rect x="498" y="288" width="18" height="74" fill="#b9c0c6" stroke="#4a545c" stroke-width="4"/>
+
+<!-- ==================== VENTILGEHÄUSE (1) & VENTILSITZ (2) ==================== -->
+<!-- Gehäuse-Aussenumriss (inkl. Zulauf- und Ablaufstutzen) -->
+<path d="M 365,362 L 525,362 L 525,408 L 600,408 L 600,480 L 525,480 L 525,576 L 365,576 L 365,568 L 290,568 L 290,496 L 365,496 Z"
+      fill="#b9c0c6" stroke="#4a545c" stroke-width="4" stroke-linejoin="round"/>
+
+<!-- Flansche links und rechts -->
+<rect x="280" y="486" width="12" height="92" rx="3" fill="#b9c0c6" stroke="#4a545c" stroke-width="4"/>
+<rect x="598" y="398" width="12" height="92" rx="3" fill="#b9c0c6" stroke="#4a545c" stroke-width="4"/>
+
+<!-- Unterer Raum + Zulaufstutzen links (Produkt steht an) -->
+<path d="M 278,508 L 379,508 L 379,496 L 511,496 L 511,562 L 379,562 L 379,556 L 278,556 Z" fill="#c9dce6"/>
+
+<!-- Oberer Raum + Ablaufstutzen rechts + Sitzöffnung (Ruhezustand leer) -->
+<path d="M 379,376 L 511,376 L 511,420 L 612,420 L 612,468 L 511,468 L 511,476 L 483,476 L 473,496 L 417,496 L 407,476 L 379,476 Z" fill="#eef1f3"/>
+
+<!-- Produktfüllung im oberen Raum + Ablauf (animiert bei geöffnetem Ventil) -->
+<path class="produkt-auslass" d="M 379,376 L 511,376 L 511,420 L 612,420 L 612,468 L 511,468 L 511,476 L 483,476 L 473,496 L 417,496 L 407,476 L 379,476 Z"
+      fill="#c9dce6" opacity="0"/>
+
+<!-- Ventilsitz-Trennwand (2) -->
+<path d="M 377,476 L 407,476 L 417,496 L 377,496 Z" fill="#b9c0c6"/>
+<path d="M 513,476 L 483,476 L 473,496 L 513,496 Z" fill="#b9c0c6"/>
+
+<!-- Innenkonturen Ventilgehäuse und Ventilsitz -->
+<g fill="none" stroke="#4a545c" stroke-width="4" stroke-linejoin="round">
+  <!-- Oberer Raum + Ablauf -->
+  <path d="M 610,420 L 511,420 L 511,376 L 379,376 L 379,476 L 407,476 L 417,496 L 379,496 L 379,508 L 280,508"/>
+  <path d="M 610,468 L 511,468 L 511,476 L 483,476 L 473,496 L 511,496 L 511,562 L 379,562 L 379,556 L 280,556"/>
+</g>
+
+<!-- ==================== PRODUKTFLUSS (animiert, nur bei offenem Ventil) ==================== -->
+<g class="fluss-gruppe" opacity="0">
+  <path class="fluss-strich" d="M 286,522 L 408,522 C 430,522 438,508 438,486 C 438,466 456,460 482,454 C 498,450 510,438 532,438 L 602,438"
+        fill="none" stroke="#134061" stroke-width="5" stroke-linecap="round" stroke-dasharray="16 18" marker-end="url(#pfeil-fluss)"/>
+  <path class="fluss-strich" d="M 286,542 L 424,542 C 448,542 458,524 458,494 C 458,472 476,462 508,456 L 602,456"
+        fill="none" stroke="#134061" stroke-width="5" stroke-linecap="round" stroke-dasharray="16 18" marker-end="url(#pfeil-fluss)"/>
+</g>
+
+<!-- ==================== BEWEGLICHE EINHEIT: KOLBEN + KOLBENSTANGE (5) + VENTILKEGEL (3) ==================== -->
+<g class="bewegt">
+  <!-- Kolbenstange (5) -->
+  <rect x="436" y="236" width="18" height="226" fill="#8a96a0" stroke="#4a545c" stroke-width="4"/>
+
+  <!-- Kolben im Pneumatikzylinder -->
+  <rect x="373" y="212" width="144" height="26" rx="3" fill="#8a96a0" stroke="#4a545c" stroke-width="4"/>
+  <!-- Kolbendichtungen -->
+  <rect x="371" y="218" width="5" height="14" rx="2" fill="#22262a"/>
+  <rect x="514" y="218" width="5" height="14" rx="2" fill="#22262a"/>
+
+  <!-- Ventilkegel (3) -->
+  <path d="M 403,460 L 487,460 L 487,468 L 473,496 L 417,496 L 403,468 Z"
+        fill="#134061" stroke="#134061" stroke-width="3" stroke-linejoin="round"/>
+</g>
+
+<!-- Statische Stangenführungen / Dichtungen (über der Kolbenstange) -->
+<rect x="430" y="276" width="6" height="10" rx="1" fill="#22262a"/>
+<rect x="454" y="276" width="6" height="10" rx="1" fill="#22262a"/>
+<rect x="430" y="364" width="6" height="10" rx="1" fill="#22262a"/>
+<rect x="454" y="364" width="6" height="10" rx="1" fill="#22262a"/>
+
+<!-- ==================== DRUCKLUFT & ATMOSPHÄRE (LINKS) ==================== -->
+<!-- Druckluft-Pfeil (einströmend) -->
+<g class="p-druckluft">
+  <path d="M 248,236 Q 286,236 314,251" fill="none" stroke="#134061" stroke-width="5" stroke-linecap="round" marker-end="url(#pfeil-haupt)"/>
+</g>
+<path class="luft-ein-fluss" d="M 248,236 Q 286,236 314,251" fill="none" stroke="#69A9C9" stroke-width="4" stroke-dasharray="8 10" stroke-linecap="round" opacity="0"/>
+<text x="236" y="244" font-size="26" font-weight="bold" text-anchor="end" fill="#134061">Druckluft</text>
+
+<!-- Atmosphäre-Pfeil (Luft entweicht) -->
+<g class="p-atmosphaere">
+  <path d="M 318,262 Q 290,288 250,288" fill="none" stroke="#484846" stroke-width="5" stroke-linecap="round" marker-end="url(#pfeil-hilfe)"/>
+</g>
+<path class="luft-aus-fluss" d="M 318,262 Q 290,288 250,288" fill="none" stroke="#69A9C9" stroke-width="4" stroke-dasharray="8 10" stroke-linecap="round" opacity="0"/>
+<text x="236" y="296" font-size="26" text-anchor="end" fill="#484846">Atmosphäre</text>
+<text x="236" y="326" font-size="23" text-anchor="end" fill="#484846">(Luft entweicht)</text>
+
+</svg>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pneumatisches Sitzventil beschriften</title>
+  <link rel="stylesheet" href="../style.css?v=3d62503e">
+</head>
+<body>
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · a.1</span>
+    <h1>Sitzventil beschriften</h1>
+    <p>Benennen Sie die Bauteile eines pneumatischen Sitzventils: zuordnen, im Bild zeigen und eintippen.</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+<main class="z-wrap">
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+  <div id="zuordnung"></div>
+</main>
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+<script src="../assets/zuordnung.js?v=82b06139"></script>
+<script>
+Zuordnung.init({
+  stufen: ['zuordnen', 'zeigen', 'eintippen'],
+  beschriften: {
+    bild: "ventile/a.1_schema_sitzventil_nummern.svg",
+    bildLeer: "ventile/a.1_schema_sitzventil_leer.svg",
+    quelle: "Schema nach dem Lehrmittel a.1, Rohstoffe annehmen (pneumatische Sitzventile)",
+    treffer: 0.12,
+    teile: [
+      {n: 1, name: "Ventilgehäuse", keys: ["ventilgehaeuse", "ventilgehäuse", "gehaeuse", "gehäuse"], zonen: [{cx: 81.5, cy: 91.6}, {cx: 56.5, cy: 67.7}, {cx: 87.1, cy: 71.6}, {cx: 48.4, cy: 85.8}, {cx: 68.5, cy: 91.8}]},
+      {n: 2, name: "Ventilsitz", keys: ["ventilsitz", "sitz"], zonen: [{cx: 75.8, cy: 78.7}, {cx: 60.0, cy: 78.5}]},
+      {n: 3, name: "Ventilkegel", keys: ["ventilkegel", "kegel"], zonen: [{cx: 68.5, cy: 76.0}]},
+      {n: 4, name: "Antriebseinheit", keys: ["antriebseinheit", "antrieb", "antriebszylinder"], zonen: [{cx: 78.5, cy: 52.4}, {cx: 82.9, cy: 29.5}]},
+      {n: 5, name: "Kolbenstange", keys: ["kolbenstange", "stange"], zonen: [{cx: 70.6, cy: 52.6}, {cx: 68.5, cy: 67.7}]},
+      {n: 6, name: "Pneumatikzylinder mit integrierter Feder", keys: ["pneumatikzylinder mit integrierter feder", "pneumatikzylinder", "zylinder mit feder", "zylinder", "feder"], zonen: [{cx: 55.8, cy: 17.1}, {cx: 66.1, cy: 22.6}]}
+    ]
+  }
+});
+</script>
+</body>
+</html>

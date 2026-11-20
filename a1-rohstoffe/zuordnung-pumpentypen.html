@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pumpentypen zuordnen</title>
+  <link rel="stylesheet" href="../style.css?v=3d62503e">
+</head>
+<body>
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · a.1</span>
+    <h1>Pumpentypen</h1>
+    <p>Ordnen Sie Eigenschaften und Einsatz dem richtigen Pumpentyp zu.</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+<main class="z-wrap">
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+  <div id="zuordnung"></div>
+</main>
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+<script src="../assets/zuordnung.js?v=82b06139"></script>
+<script>
+Zuordnung.init({
+  stufen: ['zuordnen', 'anklicken', 'eintippen'],
+  gruppen: [
+    { key: 'zentrifugal', label: 'Zentrifugalpumpe', keys: ['zentrifugalpumpe', 'zentrifugal', 'kreiselpumpe', 'kreisel'] },
+    { key: 'seitenkanal', label: 'Seitenkanalpumpe', keys: ['seitenkanalpumpe', 'seitenkanal', 'flüssigkeitsringpumpe', 'fluessigkeitsringpumpe', 'flüssigkeitsring', 'fluessigkeitsring'] },
+    { key: 'impeller', label: 'Impellerpumpe', keys: ['impellerpumpe', 'impeller'] },
+    { key: 'exzenter', label: 'Exzenterschneckenpumpe', keys: ['exzenterschneckenpumpe', 'exzenterschnecke', 'exzenter', 'schneckenpumpe'] },
+    { key: 'kolben', label: 'Kolbenpumpe', keys: ['kolbenpumpe', 'kolben'] },
+    { key: 'dreh', label: 'Dreh- oder Kreiskolbenpumpe', keys: ['drehkolbenpumpe', 'kreiskolbenpumpe', 'dreh- oder kreiskolbenpumpe', 'drehkolben', 'kreiskolben', 'zahnradpumpe', 'kapselpumpe'] }
+  ],
+  karten: [
+    { text: 'Wandelt Geschwindigkeitsenergie in Druckenergie um', gruppe: 'zentrifugal' },
+    { text: 'Nicht selbstansaugend', gruppe: 'zentrifugal' },
+    { text: 'Einfache Bauweise und gutes Preis-/Leistungsverhältnis', gruppe: 'zentrifugal' },
+    { text: 'Selbstansaugend, wenn das Gehäuse etwa zur Hälfte mit Flüssigkeit gefüllt ist', gruppe: 'seitenkanal' },
+    { text: 'Rund doppelt so hoher Stromverbrauch wie eine Zentrifugalpumpe mit gleicher Leistung', gruppe: 'seitenkanal' },
+    { text: 'Reinigungsrücklaufpumpe', gruppe: 'seitenkanal' },
+    { text: 'Elastische Lamellen streifen am Gehäuserand', gruppe: 'impeller' },
+    { text: 'Teures Verschleissteil aus Gummi', gruppe: 'impeller' },
+    { text: 'Ungeeignet für CIP-Reinigung bei über 70 °C', gruppe: 'impeller' },
+    { text: 'Rotor wie eine Rundgewindeschraube, der sich im Stator dreht', gruppe: 'exzenter' },
+    { text: 'Joghurt mit Fruchtstücken und Quark', gruppe: 'exzenter' },
+    { text: 'Stator aus Kunststoff, wird bei Trockenlauf zerstört', gruppe: 'exzenter' },
+    { text: 'Pulsierende Förderung', gruppe: 'kolben' },
+    { text: 'Dosierpumpe und Kompressor', gruppe: 'kolben' },
+    { text: 'Homogenisator und Hochdruckreiniger', gruppe: 'kolben' },
+    { text: 'Auch mit Zahnrädern oder Kapseln gebaut', gruppe: 'dreh' },
+    { text: 'Sehr teuer (Präzisionspumpe)', gruppe: 'dreh' },
+    { text: 'Fördert Butter', gruppe: 'dreh' }
+  ],
+  intro: {
+    zuordnen: 'Tippen Sie auf den Pumpentyp, zu dem die Eigenschaft oder der Einsatz unten gehört, oder ziehen Sie die Karte dorthin.',
+    anklicken: 'Klicken Sie pro Karte den richtigen Pumpentyp an.',
+    eintippen: 'Schreiben Sie zu jeder Karte den Pumpentyp auf, zum Beispiel «Kolbenpumpe».'
+  }
+});
+</script>
+</body>
+</html>

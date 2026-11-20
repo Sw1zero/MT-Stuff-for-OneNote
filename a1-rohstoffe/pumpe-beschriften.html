@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pumpe beschriften</title>
+  <link rel="stylesheet" href="../style.css?v=3d62503e">
+</head>
+<body>
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · a.1</span>
+    <h1>Pumpe beschriften</h1>
+    <p>Benennen Sie die Bauteile einer Pumpe: zuordnen, im Bild zeigen und eintippen.</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+<main class="z-wrap">
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+  <div id="zuordnung"></div>
+</main>
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+<script src="../assets/zuordnung.js?v=82b06139"></script>
+<script>
+Zuordnung.init({
+  stufen: ['zuordnen', 'zeigen', 'eintippen'],
+  beschriften: {
+    bild: "images/pumpen/a.1_Pumpe_Grundaufbau_nummeriert.png",
+    bildLeer: "images/pumpen/a.1_Pumpe_Grundaufbau_unnummeriert.png",
+    quelle: "Bildquelle: Lehrmittel a.1, Rohstoffe annehmen",
+    treffer: 0.12,
+    teile: [
+      {n: 1, name: "Elektromotor", keys: ["elektromotor", "motor"], zonen: [{cx: 27, cy: 44}, {cx: 12, cy: 48}]},
+      {n: 2, name: "Druckstutzen", keys: ["druckstutzen"], zonen: [{cx: 68, cy: 23}]},
+      {n: 3, name: "Pumpengehäuse", keys: ["pumpengehaeuse", "pumpengehäuse", "gehaeuse", "gehäuse"], zonen: [{cx: 76, cy: 36}, {cx: 73, cy: 67}]},
+      {n: 4, name: "Saugstutzen", keys: ["saugstutzen"], zonen: [{cx: 85, cy: 48}]},
+      {n: 5, name: "Laufrad", keys: ["laufrad"], zonen: [{cx: 71.5, cy: 39}, {cx: 70.5, cy: 59.5}]},
+      {n: 6, name: "Gleitringdichtung", keys: ["gleitringdichtung", "gleitring", "dichtung"], zonen: [{cx: 66, cy: 55}]}
+    ]
+  }
+});
+</script>
+</body>
+</html>

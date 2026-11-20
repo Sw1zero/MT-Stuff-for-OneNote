@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wahr oder Falsch – Pumpen</title>
+  <link rel="stylesheet" href="../style.css?v=3d62503e">
+</head>
+<body>
+
+<header class="bzwu-header">
+  <div class="header-text">
+  <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · a.1</span>
+  <h1>Wahr oder Falsch?</h1>
+  <p>Pumpen · Wischen Sie nach rechts für wahr, nach links für falsch</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+
+<main class="q-wrap">
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+  <div id="quiz"></div>
+</main>
+
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+
+<script src="../assets/quiz.js?v=6c3e9a7b"></script>
+<script>
+var CARDS = [
+  {
+    statement: 'Alle Pumpen erzeugen mit ihrer Vorrichtung im Gehäuse einen Unterdruck. Der Luftdruck drückt die Flüssigkeit dann in die Pumpe.',
+    answer: true,
+    explanation: 'Das ist das gemeinsame Grundprinzip. Die Vorrichtung kann ein Kreisel, ein Kolben, ein Zahnrad oder eine Membrane sein.'
+  },
+  {
+    statement: 'Die Zentrifugalpumpe ist selbstansaugend.',
+    answer: false,
+    explanation: 'Das ist ein Nachteil der Zentrifugalpumpe: Sie ist nicht selbstansaugend.'
+  },
+  {
+    statement: 'In der Zentrifugalpumpe wird Geschwindigkeitsenergie in Druckenergie umgewandelt.',
+    answer: true,
+    explanation: 'Das Laufrad beschleunigt die Flüssigkeit. Im Pumpengehäuse und vor allem beim Druckstutzen wird die Geschwindigkeit in Druck umgewandelt.'
+  },
+  {
+    statement: 'Eine Zentrifugalpumpe eignet sich nicht für Käsebruch.',
+    answer: false,
+    explanation: 'Mit einem speziellen Laufrad und Gehäuse (Spezialausführung) kann auch Käsebruch gefördert werden.'
+  },
+  {
+    statement: 'Die Seitenkanalpumpe saugt auch ohne Füllung des Gehäuses von selbst an.',
+    answer: false,
+    explanation: 'Sie ist nur selbstansaugend, wenn das Gehäuse etwa zur Hälfte mit Flüssigkeit gefüllt ist.'
+  },
+  {
+    statement: 'Die Impellerpumpe saugt auch ohne vorheriges Einfüllen von Flüssigkeit selbst an.',
+    answer: true,
+    explanation: 'Sie ist selbstansaugend und kann auch Luft fördern.'
+  },
+  {
+    statement: 'Bei Undichtheit ersetzen Sie nur die undichte Gleitringdichtung.',
+    answer: false,
+    explanation: 'Sie ersetzen immer alle Gleitringdichtungen, periodisch oder bei Undichtheit.'
+  },
+  {
+    statement: 'Bei Trockenlauf wird der Stator der Exzenterschneckenpumpe zerstört.',
+    answer: true,
+    explanation: 'Der Rotor besteht aus Chromnickelstahl. Der Stator aus Kunststoff ist das teurere Teil und wird bei Trockenlauf zerstört.'
+  },
+  {
+    statement: 'Die Exzenterschneckenpumpe eignet sich für Joghurt mit Fruchtstücken und für Quark.',
+    answer: true,
+    explanation: 'Sie fördert hochviskose Produkte mit Feststoffanteilen schonend und erreicht hohe Drücke.'
+  },
+  {
+    statement: 'Eine Kolbenpumpe mit einem Kolben fördert gleichmässig.',
+    answer: false,
+    explanation: 'Bei der Einkolben-Ausführung ist die Förderung pulsierend.'
+  },
+  {
+    statement: 'Eine Kolbenpumpe darf gegen eine geschlossene Druckleitung arbeiten.',
+    answer: false,
+    explanation: 'Kolbenpumpen fördern zwangsweise. Sie dürfen nie gegen geschlossene Druckleitungen arbeiten.'
+  },
+  {
+    statement: 'Die Dreh- oder Kreiskolbenpumpe ist eine besonders günstige Pumpe.',
+    answer: false,
+    explanation: 'Sie ist sehr teuer, weil sie eine Präzisionspumpe ist.'
+  },
+  {
+    statement: 'Wenn man den Förderstrom drosselt, baut man die Drosselung in die Druckleitung ein.',
+    answer: true,
+    explanation: 'Blenden oder Drosselventile gehören immer in die Druckleitung. Zwangsweise fördernde Pumpen dürfen Sie aber nicht drosseln.'
+  },
+  {
+    statement: 'Die Fördermenge lässt sich stufenlos regulieren, indem man die Drehzahl des Elektromotors mit einem Frequenzumformer verändert.',
+    answer: true,
+    explanation: 'So lässt sich das Produkt möglichst schonend pumpen.'
+  },
+  {
+    statement: 'Luftkissen in der Saugleitung müssen Sie verhindern.',
+    answer: true,
+    explanation: 'Luftkissen und Lufteinzüge in der Saugleitung gehören zu den Grundregeln beim Betrieb von Pumpen.'
+  },
+  {
+    statement: 'Pumpen müssen Sie nur bei sichtbarer Verschmutzung reinigen.',
+    answer: false,
+    explanation: 'Reinigen Sie die Pumpen nach jedem Gebrauch und überprüfen Sie die Sauberkeit visuell und mit Stufenkontrollen.'
+  }
+];
+
+Quiz.init({ wahrFalsch: true, questions: CARDS, messages: { excellent: 'Sie kennen die Pumpen sehr gut.' } });
+</script>
+
+</body>
+</html>

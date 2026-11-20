@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pumpen am Bild erkennen</title>
+  <link rel="stylesheet" href="../style.css?v=3d62503e">
+  <style>
+    /* Geräteabbildungen brauchen mehr Platz als Piktogramme (Standard 96 px) */
+    .z-gross .z-current .z-img, .z-gross .z-row-card .z-img { max-height: 240px; }
+    .z-gross .z-card .z-img { max-height: 72px; max-width: 110px; }
+  </style>
+</head>
+<body>
+<header class="bzwu-header">
+  <div class="header-text">
+    <span class="school-badge">BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · a.1</span>
+    <h1>Pumpen am Bild erkennen</h1>
+    <p>Ordnen Sie jede Abbildung dem richtigen Pumpentyp zu.</p>
+  </div>
+  <div class="header-logos">
+    <img src="../assets/logos/bzwu.png" alt="BZWU" class="header-logo">
+    <img src="../assets/logos/milchtechnologen.svg" alt="Milchtechnologen" class="header-logo">
+  </div>
+</header>
+<main class="z-wrap z-gross">
+  <a class="back-link" href="../index.html">&#8592; Alle Lerntools</a>
+  <div id="zuordnung"></div>
+</main>
+<footer class="bzwu-footer">
+  BZWU Wil-Uzwil · Milchtechnologin / Milchtechnologe EFZ · Philipp Neukomm
+</footer>
+<script src="../assets/zuordnung.js?v=82b06139"></script>
+<script>
+Zuordnung.init({
+  stufen: ['zuordnen', 'anklicken', 'eintippen'],
+  gruppen: [
+    { key: 'zentrifugal', label: 'Zentrifugalpumpe', keys: ['zentrifugalpumpe', 'zentrifugal', 'kreiselpumpe', 'kreisel'] },
+    { key: 'seitenkanal', label: 'Seitenkanalpumpe', keys: ['seitenkanalpumpe', 'seitenkanal', 'flüssigkeitsringpumpe', 'fluessigkeitsringpumpe', 'flüssigkeitsring', 'fluessigkeitsring'] },
+    { key: 'impeller', label: 'Impellerpumpe', keys: ['impellerpumpe', 'impeller'] },
+    { key: 'exzenter', label: 'Exzenterschneckenpumpe', keys: ['exzenterschneckenpumpe', 'exzenterschnecke', 'exzenter', 'schneckenpumpe'] },
+    { key: 'kolben', label: 'Kolbenpumpe', keys: ['kolbenpumpe', 'kolben'] },
+    { key: 'dreh', label: 'Dreh- oder Kreiskolbenpumpe', keys: ['drehkolbenpumpe', 'kreiskolbenpumpe', 'dreh- oder kreiskolbenpumpe', 'drehkolben', 'kreiskolben', 'zahnradpumpe', 'kapselpumpe'] }
+  ],
+  karten: [
+    { img: 'images/pumpen/a.1_Zentrifugalpumpe_aussen.png', alt: 'Abbildung 1', gruppe: 'zentrifugal' },
+    { img: 'images/pumpen/a.1_Fluessigkeitsringpumpe.png', alt: 'Abbildung 2', gruppe: 'seitenkanal' },
+    { img: 'images/pumpen/a.1_Impellerpumpe.png', alt: 'Abbildung 3', gruppe: 'impeller' },
+    { img: 'images/pumpen/a.1_Exzenterschneckenpumpe.png', alt: 'Abbildung 4', gruppe: 'exzenter' },
+    { img: 'images/pumpen/a.1_Kolbenpumpe.png', alt: 'Abbildung 5', gruppe: 'kolben' },
+    { img: 'images/pumpen/a.1_Dreh-_oder_Kreiselpumpe.png', alt: 'Abbildung 6', gruppe: 'dreh' },
+    { img: 'images/pumpen/a.1_Produktefluss_Drehpumpe.png', alt: 'Abbildung 7', gruppe: 'dreh' }
+  ],
+  intro: {
+    zuordnen: 'Tippen Sie auf den Pumpentyp, zu dem die Abbildung unten gehört, oder ziehen Sie die Abbildung dorthin.',
+    anklicken: 'Klicken Sie pro Abbildung den richtigen Pumpentyp an.',
+    eintippen: 'Schreiben Sie zu jeder Abbildung den Pumpentyp auf, zum Beispiel «Kolbenpumpe».'
+  }
+});
+</script>
+</body>
+</html>
